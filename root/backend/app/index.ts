@@ -1,10 +1,12 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
 import Routes from "./routes/routes";
+import { enhanceResponse } from "../libs/expressEnhancer";
 
 export default class Server {
   constructor(app: Application) {
     this.config(app);
+    app.use(enhanceResponse);
     new Routes(app);
     app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
       console.error("Error details: " + error);

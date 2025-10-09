@@ -17,7 +17,7 @@ class UserService implements IUserService {
           email: "email",
           password: "123",
         }
-      ], "Success Message");
+      ], "Successfully get all users");
     } catch (error) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Data not found");
     }
