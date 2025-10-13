@@ -62,12 +62,7 @@ cd SEG2202SE/root
 ### 2. Set Up the MySQL Database
 1. Launch XAMPP Control Panel and start MySQL.
 2. Open your browser and go to http://localhost/phpmyadmin.
-3. Create a new database called:
-```bash
-subjectenrollmentdatabase
-```
-4. Import the SQL schema:
-- Click on the okujobseekerdatabase database in phpMyAdmin.
+3. Import the SQL schema:
 - Copy the `database.txt` file from the **/database** folder.
 - Go to the SQL tab and paste it.
 
