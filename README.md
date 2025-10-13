@@ -56,7 +56,6 @@ Follow these steps to set up the **University Subject Enrollment Platform** on y
 
 ```bash
 git clone https://github.com/iZ86/SEG2202SE.git
-cd SEG2202SE/root
 ```
 
 ### 2. Set Up the MySQL Database
