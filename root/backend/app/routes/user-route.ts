@@ -11,7 +11,7 @@ class UserRoute {
   }
 
   initializeRoutes() {
-    this.router.get("/users", asyncHandler(this.controller.getUsers));
+    this.router.get("/", asyncHandler(this.controller.getUsers));
   }
 }
 

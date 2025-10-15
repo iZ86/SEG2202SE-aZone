@@ -3,3 +3,8 @@ export enum ENUM_ERROR_CODE {
   INVALID_DATA = 'ERR_INVALID_DATA',
   ENTITY_NOT_FOUND = 'ERR_ENTITY_NOT_FOUND',
 }
+
+export enum ENUM_USER_ROLE {
+  STUDENT = "student",
+  ADMIN = "admin",
+}
