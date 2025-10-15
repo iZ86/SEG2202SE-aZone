@@ -14,6 +14,29 @@ CREATE TABLE REGISTERED_USER (
     status TINYINT(1) DEFAULT 1
 );
 
+CREATE TABLE PROGRAMME (
+    programmeId INT AUTO_INCREMENT PRIMARY KEY,
+    programmeName VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE INTAKE (
+    intakeId INT AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE SUBJECT (
+    subjectId INT AUTO_INCREMENT PRIMARY KEY,
+    subjectCode VARCHAR(50) NOT NULL,
+    subjectName VARCHAR(255) NOT NULL,
+    description TEXT,
+    creditHours INT
+);
+
+CREATE TABLE ENROLLMENT (
+    enrollmentId INT AUTO_INCREMENT PRIMARY KEY,
+    enrollmentStartDateTime DATETIME,
+    enrollmentEndDateTime DATETIME
+);
+
 CREATE TABLE ADMIN (
     adminId INT AUTO_INCREMENT PRIMARY KEY,
     FOREIGN KEY (adminId) REFERENCES REGISTERED_USER(userId)
@@ -34,15 +57,6 @@ CREATE TABLE COURSE (
         ON DELETE CASCADE
 );
 
-CREATE TABLE PROGRAMME (
-    programmeId INT AUTO_INCREMENT PRIMARY KEY,
-    programmeName VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE INTAKE (
-    intakeId INT AUTO_INCREMENT PRIMARY KEY
-);
-
 CREATE TABLE PROGRAMME_INTAKE (
     programmeIntakeId INT AUTO_INCREMENT PRIMARY KEY,
     programmeId INT,
@@ -55,14 +69,6 @@ CREATE TABLE PROGRAMME_INTAKE (
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
         ON DELETE CASCADE,
     UNIQUE (programmeIntakeId, programmeId, intakeId, semester)
-);
-
-CREATE TABLE SUBJECT (
-    subjectId INT AUTO_INCREMENT PRIMARY KEY,
-    subjectCode VARCHAR(50) NOT NULL,
-    subjectName VARCHAR(255) NOT NULL,
-    description TEXT,
-    creditHours INT
 );
 
 CREATE TABLE COURSE_SUBJECT (
@@ -85,25 +91,6 @@ CREATE TABLE STUDENT_SUBJECT (
     PRIMARY KEY (studentId, subjectId)
 );
 
-CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
-    studentId INT,
-    courseId INT,
-    programmeIntakeId INT,
-    FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
-        ON DELETE CASCADE,
-    PRIMARY KEY (studentId, courseId, programmeIntakeId)
-);
-
-CREATE TABLE ENROLLMENT (
-    enrollmentId INT AUTO_INCREMENT PRIMARY KEY,
-    enrollmentStartDateTime DATETIME,
-    enrollmentEndDateTime DATETIME
-);
-
 CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
     programmeIntakeId INT,
     enrollmentId INT,
@@ -122,4 +109,17 @@ CREATE TABLE ENROLLMENT_SUBJECT (
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
         ON DELETE CASCADE,
     PRIMARY KEY (enrollmentId, subjectId)
+);
+
+CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
+    studentId INT,
+    courseId INT,
+    programmeIntakeId INT,
+    FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
+        ON DELETE CASCADE,
+    PRIMARY KEY (studentId, courseId, programmeIntakeId)
 );
