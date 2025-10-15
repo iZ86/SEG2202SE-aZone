@@ -1,39 +1,40 @@
-import { Request as ExpressRequest, Response as ExpressResponse, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 
 /**
  * Extended Request interface
  * Allows accessing req.user.userId, etc.
- */
-export interface Request extends ExpressRequest {
-  user?: {
-    userId?: number;
-    isStudent?: boolean;
-    isAdmin?: boolean;
-  };
-}
-
-/**
+ *
  * Extended Response interface
  * Adds res.sendSuccess() and res.sendError.*
  */
-export interface Response extends ExpressResponse {
-  sendSuccess<T>(data: T, message?: string): void;
-  sendError: {
-    badRequest(message?: string, error?: any): void;
-    unauthorized(message?: string, error?: any): void;
-    forbidden(message?: string, error?: any): void;
-    notFound(message?: string, error?: any): void;
-    invalidContentType(message?: string, error?: any): void;
-    tooManyRequests(message?: string, error?: any): void;
-    internal(message?: string, error?: any): void;
-    maintenance(message?: string, error?: any): void;
-  };
+declare module 'express-serve-static-core' {
+  interface Request {
+    user: {
+      userId: number;
+      isStudent: boolean;
+      isAdmin: boolean;
+    };
+  }
+
+  interface Response {
+    sendSuccess<T>(data: T, message?: string): void;
+    sendError: {
+      badRequest(message?: string, error?: any): void;
+      unauthorized(message?: string, error?: any): void;
+      forbidden(message?: string, error?: any): void;
+      notFound(message?: string, error?: any): void;
+      invalidContentType(message?: string, error?: any): void;
+      tooManyRequests(message?: string, error?: any): void;
+      internal(message?: string, error?: any): void;
+      maintenance(message?: string, error?: any): void;
+    };
+  }
 }
 
 /**
  * Middleware to attach response helper methods.
  */
-export function enhanceResponse(req: Request, res: ExpressResponse, next: NextFunction) {
+export function enhanceResponse(req: Request, res: Response, next: NextFunction) {
   const r = res as Response;
 
   r.sendSuccess = function <T>(data: T, message = "Success") {

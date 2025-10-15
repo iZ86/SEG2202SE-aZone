@@ -28,24 +28,33 @@ CREATE TABLE STUDENT (
 
 CREATE TABLE COURSE (
     courseId INT AUTO_INCREMENT PRIMARY KEY,
-    courseName VARCHAR(255) NOT NULL
+    programmeId INT,
+    courseName VARCHAR(255) NOT NULL,
+    FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE PROGRAMME (
+    programmeId INT AUTO_INCREMENT PRIMARY KEY,
+    programmeName VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE INTAKE (
     intakeId INT AUTO_INCREMENT PRIMARY KEY
 );
 
-CREATE TABLE COURSE_INTAKE (
-    courseId INT,
+CREATE TABLE PROGRAMME_INTAKE (
+    programmeIntakeId INT AUTO_INCREMENT PRIMARY KEY,
+    programmeId INT,
     intakeId INT,
     semester INT,
     semesterStartPeriod DATE,
     semesterEndPeriod DATE,
-    FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
+    FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
         ON DELETE CASCADE,
-    PRIMARY KEY (courseId, intakeId, semester)
+    UNIQUE (programmeIntakeId, programmeId, intakeId, semester)
 );
 
 CREATE TABLE SUBJECT (
@@ -76,17 +85,17 @@ CREATE TABLE STUDENT_SUBJECT (
     PRIMARY KEY (studentId, subjectId)
 );
 
-CREATE TABLE STUDENT_COURSE_INTAKE (
+CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
     studentId INT,
     courseId INT,
-    intakeId INT,
+    programmeIntakeId INT,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
         ON DELETE CASCADE,
-    FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
+    FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
         ON DELETE CASCADE,
-	PRIMARY KEY (studentId, courseId, intakeId)
+    PRIMARY KEY (studentId, courseId, programmeIntakeId)
 );
 
 CREATE TABLE ENROLLMENT (
@@ -95,16 +104,14 @@ CREATE TABLE ENROLLMENT (
     enrollmentEndDateTime DATETIME
 );
 
-CREATE TABLE ENROLLMENT_COURSE_INTAKE (
+CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
+    programmeIntakeId INT,
     enrollmentId INT,
-    courseId INT,
-    intakeId INT,
-    semester INT,
+    FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
+        ON DELETE CASCADE,
     FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
         ON DELETE CASCADE,
-    FOREIGN KEY (courseId, intakeId, semester) REFERENCES COURSE_INTAKE(courseId, intakeId, semester)
-        ON DELETE CASCADE,
-    PRIMARY KEY (enrollmentId, courseId, intakeId, semester)
+    PRIMARY KEY (programmeIntakeId, enrollmentId)
 );
 
 CREATE TABLE ENROLLMENT_SUBJECT (
