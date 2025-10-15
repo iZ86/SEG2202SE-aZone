@@ -80,6 +80,7 @@ npm install
 Start both backend and frontend servers by just do this in the terminal:
 ```bash
 # cd back to /SEG2202SE/root/
+npm i
 npm run dev
 ```
 
