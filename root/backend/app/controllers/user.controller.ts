@@ -1,4 +1,4 @@
-import { Request, Response } from "../../libs/expressEnhancer";
+import { Request, Response } from "express";
 import UserService from "../services/user.service";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 

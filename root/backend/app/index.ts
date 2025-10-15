@@ -6,7 +6,6 @@ import { enhanceResponse } from "../libs/expressEnhancer";
 export default class Server {
   constructor(app: Application) {
     this.config(app);
-    app.use(enhanceResponse);
     new Routes(app);
     app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
       console.error("Error details: " + error);
@@ -22,6 +21,7 @@ export default class Server {
     };
     app.use(cors(corsOptions));
     app.use(express.json());
+    app.use(enhanceResponse);
     // Middleware to prevent invalid JSON format from crashing the server.
     app.use((err: Error, req: Request, res: Response, next: Function) => {
       if (err instanceof SyntaxError) {
