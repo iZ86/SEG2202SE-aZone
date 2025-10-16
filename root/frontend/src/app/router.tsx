@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import GuestLogin from "./routes/GuestLogin";
+import GuestLogin from "@routes/GuestLogin";
 
 const routes = [
   {
