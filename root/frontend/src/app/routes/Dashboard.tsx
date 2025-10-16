@@ -8,13 +8,13 @@ import StudentNavbar from "@components/StudentNavbar";
 
 /** TBD: A042 */
 export default function Dashboard() {
-    return (
-        <div className="flex flex-col min-h-screen">
-            <StudentNavbar />
-            <div>
-                {/** TODO: Fill in this with the appropriate components. */}
-            </div>
+  return (
+    <div className="flex flex-col min-h-screen">
+      <StudentNavbar />
+      <div>
+        {/** TODO: Fill in this with the appropriate components. */}
+      </div>
 
-        </div>
-    );
+    </div>
+  );
 }
