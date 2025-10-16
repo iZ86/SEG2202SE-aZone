@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth.model";
+import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth-model";
 
 interface IAuthRepository {
   getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData>;
