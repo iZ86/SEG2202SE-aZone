@@ -81,16 +81,6 @@ CREATE TABLE COURSE_SUBJECT (
     PRIMARY KEY (courseId, subjectId)
 );
 
-CREATE TABLE STUDENT_SUBJECT (
-    studentId INT,
-    subjectId INT,
-    FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
-        ON DELETE CASCADE,
-    PRIMARY KEY (studentId, subjectId)
-);
-
 CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
     programmeIntakeId INT,
     enrollmentId INT,
@@ -101,14 +91,47 @@ CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
     PRIMARY KEY (programmeIntakeId, enrollmentId)
 );
 
+CREATE TABLE CLASSTYPE (
+    classTypeId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    classType VARCHAR(255)
+);
+
+CREATE TABLE VENUE (
+    venueId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    venue VARCHAR(255)
+);
+
 CREATE TABLE ENROLLMENT_SUBJECT (
+    enrollmentSubjectId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     enrollmentId INT,
     subjectId INT,
+    classTypeId INT,
+    venueId INT,
     FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
         ON DELETE CASCADE,
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
         ON DELETE CASCADE,
-    PRIMARY KEY (enrollmentId, subjectId)
+    FOREIGN KEY (classTypeId) REFERENCES CLASSTYPE(classTypeId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE SUBJECT_STATUS (
+    subjectStatusId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    subjectStatus VARCHAR(255)
+);
+
+CREATE TABLE STUDENT_ENROLLMENT_SUBJECT (
+    studentId INT,
+    enrollmentSubjectId INT,
+    subjectStatusId INT,
+    FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (enrollmentSubjectId) REFERENCES ENROLLMENT_SUBJECT(enrollmentSubjectId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (subjectStatusId) REFERENCES SUBJECT_STATUS(subjectStatusId)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
