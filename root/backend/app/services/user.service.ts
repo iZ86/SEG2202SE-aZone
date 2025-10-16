@@ -31,11 +31,19 @@ class UserService implements IUserService {
   async getAdminById(adminId: number): Promise<Result<UserData>> {
     const admin: UserData = await UserRepository.getAdminById(adminId);
 
+    if (!admin) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Admin not found");
+    }
+
     return Result.succeed(admin, "Admin retrieve success");
   }
 
   async getStudentById(studentId: number): Promise<Result<UserData>> {
     const student: UserData = await UserRepository.getStudentById(studentId);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
+    }
 
     return Result.succeed(student, "Student retrieve success");
   }
