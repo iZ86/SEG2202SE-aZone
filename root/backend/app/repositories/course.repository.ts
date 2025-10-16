@@ -31,7 +31,7 @@ class CourseRepository implements ICourseRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -49,7 +49,7 @@ class CourseRepository implements ICourseRepository {
           if (err) reject(err);
           resolve(res?.[0]);
         }
-      )
+      );
     });
   }
 
@@ -63,7 +63,7 @@ class CourseRepository implements ICourseRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -77,22 +77,22 @@ class CourseRepository implements ICourseRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
   deleteCourseById(courseId: number): Promise<ResultSetHeader> {
-      return new Promise((resolve, reject) => {
-        databaseConn.query<ResultSetHeader>(
-          "DELETE FROM COURSE WHERE courseId = ?;",
-          [courseId],
-          (err, res) => {
-            if (err) reject(err);
-            resolve(res);
-          }
-        )
-      });
-    }
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM COURSE WHERE courseId = ?;",
+        [courseId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
 }
 
 export default new CourseRepository();

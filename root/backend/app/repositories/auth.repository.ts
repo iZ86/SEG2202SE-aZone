@@ -17,7 +17,7 @@ class AuthRepository implements IAuthRepository {
           if (err) reject(err);
           resolve(res?.[0]);
         }
-      )
+      );
     });
   }
 
@@ -30,7 +30,7 @@ class AuthRepository implements IAuthRepository {
           if (err) reject(err);
           resolve(res?.[0]);
         }
-      )
+      );
     });
   }
 
@@ -44,7 +44,7 @@ class AuthRepository implements IAuthRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 }

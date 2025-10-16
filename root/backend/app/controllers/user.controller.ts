@@ -25,7 +25,7 @@ export default class UserController {
   async getStudents(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
-    const query: string = req.query.query as string
+    const query: string = req.query.query as string;
 
     const response: Result<UserData[]> = await UserService.getStudents(query, pageSize, page);
 
@@ -113,7 +113,7 @@ export default class UserController {
     const userId: number = parseInt(req.params.userId);
 
     const response = await UserService.deleteUserById(userId);
-    
+
     if (response.isSuccess()) {
       return res.sendSuccess(response.getData(), response.getMessage());
     } else {

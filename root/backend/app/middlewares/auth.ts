@@ -15,7 +15,7 @@ export const checkAuthTokenHeader = (req: Request, res: Response, next: NextFunc
     return res.sendError.unauthorized("Invalid credentials");
   }
   return next();
-}
+};
 
 /** Checks if the token is valid or not. */
 export const verifyAuthTokenHeader = (req: Request, res: Response, next: NextFunction) => {
@@ -44,7 +44,7 @@ export const verifyAuthTokenHeader = (req: Request, res: Response, next: NextFun
     }
   }
 
-}
+};
 
 export const verifyAdminAuthToken = async (req: Request, res: Response, next: NextFunction) => {
   const isAdmin: boolean = await UserRepository.isAdminExist(req.user.userId);
@@ -53,17 +53,17 @@ export const verifyAdminAuthToken = async (req: Request, res: Response, next: Ne
     req.user = {
       ...req.user,
       isAdmin: false,
-    }
+    };
     return next();
   }
 
   req.user = {
     ...req.user,
     isAdmin: true,
-  }
+  };
 
   return next();
-}
+};
 
 export const verifyStudentAuthToken = async (req: Request, res: Response, next: NextFunction) => {
   const isStudent: boolean = await UserRepository.isStudentExist(req.user.userId);
@@ -72,24 +72,24 @@ export const verifyStudentAuthToken = async (req: Request, res: Response, next: 
     req.user = {
       ...req.user,
       isStudent: false,
-    }
+    };
     return next();
   }
 
   req.user = {
     ...req.user,
     isStudent: true,
-  }
+  };
 
   return next();
-}
+};
 
 export const verifyAuthToken = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.user.isAdmin && !req.user.isStudent) {
     return res.sendError.unauthorized("Unauthorized");
   }
   return next();
-}
+};
 
 /** Checks if the content type is application/json. */
 export const checkContentType = (req: Request, res: Response, next: NextFunction) => {
@@ -98,7 +98,7 @@ export const checkContentType = (req: Request, res: Response, next: NextFunction
     return res.sendError.invalidContentType("Only supports Content-Type: application/json in HTTP request headers.");
   }
   return next();
-}
+};
 
 interface JwtPayloadDTO {
   userId: number;

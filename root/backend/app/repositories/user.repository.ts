@@ -36,7 +36,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -62,7 +62,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -78,7 +78,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res?.[0]);
         }
-      )
+      );
     });
   }
 
@@ -94,7 +94,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res?.[0]);
         }
-      )
+      );
     });
   }
 
@@ -138,7 +138,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -152,7 +152,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -166,7 +166,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 
@@ -179,7 +179,7 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
+      );
     });
   }
 }
