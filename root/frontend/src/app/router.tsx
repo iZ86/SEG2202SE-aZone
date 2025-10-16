@@ -3,7 +3,7 @@ import GuestLogin from "./routes/GuestLogin";
 
 const routes = [
   {
-    path: "/",
+    path: "/login",
     element: <GuestLogin />,
   },
 ];
