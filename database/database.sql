@@ -148,3 +148,86 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
         ON DELETE CASCADE,
     PRIMARY KEY (studentId, courseId, programmeIntakeId)
 );
+
+-- DATA MANIPULATION LANGUAGE --
+-- The password is encrypted with "abc" --
+-- All of the users have the same password "test123"
+INSERT INTO `CLASSTYPE` (`classTypeId`, `classType`) VALUES
+(1, 'Lecture'),
+(2, 'Practical'),
+(3, 'Tutorial'),
+(4, 'Workshop');
+
+INSERT INTO `ENROLLMENT` (`enrollmentId`, `enrollmentStartDateTime`, `enrollmentEndDateTime`) VALUES
+(1, '2025-10-01 08:30:00', '2025-10-03 23:59:59');
+
+
+INSERT INTO `INTAKE` (`intakeId`) VALUES
+(202501),
+(202502),
+(202504),
+(202508),
+(202509);
+
+INSERT INTO `PROGRAMME` (`programmeId`, `programmeName`) VALUES
+(1, 'Bachelors Degree'),
+(2, 'Diploma'),
+(3, 'Foundation');
+
+INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`) VALUES
+(1, 2, 'Diploma in Information Technology'),
+(2, 1, 'Bachelor of Science (Honours) in\r\nComputer Science'),
+(3, 1, 'Bachelor of Science (Honours) in Information Technology'),
+(4, 1, 'Bachelor of \r\nSoftware Engineering (Hons)'),
+(5, 1, 'Bachelor (Honours)  \r\nin Finance'),
+(6, 3, 'Foundation in Art'),
+(7, 3, 'Foundation in Science and Technology'),
+(8, 2, 'Diploma in Finance'),
+(9, 2, 'Diploma in Business Administration');
+
+INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `semester`, `semesterStartPeriod`, `semesterEndPeriod`) VALUES
+(1, 1, 202509, 4, '2025-09-22', '2026-01-16'),
+(2, 2, 202508, 1, '2025-08-16', '2025-12-12'),
+(3, 1, 202504, 5, '2025-04-09', '2025-08-06');
+
+INSERT INTO `ENROLLMENT_PROGRAMME_INTAKE` (`programmeIntakeId`, `enrollmentId`) VALUES (1, 1);
+
+INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
+(1, 'admin', 'admin', 'admin@imail.sunway.edu.my', '-', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
+(23049679, 'Isaac Ming', 'Yeow', 'izack86@gmail.com', '0111235123', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
+(23055155, 'Jia Seng', 'Foo', 'skyfoojs@gmail.com', '0172681225', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
+(23056138, 'Yu Xiang', 'Yeo', 'yyx@gmail.com', '0111231234', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1);
+
+INSERT INTO `ADMIN` (`adminId`) VALUES (1);
+
+INSERT INTO `STUDENT` (`studentId`) VALUES
+(23049679),
+(23055155),
+(23056138);
+
+INSERT INTO `STUDENT_COURSE_PROGRAMME_INTAKE` (`studentId`, `courseId`, `programmeIntakeId`) VALUES
+(23049679, 3, 3),
+(23055155, 4, 1),
+(23056138, 2, 1);
+
+INSERT INTO `SUBJECT` (`subjectId`, `subjectCode`, `subjectName`, `description`, `creditHours`) VALUES
+(1, 'SEG2202', 'Software Engineering', 'This is a subject called Software Engineering.', 4),
+(2, 'CSC1024', 'Programming Principles', 'This is a subject called Programming Principles.', 4),
+(3, 'MTH1114', 'Computer Mathematics', 'This is a subject called Computer Mathematics.', 4),
+(4, 'NET1014', 'Networking Principles', 'This is a subject called Networking Principles.', 4),
+(5, 'CSC1202', 'Computer Orgnisation', 'This is a subject called Computer Orgnisation.', 4),
+(6, 'ENG1044', 'English for Computer Technology Studies', 'This is a subject called English for Computer Technology Studies.', 4),
+(7, 'FEL1204', 'Principles of Marketing', 'This is a subject called English for Principles of Marketing.', 4),
+(8, 'FEL1304', 'Startup Foundry', 'This is a subject called Startup Foundry.', 4);
+
+INSERT INTO `COURSE_SUBJECT` (`courseId`, `subjectId`) VALUES
+(2, 2),
+(2, 3),
+(3, 4),
+(4, 1),
+(4, 2);
+
+INSERT INTO `SUBJECT_STATUS` (`subjectStatusId`, `subjectStatus`) VALUES
+(1, 'Active'),
+(2, 'Exempted'),
+(3, 'Completed');
