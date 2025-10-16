@@ -26,4 +26,4 @@ export const createStudentValidator: any = [
     .notEmpty().withMessage('Missing status')
     .isIn([0, 1]).withMessage('Status must be 1 or 0'),
   validate,
-]
+];

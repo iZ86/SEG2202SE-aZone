@@ -15,7 +15,7 @@ export const loginBodyValidator: any = [
     .notEmpty().withMessage('Missing role')
     .isIn(Object.values(ENUM_USER_ROLE)).withMessage('Role must user or admin'),
   validate,
-]
+];
 
 export const updateMeBodyValidator: any = [
   body('phoneNumber')
@@ -27,4 +27,4 @@ export const updateMeBodyValidator: any = [
     .notEmpty().withMessage('Missing email')
     .isEmail().withMessage('email must be email'),
   validate,
-]
+];
