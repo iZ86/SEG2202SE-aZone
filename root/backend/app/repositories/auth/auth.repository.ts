@@ -1,3 +1,4 @@
+import { ResultSetHeader } from "mysql2";
 import databaseConn from "../../database/db-connection";
 import { BasicAdminLoginData, BasicStudentLoginData } from "../../models/auth/auth.model";
 
@@ -28,6 +29,20 @@ class AuthRepository implements IAuthRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res?.[0]);
+        }
+      )
+    });
+  }
+
+  updateMe(userId: number, phoneNumber: string, email: string): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE REGISTERED_USER SET phoneNumber = ?, email = ? " +
+        "WHERE userId = ?;",
+        [phoneNumber, email, userId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
         }
       )
     });

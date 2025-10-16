@@ -87,6 +87,12 @@ class AuthService implements IAuthService {
 
     return Result.succeed(user, "Get me success");
   }
+
+  async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<null>> {
+    const response = await AuthRepository.updateMe(userId, phoneNumber, email);
+
+    return Result.succeed(null, "Update me success");
+  }
 }
 
 export default new AuthService();

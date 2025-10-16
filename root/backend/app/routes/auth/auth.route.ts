@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler } from "../../utils/utils";
 import AuthController from "../../controllers/auth/auth.controller";
-import { login } from "../../validators/auth/auth-validator";
+import { loginBodyValidator, updateMeBodyValidator } from "../../validators/auth-validator";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../../middlewares/auth";
 
 class AuthRoute {
@@ -13,8 +13,9 @@ class AuthRoute {
   }
 
   initializeRoutes() {
-    this.router.post("/login", login, asyncHandler(this.controller.login));
+    this.router.post("/login", loginBodyValidator, asyncHandler(this.controller.login));
     this.router.get("/me", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getMe));
+    this.router.put("/me", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, updateMeBodyValidator, asyncHandler(this.controller.udpateMe));
   }
 }
 

@@ -28,6 +28,8 @@ export default class AuthController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
           return res.sendError.unauthorized(response.getMessage());
+        default:
+          return res.sendError.badRequest(response.getMessage());
       }
     }
   }
@@ -44,6 +46,27 @@ export default class AuthController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
           return res.sendError.unauthorized(response.getMessage());
+        default:
+          return res.sendError.badRequest(response.getMessage());
+      }
+    }
+  }
+
+  async udpateMe(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const phoneNumber: string = req.body.phoneNumber;
+    const email: string = req.body.email;
+
+    const response = await AuthService.updateMe(userId, phoneNumber, email);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+        default:
+          return res.sendError.badRequest(response.getMessage());
       }
     }
   }
