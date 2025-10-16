@@ -2,6 +2,13 @@
 
 @theme {
   --color-blue-yinmn: #274C77;
+
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.875rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2.25rem;
 }
 
 :root {
