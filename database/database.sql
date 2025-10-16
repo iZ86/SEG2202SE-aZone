@@ -107,6 +107,8 @@ CREATE TABLE ENROLLMENT_SUBJECT (
     subjectId INT,
     classTypeId INT,
     venueId INT,
+    startTime TIME,
+    endTime TIME,
     FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
         ON DELETE CASCADE,
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
