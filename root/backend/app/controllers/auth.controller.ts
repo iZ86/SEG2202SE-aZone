@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { Result } from "../../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../../enums/enums";
-import AuthService from "../../services/auth/auth.service";
+import { Result } from "../../libs/Result";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
+import AuthService from "../services/auth.service";
 
 export default class AuthController {
   async login(req: Request, res: Response) {

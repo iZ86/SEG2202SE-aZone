@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { asyncHandler } from "../../utils/utils";
-import AuthController from "../../controllers/auth/auth.controller";
-import { loginBodyValidator, updateMeBodyValidator } from "../../validators/auth-validator";
-import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../../middlewares/auth";
+import { asyncHandler } from "../utils/utils";
+import AuthController from "../controllers/auth.controller";
+import { loginBodyValidator, updateMeBodyValidator } from "../validators/auth-validator";
+import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
 
 class AuthRoute {
   router = Router();

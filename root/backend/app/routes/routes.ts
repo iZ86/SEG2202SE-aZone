@@ -1,6 +1,6 @@
 import { Application, Request, Response } from "express";
 import userRoute from "./user-route";
-import authRoute from "./auth/auth.route";
+import authRoute from "./auth.route";
 
 export default class Routes {
   constructor(app: Application) {
