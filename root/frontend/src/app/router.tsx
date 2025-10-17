@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GuestLogin from "@routes/GuestLogin";
 import Dashboard from "@routes/Dashboard";
+import AdminDashboard from "@routes/admin/AdminDashboard";
 
 const routes = [
   {
@@ -9,8 +10,12 @@ const routes = [
   },
   {
     path: "/dashboard",
-    element: <Dashboard />
-  }
+    element: <Dashboard />,
+  },
+  {
+    path: "/admin",
+    element: <AdminDashboard />,
+  },
 ];
 
 export const Router = () => {
