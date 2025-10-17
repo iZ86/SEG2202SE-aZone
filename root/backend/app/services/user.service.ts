@@ -10,6 +10,7 @@ interface IUserService {
   getStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
+  isUserExist(userId: number): Promise<boolean>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<null>>;
   updateUserDetailsById(firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean, userId: number): Promise<Result<null>>;
   deleteUserById(userId: number): Promise<Result<null>>;
@@ -48,6 +49,16 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
+  async isUserExist(userId: number): Promise<boolean> {
+    const isUserExist: boolean = await UserRepository.isUserExist(userId);
+
+    if (!isUserExist) {
+      return false;
+    }
+
+    return true;
+  }
+
   async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<null>> {
     const hashedPassword: string = await argon2.hash(password, {
       type: argon2.argon2id,
@@ -64,12 +75,24 @@ class UserService implements IUserService {
   }
 
   async updateUserDetailsById(firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean, userId: number): Promise<Result<null>> {
+    const userResponse: boolean = await this.isUserExist(userId);
+
+    if (!userResponse) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
+    }
+
     await UserRepository.updateUserById(userId, firstName, lastName, phoneNumber, email, status);
 
     return Result.succeed(null, "Student update success");
   }
 
   async deleteUserById(userId: number): Promise<Result<null>> {
+    const userResponse: boolean = await this.isUserExist(userId);
+
+    if (!userResponse) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
+    }
+
     await UserRepository.deleteUserById(userId);
 
     return Result.succeed(null, "User delete success");
