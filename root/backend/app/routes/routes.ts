@@ -2,6 +2,7 @@ import { Application, Request, Response } from "express";
 import userRoute from "./user.route";
 import authRoute from "./auth.route";
 import courseRoute from "./course.route";
+import programmeRoute from "./programme.route";
 import intakeRoute from "./intake.route";
 
 export default class Routes {
@@ -9,6 +10,7 @@ export default class Routes {
     app.use("/api/v1/user", userRoute);
     app.use("/api/v1/auth", authRoute);
     app.use("/api/v1/course", courseRoute);
+    app.use("/api/v1/programme", programmeRoute);
     app.use("/api/v1/intake", intakeRoute);
   }
 }
