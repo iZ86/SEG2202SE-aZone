@@ -1,0 +1,85 @@
+import { Request, Response } from "express";
+import { ENUM_ERROR_CODE } from "../enums/enums";
+import { Result } from "../../libs/Result";
+import { IntakeData } from "../models/intake-model";
+import IntakeService from "../services/intake.service";
+
+export default class IntakeController {
+  async getIntakes(req: Request, res: Response) {
+    const page: number = parseInt(req.query.page as string) || 1;
+    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const query: string = req.query.query as string || "";
+
+    const response: Result<IntakeData[]> = await IntakeService.getIntakes(query, pageSize, page);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async getIntakeById(req: Request, res: Response) {
+    const intakeId: number = parseInt(req.params.intakeId as string);
+
+    const response: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async createIntake(req: Request, res: Response) {
+    const intakeId: number = req.body.intakeId;
+
+    const response = await IntakeService.createIntake(intakeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async updateIntakeById(req: Request, res: Response) {
+    const intakeId: number = parseInt(req.params.intakeId as string);
+    const newIntakeId: number = req.body.intakeId;
+    
+    const response = await IntakeService.updateIntakeById(intakeId, newIntakeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async deleteIntakeById(req: Request, res: Response) {
+    const intakeId: number = parseInt(req.params.intakeId as string);
+
+    const response = await IntakeService.deleteIntakeById(intakeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+}
