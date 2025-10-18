@@ -11,9 +11,9 @@ export const loginBodyValidator: any = [
     .notEmpty().withMessage('Missing password')
     .isString().withMessage('Password must be string'),
   body('role')
-    .trim()
     .notEmpty().withMessage('Missing role')
-    .isIn(Object.values(ENUM_USER_ROLE)).withMessage('Role must user or admin'),
+    .isNumeric().withMessage('Role must be number')
+    .isIn(Object.values(ENUM_USER_ROLE)).withMessage('Invalid user role'),
   validate,
 ];
 

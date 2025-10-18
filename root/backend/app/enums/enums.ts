@@ -5,6 +5,6 @@ export enum ENUM_ERROR_CODE {
 }
 
 export enum ENUM_USER_ROLE {
-  STUDENT = "student",
-  ADMIN = "admin",
+  STUDENT = 1,
+  ADMIN = 2,
 }
