@@ -193,12 +193,12 @@ INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, 
 INSERT INTO `ENROLLMENT_PROGRAMME_INTAKE` (`programmeIntakeId`, `enrollmentId`) VALUES (1, 1);
 
 INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
-(1, 'admin', 'admin', 'admin@imail.sunway.edu.my', '-', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
+(10000001, 'admin', 'admin', 'admin@imail.sunway.edu.my', '-', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
 (23049679, 'Isaac Ming', 'Yeow', 'izack86@gmail.com', '0111235123', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
 (23055155, 'Jia Seng', 'Foo', 'skyfoojs@gmail.com', '0172681225', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1),
 (23056138, 'Yu Xiang', 'Yeo', 'yyx@gmail.com', '0111231234', '$argon2id$v=19$m=65536,t=3,p=4$OXj/r5uJaBioWzU37JW0wA$qEKKZL7Fn9TEgwV0iZ2PP/ZnBRmyKibmWBWP/9LizdM', 1);
 
-INSERT INTO `ADMIN` (`adminId`) VALUES (1);
+INSERT INTO `ADMIN` (`adminId`) VALUES (10000001);
 
 INSERT INTO `STUDENT` (`studentId`) VALUES
 (23049679),
