@@ -8,7 +8,7 @@ export default class AuthController {
     const userId: number = req.body.userId;
     const password: string = req.body.password;
     const role: ENUM_USER_ROLE = parseInt(req.body.role);
-    let response: Result<string>;
+    let response: Result<{token: string}>;
 
     switch (role) {
       case ENUM_USER_ROLE.STUDENT:

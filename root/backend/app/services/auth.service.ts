@@ -7,12 +7,12 @@ import AuthRepository from "../repositories/auth.repository";
 import UserRepository from "../repositories/user.repository";
 
 interface IAuthService {
-  loginStudent(studentId: number, password: string): Promise<Result<string>>;
-  loginAdmin(userId: number, password: string): Promise<Result<string>>;
+  loginStudent(studentId: number, password: string): Promise<Result<{token: string}>>;
+  loginAdmin(userId: number, password: string): Promise<Result<{token: string}>>;
 }
 
 class AuthService implements IAuthService {
-  async loginStudent(studentId: number, password: string): Promise<Result<string>> {
+  async loginStudent(studentId: number, password: string): Promise<Result<{token: string}>> {
     const basicStudentLoginData: BasicStudentLoginData = await AuthRepository.getBasicStudentLoginData(studentId);
 
     // Return fail if studentId invalid
@@ -38,10 +38,10 @@ class AuthService implements IAuthService {
       }
     );
 
-    return Result.succeed(token, "Login success");
+    return Result.succeed({token: token}, "Login success");
   }
 
-  async loginAdmin(userId: number, password: string): Promise<Result<string>> {
+  async loginAdmin(userId: number, password: string): Promise<Result<{token: string}>> {
     const basicAdminLoginData: BasicAdminLoginData = await AuthRepository.getBasicAdminLoginData(userId);
 
     // Return fail if studentId invalid
@@ -67,7 +67,7 @@ class AuthService implements IAuthService {
       }
     );
 
-    return Result.succeed(token, "Login success");
+    return Result.succeed({token: token}, "Login success");
   }
 
   async getMe(userId: number, role: ENUM_USER_ROLE): Promise<Result<UserData>> {
