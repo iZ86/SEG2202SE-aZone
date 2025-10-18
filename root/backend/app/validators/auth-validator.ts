@@ -5,7 +5,7 @@ import { ENUM_USER_ROLE } from "../enums/enums";
 export const loginBodyValidator: any = [
   body('userId')
     .notEmpty().withMessage('Missing userId')
-    .isNumeric().withMessage('Indentifier must be number'),
+    .isNumeric().withMessage('userId must be number'),
   body('password')
     .trim()
     .notEmpty().withMessage('Missing password')
