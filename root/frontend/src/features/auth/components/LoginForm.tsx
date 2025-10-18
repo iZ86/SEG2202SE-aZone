@@ -3,19 +3,28 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 import aZoneLogoBlueYinmn from "@images/aZone-logo-blue-yinmn.png";
 import PasswordTextField from "@components/PasswordTextField";
-import { studentLogin } from "../api/student-login";
+import { loginAPI } from "../api/login";
 import NormalTextField from "@components/NormalTextField";
 import HeavyButton from "@components/HeavyButton";
-import isStudentId from "../utils/isStudentId";
+import isUserId from "../utils/isUserId";
 
 import { User } from "lucide-react";
 
+/** Student Login Form. */
+export function StudentLoginForm() {
+  return <LoginForm userRole={1} />
+}
+
+export function AdminLoginForm() {
+  return <LoginForm userRole={2} />
+}
+
 /** The login form of the login page. */
-export default function LoginForm() {
-  const [studentId, setStudentId] = useState("");
+function LoginForm({ userRole }: { userRole: 1 | 2 }) {
+  const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [invalidStudentId, setInvalidStudentId] = useState(false);
+  const [invalidUserId, setInvalidUserId] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -27,37 +36,38 @@ export default function LoginForm() {
       return;
     }
 
-    const response: Response | undefined = await studentLogin(
-      studentId,
-      password
+
+    const response: Response | undefined = await loginAPI(
+      userId,
+      password,
+      userRole
     );
     if (response) {
       const data = await response.json();
 
       if (response.status === 200) {
-        const token = data.token;
-
+        const token = data.data.token;
+        console.log(token + "hello");
         if (rememberMe) {
-          sessionStorage.setItem("aZoneStudentAuthToken", token);
+          sessionStorage.setItem(userRole === 1 ? "aZoneStudentAuthToken" : "aZoneAdminAuthToken", token);
         } else {
-          localStorage.setItem("aZoneStudentAuthToken", token);
+          localStorage.setItem(userRole === 1 ? "aZoneStudentAuthToken" : "aZoneAdminAuthToken", token);
         }
-        navigate("/dashboard");
+        navigate(userRole === 1 ? "/dashboard" : "/admin/dashboard");
       } else if (response.status === 403) {
-        setInvalidStudentId(true);
+        setInvalidUserId(true);
         setInvalidPassword(true);
       } else if (response.status === 500) {
         // TODO: Add Internal Error Occurred.
       }
     }
-
   }
 
   /** This is used to validate the inputs before sending making a request to the backend. */
   function isInputValid(): boolean {
     let inputValid = true;
 
-    if (!studentId || !isStudentId(studentId)) {
+    if (!userId || !isUserId(userId)) {
       inputValid = false;
     }
 
@@ -65,22 +75,22 @@ export default function LoginForm() {
       inputValid = false;
     }
 
-    if (invalidStudentId && invalidPassword) {
+    if (invalidUserId && invalidPassword) {
       inputValid = false;
     }
 
     if (inputValid === false) {
-      setInvalidStudentId(true);
+      setInvalidUserId(true);
       setInvalidPassword(true);
     }
 
     return inputValid;
   }
 
-  /** This function is called when the student id input is changed. */
-  function onChangeStudentId(studentId: string): void {
-    setStudentId(studentId);
-    setInvalidStudentId(false);
+  /** This function is called when the user id input is changed. */
+  function onChangeUserId(userId: string): void {
+    setUserId(userId);
+    setInvalidUserId(false);
     setInvalidPassword(false);
   }
 
@@ -88,7 +98,7 @@ export default function LoginForm() {
   function onChangePassword(password: string): void {
     setPassword(password);
     setInvalidPassword(false);
-    setInvalidStudentId(false);
+    setInvalidUserId(false);
   }
 
   return (
@@ -97,17 +107,18 @@ export default function LoginForm() {
         src={aZoneLogoBlueYinmn}
         alt="aZone Logo Blue Yinmn"
       />
+      {userRole === 2 ? <h6 className="text-blue-yinmn font-bold text-xl">ADMIN LOGIN</h6> : undefined}
       <form
         className="flex flex-col gap-y-8 justify-center items-center"
         onSubmit={login}
       >
 
         <NormalTextField
-          text={studentId}
-          onChange={onChangeStudentId}
-          isInvalid={invalidStudentId}
+          text={userId}
+          onChange={onChangeUserId}
+          isInvalid={invalidUserId}
           Icon={User}
-          placeholder={"Student ID"}
+          placeholder={userRole === 1 ? "Student Id" : "Admin Id"}
           minWidth="74"
         />
         <div className="flex flex-col gap-y-6">
@@ -118,9 +129,9 @@ export default function LoginForm() {
               onChange={onChangePassword}
               invalidPassword={invalidPassword}
             />
-            {invalidStudentId && invalidPassword ? (
+            {invalidUserId && invalidPassword ? (
               <p className="text-red-tomato text-base">
-                Invalid Student ID and Password
+                Invalid {userRole === 1 ? "Student" : "Admin"} Id and Password
               </p>
             ) : undefined}
           </div>

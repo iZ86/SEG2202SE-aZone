@@ -1,4 +1,4 @@
-export const studentLogin = async (studentId: string, password: string): Promise<Response | undefined> => {
+export const loginAPI = async (userId: string, password: string, role: number): Promise<Response | undefined> => {
   try {
     return await fetch("http://localhost:8080/api/v1/auth/login",
       {
@@ -7,9 +7,9 @@ export const studentLogin = async (studentId: string, password: string): Promise
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userId: studentId,
+          userId: userId,
           password: password,
-          role: 1
+          role: role
         }),
         mode: "cors"
       });

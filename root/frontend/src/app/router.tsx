@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GuestLogin from "@routes/GuestLogin";
 import Dashboard from "@routes/Dashboard";
 import AdminDashboard from "@routes/admin/AdminDashboard";
+import AdminLogin from "@routes/admin/AdminLogin";
 
 const routes = [
   {
@@ -13,7 +14,11 @@ const routes = [
     element: <Dashboard />,
   },
   {
-    path: "/admin",
+    path: "/admin/login",
+    element: <AdminLogin />
+  },
+  {
+    path: "/admin/dashboard",
     element: <AdminDashboard />,
   },
 ];
