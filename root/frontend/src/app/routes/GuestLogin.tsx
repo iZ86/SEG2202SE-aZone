@@ -1,9 +1,12 @@
+import LoginForm from "@features/auth/components/LoginForm";
+
+
+/** TBD: A042 */
 export default function GuestLogin() {
   return (
-    <div className="flex justify-center items-center w-screen h-screen bg-white">
-      <div className="font-bold text-2xl text-center text-black">
-        This is an example for Guest Login
-      </div>
+    <div className="flex flex-col min-h-screen bg-white-antiflash font-poppins my-auto justify-center items-center">
+      <LoginForm />
     </div>
   );
 }
+
