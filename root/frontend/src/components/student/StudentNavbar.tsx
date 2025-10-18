@@ -1,18 +1,11 @@
-import { Menu } from "lucide-react";
-import aZoneLogoWhite from "@images/aZone-logo-white.png";
+import UserNavbar from "@components/UserNavbar";
+import StudentSideBar from "./StudentSidebar";
 
 
-
-export default function StudentNavbar() {
+export default function StudentNavbar({page}: {page: string}) {
   return (
-    <div className="flex bg-blue-yinmn px-12 py-2 items-center">
-      <div className="flex gap-x-12 items-center">
-
-        <Menu size={48} className="cursor-pointer" />
-        <img src={aZoneLogoWhite} className="cursor-pointer" />
-        <div className="flex gap-x-8 items-center">
-        </div>
-      </div>
-    </div>
+    <UserNavbar userRole={1} >
+      <StudentSideBar page={page} />
+    </UserNavbar>
   );
 }

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
-export default function AdminSideBar({ page }: { page: string }) {
+export default function StudentSideBar({ page }: { page: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
