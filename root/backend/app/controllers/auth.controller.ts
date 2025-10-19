@@ -45,7 +45,7 @@ export default class AuthController {
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
-          return res.sendError.unauthorized(response.getMessage());
+          return res.sendError.forbidden(response.getMessage());
         default:
           return res.sendError.badRequest(response.getMessage());
       }
