@@ -7,11 +7,12 @@ export default class Server {
   constructor(app: Application) {
     this.config(app);
     new Routes(app);
+
+
     app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
       console.error("Error details: " + error);
-      res.status(500).json({
-        message: "An internal error occured."
-      });
+      res.sendError.internal("An internal error occured.");
+      return;
     })
   }
 
@@ -26,11 +27,12 @@ export default class Server {
     app.use((err: Error, req: Request, res: Response, next: Function) => {
       if (err instanceof SyntaxError) {
         console.error(err);
-        res.status(400).send({ message: "Invalid JSON format." });
+        res.sendError.badRequest("Invalid JSON format.");
         return;
       }
       next();
     });
+
     app.use(express.urlencoded({ extended: true }));
   }
 }
