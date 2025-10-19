@@ -19,14 +19,14 @@ declare module 'express-serve-static-core' {
   interface Response {
     sendSuccess<T>(data: T, message?: string): void;
     sendError: {
-      badRequest(message?: string, error?: any): void;
-      unauthorized(message?: string, error?: any): void;
-      forbidden(message?: string, error?: any): void;
-      notFound(message?: string, error?: any): void;
-      invalidContentType(message?: string, error?: any): void;
-      tooManyRequests(message?: string, error?: any): void;
-      internal(message?: string, error?: any): void;
-      maintenance(message?: string, error?: any): void;
+      badRequest(message?: string): void;
+      unauthorized(message?: string): void;
+      forbidden(message?: string): void;
+      notFound(message?: string): void;
+      invalidContentType(message?: string): void;
+      tooManyRequests(message?: string): void;
+      internal(message?: string): void;
+      maintenance(message?: string): void;
     };
   }
 }
@@ -46,36 +46,36 @@ export function enhanceResponse(req: Request, res: Response, next: NextFunction)
   };
 
   r.sendError = {
-    badRequest(message = "Bad Request", error = null) {
-      return r.status(400).json({ success: false, message, error });
+    badRequest(message = "Bad Request") {
+      return r.status(400).json({ success: false, message });
     },
 
-    unauthorized(message = "Unauthorized", error = null) {
-      return r.status(401).json({ success: false, message, error });
+    unauthorized(message = "Unauthorized") {
+      return r.status(401).json({ success: false, message });
     },
 
-    forbidden(message = "Forbidden", error = null) {
-      return r.status(403).json({ success: false, message, error });
+    forbidden(message = "Forbidden") {
+      return r.status(403).json({ success: false, message });
     },
 
-    notFound(message = "Not Found", error = null) {
-      return r.status(404).json({ success: false, message, error });
+    notFound(message = "Not Found") {
+      return r.status(404).json({ success: false, message });
     },
 
-    invalidContentType(message = "Invalid Content Type", error = null) {
-      return r.status(415).json({ success: false, message, error });
+    invalidContentType(message = "Invalid Content Type") {
+      return r.status(415).json({ success: false, message });
     },
 
-    tooManyRequests(message = "Too Many Requests", error = null) {
-      return r.status(429).json({ success: false, message, error });
+    tooManyRequests(message = "Too Many Requests") {
+      return r.status(429).json({ success: false, message });
     },
 
-    internal(message = "Internal Server Error", error = null) {
-      return r.status(500).json({ success: false, message, error });
+    internal(message = "Internal Server Error") {
+      return r.status(500).json({ success: false, message });
     },
 
-    maintenance(message = "Service Unavailable", error = null) {
-      return r.status(503).json({ success: false, message, error });
+    maintenance(message = "Service Unavailable") {
+      return r.status(503).json({ success: false, message });
     },
   };
 
