@@ -4,6 +4,7 @@ import authRoute from "./auth.route";
 import courseRoute from "./course.route";
 import programmeRoute from "./programme.route";
 import intakeRoute from "./intake.route";
+import subjectRoute from "./subject.route";
 
 export default class Routes {
   constructor(app: Application) {
@@ -12,5 +13,6 @@ export default class Routes {
     app.use("/api/v1/course", courseRoute);
     app.use("/api/v1/programme", programmeRoute);
     app.use("/api/v1/intake", intakeRoute);
+    app.use("/api/v1/subject", subjectRoute);
   }
 }
