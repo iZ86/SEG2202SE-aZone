@@ -13,7 +13,7 @@ export default class UserController {
     const response: Result<UserData[]> = await UserService.getAdmins(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -30,7 +30,7 @@ export default class UserController {
     const response: Result<UserData[]> = await UserService.getStudents(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -45,7 +45,7 @@ export default class UserController {
     const response: Result<UserData> = await UserService.getAdminById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -60,7 +60,7 @@ export default class UserController {
     const response: Result<UserData> = await UserService.getStudentById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -80,7 +80,7 @@ export default class UserController {
     const response = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, status);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.create(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -100,7 +100,7 @@ export default class UserController {
     const response = await UserService.updateUserDetailsById(firstName, lastName, phoneNumber, email, status, userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -115,7 +115,7 @@ export default class UserController {
     const response = await UserService.deleteUserById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.delete(response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

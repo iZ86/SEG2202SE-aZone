@@ -23,7 +23,7 @@ export default class AuthController {
     }
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
@@ -41,7 +41,7 @@ export default class AuthController {
     const response = await AuthService.getMe(userId, isAdmin ? ENUM_USER_ROLE.ADMIN : ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
@@ -60,7 +60,7 @@ export default class AuthController {
     const response = await AuthService.updateMe(userId, phoneNumber, email);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

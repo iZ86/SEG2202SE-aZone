@@ -13,7 +13,7 @@ export default class ProgrammeController {
     const response: Result<ProgrammeData[]> = await ProgrammeService.getProgrammes(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -28,7 +28,7 @@ export default class ProgrammeController {
     const response: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -43,7 +43,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.createProgramme(programmeName);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.create(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -59,7 +59,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.updateProgrammeById(programmeId, programmeName);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -74,7 +74,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.deleteProgrammeById(programmeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.delete(response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -91,7 +91,7 @@ export default class ProgrammeController {
     const response: Result<ProgrammeData[]> = await ProgrammeService.getProgrammeIntakes(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -106,7 +106,7 @@ export default class ProgrammeController {
     const response: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -125,7 +125,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.createProgrammeIntake(programmeId, intakeId, semester, semesterStartPeriod, semesterEndPeriod);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.create(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -147,7 +147,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartPeriod, semesterEndPeriod);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -164,7 +164,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.deleteProgrammeIntakeById(programmeIntakeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess(response.getData(), response.getMessage());
+      return res.sendSuccess.delete(response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
