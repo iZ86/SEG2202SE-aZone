@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import CourseController from "../controllers/course.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateCourseBodyValidator } from "../validators/course-validator";
+import { createAndUpdateCourseBodyValidator, createCourseSubjectBodyValidator } from "../validators/course-validator";
 
 class CourseRoute {
   router = Router();
@@ -13,6 +13,9 @@ class CourseRoute {
   }
 
   initializeRoutes() {
+    this.router.delete("/:courseId/subject/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteCourseSubjectByCourseIdAndSubjectId));
+    this.router.get("/subject/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getCourseSubjectByCourseId));
+    this.router.post("/subject", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createCourseSubjectBodyValidator, asyncHandler(this.controller.createCourseSubject));
     this.router.get("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getCourseById));
     this.router.put("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateCourseBodyValidator, asyncHandler(this.controller.updateCourseById));
     this.router.delete("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteCourseById));

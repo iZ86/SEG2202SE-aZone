@@ -11,3 +11,14 @@ export const createAndUpdateCourseBodyValidator: any = [
     .isString().withMessage('courseName must be string'),
   validate,
 ];
+
+
+export const createCourseSubjectBodyValidator: any = [
+  body('courseId')
+    .notEmpty().withMessage('Missing courseId')
+    .isNumeric().withMessage('courseId must be number'),
+  body('subjectId')
+    .notEmpty().withMessage('Missing subjectId')
+    .isNumeric().withMessage('subjectId must be number'),
+  validate,
+];
