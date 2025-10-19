@@ -21,12 +21,14 @@ export default class Server {
       origin: "http://localhost:5173"
     };
     app.use(cors(corsOptions));
-    app.use(express.json());
+
+    
     app.use(enhanceResponse);
+    app.use(express.json());
     // Middleware to prevent invalid JSON format from crashing the server.
-    app.use((err: Error, req: Request, res: Response, next: Function) => {
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       if (err instanceof SyntaxError) {
-        console.error(err);
+        console.error("Invalid JSON Format Error Middleware: " + err);
         res.sendError.badRequest("Invalid JSON format.");
         return;
       }
