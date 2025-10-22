@@ -128,6 +128,28 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
+  getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<CourseSubjectData[]>(
+        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName, s.* " +
+        "FROM COURSE c " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "INNER JOIN COURSE_SUBJECT cs ON c.courseId = cs.courseId " +
+        "INNER JOIN SUBJECT s ON cs.subjectId = s.subjectId " +
+        "WHERE c.courseId = ? " +
+        "AND s.subjectId = ?;",
+        [
+          courseId,
+          subjectId,
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res?.[0]);
+        }
+      );
+    });
+  }
+
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       databaseConn.query(

@@ -105,9 +105,12 @@ class CourseService implements ICourseService {
       return Result.fail(ENUM_ERROR_CODE.BAD_REQUEST, "Course subject already exist");
     }
 
+  async createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
     await CourseRepository.createCourseSubject(courseId, subjectId);
 
-    return Result.succeed(null, "Course subject create success");
+    const courseSubject: CourseSubjectData = await CourseRepository.getCourseSubjectByCourseIdAndSubjectId(courseId, subjectId);
+
+    return Result.succeed(courseSubject, "Course subject create success");
   }
 
   async deleteCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<Result<null>> {
