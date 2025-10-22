@@ -6,12 +6,12 @@ import ProgrammeRepository from "../repositories/programme.repository";
 import IntakeService from "./intake.service";
 
 interface IProgrammeService {
-  getProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeData[]>>;
+  getAllProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeData[]>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
   createProgramme(programmeName: string): Promise<Result<null>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<null>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
-  getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>>;
+  getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<Result<null>>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<Result<null>>;
@@ -19,7 +19,7 @@ interface IProgrammeService {
 }
 
 class ProgrammeService implements IProgrammeService {
-  async getProgrammes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeData[]>> {
+  async getAllProgrammes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeData[]>> {
     const programmes: ProgrammeData[] = await ProgrammeRepository.getProgrammes(query, pageSize, page);
 
     return Result.succeed(programmes, "Programmes retrieve success");
@@ -65,7 +65,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme delete success");
   }
 
-  async getProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>> {
+  async getAllProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>> {
     const programmeIntakesData: ProgrammeIntakeData[] = await ProgrammeRepository.getProgrammeIntakes(query, pageSize, page);
 
     return Result.succeed(programmeIntakesData, "Programme delete success");

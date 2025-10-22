@@ -5,7 +5,7 @@ import SubjectService from "../services/subject.service";
 import { SubjectData } from "../models/subject-model";
 
 export default class SubjectController {
-  async getSubjects(req: Request, res: Response) {
+  async getAllSubjects(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";

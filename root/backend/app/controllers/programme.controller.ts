@@ -83,7 +83,7 @@ export default class ProgrammeController {
     }
   }
 
-  async getProgrammeIntakes(req: Request, res: Response) {
+  async getAllProgrammeIntakes(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";

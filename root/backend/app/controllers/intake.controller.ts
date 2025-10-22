@@ -5,7 +5,7 @@ import { IntakeData } from "../models/intake-model";
 import IntakeService from "../services/intake.service";
 
 export default class IntakeController {
-  async getIntakes(req: Request, res: Response) {
+  async getAllIntakes(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";

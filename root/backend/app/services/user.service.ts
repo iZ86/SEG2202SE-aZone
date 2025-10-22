@@ -7,8 +7,8 @@ import UserRepository from "../repositories/user.repository";
 import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
 
 interface IUserService {
-  getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
-  getStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
+  getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
+  getAllStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
@@ -23,13 +23,13 @@ interface IUserService {
 }
 
 class UserService implements IUserService {
-  async getAdmins(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
+  async getAllAdmins(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
     const admins: UserData[] = await UserRepository.getAdmins(query, pageSize, page);
 
     return Result.succeed(admins, "Admins retrieve success");
   }
 
-  async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
+  async getAllStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
     const students: UserData[] = await UserRepository.getStudents(query, pageSize, page);
 
     return Result.succeed(students, "Students retrieve success");

@@ -4,7 +4,7 @@ import { SubjectData } from "../models/subject-model";
 import SubjectRepository from "../repositories/subject.repository";
 
 interface ISubjectService {
-  getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectData[]>>;
+  getAllSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectData[]>>;
   getSubjectById(subjectId: number): Promise<Result<SubjectData>>;
   createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<null>>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<null>>;
@@ -12,7 +12,7 @@ interface ISubjectService {
 }
 
 class SubjectService implements ISubjectService {
-  async getSubjects(query: string = "", pageSize: number, page: number): Promise<Result<SubjectData[]>> {
+  async getAllSubjects(query: string = "", pageSize: number, page: number): Promise<Result<SubjectData[]>> {
     const subjects: SubjectData[] = await SubjectRepository.getSubjects(query, pageSize, page);
 
     return Result.succeed(subjects, "Subjects retrieve success");

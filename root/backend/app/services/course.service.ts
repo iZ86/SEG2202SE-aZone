@@ -9,7 +9,7 @@ import { ProgrammeData } from "../models/programme-model";
 import { SubjectData } from "../models/subject-model";
 
 interface ICourseService {
-  getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseData[]>>;
+  getAllCourses(query: string, pageSize: number, page: number): Promise<Result<CourseData[]>>;
   getCourseById(courseId: number): Promise<Result<CourseData>>;
   createCourse(courseName: string, programmeId: number): Promise<Result<null>>;
   updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<null>>;
@@ -21,7 +21,7 @@ interface ICourseService {
 }
 
 class CourseService implements ICourseService {
-  async getCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseData[]>> {
+  async getAllCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseData[]>> {
     const courses: CourseData[] = await CourseRepository.getCourses(query, pageSize, page);
 
     return Result.succeed(courses, "Courses retrieve success");
