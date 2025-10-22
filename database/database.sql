@@ -11,7 +11,7 @@ CREATE TABLE REGISTERED_USER (
     email VARCHAR(350) UNIQUE NOT NULL,
     phoneNumber VARCHAR(20),
     password VARCHAR(255) NOT NULL,
-    status TINYINT(1) DEFAULT 1
+    status INT DEFAULT 1
 );
 
 CREATE TABLE PROGRAMME (
@@ -140,13 +140,14 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
     studentId INT,
     courseId INT,
     programmeIntakeId INT,
+    status INT DEFAULT 1,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
         ON DELETE CASCADE,
     FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
         ON DELETE CASCADE,
-    PRIMARY KEY (studentId, courseId, programmeIntakeId)
+    PRIMARY KEY (studentId, courseId, programmeIntakeId, status)
 );
 
 -- DATA MANIPULATION LANGUAGE --
@@ -205,10 +206,10 @@ INSERT INTO `STUDENT` (`studentId`) VALUES
 (23055155),
 (23056138);
 
-INSERT INTO `STUDENT_COURSE_PROGRAMME_INTAKE` (`studentId`, `courseId`, `programmeIntakeId`) VALUES
-(23049679, 3, 3),
-(23055155, 4, 1),
-(23056138, 2, 1);
+INSERT INTO `STUDENT_COURSE_PROGRAMME_INTAKE` (`studentId`, `courseId`, `programmeIntakeId`, `status`) VALUES
+(23049679, 3, 3, 1),
+(23055155, 4, 1, 1),
+(23056138, 2, 1, 1);
 
 INSERT INTO `SUBJECT` (`subjectId`, `subjectCode`, `subjectName`, `description`, `creditHours`) VALUES
 (1, 'SEG2202', 'Software Engineering', 'This is a subject called Software Engineering.', 4),
