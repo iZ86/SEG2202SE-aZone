@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
-import UserService from "../services/user.service";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import UserService from "../services/user.service";
+import CourseService from "../services/course.service";
+import ProgrammeService from "../services/programme.service";
+import { CourseData } from "../models/course-model";
+import { ProgrammeIntakeData } from "../models/programme-model";
 
 export default class UserController {
   async getAllAdmins(req: Request, res: Response) {
@@ -10,7 +14,7 @@ export default class UserController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<UserData[]> = await UserService.getAdmins(query, pageSize, page);
+    const response: Result<UserData[]> = await UserService.getAllAdmins(query, pageSize, page);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -27,7 +31,7 @@ export default class UserController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
 
-    const response: Result<UserData[]> = await UserService.getStudents(query, pageSize, page);
+    const response: Result<UserData[]> = await UserService.getAllStudents(query, pageSize, page);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -77,7 +81,7 @@ export default class UserController {
     const password: string = req.body.password;
     const status: boolean = req.body.status;
 
-    const response = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, status);
+    const response: Result<UserData> = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -97,7 +101,13 @@ export default class UserController {
     const email: string = req.body.email;
     const status: boolean = req.body.status;
 
-    const response = await UserService.updateUserDetailsById(firstName, lastName, phoneNumber, email, status, userId);
+    const userResponse: boolean = await UserService.isUserExist(userId);
+
+    if (!userResponse) {
+      return res.sendError.notFound("Invalid userId");
+    }
+
+    const response: Result<UserData> = await UserService.updateUserById(userId, firstName, lastName, phoneNumber, email, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -112,7 +122,13 @@ export default class UserController {
   async deleteUserById(req: Request, res: Response) {
     const userId: number = parseInt(req.params.userId);
 
-    const response = await UserService.deleteUserById(userId);
+    const userResponse: boolean = await UserService.isUserExist(userId);
+
+    if (!userResponse) {
+      return res.sendError.notFound("Invalid userId");
+    }
+
+    const response: Result<null> = await UserService.deleteUserById(userId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete(response.getMessage());

@@ -2,9 +2,12 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { UserData } from "../models/user-model";
 import UserRepository from "../repositories/user.repository";
+import CourseService from "./course.service";
+import ProgrammeService from "./programme.service";
 import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { ProgrammeIntakeData } from "../models/programme-model";
+import { CourseData } from "../models/course-model";
 
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
@@ -13,8 +16,8 @@ interface IUserService {
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
-  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<null>>;
-  updateUserDetailsById(firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean, userId: number): Promise<Result<null>>;
+  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<UserData>>;
+  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
@@ -76,7 +79,7 @@ class UserService implements IUserService {
     return true;
   }
 
-  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<null>> {
+  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<UserData>> {
     const hashedPassword: string = await argon2.hash(password, {
       type: argon2.argon2id,
       memoryCost: 2 ** 16,
@@ -86,33 +89,37 @@ class UserService implements IUserService {
 
     const createUserResponse: ResultSetHeader = await UserRepository.createUser(firstName, lastName, email, phoneNumber, hashedPassword, status);
 
-    await UserRepository.createStudent(createUserResponse.insertId);
+    const response: ResultSetHeader = await UserRepository.createStudent(createUserResponse.insertId);
 
-    return Result.succeed(null, "Student create success");
+    const student: UserData = await UserRepository.getStudentById(response.insertId);
+
+    return Result.succeed(student, "Student create success");
   }
 
-  async updateUserDetailsById(firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean, userId: number): Promise<Result<null>> {
-    const userResponse: boolean = await this.isUserExist(userId);
-
-    if (!userResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
-    }
-
+  async updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>> {
     await UserRepository.updateUserById(userId, firstName, lastName, phoneNumber, email, status);
 
-    return Result.succeed(null, "Student update success");
+    const student: UserData = await UserRepository.getStudentById(userId);
+
+    return Result.succeed(student, "Student update success");
   }
 
   async deleteUserById(userId: number): Promise<Result<null>> {
-    const userResponse: boolean = await this.isUserExist(userId);
-
-    if (!userResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
-    }
-
     await UserRepository.deleteUserById(userId);
 
     return Result.succeed(null, "User delete success");
+  }
+
+  async getStudentCourseProgrammeIntakes(query: string = "", pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
+    const studentCourseProgrammeIntakes: StudentCourseProgrammeIntakeData[] = await UserRepository.getStudentCourseProgrammeIntakes(query, pageSize, page, status);
+
+    if (!studentCourseProgrammeIntakes.length) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
+    }
+
+    return Result.succeed(studentCourseProgrammeIntakes, "Students course programme intakes retrieve success");
+  }
+
   async getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
     const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
 

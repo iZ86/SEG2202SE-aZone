@@ -10,7 +10,7 @@ export default class IntakeController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<IntakeData[]> = await IntakeService.getIntakes(query, pageSize, page);
+    const response: Result<IntakeData[]> = await IntakeService.getAllIntakes(query, pageSize, page);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -56,6 +56,12 @@ export default class IntakeController {
     const intakeId: number = parseInt(req.params.intakeId as string);
     const newIntakeId: number = req.body.intakeId;
 
+    const intakeResponse: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+
+    if (!intakeResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid intakeId");
+    }
+
     const response = await IntakeService.updateIntakeById(intakeId, newIntakeId);
 
     if (response.isSuccess()) {
@@ -70,6 +76,12 @@ export default class IntakeController {
 
   async deleteIntakeById(req: Request, res: Response) {
     const intakeId: number = parseInt(req.params.intakeId as string);
+
+    const intakeResponse: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+
+    if (!intakeResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid intakeId");
+    }
 
     const response = await IntakeService.deleteIntakeById(intakeId);
 

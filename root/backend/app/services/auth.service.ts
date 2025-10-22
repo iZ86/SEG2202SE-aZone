@@ -7,12 +7,14 @@ import AuthRepository from "../repositories/auth.repository";
 import UserRepository from "../repositories/user.repository";
 
 interface IAuthService {
-  loginStudent(studentId: number, password: string): Promise<Result<{token: string}>>;
-  loginAdmin(userId: number, password: string): Promise<Result<{token: string}>>;
+  loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>>;
+  loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>>;
+  getMe(userId: number, role: ENUM_USER_ROLE): Promise<Result<UserData>>;
+  updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>>;
 }
 
 class AuthService implements IAuthService {
-  async loginStudent(studentId: number, password: string): Promise<Result<{token: string}>> {
+  async loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>> {
     const basicStudentLoginData: BasicStudentLoginData = await AuthRepository.getBasicStudentLoginData(studentId);
 
     // Return fail if studentId invalid
@@ -38,10 +40,10 @@ class AuthService implements IAuthService {
       }
     );
 
-    return Result.succeed({token: token}, "Login success");
+    return Result.succeed({ token: token }, "Login success");
   }
 
-  async loginAdmin(userId: number, password: string): Promise<Result<{token: string}>> {
+  async loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>> {
     const basicAdminLoginData: BasicAdminLoginData = await AuthRepository.getBasicAdminLoginData(userId);
 
     // Return fail if studentId invalid
@@ -67,7 +69,7 @@ class AuthService implements IAuthService {
       }
     );
 
-    return Result.succeed({token: token}, "Login success");
+    return Result.succeed({ token: token }, "Login success");
   }
 
   async getMe(userId: number, role: ENUM_USER_ROLE): Promise<Result<UserData>> {
@@ -88,10 +90,11 @@ class AuthService implements IAuthService {
     return Result.succeed(user, "Get me success");
   }
 
-  async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<null>> {
-    const response = await AuthRepository.updateMe(userId, phoneNumber, email);
+  async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
+    await AuthRepository.updateMe(userId, phoneNumber, email);
+    const user: UserData = await UserRepository.getUserById(userId);
 
-    return Result.succeed(null, "Update me success");
+    return Result.succeed(user, "Update me success");
   }
 }
 

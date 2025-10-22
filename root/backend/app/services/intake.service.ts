@@ -6,8 +6,8 @@ import IntakeRepository from "../repositories/intake.repository";
 interface IInterfaceService {
   getAllIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeData[]>>;
   getIntakeById(intakeId: number): Promise<Result<IntakeData>>;
-  createIntake(intakeId: number): Promise<Result<null>>;
-  updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<null>>;
+  createIntake(intakeId: number): Promise<Result<IntakeData>>;
+  updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>>;
   deleteIntakeById(intakeId: number): Promise<Result<null>>;
 }
 
@@ -28,31 +28,22 @@ class InterfaceService implements IInterfaceService {
     return Result.succeed(intake, "Intake retrieve success");
   }
 
-  async createIntake(intakeId: number): Promise<Result<null>> {
-    await IntakeRepository.createIntake(intakeId);
+  async createIntake(intakeId: number): Promise<Result<IntakeData>> {
+    const response = await IntakeRepository.createIntake(intakeId);
 
-    return Result.succeed(null, "Intake create success");
+    const intake: IntakeData = await IntakeRepository.getIntakeById(response.insertId);
+    return Result.succeed(intake, "Intake create success");
   }
 
-  async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<null>> {
-    const intakeResponse: Result<IntakeData> = await this.getIntakeById(intakeId);
-
-    if (!intakeResponse.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid intakeId");
-    }
-
+  async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>> {
     await IntakeRepository.updateIntakeById(intakeId, newIntakeId);
 
-    return Result.succeed(null, "Intake update success");
+    const intake: IntakeData = await IntakeRepository.getIntakeById(newIntakeId);
+
+    return Result.succeed(intake, "Intake update success");
   }
 
   async deleteIntakeById(intakeId: number): Promise<Result<null>> {
-    const intakeResponse: Result<IntakeData> = await this.getIntakeById(intakeId);
-
-    if (!intakeResponse.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid intakeId");
-    }
-    
     await IntakeRepository.deleteIntakeById(intakeId);
 
     return Result.succeed(null, "Intake delete success");

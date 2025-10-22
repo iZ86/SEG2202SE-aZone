@@ -10,7 +10,7 @@ export default class SubjectController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<SubjectData[]> = await SubjectService.getSubjects(query, pageSize, page);
+    const response: Result<SubjectData[]> = await SubjectService.getAllSubjects(query, pageSize, page);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -62,7 +62,13 @@ export default class SubjectController {
     const description: string = req.body.description;
     const creditHours: number = req.body.creditHours;
 
-    const response = await SubjectService.updateSubjectById(subjectId,subjectName, subjectCode, description, creditHours);
+    const subjectResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
+
+    if (!subjectResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid subjectId");
+    }
+
+    const response = await SubjectService.updateSubjectById(subjectId, subjectName, subjectCode, description, creditHours);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -76,6 +82,11 @@ export default class SubjectController {
 
   async deleteSubjectById(req: Request, res: Response) {
     const subjectId: number = parseInt(req.params.subjectId as string);
+    const subjectResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
+
+    if (!subjectResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid subjectId");
+    }
 
     const response = await SubjectService.deleteSubjectById(subjectId);
 
