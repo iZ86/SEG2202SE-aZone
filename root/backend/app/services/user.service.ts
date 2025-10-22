@@ -9,6 +9,7 @@ import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getAllStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
+  getUserById(userId: number): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
@@ -33,6 +34,16 @@ class UserService implements IUserService {
     const students: UserData[] = await UserRepository.getStudents(query, pageSize, page);
 
     return Result.succeed(students, "Students retrieve success");
+  }
+
+  async getUserById(userId: number): Promise<Result<UserData>> {
+    const user: UserData = await UserRepository.getAdminById(userId);
+
+    if (!user) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "User not found");
+    }
+
+    return Result.succeed(user, "User retrieve success");
   }
 
   async getAdminById(adminId: number): Promise<Result<UserData>> {

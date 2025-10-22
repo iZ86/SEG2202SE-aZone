@@ -5,6 +5,7 @@ import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model
 interface IUserRepostory {
   getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
+  getUserById(userId: number): Promise<UserData>;
   getStudentById(studentId: number): Promise<UserData>;
   getAdminById(adminId: number): Promise<UserData>;
   isAdminExist(adminId: number): Promise<boolean>;
@@ -61,6 +62,21 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getUserById(userId: number): Promise<UserData> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserData[]>(
+        "SELECT userId, firstName, lastName, email, phoneNumber, status " +
+        "FROM REGISTERED_USER " +
+        "WHERE userId = ?;",
+        [userId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res?.[0]);
         }
       );
     });
