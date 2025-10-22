@@ -50,3 +50,39 @@ export const updateStudentValidator: any = [
     .isIn([0, 1]).withMessage('Status must be 1 or 0'),
   validate,
 ];
+
+export const createStudentCourseProgrammeIntakeBodyValidator: any = [
+  body('studentId')
+    .trim()
+    .notEmpty().withMessage('Missing studentId')
+    .isNumeric().withMessage('studentId must be numeric'),
+  body('courseId')
+    .trim()
+    .notEmpty().withMessage('Missing courseId')
+    .isNumeric().withMessage('courseId must be numeric'),
+  body('programmeIntakeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeIntakeId')
+    .isNumeric().withMessage('programmeIntakeId must be numeric'),
+  body('status')
+    .trim()
+    .notEmpty().withMessage('Missing status')
+    .isNumeric().withMessage('status must be numeric'),
+  validate
+];
+
+export const updateStudentCourseProgrammeIntakeBodyValidator: any = [
+  body('courseId')
+    .trim()
+    .notEmpty().withMessage('Missing courseId')
+    .isNumeric().withMessage('courseId must be numeric'),
+  body('programmeIntakeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeIntakeId')
+    .isNumeric().withMessage('programmeIntakeId must be numeric'),
+  body('status')
+    .trim()
+    .notEmpty().withMessage('Missing status')
+    .isNumeric().withMessage('status must be numeric'),
+  validate
+];

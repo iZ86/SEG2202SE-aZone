@@ -7,3 +7,20 @@ export interface UserData extends RowDataPacket {
   email: string;
   phoneNumber: string;
 }
+
+export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
+  studentId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  courseId: number;
+  courseName: string;
+  programmeIntakeId: number;
+  programmeId: number;
+  programmeName: string;
+  intakeId: number;
+  semester: number;
+  semesterStartPeriod: Date;
+  semesterEndPeriod: Date;
+}

@@ -123,4 +123,111 @@ export default class UserController {
       }
     }
   }
+
+  async getAllStudentCourseProgrammeIntakes(req: Request, res: Response) {
+    const page: number = parseInt(req.query.page as string) || 1;
+    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const query: string = req.query.query as string;
+    const status: number = parseInt(req.query.status as string) || 1;
+
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakes(query, pageSize, page, status);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async getStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId);
+
+    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async createStudentCourseProgrammeIntake(req: Request, res: Response) {
+    const studentId: number = req.body.studentId;
+    const courseId: number = req.body.courseId;
+    const programmeIntakeId: number = req.body.programmeIntakeId;
+    const status: number = req.body.status;
+
+    const studentResponse: Result<UserData> = await UserService.getStudentById(studentId);
+    const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+
+    if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId, or courseId, or programmeIntakeId");
+    }
+
+    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, status);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async updateStudentCourseProgrammeIntake(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId);
+    const courseId: number = req.body.courseId;
+    const programmeIntakeId: number = req.body.programmeIntakeId;
+    const status: number = req.body.status;
+
+    const studentResponse: Result<UserData> = await UserService.getStudentById(studentId);
+    const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+
+    if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid studentId, or courseId, or programmeIntakeId");
+    }
+
+    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId);
+    const status: number = parseInt(req.params.status);
+
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+
+    if (!studentCourseProgrammeIntake.isSuccess()) {
+      return res.sendError.notFound("Student course programme intake not found");
+    }
+
+    const response: Result<null> = await UserService.deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(studentId, status);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
 }
