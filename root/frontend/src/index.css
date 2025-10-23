@@ -41,7 +41,39 @@ h1, h2, h3 {
   font-family: "Poppins", sans-serif;
 }
 
+h1 {
+  font-size: 32px;
+  line-height: 48px;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 36px;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 27px;
+}
+
+h4 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+h5 {
+  font-size: 13px;
+  line-height: 19.5px;
+}
+
+h6 {
+  font-size: 11px;
+  line-height: 16.5px;
+}
+
 p {
+  font-size: 16px;
+  line-height: 24px;
   font-family: "Nunito Sans", sans-serif;
 }
 
