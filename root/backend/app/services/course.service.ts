@@ -24,7 +24,7 @@ class CourseService implements ICourseService {
   }
 
   async getCourseById(courseId: number): Promise<Result<CourseData>> {
-    const course: CourseData = await CourseRepository.getCourseById(courseId);
+    const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
 
     if (!course) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
@@ -36,7 +36,11 @@ class CourseService implements ICourseService {
   async createCourse(courseName: string, programmeId: number): Promise<Result<CourseData>> {
     const response: ResultSetHeader = await CourseRepository.createCourse(courseName, programmeId);
 
-    const course: CourseData = await CourseRepository.getCourseById(response.insertId);
+    const course: CourseData | undefined = await CourseRepository.getCourseById(response.insertId);
+
+    if (!course) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course created not found");
+    }
 
     return Result.succeed(course, "Course create success");
   }
@@ -44,7 +48,11 @@ class CourseService implements ICourseService {
   async updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseData>> {
     await CourseRepository.updateCourseById(courseId, programmeId, courseName);
 
-    const course: CourseData = await CourseRepository.getCourseById(courseId);
+    const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
+
+    if (!course) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course updated not found");
+    }
 
     return Result.succeed(course, "Course update success");
   }
@@ -74,8 +82,12 @@ class CourseService implements ICourseService {
   async createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
     await CourseRepository.createCourseSubject(courseId, subjectId);
 
-    const courseSubject: CourseSubjectData = await CourseRepository.getCourseSubjectByCourseIdAndSubjectId(courseId, subjectId);
+    const courseSubject: CourseSubjectData | undefined = await CourseRepository.getCourseSubjectByCourseIdAndSubjectId(courseId, subjectId);
 
+    if (!courseSubject) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course subject created not found");
+    }
+    
     return Result.succeed(courseSubject, "Course subject create success");
   }
 

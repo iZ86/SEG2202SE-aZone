@@ -15,7 +15,7 @@ interface IAuthService {
 
 class AuthService implements IAuthService {
   async loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>> {
-    const basicStudentLoginData: BasicStudentLoginData = await AuthRepository.getBasicStudentLoginData(studentId);
+    const basicStudentLoginData: BasicStudentLoginData | undefined = await AuthRepository.getBasicStudentLoginData(studentId);
 
     // Return fail if studentId invalid
     if (!basicStudentLoginData) {
@@ -44,7 +44,7 @@ class AuthService implements IAuthService {
   }
 
   async loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>> {
-    const basicAdminLoginData: BasicAdminLoginData = await AuthRepository.getBasicAdminLoginData(userId);
+    const basicAdminLoginData: BasicAdminLoginData | undefined = await AuthRepository.getBasicAdminLoginData(userId);
 
     // Return fail if studentId invalid
     if (!basicAdminLoginData) {
@@ -73,7 +73,7 @@ class AuthService implements IAuthService {
   }
 
   async getMe(userId: number, role: ENUM_USER_ROLE): Promise<Result<UserData>> {
-    let user: UserData;
+    let user: UserData | undefined;
     switch (role) {
       case ENUM_USER_ROLE.STUDENT:
         user = await UserRepository.getStudentById(userId);
@@ -87,12 +87,20 @@ class AuthService implements IAuthService {
         return Result.fail(ENUM_ERROR_CODE.INVALID_DATA, "Invalid data");
     }
 
+    if (!user) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get user");
+    }
+
     return Result.succeed(user, "Get me success");
   }
 
   async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
     await AuthRepository.updateMe(userId, phoneNumber, email);
-    const user: UserData = await UserRepository.getUserById(userId);
+    const user: UserData | undefined = await UserRepository.getUserById(userId);
+
+    if (!user) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get updated user");
+    }
 
     return Result.succeed(user, "Update me success");
   }

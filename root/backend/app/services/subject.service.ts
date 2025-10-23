@@ -20,7 +20,7 @@ class SubjectService implements ISubjectService {
   }
 
   async getSubjectById(subjectId: number): Promise<Result<SubjectData>> {
-    const subject: SubjectData = await SubjectRepository.getSubjectById(subjectId);
+    const subject: SubjectData | undefined = await SubjectRepository.getSubjectById(subjectId);
 
     if (!subject) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject not found");
@@ -31,15 +31,23 @@ class SubjectService implements ISubjectService {
 
   async createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<SubjectData>> {
     const response: ResultSetHeader = await SubjectRepository.createSubject(subjectCode, subjectName, description, creditHours);
-    const subject: SubjectData = await SubjectRepository.getSubjectById(response.insertId);
+    const subject: SubjectData | undefined = await SubjectRepository.getSubjectById(response.insertId);
+
+    if (!subject) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject created not found");
+    }
 
     return Result.succeed(subject, "Subject create success");
   }
 
   async updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<SubjectData>> {
     await SubjectRepository.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours);
-    const subject: SubjectData = await SubjectRepository.getSubjectById(subjectId);
-    
+    const subject: SubjectData |undefined = await SubjectRepository.getSubjectById(subjectId);
+
+    if (!subject) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject updated not found");
+    }
+
     return Result.succeed(subject, "Subject update success");
   }
 

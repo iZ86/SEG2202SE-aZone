@@ -3,11 +3,7 @@ import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import UserRepository from "../repositories/user.repository";
-import CourseService from "./course.service";
-import ProgrammeService from "./programme.service";
 import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
-import { ProgrammeIntakeData } from "../models/programme-model";
-import { CourseData } from "../models/course-model";
 
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
@@ -40,7 +36,7 @@ class UserService implements IUserService {
   }
 
   async getUserById(userId: number): Promise<Result<UserData>> {
-    const user: UserData = await UserRepository.getAdminById(userId);
+    const user: UserData | undefined = await UserRepository.getAdminById(userId);
 
     if (!user) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "User not found");
@@ -50,7 +46,7 @@ class UserService implements IUserService {
   }
 
   async getAdminById(adminId: number): Promise<Result<UserData>> {
-    const admin: UserData = await UserRepository.getAdminById(adminId);
+    const admin: UserData | undefined = await UserRepository.getAdminById(adminId);
 
     if (!admin) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Admin not found");
@@ -60,7 +56,7 @@ class UserService implements IUserService {
   }
 
   async getStudentById(studentId: number): Promise<Result<UserData>> {
-    const student: UserData = await UserRepository.getStudentById(studentId);
+    const student: UserData | undefined = await UserRepository.getStudentById(studentId);
 
     if (!student) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
@@ -91,7 +87,11 @@ class UserService implements IUserService {
 
     const response: ResultSetHeader = await UserRepository.createStudent(createUserResponse.insertId);
 
-    const student: UserData = await UserRepository.getStudentById(response.insertId);
+    const student: UserData | undefined = await UserRepository.getStudentById(response.insertId);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student created not found");
+    }
 
     return Result.succeed(student, "Student create success");
   }
@@ -99,7 +99,11 @@ class UserService implements IUserService {
   async updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>> {
     await UserRepository.updateUserById(userId, firstName, lastName, phoneNumber, email, status);
 
-    const student: UserData = await UserRepository.getStudentById(userId);
+    const student: UserData | undefined = await UserRepository.getStudentById(userId);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student updated not found");
+    }
 
     return Result.succeed(student, "Student update success");
   }
@@ -121,7 +125,7 @@ class UserService implements IUserService {
   }
 
   async getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
-    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (!studentCourseProgrammeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
@@ -134,7 +138,11 @@ class UserService implements IUserService {
   async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
     await UserRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, status);
 
-    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
+
+    if (!studentCrouseProgrammeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake created not found");
+    }
 
     return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake create success");
   }
@@ -142,7 +150,11 @@ class UserService implements IUserService {
   async updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
     await UserRepository.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
 
-    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await UserRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
+
+    if (!studentCrouseProgrammeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake updated not found");
+    }
 
     return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake update success");
   }

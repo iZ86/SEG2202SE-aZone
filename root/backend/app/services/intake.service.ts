@@ -19,7 +19,7 @@ class InterfaceService implements IInterfaceService {
   }
 
   async getIntakeById(intakeId: number): Promise<Result<IntakeData>> {
-    const intake: IntakeData = await IntakeRepository.getIntakeById(intakeId);
+    const intake: IntakeData | undefined = await IntakeRepository.getIntakeById(intakeId);
 
     if (!intake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake not found");
@@ -31,14 +31,23 @@ class InterfaceService implements IInterfaceService {
   async createIntake(intakeId: number): Promise<Result<IntakeData>> {
     const response = await IntakeRepository.createIntake(intakeId);
 
-    const intake: IntakeData = await IntakeRepository.getIntakeById(response.insertId);
+    const intake: IntakeData | undefined = await IntakeRepository.getIntakeById(response.insertId);
+
+    if (!intake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake created not found");
+    }
+
     return Result.succeed(intake, "Intake create success");
   }
 
   async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>> {
     await IntakeRepository.updateIntakeById(intakeId, newIntakeId);
 
-    const intake: IntakeData = await IntakeRepository.getIntakeById(newIntakeId);
+    const intake: IntakeData | undefined = await IntakeRepository.getIntakeById(newIntakeId);
+
+    if (!intake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake updated not found");
+    }
 
     return Result.succeed(intake, "Intake update success");
   }
