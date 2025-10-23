@@ -3,33 +3,33 @@ import databaseConn from "../database/db-connection";
 import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth-model";
 
 interface IAuthRepository {
-  getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData>;
-  getBasicAdminLoginData(userId: number): Promise<BasicAdminLoginData>;
+  getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData | undefined>;
+  getBasicAdminLoginData(userId: number): Promise<BasicAdminLoginData | undefined>;
   updateMe(userId: number, phoneNumber: string, email: string): Promise<ResultSetHeader>;
 }
 
 class AuthRepository implements IAuthRepository {
-  getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData> {
+  getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<BasicStudentLoginData[]>(
         "SELECT s.studentId, ru.userId, ru.email, ru.password FROM REGISTERED_USER ru INNER JOIN STUDENT s ON ru.userId = s.studentId WHERE s.studentId = ?;",
         [studentId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
   }
 
-  getBasicAdminLoginData(adminId: number): Promise<BasicAdminLoginData> {
+  getBasicAdminLoginData(adminId: number): Promise<BasicAdminLoginData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<BasicAdminLoginData[]>(
         "SELECT a.adminId, ru.userId, ru.email, ru.password FROM REGISTERED_USER ru INNER JOIN ADMIN a ON ru.userId = a.adminId WHERE a.adminId = ?;",
         [adminId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
