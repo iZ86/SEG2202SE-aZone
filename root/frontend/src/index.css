@@ -37,6 +37,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3 {
+  font-family: "Poppins", sans-serif;
+}
+
+p {
+  font-family: "Nunito Sans", sans-serif;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
