@@ -108,7 +108,7 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
         src={aZoneLogoBlueYinmn}
         alt="aZone Logo Blue Yinmn"
       />
-      {userRole === 2 ? <h6 className="text-blue-yinmn font-bold text-xl">ADMIN LOGIN</h6> : undefined}
+      {userRole === 2 ? <h1 className="text-blue-yinmn font-bold">ADMIN LOGIN</h1> : undefined}
       <form
         className="flex flex-col gap-y-8"
         onSubmit={login}
