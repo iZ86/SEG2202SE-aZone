@@ -1,6 +1,7 @@
 import StudentNavbar from "@components/student/StudentNavbar";
 import { Search, ClipboardList } from "lucide-react";
 import { useState } from "react";
+import MediumButton from "@components/MediumButton";
 
 export default function Enrollment() {
     const [selected, setSelected] = useState(null);
@@ -18,8 +19,8 @@ export default function Enrollment() {
             <StudentNavbar page="enrollment" />
 
             <main className="px-10 py-10 flex-1">
-                <h1 className="text-3xl text-black font-bold">Available Subjects</h1>
-                <p className="text-xl text-gray-500 font-normal mt-3">Select your subjects for the upcoming semester</p>
+                <h1 className="text-black font-bold">Available Subjects</h1>
+                <p className="text-gray-500 font-normal mt-3">Select your subjects for the upcoming semester</p>
 
                 <div className="relative mt-6">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -43,22 +44,33 @@ export default function Enrollment() {
                                     <ClipboardList className="text-gray-700 w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-black">
+                                    <h3 className="text-lg font-semibold text-black">
                                         {subj.code} - {subj.name}
-                                    </h2>
+                                    </h3>
                                     <p className="text-gray-600 text-sm">Credit Hours: {subj.credits}</p>
                                     <p className="text-red-500 text-sm font-medium">
                                         Total seat left: {subj.seats}
                                     </p>
                                 </div>
                             </div>
-
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-md transition">
-                                Choose
-                            </button>
+                            
+                            <MediumButton buttonText="Choose" submit={true} />
                         </div>
                     ))}
                 </div>
+
+                <div className="fixed bottom-0 left-0 w-full bg-white shadow-md border-t border-gray-200">
+                    <div className="flex justify-between items-center px-10 py-6">
+                        <h3 className="text-black">
+                            Total Subjects Selected: {selected !== null ? 1 : 0} | Total Credit Hours Selected: {selected !== null ? subjects[selected]?.credits : 0}
+                        </h3>
+                        <MediumButton buttonText="Submit Enrollment" submit={true} />
+                    </div>
+                </div>
+
+                <button className="fixed bottom-30 right-10 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-all">
+                    <ClipboardList className="w-6 h-6" />
+                </button>
             </main>
         </div>
     );
