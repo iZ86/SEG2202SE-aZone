@@ -9,6 +9,7 @@ import HeavyButton from "@components/HeavyButton";
 import isUserId from "../utils/isUserId";
 
 import { User } from "lucide-react";
+import MediumButton from "@components/MediumButton";
 
 /** Student Login Form. */
 export function StudentLoginForm() {
@@ -109,7 +110,7 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
       />
       {userRole === 2 ? <h6 className="text-blue-yinmn font-bold text-xl">ADMIN LOGIN</h6> : undefined}
       <form
-        className="flex flex-col gap-y-8 justify-center items-center"
+        className="flex flex-col gap-y-8"
         onSubmit={login}
       >
 
@@ -157,7 +158,7 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
           </div>
         </div>
 
-        <HeavyButton buttonText="LOG IN" submit={true} />
+        <MediumButton buttonText="LOG IN" submit={true} />
       </form>
     </div>
   );
