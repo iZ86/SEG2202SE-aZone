@@ -12,6 +12,13 @@ interface IUserRepostory {
   isStudentExist(studentId: number): Promise<boolean>;
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<ResultSetHeader>;
   createStudent(studentId: number): Promise<ResultSetHeader>;
+  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader>;
+  deleteUserById(userId: number): Promise<ResultSetHeader>;
+  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData| undefined>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
+  deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(studentId: number, status: number): Promise<ResultSetHeader>;
 }
 
 class UserRepository implements IUserRepostory {

@@ -5,6 +5,7 @@ import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth-model
 interface IAuthRepository {
   getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData>;
   getBasicAdminLoginData(userId: number): Promise<BasicAdminLoginData>;
+  updateMe(userId: number, phoneNumber: string, email: string): Promise<ResultSetHeader>;
 }
 
 class AuthRepository implements IAuthRepository {

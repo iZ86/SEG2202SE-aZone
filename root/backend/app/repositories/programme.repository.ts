@@ -11,6 +11,8 @@ interface IProgrammeRepository {
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData>;
   getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
+  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
+  deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
