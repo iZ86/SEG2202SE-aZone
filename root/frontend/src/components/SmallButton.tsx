@@ -8,7 +8,7 @@ export default function SmallButton({
   buttonText: string, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, onClick?: () => {}
 }) {
 
-  const commonClasses = `px-4 py-2 ${backgroundColor} ${textColor} font-bold text-base flex justify-center items-center rounded-lg ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
+  const commonClasses = `px-4 py-2 ${backgroundColor} ${textColor} font-bold text-base flex justify-center items-center rounded-sm ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
 
   if (link.length > 0) {
     return (

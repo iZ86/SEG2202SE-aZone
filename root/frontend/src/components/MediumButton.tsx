@@ -8,7 +8,7 @@ export default function MediumButton({
   buttonText: string, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, onClick?: () => {}
 }) {
 
-  const commonClasses = `px-6 py-1.5 ${backgroundColor} ${textColor} font-bold text-xl flex justify-center items-center rounded-xl ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
+  const commonClasses = `px-6 py-1.5 ${backgroundColor} ${textColor} font-bold text-xl flex justify-center items-center rounded-md ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
 
   if (link.length > 0) {
     return (
