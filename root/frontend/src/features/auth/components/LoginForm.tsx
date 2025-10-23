@@ -5,7 +5,6 @@ import aZoneLogoBlueYinmn from "@images/aZone-logo-blue-yinmn.png";
 import PasswordTextField from "@components/PasswordTextField";
 import { loginAPI } from "../api/login";
 import NormalTextField from "@components/NormalTextField";
-import HeavyButton from "@components/HeavyButton";
 import isUserId from "../utils/isUserId";
 
 import { User } from "lucide-react";
