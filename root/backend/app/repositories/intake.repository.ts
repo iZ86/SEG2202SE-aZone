@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 
 interface IIntakeRepository {
   getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]>;
-  getIntakeById(intakeId: number): Promise<IntakeData>;
+  getIntakeById(intakeId: number): Promise<IntakeData | undefined>;
   createIntake(intakeId: number): Promise<ResultSetHeader>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader>;
   deleteIntakeById(intakeId: number): Promise<ResultSetHeader>;
@@ -32,7 +32,7 @@ class IntakeRepository implements IIntakeRepository {
     });
   }
 
-  getIntakeById(intakeId: number): Promise<IntakeData> {
+  getIntakeById(intakeId: number): Promise<IntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<IntakeData[]>(
         "SELECT intakeId " +
@@ -41,7 +41,7 @@ class IntakeRepository implements IIntakeRepository {
         [intakeId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });

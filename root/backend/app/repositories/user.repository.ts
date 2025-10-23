@@ -5,13 +5,20 @@ import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model
 interface IUserRepostory {
   getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
-  getUserById(userId: number): Promise<UserData>;
-  getStudentById(studentId: number): Promise<UserData>;
-  getAdminById(adminId: number): Promise<UserData>;
+  getUserById(userId: number): Promise<UserData | undefined>;
+  getStudentById(studentId: number): Promise<UserData | undefined>;
+  getAdminById(adminId: number): Promise<UserData | undefined>;
   isAdminExist(adminId: number): Promise<boolean>;
   isStudentExist(studentId: number): Promise<boolean>;
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<ResultSetHeader>;
   createStudent(studentId: number): Promise<ResultSetHeader>;
+  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader>;
+  deleteUserById(userId: number): Promise<ResultSetHeader>;
+  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData| undefined>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
+  deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(studentId: number, status: number): Promise<ResultSetHeader>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -67,7 +74,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getUserById(userId: number): Promise<UserData> {
+  getUserById(userId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT userId, firstName, lastName, email, phoneNumber, status " +
@@ -76,13 +83,13 @@ class UserRepository implements IUserRepostory {
         [userId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
   }
 
-  getStudentById(studentId: number): Promise<UserData> {
+  getStudentById(studentId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber " +
@@ -92,13 +99,13 @@ class UserRepository implements IUserRepostory {
         [studentId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
   }
 
-  getAdminById(adminId: number): Promise<UserData> {
+  getAdminById(adminId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber " +
@@ -108,7 +115,7 @@ class UserRepository implements IUserRepostory {
         [adminId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
@@ -252,7 +259,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData> {
+  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
         "SELECT s.studentId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status " +
@@ -269,7 +276,7 @@ class UserRepository implements IUserRepostory {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });

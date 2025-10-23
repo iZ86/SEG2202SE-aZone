@@ -25,7 +25,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>> {
-    const programme: ProgrammeData = await ProgrammeRepository.getProgrammeById(programmeId);
+    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
 
     if (!programme) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme not found");
@@ -37,14 +37,22 @@ class ProgrammeService implements IProgrammeService {
   async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
     const response: ResultSetHeader = await ProgrammeRepository.createProgramme(programmeName);
 
-    const programme: ProgrammeData = await ProgrammeRepository.getProgrammeById(response.insertId);
+    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(response.insertId);
+
+    if (!programme) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme created not found");
+    }
 
     return Result.succeed(programme, "Programme create success");
   }
 
   async updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
     await ProgrammeRepository.updateProgrammeById(programmeId, programmeName);
-    const programme: ProgrammeData = await ProgrammeRepository.getProgrammeById(programmeId);
+    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
+
+    if (!programme) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme updated not found");
+    }
 
     return Result.succeed(programme, "Programme update success");
   }
@@ -62,7 +70,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>> {
-    const programmeIntake: ProgrammeIntakeData = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
 
     if (!programmeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
@@ -74,7 +82,11 @@ class ProgrammeService implements IProgrammeService {
   async createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<Result<ProgrammeIntakeData>> {
     const response: ResultSetHeader = await ProgrammeRepository.createProgrammeIntake(programmeId, intakeId, semester, semesterStartPeriod, semesterEndPeriod);
 
-    const programmeIntake: ProgrammeIntakeData = await ProgrammeRepository.getProgrammeIntakeById(response.insertId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(response.insertId);
+
+    if (!programmeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake created not found");
+    }
 
     return Result.succeed(programmeIntake, "Programme Intake create success");
   }
@@ -82,7 +94,11 @@ class ProgrammeService implements IProgrammeService {
   async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<Result<ProgrammeIntakeData>> {
     await ProgrammeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartPeriod, semesterEndPeriod);
 
-    const programmeIntake: ProgrammeIntakeData = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
+
+    if (!programmeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake updated not found");
+    }
 
     return Result.succeed(programmeIntake, "Programme Intake update success");
   }

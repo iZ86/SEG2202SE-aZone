@@ -4,13 +4,15 @@ import databaseConn from "../database/db-connection";
 
 interface IProgrammeRepository {
   getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
-  getProgrammeById(programmeId: number): Promise<ProgrammeData>;
+  getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined>;
   createProgramme(programmeName: string): Promise<ResultSetHeader>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader>;
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
-  getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData>;
+  getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
   getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
+  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
+  deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -37,7 +39,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeById(programmeId: number): Promise<ProgrammeData> {
+  getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeData[]>(
         "SELECT programmeId, programmeName " +
@@ -46,7 +48,7 @@ class ProgrammeRepository implements IProgrammeRepository {
         [programmeId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
@@ -122,7 +124,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData> {
+  getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, semesterEndPeriod " +
@@ -133,7 +135,7 @@ class ProgrammeRepository implements IProgrammeRepository {
         [programmeIntakeId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });

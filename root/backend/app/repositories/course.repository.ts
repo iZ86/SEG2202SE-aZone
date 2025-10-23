@@ -4,11 +4,12 @@ import { CourseData, CourseSubjectData } from "../models/course-model";
 
 interface ICourseRepository {
   getCourses(query: string, pageSize: number, page: number): Promise<CourseData[]>;
-  getCourseById(courseId: number): Promise<CourseData>;
+  getCourseById(courseId: number): Promise<CourseData | undefined>;
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
   getCourseSubjectByCourseId(courseId: number, query: string, pageSize: number, page: number): Promise<CourseSubjectData[]>;
+  getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
   createCourseSubject(courseId: number, subjectId: number): Promise<ResultSetHeader>;
   deleteCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<ResultSetHeader>;
@@ -39,7 +40,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseById(courseId: number): Promise<CourseData> {
+  getCourseById(courseId: number): Promise<CourseData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseData[]>(
         "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
@@ -51,7 +52,7 @@ class CourseRepository implements ICourseRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
@@ -128,7 +129,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData> {
+  getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseSubjectData[]>(
         "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName, s.* " +
@@ -144,7 +145,7 @@ class CourseRepository implements ICourseRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });

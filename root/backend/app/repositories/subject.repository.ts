@@ -4,7 +4,7 @@ import { SubjectData } from "../models/subject-model";
 
 interface ISubjectRepository {
   getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
-  getSubjectById(subjectId: number): Promise<SubjectData>;
+  getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
   createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   deleteSubjectById(subjectId: number): Promise<ResultSetHeader>;
@@ -36,7 +36,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectById(subjectId: number): Promise<SubjectData> {
+  getSubjectById(subjectId: number): Promise<SubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<SubjectData[]>(
         "SELECT * " +
@@ -47,7 +47,7 @@ class SubjectRepository implements ISubjectRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res?.[0]);
+          resolve(res[0]);
         }
       );
     });
