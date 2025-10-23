@@ -8,7 +8,7 @@ export default function HeavyButton({
   buttonText: string, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, onClick?: () => {}
 }) {
 
-  const commonClasses = `px-8 py-4 ${backgroundColor} ${textColor} font-bold text-2xl flex justify-center items-center rounded-lg ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
+  const commonClasses = `font-nunito-sans px-8 py-4 ${backgroundColor} ${textColor} font-bold text-2xl flex justify-center items-center rounded-lg ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
 
   if (link.length > 0) {
     return (
