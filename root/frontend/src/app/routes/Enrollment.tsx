@@ -61,9 +61,9 @@ export default function Enrollment() {
 
                 <div className="fixed bottom-0 left-0 w-full bg-white shadow-md border-t border-gray-200">
                     <div className="flex justify-between items-center px-10 py-6">
-                        <h3 className="text-black">
+                        <h4 className="text-black font-semibold">
                             Total Subjects Selected: {selected !== null ? 1 : 0} | Total Credit Hours Selected: {selected !== null ? subjects[selected]?.credits : 0}
-                        </h3>
+                        </h4>
                         <MediumButton buttonText="Submit Enrollment" submit={true} />
                     </div>
                 </div>
