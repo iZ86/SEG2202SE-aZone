@@ -21,6 +21,10 @@ const routes = [
     path: "/admin/dashboard",
     element: <AdminDashboard />,
   },
+  {
+    path: "/admin/users",
+    element: <AdminUser />,
+  },
 ];
 
 export const Router = () => {

@@ -56,6 +56,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               </Link>
             )
           )}
+            {
+              to: "/admin/users",
+              label: "Users",
+              key: "users",
+            },
 
           {/* Sign out button */}
           <button
