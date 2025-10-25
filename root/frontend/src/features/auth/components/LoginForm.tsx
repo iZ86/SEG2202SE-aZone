@@ -53,7 +53,7 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
         } else {
           localStorage.setItem(userRole === 1 ? "aZoneStudentAuthToken" : "aZoneAdminAuthToken", token);
         }
-        navigate(userRole === 1 ? "/dashboard" : "/admin/dashboard");
+        navigate(userRole === 1 ? "/" : "/admin");
       } else if (response.status === 403) {
         setInvalidUserId(true);
         setInvalidPassword(true);

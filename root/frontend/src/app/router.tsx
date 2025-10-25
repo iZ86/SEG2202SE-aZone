@@ -3,6 +3,7 @@ import GuestLogin from "@routes/GuestLogin";
 import Dashboard from "@routes/Dashboard";
 import AdminDashboard from "@routes/admin/AdminDashboard";
 import AdminLogin from "@routes/admin/AdminLogin";
+import AdminUser from "@routes/admin/AdminUser";
 
 const routes = [
   {
@@ -10,15 +11,15 @@ const routes = [
     element: <GuestLogin />,
   },
   {
-    path: "/dashboard",
+    path: "/",
     element: <Dashboard />,
   },
   {
     path: "/admin/login",
-    element: <AdminLogin />
+    element: <AdminLogin />,
   },
   {
-    path: "/admin/dashboard",
+    path: "/admin",
     element: <AdminDashboard />,
   },
   {
