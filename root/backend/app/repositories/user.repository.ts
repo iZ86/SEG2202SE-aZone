@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
 
 interface IUserRepostory {
   getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -8,6 +8,8 @@ interface IUserRepostory {
   getUserById(userId: number): Promise<UserData | undefined>;
   getStudentById(studentId: number): Promise<UserData | undefined>;
   getAdminById(adminId: number): Promise<UserData | undefined>;
+  getAdminCount(query: string): Promise<number>;
+  getStudentCount(query: string): Promise<number>
   isAdminExist(adminId: number): Promise<boolean>;
   isStudentExist(studentId: number): Promise<boolean>;
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<ResultSetHeader>;
@@ -116,6 +118,54 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getStudentCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM REGISTERED_USER ru " +
+        "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
+        "WHERE ru.userId LIKE ? " +
+        "OR ru.firstName LIKE ? " +
+        "OR ru.lastName LIKE ? " +
+        "OR ru.email LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
+        }
+      );
+    });
+  }
+
+  getAdminCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM REGISTERED_USER ru " +
+        "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
+        "WHERE ru.userId LIKE ? " +
+        "OR ru.firstName LIKE ? " +
+        "OR ru.lastName LIKE ? " +
+        "OR ru.email LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });
