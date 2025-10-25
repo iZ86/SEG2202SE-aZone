@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import UserRepository from "../repositories/user.repository";
 import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
 
@@ -64,8 +64,19 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-  async getStudentCount(query: string = ""): Promise<Result<number>> {
-    const userCount: number = await UserRepository.getStudentCount(query);
+  async getUserCount(query: string = "", role: ENUM_USER_ROLE): Promise<Result<number>> {
+    let userCount: number;
+
+    switch (role) {
+      case ENUM_USER_ROLE.ADMIN:
+        userCount = await UserRepository.getAdminCount(query);
+        break;
+      case ENUM_USER_ROLE.STUDENT:
+        userCount = await UserRepository.getStudentCount(query);
+        break;
+      default:
+        return Result.succeed(0, "Failed to get user count");
+    }
 
     return Result.succeed(userCount ? userCount : 0, "User count retrieve success");
   }
