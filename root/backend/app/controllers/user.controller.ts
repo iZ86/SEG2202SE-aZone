@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
 import UserService from "../services/user.service";
@@ -15,7 +15,7 @@ export default class UserController {
     const query: string = req.query.query as string || "";
 
     const response: Result<UserData[]> = await UserService.getAllAdmins(query, pageSize, page);
-    const userCount: Result<number> = await UserService.getStudentCount(query);
+    const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.ADMIN);
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
         users: response.getData(),
@@ -150,7 +150,7 @@ export default class UserController {
     const status: number = parseInt(req.query.status as string) || 1;
 
     const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakes(query, pageSize, page, status);
-    const userCount: Result<number> = await UserService.getStudentCount(query);
+    const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
