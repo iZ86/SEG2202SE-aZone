@@ -3,7 +3,7 @@ import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import UserRepository from "../repositories/user.repository";
-import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
 
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
@@ -31,7 +31,6 @@ class UserService implements IUserService {
 
   async getAllStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
     const students: UserData[] = await UserRepository.getStudents(query, pageSize, page);
-
     return Result.succeed(students, "Students retrieve success");
   }
 
@@ -63,6 +62,12 @@ class UserService implements IUserService {
     }
 
     return Result.succeed(student, "Student retrieve success");
+  }
+
+  async getStudentCount(query: string = ""): Promise<Result<number>> {
+    const userCount: number = await UserRepository.getStudentCount(query);
+
+    return Result.succeed(userCount ? userCount : 0, "User count retrieve success");
   }
 
   async isUserExist(userId: number): Promise<boolean> {

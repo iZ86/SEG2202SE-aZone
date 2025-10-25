@@ -24,3 +24,7 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   semesterStartPeriod: Date;
   semesterEndPeriod: Date;
 }
+
+export interface UserCount extends RowDataPacket {
+  totalCount: number;
+}

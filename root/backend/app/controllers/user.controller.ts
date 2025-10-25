@@ -15,9 +15,12 @@ export default class UserController {
     const query: string = req.query.query as string || "";
 
     const response: Result<UserData[]> = await UserService.getAllAdmins(query, pageSize, page);
-
+    const userCount: Result<number> = await UserService.getStudentCount(query);
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        users: response.getData(),
+        userCount: userCount.isSuccess() ? userCount.getData() : 0,
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -147,9 +150,13 @@ export default class UserController {
     const status: number = parseInt(req.query.status as string) || 1;
 
     const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakes(query, pageSize, page, status);
+    const userCount: Result<number> = await UserService.getStudentCount(query);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        users: response.getData(),
+        userCount: userCount.isSuccess() ? userCount.getData() : 0,
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
