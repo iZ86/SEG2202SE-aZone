@@ -8,11 +8,11 @@ import subjectRoute from "./subject.route";
 
 export default class Routes {
   constructor(app: Application) {
-    app.use("/api/v1/user", userRoute);
+    app.use("/api/v1/users", userRoute);
     app.use("/api/v1/auth", authRoute);
-    app.use("/api/v1/course", courseRoute);
-    app.use("/api/v1/programme", programmeRoute);
-    app.use("/api/v1/intake", intakeRoute);
-    app.use("/api/v1/subject", subjectRoute);
+    app.use("/api/v1/courses", courseRoute);
+    app.use("/api/v1/programmes", programmeRoute);
+    app.use("/api/v1/intakes", intakeRoute);
+    app.use("/api/v1/subjects", subjectRoute);
   }
 }
