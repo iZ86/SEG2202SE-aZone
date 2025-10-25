@@ -17,7 +17,7 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData| undefined>;
+  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(studentId: number, status: number): Promise<ResultSetHeader>;
@@ -28,14 +28,16 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
-        "WHERE ru.firstName LIKE ? " +
+        "WHERE ru.userId LIKE ? " +
+        "OR ru.firstName LIKE ? " +
         "OR ru.lastName LIKE ? " +
         "OR ru.email LIKE ? " +
         "LIMIT ? OFFSET ?;",
         [
+          "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
@@ -57,11 +59,13 @@ class UserRepository implements IUserRepostory {
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
-        "WHERE ru.firstName LIKE ? " +
+        "WHERE ru.userId LIKE ? " +
+        "OR ru.firstName LIKE ? " +
         "OR ru.lastName LIKE ? " +
         "OR ru.email LIKE ? " +
         "LIMIT ? OFFSET ?;",
         [
+          "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
@@ -183,7 +187,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   isAdminExist(adminId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -198,7 +202,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   isStudentExist(studentId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -213,7 +217,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
@@ -227,7 +231,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   createStudent(studentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
@@ -241,7 +245,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
@@ -255,7 +259,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   deleteUserById(userId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
@@ -268,13 +272,13 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT s.studentId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
@@ -287,12 +291,10 @@ class UserRepository implements IUserRepostory {
         "OR ru.firstName LIKE ? " +
         "OR ru.lastName LIKE ? " +
         "OR ru.email LIKE ? " +
-        "OR c.courseName LIKE ? " +
-        "OR pi.intakeId LIKE ?) " +
+        "OR c.courseName LIKE ?) " +
         "LIMIT ? OFFSET ?;",
         [
           status,
-          "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
@@ -307,12 +309,12 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT s.studentId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
@@ -330,7 +332,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
@@ -344,7 +346,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
@@ -358,7 +360,7 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
-  }
+  };
 
   deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(studentId: number, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
