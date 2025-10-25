@@ -1,26 +1,26 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, Dispatch, SetStateAction} from "react";
 import { useNavigate } from "react-router";
 import aZoneLogoBlueYinmn from "@images/aZone-logo-blue-yinmn.png";
 import PasswordTextField from "@components/PasswordTextField";
 import { loginAPI } from "../api/login";
 import NormalTextField from "@components/NormalTextField";
-import HeavyButton from "@components/HeavyButton";
 import isUserId from "../utils/isUserId";
 
 import { User } from "lucide-react";
+import MediumButton from "@components/MediumButton";
 
 /** Student Login Form. */
-export function StudentLoginForm() {
-  return <LoginForm userRole={1} />
+export function StudentLoginForm({setError500}: {setError500: Dispatch<SetStateAction<boolean>>}) {
+  return <LoginForm userRole={1} setError500={setError500} />
 }
 
-export function AdminLoginForm() {
-  return <LoginForm userRole={2} />
+export function AdminLoginForm({setError500}: {setError500: Dispatch<SetStateAction<boolean>>}) {
+  return <LoginForm userRole={2} setError500={setError500} />
 }
 
 /** The login form of the login page. */
-function LoginForm({ userRole }: { userRole: 1 | 2 }) {
+function LoginForm({ userRole, setError500 }: { userRole: 1 | 2, setError500: Dispatch<SetStateAction<boolean>>}) {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -58,7 +58,7 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
         setInvalidUserId(true);
         setInvalidPassword(true);
       } else if (response.status === 500) {
-        // TODO: Add Internal Error Occurred.
+        setError500(true);
       }
     }
   }
@@ -107,9 +107,9 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
         src={aZoneLogoBlueYinmn}
         alt="aZone Logo Blue Yinmn"
       />
-      {userRole === 2 ? <h6 className="text-blue-yinmn font-bold text-xl">ADMIN LOGIN</h6> : undefined}
+      {userRole === 2 ? <h1 className="text-blue-yinmn font-bold">ADMIN LOGIN</h1> : undefined}
       <form
-        className="flex flex-col gap-y-8 justify-center items-center"
+        className="flex flex-col gap-y-8"
         onSubmit={login}
       >
 
@@ -157,7 +157,7 @@ function LoginForm({ userRole }: { userRole: 1 | 2 }) {
           </div>
         </div>
 
-        <HeavyButton buttonText="LOG IN" submit={true} />
+        <MediumButton buttonText="LOG IN" submit={true} />
       </form>
     </div>
   );
