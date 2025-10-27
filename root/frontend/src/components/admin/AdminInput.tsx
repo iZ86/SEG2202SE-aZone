@@ -129,8 +129,8 @@ export function ShortTextInput({
     case "Phone Number":
       attributes = {
         type: "tel",
-        pattern: "^[0-9]{10,11}$", // Regex: only numbers, length must be between 10 and 11.
-        title: "Phone number must be between 10 to 11 digits.",
+        pattern: "^01\\d{8,9}$", // Regex: only numbers, length must be between 10 and 11.
+        title: "Phone number must start with 01 and contain 10-11 digits",
         maxLength: 11,
       };
       break;
