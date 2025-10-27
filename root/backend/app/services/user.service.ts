@@ -3,6 +3,11 @@ import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
+import { CourseData } from "../models/course-model";
+import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
+import UserRepository from "../repositories/user.repository";
+import CourseRepository from "../repositories/course.repository";
+import ProgrammeRepository from "../repositories/programme.repository";
 
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
@@ -13,6 +18,7 @@ interface IUserService {
   isUserExist(userId: number): Promise<boolean>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
@@ -139,9 +145,23 @@ class UserService implements IUserService {
 
     return Result.succeed(studentCourseProgrammeIntakeResponse.getData(), "Student update success");
   }
+
+  async updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>> {
+    const adminResponse: UserData | undefined = await UserRepository.getAdminById(adminId);
+
+    if (!adminResponse) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid adminId");
     }
 
-    return Result.succeed(student, "Student update success");
+    await UserRepository.updateUserById(adminId, firstName, lastName, phoneNumber, email, 1);
+
+    const admin: UserData | undefined = await UserRepository.getAdminById(adminId);
+
+    if (!admin) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Admin updated not found");
+    }
+
+    return Result.succeed(admin, "Admin update success");
   }
 
   async deleteUserById(userId: number): Promise<Result<null>> {

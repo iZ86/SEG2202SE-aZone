@@ -85,18 +85,22 @@ export const updateStudentValidator: any = [
   validate,
 ];
 
-export const updateStudentCourseProgrammeIntakeBodyValidator: any = [
-  body('courseId')
+export const updateAdminValidator: any = [
+  body('firstName')
     .trim()
-    .notEmpty().withMessage('Missing courseId')
-    .isNumeric().withMessage('courseId must be numeric'),
-  body('programmeIntakeId')
+    .notEmpty().withMessage('Missing firstName')
+    .isString().withMessage('firstName must be string'),
+  body('lastName')
     .trim()
-    .notEmpty().withMessage('Missing programmeIntakeId')
-    .isNumeric().withMessage('programmeIntakeId must be numeric'),
-  body('status')
+    .notEmpty().withMessage('Missing lastName')
+    .isString().withMessage('lastName must be string'),
+  body('email')
     .trim()
-    .notEmpty().withMessage('Missing status')
-    .isNumeric().withMessage('status must be numeric'),
-  validate
+    .notEmpty().withMessage('Missing email')
+    .isEmail().withMessage('email must be email'),
+  body('phoneNumber')
+    .trim()
+    .notEmpty().withMessage('Missing phoneNumber')
+    .matches(/^01\d{8,9}$/).withMessage("phoneNumber must start with 01 and contain 10-11 digits"),
+  validate,
 ];
