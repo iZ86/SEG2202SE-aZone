@@ -47,12 +47,13 @@ export default class UserController {
   }
 
   async getAdminById(req: Request, res: Response) {
-    const userId: number = parseInt(req.params.userId);
+    const adminId: number = parseInt(req.params.adminId);
+
     if (!adminId || isNaN(adminId)) {
       return res.sendError.badRequest("Invalid adminId");
     }
 
-    const response: Result<UserData> = await UserService.getAdminById(userId);
+    const response: Result<UserData> = await UserService.getAdminById(adminId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -65,9 +66,13 @@ export default class UserController {
   }
 
   async getStudentById(req: Request, res: Response) {
-    const userId: number = parseInt(req.params.userId);
+    const studentId: number = parseInt(req.params.studentId);
 
-    const response: Result<UserData> = await UserService.getStudentById(userId);
+    if (!studentId || isNaN(studentId)) {
+      return res.sendError.badRequest("Invalid studentId");
+    }
+
+    const response: Result<UserData> = await UserService.getStudentById(studentId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -254,7 +259,7 @@ export default class UserController {
     }
   }
 
-  async updateStudentCourseProgrammeIntake(req: Request, res: Response) {
+  async updateStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
     const courseId: number = req.body.courseId;
     const programmeIntakeId: number = req.body.programmeIntakeId;
