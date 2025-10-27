@@ -14,7 +14,7 @@ interface IUserRepostory {
   isStudentExist(studentId: number): Promise<boolean>;
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<ResultSetHeader>;
   createStudent(studentId: number): Promise<ResultSetHeader>;
-  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader>;
+  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
@@ -28,7 +28,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
         "WHERE ru.userId LIKE ? " +
@@ -247,12 +247,12 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader> {
+  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE REGISTERED_USER SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, status = ? " +
         "WHERE userId = ?;",
-        [firstName, lastName, phoneNumber, email, status, userId],
+        [firstName, lastName, phoneNumber, email, userStatus, userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
@@ -286,15 +286,13 @@ class UserRepository implements IUserRepostory {
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON i.intakeId = pi.intakeId " +
-        "WHERE scpi.status = ? " +
-        "AND (ru.userId LIKE ? " +
+        "WHERE (ru.userId LIKE ? " +
         "OR ru.firstName LIKE ? " +
         "OR ru.lastName LIKE ? " +
         "OR ru.email LIKE ? " +
         "OR c.courseName LIKE ?) " +
         "LIMIT ? OFFSET ?;",
         [
-          status,
           "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",

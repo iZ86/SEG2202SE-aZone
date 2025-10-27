@@ -2,7 +2,6 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import UserRepository from "../repositories/user.repository";
 import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
 
 interface IUserService {
@@ -12,8 +11,8 @@ interface IUserService {
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
-  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
@@ -120,13 +119,26 @@ class UserService implements IUserService {
     return Result.succeed(studentCourseProgrammeIntakeResponse.getData(), "Student create success");
   }
 
-  async updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>> {
-    await UserRepository.updateUserById(userId, firstName, lastName, phoneNumber, email, status);
+  async updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+    const student: UserData | undefined = await UserRepository.getStudentById(studentId);
+    const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
+    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
 
-    const student: UserData | undefined = await UserRepository.getStudentById(userId);
+    if (!student || !course || !programme || !programmeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId, courseId, programmeId, or programmeIntakeId");
+    }
 
-    if (!student) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student updated not found");
+    await UserRepository.updateUserById(studentId, firstName, lastName, phoneNumber, email, userStatus);
+
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, courseStatus);
+
+    if (!studentCourseProgrammeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student created not found");
+    }
+
+    return Result.succeed(studentCourseProgrammeIntakeResponse.getData(), "Student update success");
+  }
     }
 
     return Result.succeed(student, "Student update success");

@@ -62,17 +62,14 @@ export const updateStudentValidator: any = [
     .trim()
     .notEmpty().withMessage('Missing phoneNumber')
     .matches(/^01\d{8,9}$/).withMessage("phoneNumber must start with 01 and contain 10-11 digits"),
-  body('status')
-    .notEmpty().withMessage('Missing status')
-    .isIn([0, 1]).withMessage('Status must be 1 or 0'),
-  validate,
-];
-
-export const createStudentCourseProgrammeIntakeBodyValidator: any = [
-  body('studentId')
+  body('userStatus')
     .trim()
-    .notEmpty().withMessage('Missing studentId')
-    .isNumeric().withMessage('studentId must be numeric'),
+    .notEmpty().withMessage('Missing userStatus')
+    .isIn([0, 1]).withMessage('userStatus must be 1 or 0'),
+  body('programmeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeId')
+    .isNumeric().withMessage('programmeId must be numeric'),
   body('courseId')
     .trim()
     .notEmpty().withMessage('Missing courseId')
@@ -81,11 +78,11 @@ export const createStudentCourseProgrammeIntakeBodyValidator: any = [
     .trim()
     .notEmpty().withMessage('Missing programmeIntakeId')
     .isNumeric().withMessage('programmeIntakeId must be numeric'),
-  body('status')
+  body('courseStatus')
     .trim()
-    .notEmpty().withMessage('Missing status')
-    .isNumeric().withMessage('status must be numeric'),
-  validate
+    .notEmpty().withMessage('Missing courseStatus')
+    .isIn([1, 0]).withMessage('courseStatus must be 1 or 0'),
+  validate,
 ];
 
 export const updateStudentCourseProgrammeIntakeBodyValidator: any = [
