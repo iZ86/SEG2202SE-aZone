@@ -10,6 +10,7 @@ interface IProgrammeRepository {
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
   getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
+  getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
@@ -115,6 +116,25 @@ class ProgrammeRepository implements IProgrammeRepository {
           "%" + query + "%",
           pageSize,
           offset,
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ProgrammeIntakeData[]>(
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, semesterEndPeriod " +
+        "FROM PROGRAMME_INTAKE pi " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
+        "WHERE pi.programmeId = ? ",
+        [
+          programmeId
         ],
         (err, res) => {
           if (err) reject(err);

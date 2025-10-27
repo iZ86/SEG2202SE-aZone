@@ -126,7 +126,7 @@ export default class ProgrammeController {
     }
   }
 
-  async getAllProgrammeIntakesByProgrammeId(req: Request, res: Response) {
+  async getProgrammeIntakesByProgrammeId(req: Request, res: Response) {
     const programmeId: number = parseInt(req.params.programmeId as string);
 
     if (!programmeId || isNaN(programmeId)) {
@@ -231,7 +231,7 @@ export default class ProgrammeController {
 
   async deleteProgrammeIntakeById(req: Request, res: Response) {
     const programmeIntakeId: number = parseInt(req.params.programmeIntakeId as string);
-    
+
     if (!programmeIntakeId || isNaN(programmeIntakeId)) {
       return res.sendError.badRequest("Invalid programmeIntakeId");
     }

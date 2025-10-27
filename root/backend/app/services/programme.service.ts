@@ -11,6 +11,7 @@ interface IProgrammeService {
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
   getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>>;
+  getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<Result<ProgrammeIntakeData>>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<Result<ProgrammeIntakeData>>;
@@ -64,16 +65,22 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getAllProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>> {
-    const programmeIntakesData: ProgrammeIntakeData[] = await ProgrammeRepository.getProgrammeIntakes(query, pageSize, page);
+    const programmeIntakesData: ProgrammeIntakeData[] = await ProgrammeRepository.getAllProgrammeIntakes(query, pageSize, page);
 
-    return Result.succeed(programmeIntakesData, "Programme delete success");
+    return Result.succeed(programmeIntakesData, "Programme retrieve success");
+  }
+
+  async getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>> {
+    const programmeIntakesData: ProgrammeIntakeData[] = await ProgrammeRepository.getProgrammeIntakesByProgrammeId(programmeId);
+
+    return Result.succeed(programmeIntakesData, "Programme retrieve success");
   }
 
   async getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>> {
     const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
 
     if (!programmeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
     }
 
     return Result.succeed(programmeIntake, "Programme retrieve success");
