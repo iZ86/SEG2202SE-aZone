@@ -6,26 +6,8 @@ import {
 } from "../api/admin-users";
 import { Link, useNavigate } from "react-router-dom";
 import Pagination from "@components/Pagination";
-
-// --- Types
-type User = {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  courseId: number;
-  courseName: string;
-  programmeIntakeId: number;
-  programmeId: number;
-  programmeName: string;
-  intakeId: number;
-  semester: string;
-  semesterStartPeriod: string;
-  semesterEndPeriod: string;
-  status: boolean;
-  role: "Student" | "Admin";
-};
+import SmallButton from "@components/SmallButton";
+import type { User } from "@datatypes/user";
 
 export default function AdminUserTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -122,12 +104,24 @@ export default function AdminUserTable() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <Link
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 text-center"
-          to="/admin/users/create"
-        >
-          Create New User
-        </Link>
+        {/* <SingleSelect
+          isEmpty={false}
+          options={[
+            { value: 1, label: "Active" },
+            { value: 0, label: "Inactive" },
+          ]}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e?.value)}
+        /> */}
+
+        <SmallButton
+          buttonText="Create New Student"
+          backgroundColor="bg-blue-500"
+          hoverBgColor="hover:bg-blue-600"
+          link="/admin/users/create"
+          textColor="text-white"
+          submit={false}
+        />
       </div>
 
       <section className="mt-4">
@@ -185,17 +179,19 @@ export default function AdminUserTable() {
                     <td className="px-6 py-5">
                       <span
                         className={`font-bold px-4 py-2 ${
-                          user.status
+                          user.userStatus
                             ? "bg-green-100 text-green-600"
                             : "bg-red-100 text-red-600"
                         } rounded-xl`}
                       >
-                        {user.status ? "Active" : "Inactive"}
+                        {user.userStatus ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-slate-500">
                       <Link
-                        to={`/admin/users/${user.userId}/edit`}
+                        to={`/admin/users/${user.userId}/edit${
+                          activeTab === "Student" ? "" : "?admin=true"
+                        }`}
                         className="text-indigo-600 hover:text-indigo-500 hover:underline"
                       >
                         <Pencil size={16} className="inline-block ml-1" />
