@@ -112,11 +112,24 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId");
     }
 
+  async updateAdminById(req: Request, res: Response) {
+    const adminId: number = parseInt(req.params.adminId);
+    const firstName: string = req.body.firstName;
+    const lastName: string = req.body.lastName;
+    const phoneNumber: string = req.body.phoneNumber;
+    const email: string = req.body.email;
+
+    if (!adminId || isNaN(adminId)) {
+      return res.sendError.badRequest("Invalid adminId");
+    }
+
+    const userResponse: boolean = await UserService.isUserExist(adminId);
+
     if (!userResponse) {
       return res.sendError.notFound("Invalid userId");
     }
 
-    const response: Result<UserData> = await UserService.updateUserById(userId, firstName, lastName, phoneNumber, email, status);
+    const response: Result<UserData> = await UserService.updateAdminById(adminId, firstName, lastName, email, phoneNumber);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
