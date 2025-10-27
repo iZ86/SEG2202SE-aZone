@@ -27,6 +27,10 @@ export default class ProgrammeController {
   async getProgrammeById(req: Request, res: Response) {
     const programmeId: number = parseInt(req.params.programmeId as string);
 
+    if (!programmeId || isNaN(programmeId)) {
+      return res.sendError.badRequest("Invalid programmeId");
+    }
+
     const response: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
 
     if (response.isSuccess()) {
@@ -58,6 +62,10 @@ export default class ProgrammeController {
     const programmeId: number = parseInt(req.params.programmeId as string);
     const programmeName: string = req.body.programmeName;
 
+    if (!programmeId || isNaN(programmeId)) {
+      return res.sendError.badRequest("Invalid programmeId");
+    }
+
     const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
 
     if (!programme.isSuccess()) {
@@ -78,6 +86,10 @@ export default class ProgrammeController {
 
   async deleteProgrammeById(req: Request, res: Response) {
     const programmeId: number = parseInt(req.params.programmeId as string);
+
+    if (!programmeId || isNaN(programmeId)) {
+      return res.sendError.badRequest("Invalid programmeId");
+    }
 
     const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
 
@@ -114,8 +126,31 @@ export default class ProgrammeController {
     }
   }
 
+  async getAllProgrammeIntakesByProgrammeId(req: Request, res: Response) {
+    const programmeId: number = parseInt(req.params.programmeId as string);
+
+    if (!programmeId || isNaN(programmeId)) {
+      return res.sendError.badRequest("Invalid programmeId");
+    }
+
+    const response: Result<ProgrammeData[]> = await ProgrammeService.getProgrammeIntakesByProgrammeId(programmeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
   async getProgrammeIntakeById(req: Request, res: Response) {
     const programmeIntakeId: number = parseInt(req.params.programmeIntakeId as string);
+
+    if (!programmeIntakeId || isNaN(programmeIntakeId)) {
+      return res.sendError.badRequest("Invalid programmeIntakeId");
+    }
 
     const response: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
 
@@ -166,6 +201,10 @@ export default class ProgrammeController {
     const semesterStartPeriod: Date = req.body.semesterStartPeriod;
     const semesterEndPeriod: Date = req.body.semesterEndPeriod;
 
+    if (!programmeIntakeId || isNaN(programmeIntakeId)) {
+      return res.sendError.badRequest("Invalid programmeIntakeId");
+    }
+
     const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
 
     const programmeIdResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
@@ -192,6 +231,10 @@ export default class ProgrammeController {
 
   async deleteProgrammeIntakeById(req: Request, res: Response) {
     const programmeIntakeId: number = parseInt(req.params.programmeIntakeId as string);
+    
+    if (!programmeIntakeId || isNaN(programmeIntakeId)) {
+      return res.sendError.badRequest("Invalid programmeIntakeId");
+    }
 
     const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
 

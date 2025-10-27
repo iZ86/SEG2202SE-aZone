@@ -25,6 +25,10 @@ export default class SubjectController {
   async getSubjectById(req: Request, res: Response) {
     const subjectId: number = parseInt(req.params.subjectId as string);
 
+    if (!subjectId || isNaN(subjectId)) {
+      return res.sendError.badRequest("Invalid subjectId");
+    }
+
     const response: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
 
     if (response.isSuccess()) {
@@ -62,6 +66,10 @@ export default class SubjectController {
     const description: string = req.body.description;
     const creditHours: number = req.body.creditHours;
 
+    if (!subjectId || isNaN(subjectId)) {
+      return res.sendError.badRequest("Invalid subjectId");
+    }
+
     const subjectResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
 
     if (!subjectResponse.isSuccess()) {
@@ -84,6 +92,10 @@ export default class SubjectController {
     const subjectId: number = parseInt(req.params.subjectId as string);
     const subjectResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
 
+    if (!subjectId || isNaN(subjectId)) {
+      return res.sendError.badRequest("Invalid subjectId");
+    }
+    
     if (!subjectResponse.isSuccess()) {
       return res.sendError.notFound("Invalid subjectId");
     }

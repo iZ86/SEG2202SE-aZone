@@ -48,6 +48,9 @@ export default class UserController {
 
   async getAdminById(req: Request, res: Response) {
     const userId: number = parseInt(req.params.userId);
+    if (!adminId || isNaN(adminId)) {
+      return res.sendError.badRequest("Invalid adminId");
+    }
 
     const response: Result<UserData> = await UserService.getAdminById(userId);
 
@@ -105,6 +108,9 @@ export default class UserController {
     const status: boolean = req.body.status;
 
     const userResponse: boolean = await UserService.isUserExist(userId);
+    if (!studentId || isNaN(studentId)) {
+      return res.sendError.badRequest("Invalid studentId");
+    }
 
     if (!userResponse) {
       return res.sendError.notFound("Invalid userId");
@@ -124,6 +130,10 @@ export default class UserController {
 
   async deleteUserById(req: Request, res: Response) {
     const userId: number = parseInt(req.params.userId);
+
+    if (!userId || isNaN(userId)) {
+      return res.sendError.badRequest("Invalid userId");
+    }
 
     const userResponse: boolean = await UserService.isUserExist(userId);
 
@@ -167,6 +177,10 @@ export default class UserController {
 
   async getStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
+
+    if (!studentId || isNaN(studentId)) {
+      return res.sendError.badRequest("Invalid studentId");
+    }
 
     const response: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
@@ -212,6 +226,10 @@ export default class UserController {
     const programmeIntakeId: number = req.body.programmeIntakeId;
     const status: number = req.body.status;
 
+    if (!studentId || isNaN(studentId)) {
+      return res.sendError.badRequest("Invalid studentId");
+    }
+
     const studentResponse: Result<UserData> = await UserService.getStudentById(studentId);
     const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
     const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
@@ -235,6 +253,10 @@ export default class UserController {
   async deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
     const status: number = parseInt(req.params.status);
+
+    if (!studentId || isNaN(studentId) || !status || !isNaN(status)) {
+      return res.sendError.badRequest("Invalid studentId or status");
+    }
 
     const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 

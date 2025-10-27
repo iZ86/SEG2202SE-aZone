@@ -29,7 +29,30 @@ export default class CourseController {
   async getCourseById(req: Request, res: Response) {
     const courseId: number = parseInt(req.params.courseId as string);
 
+    if (!courseId || isNaN(courseId)) {
+      return res.sendError.badRequest("Invalid courseId");
+    }
+
     const response: Result<CourseData> = await CourseService.getCourseById(courseId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async getCoursesByProgrammeId(req: Request, res: Response) {
+    const programmeId: number = parseInt(req.params.programmeId as string);
+
+    if (!programmeId || isNaN(programmeId)) {
+      return res.sendError.badRequest("Invalid courseId");
+    }
+
+    const response: Result<CourseData[]> = await CourseService.getCoursesByProgrammeId(programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -68,6 +91,10 @@ export default class CourseController {
     const courseName: string = req.body.courseName;
     const programmeId: number = req.body.programmeId;
 
+    if (!courseId || isNaN(courseId)) {
+      return res.sendError.badRequest("Invalid courseId");
+    }
+
     const programmeResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
     const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
 
@@ -90,12 +117,16 @@ export default class CourseController {
   async deleteCourseById(req: Request, res: Response) {
     const courseId: number = parseInt(req.params.courseId as string);
 
+    if (!courseId || isNaN(courseId)) {
+      return res.sendError.badRequest("Invalid courseId");
+    }
+
     const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
 
     if (!courseResponse.isSuccess()) {
       return res.sendError.notFound("Invalid courseId");
     }
-    
+
     const response = await CourseService.deleteCourseById(courseId);
 
     if (response.isSuccess()) {
@@ -113,6 +144,10 @@ export default class CourseController {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
+
+    if (!courseId || isNaN(courseId)) {
+      return res.sendError.badRequest("Invalid courseId");
+    }
 
     const response: Result<CourseSubjectData[]> = await CourseService.getCourseSubjectByCourseId(courseId, query, pageSize, page);
 
@@ -161,6 +196,10 @@ export default class CourseController {
   async deleteCourseSubjectByCourseIdAndSubjectId(req: Request, res: Response) {
     const courseId: number = parseInt(req.params.courseId as string);
     const subjectId: number = parseInt(req.params.subjectId as string);
+
+    if (!courseId || isNaN(courseId) || !subjectId || isNaN(subjectId)) {
+      return res.sendError.badRequest("Invalid courseId or subjectId");
+    }
 
     const courseIdResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
 
