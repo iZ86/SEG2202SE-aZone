@@ -3,20 +3,20 @@ import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
 import databaseConn from "../database/db-connection";
 
 interface IProgrammeRepository {
-  getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
+  getAllProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
   getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined>;
   createProgramme(programmeName: string): Promise<ResultSetHeader>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader>;
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
-  getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
+  getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
-  getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]> {
+  getAllProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeData[]>(
@@ -95,7 +95,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]> {
+  getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       const offset: number = (page - 1) * pageSize;
       databaseConn.query<ProgrammeIntakeData[]>(

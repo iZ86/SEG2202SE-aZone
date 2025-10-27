@@ -14,7 +14,7 @@ interface ISubjectService {
 
 class SubjectService implements ISubjectService {
   async getAllSubjects(query: string = "", pageSize: number, page: number): Promise<Result<SubjectData[]>> {
-    const subjects: SubjectData[] = await SubjectRepository.getSubjects(query, pageSize, page);
+    const subjects: SubjectData[] = await SubjectRepository.getAllSubjects(query, pageSize, page);
 
     return Result.succeed(subjects, "Subjects retrieve success");
   }

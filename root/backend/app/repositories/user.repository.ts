@@ -3,8 +3,8 @@ import databaseConn from "../database/db-connection";
 import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
 
 interface IUserRepostory {
-  getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
-  getStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
+  getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
+  getAllStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
   getStudentById(studentId: number): Promise<UserData | undefined>;
   getAdminById(adminId: number): Promise<UserData | undefined>;
@@ -16,7 +16,7 @@ interface IUserRepostory {
   createStudent(studentId: number): Promise<ResultSetHeader>;
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
-  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
@@ -24,7 +24,7 @@ interface IUserRepostory {
 }
 
 class UserRepository implements IUserRepostory {
-  getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]> {
+  getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
@@ -52,7 +52,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudents(query: string, pageSize: number, page: number): Promise<UserData[]> {
+  getAllStudents(query: string, pageSize: number, page: number): Promise<UserData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
@@ -274,7 +274,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]> {
+  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number): Promise<StudentCourseProgrammeIntakeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(

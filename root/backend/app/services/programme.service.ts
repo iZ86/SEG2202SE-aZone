@@ -19,7 +19,7 @@ interface IProgrammeService {
 
 class ProgrammeService implements IProgrammeService {
   async getAllProgrammes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeData[]>> {
-    const programmes: ProgrammeData[] = await ProgrammeRepository.getProgrammes(query, pageSize, page);
+    const programmes: ProgrammeData[] = await ProgrammeRepository.getAllProgrammes(query, pageSize, page);
 
     return Result.succeed(programmes, "Programmes retrieve success");
   }

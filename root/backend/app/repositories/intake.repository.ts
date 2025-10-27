@@ -3,7 +3,7 @@ import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 
 interface IIntakeRepository {
-  getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]>;
+  getAllIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]>;
   getIntakeById(intakeId: number): Promise<IntakeData | undefined>;
   createIntake(intakeId: number): Promise<ResultSetHeader>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader>;
@@ -11,7 +11,7 @@ interface IIntakeRepository {
 }
 
 class IntakeRepository implements IIntakeRepository {
-  getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]> {
+  getAllIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<IntakeData[]>(

@@ -3,7 +3,7 @@ import databaseConn from "../database/db-connection";
 import { SubjectData } from "../models/subject-model";
 
 interface ISubjectRepository {
-  getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
+  getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
   getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
   createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
@@ -11,7 +11,7 @@ interface ISubjectRepository {
 }
 
 class SubjectRepository implements ISubjectRepository {
-  getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]> {
+  getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<SubjectData[]>(

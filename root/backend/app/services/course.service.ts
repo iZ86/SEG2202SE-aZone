@@ -18,7 +18,7 @@ interface ICourseService {
 
 class CourseService implements ICourseService {
   async getAllCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseData[]>> {
-    const courses: CourseData[] = await CourseRepository.getCourses(query, pageSize, page);
+    const courses: CourseData[] = await CourseRepository.getAllCourses(query, pageSize, page);
 
     return Result.succeed(courses, "Courses retrieve success");
   }
@@ -87,7 +87,7 @@ class CourseService implements ICourseService {
     if (!courseSubject) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course subject created not found");
     }
-    
+
     return Result.succeed(courseSubject, "Course subject create success");
   }
 

@@ -13,7 +13,7 @@ interface IInterfaceService {
 
 class InterfaceService implements IInterfaceService {
   async getAllIntakes(query: string = "", pageSize: number, page: number): Promise<Result<IntakeData[]>> {
-    const intakes: IntakeData[] = await IntakeRepository.getIntakes(query, pageSize, page);
+    const intakes: IntakeData[] = await IntakeRepository.getAllIntakes(query, pageSize, page);
 
     return Result.succeed(intakes, "Intakes retrieve success");
   }

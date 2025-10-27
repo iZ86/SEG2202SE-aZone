@@ -196,9 +196,8 @@ export default class UserController {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
-    const status: number = parseInt(req.query.status as string) || 1;
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakes(query, pageSize, page, status);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getAllStudentCourseProgrammeIntakes(query, pageSize, page);
     const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {

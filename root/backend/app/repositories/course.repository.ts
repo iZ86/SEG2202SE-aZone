@@ -3,7 +3,7 @@ import databaseConn from "../database/db-connection";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 
 interface ICourseRepository {
-  getCourses(query: string, pageSize: number, page: number): Promise<CourseData[]>;
+  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseData[]>;
   getCourseById(courseId: number): Promise<CourseData | undefined>;
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
@@ -16,7 +16,7 @@ interface ICourseRepository {
 }
 
 class CourseRepository implements ICourseRepository {
-  getCourses(query: string, pageSize: number, page: number): Promise<CourseData[]> {
+  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseData[]>(
@@ -145,7 +145,7 @@ class CourseRepository implements ICourseRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res[0]);
+          resolve(res?.[0]);
         }
       );
     });
@@ -167,7 +167,7 @@ class CourseRepository implements ICourseRepository {
         ],
         (err, res: any[]) => {
           if (err) reject(err);
-          resolve(Boolean(res[0].courseSubjectExists));
+          resolve(Boolean(res?.[0].courseSubjectExists));
         }
       );
     });
