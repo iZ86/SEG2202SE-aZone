@@ -1,0 +1,688 @@
+import { ShortTextInput, SingleSelect } from "@components/admin/AdminInput";
+import LoadingOverlay from "@components/LoadingOverlay";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import type { SingleValue } from "react-select";
+import {
+  createStudent,
+  getAdminByIdAPI,
+  getAllProgrammesAPI,
+  getCoursesByProgrammeIdAPI,
+  getProgrammeIntakesByProgrammeIdAPI,
+  getStudentCourseProgrammeIntakeByStudentIdAPI,
+  updateAdminById,
+  updateStudentById,
+} from "../api/admin-users";
+import type { reactSelectOptionType } from "@datatypes/reactSelectOption";
+import type { Programme, ProgrammeIntake } from "@datatypes/programme";
+import type { Course } from "@datatypes/course";
+import MediumButton from "@components/MediumButton";
+
+export default function AdminUserForm({
+  type,
+  id = 0,
+}: {
+  type: "Add" | "Edit";
+  id?: number;
+}) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [status, setStatus] = useState<reactSelectOptionType>({
+    value: 1,
+    label: "Active",
+  });
+  const [programme, setProgramme] = useState<reactSelectOptionType>({
+    value: 0,
+    label: "",
+  });
+  const [course, setCourse] = useState<reactSelectOptionType>({
+    value: 0,
+    label: "",
+  });
+  const [programmeIntake, setProgrammeIntake] = useState<reactSelectOptionType>(
+    {
+      value: 0,
+      label: "",
+    }
+  );
+  const [courseStatus, setCourseStatus] = useState<reactSelectOptionType>({
+    value: 1,
+    label: "Active",
+  });
+  const statusOptions: reactSelectOptionType[] = [
+    { value: 0, label: "Inactive" },
+    { value: 1, label: "Active" },
+  ];
+  const [programmeOptions, setProgrammeOptions] = useState<
+    reactSelectOptionType[]
+  >([]);
+  const [courseOptions, setCourseOptions] = useState<reactSelectOptionType[]>(
+    []
+  );
+  const [programmeIntakeOptions, setProgrammeIntakeOptions] = useState<
+    reactSelectOptionType[]
+  >([]);
+  const courseStatusOptions: reactSelectOptionType[] = [
+    { value: 0, label: "Completed" },
+    { value: 1, label: "Active" },
+  ];
+
+  const [emptyStatus, setEmptyStatus] = useState(false);
+  const [emptyFirstName, setEmptyFirstName] = useState(false);
+  const [emptyLastName, setEmptyLastName] = useState(false);
+  const [emptyEmail, setEmptyEmail] = useState(false);
+  const [emptyPhoneNumber, setEmptyPhoneNumber] = useState(false);
+  const [emptyPassword, setEmptyPassword] = useState(false);
+  const [emptyConfirmPassword, setEmptyConfirmPassword] = useState(false);
+  const [emptyProgramme, setEmptyProgramme] = useState(false);
+  const [emptyCourse, setEmptyCourse] = useState(false);
+  const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
+  const [emptyCourseStatus, setEmptyCourseStatus] = useState(false);
+
+  const [isPasswordMatched, setIsPasswordMatched] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const skipReset = useRef(false);
+  const [searchParams] = useSearchParams();
+  const isAdmin: boolean = searchParams.get("admin") === "true";
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (isLoading) {
+      return;
+    }
+
+    if (
+      emptyFirstName ||
+      emptyLastName ||
+      emptyEmail ||
+      emptyPhoneNumber ||
+      emptyPassword ||
+      emptyConfirmPassword ||
+      emptyProgramme ||
+      emptyCourse ||
+      emptyProgrammeIntake
+    ) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (setEmptyInputs()) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    let response: Response | undefined;
+
+    if (type === "Add") {
+      response = await createStudent(
+        authToken as string,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        password,
+        status.value,
+        programme.value,
+        course.value,
+        programmeIntake.value,
+        courseStatus.value
+      );
+    } else if (type === "Edit") {
+      if (isAdmin) {
+        response = await updateAdminById(
+          authToken as string,
+          id,
+          firstName,
+          lastName,
+          email,
+          phoneNumber
+        );
+      } else {
+        response = await updateStudentById(
+          authToken as string,
+          id,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          password,
+          status.value,
+          programme.value,
+          course.value,
+          programmeIntake.value,
+          courseStatus.value
+        );
+      }
+    }
+
+    if (response && response.ok) {
+      setIsLoading(false);
+      navigate("/admin/users");
+      return;
+    }
+  }
+
+  function setEmptyInputs(): boolean {
+    let emptyInput: boolean = false;
+
+    if (firstName === "") {
+      setEmptyFirstName(true);
+      emptyInput = true;
+    }
+
+    if (lastName === "") {
+      setEmptyLastName(true);
+      emptyInput = true;
+    }
+
+    if (email === "") {
+      setEmptyEmail(true);
+      emptyInput = true;
+    }
+
+    if (phoneNumber === "") {
+      setEmptyPhoneNumber(true);
+      emptyInput = true;
+    }
+
+    if (!isAdmin) {
+      if (!programme.value) {
+        setEmptyProgramme(true);
+        emptyInput = true;
+      }
+
+      if (!course.value) {
+        setEmptyCourse(true);
+        emptyInput = true;
+      }
+
+      if (!programmeIntake.value) {
+        setEmptyProgrammeIntake(true);
+        emptyInput = true;
+      }
+    }
+
+    if (type === "Add") {
+      if (password === "") {
+        setEmptyPassword(true);
+        emptyInput = true;
+      }
+
+      if (confirmPassword === "") {
+        setEmptyConfirmPassword(true);
+        emptyInput = true;
+      }
+    }
+
+    return emptyInput;
+  }
+
+  function onChangeStatus(onChangeStatus: SingleValue<reactSelectOptionType>) {
+    if (!onChangeStatus) {
+      return;
+    }
+    setStatus(onChangeStatus);
+    setEmptyStatus(false);
+  }
+
+  function onChangeFirstName(onChangeFirstName: string) {
+    if (onChangeFirstName !== "") {
+      setEmptyFirstName(false);
+    }
+    setFirstName(onChangeFirstName);
+  }
+
+  function onChangeLastName(onChangeLastName: string) {
+    if (onChangeLastName !== "") {
+      setEmptyLastName(false);
+    }
+    setLastName(onChangeLastName);
+  }
+
+  function onChangeEmail(onChangeEmail: string) {
+    if (onChangeEmail !== "") {
+      setEmptyEmail(false);
+    }
+    setEmail(onChangeEmail);
+  }
+
+  function onChangePhoneNumber(onChangePhoneNumber: string) {
+    if (onChangePhoneNumber !== "") {
+      setEmptyPhoneNumber(false);
+    }
+    setPhoneNumber(onChangePhoneNumber);
+  }
+
+  function onChangePassword(onChangePassword: string) {
+    if (onChangePassword !== "") {
+      setEmptyPassword(false);
+    }
+    setIsPasswordMatched(onChangePassword === confirmPassword);
+    setPassword(onChangePassword);
+  }
+
+  function onChangeConfirmPassword(onChangeConfirmPassword: string) {
+    if (onChangeConfirmPassword !== "") {
+      setEmptyConfirmPassword(false);
+    }
+    setIsPasswordMatched(onChangeConfirmPassword === password);
+    setConfirmPassword(onChangeConfirmPassword);
+  }
+
+  function onChangeProgramme(
+    onChangeProgramme: SingleValue<reactSelectOptionType>
+  ) {
+    if (!onChangeProgramme) {
+      return;
+    }
+    setProgramme(onChangeProgramme);
+    setEmptyProgramme(false);
+  }
+
+  function onChangeCourse(onChangeCourse: SingleValue<reactSelectOptionType>) {
+    if (!onChangeCourse) {
+      return;
+    }
+    setCourse(onChangeCourse);
+    setEmptyCourse(false);
+  }
+
+  function onChangeProgrammeIntake(
+    onChangeProgrammeIntake: SingleValue<reactSelectOptionType>
+  ) {
+    if (!onChangeProgrammeIntake) {
+      return;
+    }
+    setProgrammeIntake(onChangeProgrammeIntake);
+    setEmptyProgrammeIntake(false);
+  }
+
+  function onChangeCourseStatus(
+    onChangeCourseStatus: SingleValue<reactSelectOptionType>
+  ) {
+    if (!onChangeCourseStatus) {
+      return;
+    }
+    setCourseStatus(onChangeCourseStatus);
+    setEmptyCourseStatus(false);
+  }
+
+  async function getAllProgrammes(token: string) {
+    const response: Response | undefined = await getAllProgrammesAPI(token);
+
+    if (!response?.ok) {
+      setProgrammeOptions([]);
+      return;
+    }
+
+    const { data } = await response.json();
+
+    if (!data || data.length === 0) {
+      setProgrammeOptions([]);
+      return;
+    }
+
+    const options = data.map((programme: Programme) => ({
+      value: programme.programmeId,
+      label: programme.programmeName,
+    }));
+
+    setProgrammeOptions(options);
+  }
+
+  async function getCoursesByProgrammeId(token: string, programmeId: number) {
+    const response: Response | undefined = await getCoursesByProgrammeIdAPI(
+      token,
+      programmeId
+    );
+
+    if (!response?.ok) {
+      setCourseOptions([]);
+      return;
+    }
+
+    const { data } = await response.json();
+
+    if (!data || data.length === 0) {
+      setCourseOptions([]);
+      return;
+    }
+
+    const options = data.map((course: Course) => ({
+      value: course.courseId,
+      label: course.courseName,
+    }));
+
+    setCourseOptions(options);
+  }
+
+  async function getProgrammeIntakesByProgrammeId(
+    token: string,
+    programmeId: number
+  ) {
+    const response: Response | undefined =
+      await getProgrammeIntakesByProgrammeIdAPI(token, programmeId);
+
+    if (!response?.ok) {
+      setProgrammeIntakeOptions([]);
+      return;
+    }
+
+    const { data } = await response.json();
+
+    if (!data || data.length === 0) {
+      setProgrammeIntakeOptions([]);
+      return;
+    }
+
+    const options = data.map((programmeIntake: ProgrammeIntake) => ({
+      value: programmeIntake.programmeIntakeId,
+      label:
+        programmeIntake.intakeId + " - Semester " + programmeIntake.semester,
+    }));
+
+    setProgrammeIntakeOptions(options);
+  }
+
+  const setupEditStudentForm = useCallback(
+    async (token: string, studentId: number) => {
+      const response: Response | undefined =
+        await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
+
+      if (!response?.ok) {
+        navigate("/admin/users");
+        return;
+      }
+      const { data } = await response.json();
+
+      skipReset.current = true;
+
+      setFirstName(data.firstName);
+      setLastName(data.lastName);
+      setEmail(data.email);
+      setPhoneNumber(data.phoneNumber);
+      setStatus({
+        value: data.userStatus ? 1 : 0,
+        label: data.userStatus ? "Active" : "Inactive",
+      });
+      setProgramme({
+        value: data.programmeId,
+        label: data.programmeName,
+      });
+      setCourse({
+        value: data.courseId,
+        label: data.courseName,
+      });
+      setProgrammeIntake({
+        value: data.programmeIntakeId,
+        label: data.intakeId + " - Semester " + data.semester,
+      });
+      setCourseStatus({
+        value: data.courseStatus,
+        label: data.courseStatus === 1 ? "Active" : "Completed",
+      });
+    },
+    [navigate]
+  );
+
+  const setupEditAdminForm = useCallback(
+    async (token: string, adminId: number) => {
+      const response: Response | undefined = await getAdminByIdAPI(
+        token,
+        adminId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/users");
+        return;
+      }
+      const { data } = await response.json();
+
+      skipReset.current = true;
+
+      setFirstName(data.firstName);
+      setLastName(data.lastName);
+      setEmail(data.email);
+      setPhoneNumber(data.phoneNumber);
+      setStatus({
+        value: data.userStatus ? 1 : 0,
+        label: data.userStatus ? "Active" : "Inactive",
+      });
+    },
+    [navigate]
+  );
+
+  useEffect(() => {
+    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
+      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
+
+    if (!token) {
+      navigate("/admin/login");
+      return;
+    }
+
+    setAuthToken(token);
+    getAllProgrammes(token);
+
+    if (type === "Edit" && id > 0) {
+      if (isAdmin) {
+        setupEditAdminForm(token, id);
+      } else {
+        setupEditStudentForm(token, id);
+      }
+    }
+  }, [navigate, type, id, setupEditStudentForm, setupEditAdminForm, isAdmin]);
+
+  useEffect(() => {
+    if (programme.value === 0 || !authToken) {
+      setCourseOptions([]);
+      return;
+    }
+
+    getCoursesByProgrammeId(authToken, programme.value);
+    getProgrammeIntakesByProgrammeId(authToken, programme.value);
+
+    if (skipReset.current) {
+      skipReset.current = false;
+    } else {
+      setCourse({
+        value: 0,
+        label: "",
+      });
+      setProgrammeIntake({
+        value: 0,
+        label: "",
+      });
+    }
+  }, [authToken, programme]);
+
+  return (
+    <section className="flex-1 bg-white rounded-lg border">
+      {isLoading && <LoadingOverlay />}
+      <div className="flex flex-col">
+        {/* Header */}
+        <div className="flex flex-col w-full px-10 py-6">
+          <h1 className="text-3xl font-bold text-slate-900">
+            {type === "Edit" ? "Edit" : "Create New"} Student
+          </h1>
+          <p className="mt-1 text-slate-400">
+            {type === "Edit"
+              ? "Make changes to the student information below."
+              : "Fill in the details below to create a new student."}
+          </p>
+        </div>
+
+        <hr className="border-slate-200 w-full border" />
+
+        <div className="flex flex-col px-10 py-6 justify-center items-center">
+          <form onSubmit={handleSubmit} className="mt-6">
+            <div className="flex w-5xl gap-x-10 mt-4">
+              <div className="flex-1">
+                <ShortTextInput
+                  headerText="First Name"
+                  placeHolderText="e.g., John"
+                  isEmpty={emptyFirstName}
+                  onChange={onChangeFirstName}
+                  value={firstName}
+                />
+              </div>
+              <div className="flex-1">
+                <ShortTextInput
+                  headerText="Last Name"
+                  placeHolderText="e.g., Tan"
+                  isEmpty={emptyLastName}
+                  onChange={onChangeLastName}
+                  value={lastName}
+                />
+              </div>
+            </div>
+
+            <div className="flex w-5xl gap-x-10 mt-4">
+              <div className="flex-1">
+                <ShortTextInput
+                  headerText="Email"
+                  placeHolderText="e.g., john@example.com"
+                  isEmpty={emptyEmail}
+                  onChange={onChangeEmail}
+                  value={email}
+                />
+              </div>
+              <div className="flex-1">
+                <ShortTextInput
+                  headerText="Phone Number"
+                  placeHolderText="e.g., 0123456789"
+                  isEmpty={emptyPhoneNumber}
+                  onChange={onChangePhoneNumber}
+                  value={phoneNumber}
+                />
+              </div>
+            </div>
+
+            {type === "Add" && (
+              <div className="flex w-5xl gap-x-10 mt-4">
+                <div className="flex-1">
+                  <ShortTextInput
+                    headerText="Password"
+                    placeHolderText=""
+                    isEmpty={emptyPassword}
+                    onChange={onChangePassword}
+                    value={password}
+                  />
+                  {!isPasswordMatched && (
+                    <p className="text-red-500 mt-1">Passwords do not match</p>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <ShortTextInput
+                    headerText="Confirm Password"
+                    placeHolderText=""
+                    isEmpty={emptyConfirmPassword}
+                    onChange={onChangeConfirmPassword}
+                    value={confirmPassword}
+                  />
+                </div>
+              </div>
+            )}
+
+            {!isAdmin && (
+              <>
+                <div className="flex w-5xl gap-x-10 mt-4">
+                  <div className="flex-1">
+                    <SingleSelect
+                      headerText="Select Student Programme"
+                      options={programmeOptions}
+                      value={programme}
+                      isEmpty={emptyProgramme}
+                      onChange={onChangeProgramme}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <SingleSelect
+                      headerText="Select Student Course"
+                      options={courseOptions}
+                      value={course}
+                      isEmpty={emptyCourse}
+                      onChange={onChangeCourse}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex w-5xl gap-x-10 mt-4">
+                  <div className="flex-1">
+                    <SingleSelect
+                      headerText="Select Student Intake"
+                      options={programmeIntakeOptions}
+                      value={programmeIntake}
+                      isEmpty={emptyProgrammeIntake}
+                      onChange={onChangeProgrammeIntake}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {!isAdmin && (
+              <>
+                <div className="flex w-5xl gap-x-10 mt-4">
+                  <div className="flex-1">
+                    <SingleSelect
+                      headerText={`Select Student Status`}
+                      options={statusOptions}
+                      value={status}
+                      isEmpty={emptyStatus}
+                      onChange={onChangeStatus}
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <SingleSelect
+                      headerText="Select Course Status"
+                      options={courseStatusOptions}
+                      value={courseStatus}
+                      isEmpty={emptyCourseStatus}
+                      onChange={onChangeCourseStatus}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className="justify-center flex mt-10 gap-x-10">
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/users"
+              />
+              <MediumButton
+                buttonText={
+                  type === "Edit" ? "Save Changes" : "Create New Student"
+                }
+                submit={true}
+                backgroundColor="bg-blue-500"
+                hoverBgColor="hover:bg-blue-600"
+                textColor="text-white"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
