@@ -16,7 +16,7 @@ interface IUserService {
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
-  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
@@ -96,7 +96,7 @@ class UserService implements IUserService {
     return true;
   }
 
-  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
     const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
     const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
     const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
@@ -112,7 +112,7 @@ class UserService implements IUserService {
       parallelism: 1
     });
 
-    const createUserResponse: ResultSetHeader = await UserRepository.createUser(firstName, lastName, email, phoneNumber, hashedPassword, status);
+    const createUserResponse: ResultSetHeader = await UserRepository.createUser(firstName, lastName, email, phoneNumber, hashedPassword, userStatus);
 
     const response: ResultSetHeader = await UserRepository.createStudent(createUserResponse.insertId);
 
