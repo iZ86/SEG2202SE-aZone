@@ -13,6 +13,7 @@ class CourseRoute {
   }
 
   initializeRoutes() {
+    this.router.get("/programme/:programmeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getCoursesByProgrammeId));
     this.router.delete("/:courseId/subject/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteCourseSubjectByCourseIdAndSubjectId));
     this.router.get("/subject/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getCourseSubjectByCourseId));
     this.router.post("/subject", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createCourseSubjectBodyValidator, asyncHandler(this.controller.createCourseSubject));

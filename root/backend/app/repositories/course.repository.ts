@@ -5,6 +5,7 @@ import { CourseData, CourseSubjectData } from "../models/course-model";
 interface ICourseRepository {
   getAllCourses(query: string, pageSize: number, page: number): Promise<CourseData[]>;
   getCourseById(courseId: number): Promise<CourseData | undefined>;
+  getCoursesByProgrammeId(programmeId: number): Promise<CourseData[] | undefined>;
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
@@ -52,7 +53,25 @@ class CourseRepository implements ICourseRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res[0]);
+          resolve(res?.[0]);
+        }
+      );
+    });
+  }
+
+  getCoursesByProgrammeId(programmeId: number): Promise<CourseData[] | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<CourseData[]>(
+        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
+        "FROM COURSE c " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "WHERE p.programmeId = ?;",
+        [
+          programmeId,
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
         }
       );
     });
