@@ -1,4 +1,3 @@
-import { ShortTextInput, SingleSelect } from "@components/admin/AdminInput";
 import LoadingOverlay from "@components/LoadingOverlay";
 import {
   useCallback,
@@ -19,10 +18,14 @@ import {
   updateAdminById,
   updateStudentById,
 } from "../api/admin-users";
-import type { reactSelectOptionType } from "@datatypes/reactSelectOption";
+import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import type { Programme, ProgrammeIntake } from "@datatypes/programme";
 import type { Course } from "@datatypes/course";
 import MediumButton from "@components/MediumButton";
+import NormalTextField from "@components/NormalTextField";
+import PasswordTextField from "@components/PasswordTextField";
+import SingleFilter from "@components/SingleFilter";
+import AdminEmptyInput from "@components/admin/AdminEmptyInput";
 
 export default function AdminUserForm({
   type,
@@ -42,16 +45,16 @@ export default function AdminUserForm({
     label: "Active",
   });
   const [programme, setProgramme] = useState<reactSelectOptionType>({
-    value: 0,
+    value: -1,
     label: "",
   });
   const [course, setCourse] = useState<reactSelectOptionType>({
-    value: 0,
+    value: -1,
     label: "",
   });
   const [programmeIntake, setProgrammeIntake] = useState<reactSelectOptionType>(
     {
-      value: 0,
+      value: -1,
       label: "",
     }
   );
@@ -200,17 +203,17 @@ export default function AdminUserForm({
     }
 
     if (!isAdmin) {
-      if (!programme.value) {
+      if (!programme.value || programme.value === -1) {
         setEmptyProgramme(true);
         emptyInput = true;
       }
 
-      if (!course.value) {
+      if (!course.value || course.value === -1) {
         setEmptyCourse(true);
         emptyInput = true;
       }
 
-      if (!programmeIntake.value) {
+      if (!programmeIntake.value || programmeIntake.value === -1) {
         setEmptyProgrammeIntake(true);
         emptyInput = true;
       }
@@ -500,11 +503,11 @@ export default function AdminUserForm({
       skipReset.current = false;
     } else {
       setCourse({
-        value: 0,
+        value: -1,
         label: "",
       });
       setProgrammeIntake({
-        value: 0,
+        value: -1,
         label: "",
       });
     }
@@ -529,107 +532,120 @@ export default function AdminUserForm({
         <hr className="border-slate-200 w-full border" />
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
-          <form onSubmit={handleSubmit} className="mt-6">
-            <div className="flex w-5xl gap-x-10 mt-4">
+          <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
+            <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <ShortTextInput
-                  headerText="First Name"
-                  placeHolderText="e.g., John"
-                  isEmpty={emptyFirstName}
-                  onChange={onChangeFirstName}
-                  value={firstName}
-                />
+                <AdminEmptyInput isInvalid={emptyFirstName}>
+                  <NormalTextField
+                    text={firstName}
+                    onChange={onChangeFirstName}
+                    isInvalid={emptyFirstName}
+                    placeholder="First Name"
+                  />
+                </AdminEmptyInput>
               </div>
+
               <div className="flex-1">
-                <ShortTextInput
-                  headerText="Last Name"
-                  placeHolderText="e.g., Tan"
-                  isEmpty={emptyLastName}
-                  onChange={onChangeLastName}
-                  value={lastName}
-                />
+                <AdminEmptyInput isInvalid={emptyLastName}>
+                  <NormalTextField
+                    text={lastName}
+                    onChange={onChangeLastName}
+                    isInvalid={emptyLastName}
+                    placeholder="Last Name"
+                  />
+                </AdminEmptyInput>
               </div>
             </div>
 
-            <div className="flex w-5xl gap-x-10 mt-4">
+            <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <ShortTextInput
-                  headerText="Email"
-                  placeHolderText="e.g., john@example.com"
-                  isEmpty={emptyEmail}
-                  onChange={onChangeEmail}
-                  value={email}
-                />
+                <AdminEmptyInput isInvalid={emptyEmail}>
+                  <NormalTextField
+                    text={email}
+                    onChange={onChangeEmail}
+                    isInvalid={emptyEmail}
+                    placeholder="Email (e.g., john@example.com)"
+                  />
+                </AdminEmptyInput>
               </div>
               <div className="flex-1">
-                <ShortTextInput
-                  headerText="Phone Number"
-                  placeHolderText="e.g., 0123456789"
-                  isEmpty={emptyPhoneNumber}
-                  onChange={onChangePhoneNumber}
-                  value={phoneNumber}
-                />
+                <AdminEmptyInput isInvalid={emptyPhoneNumber}>
+                  <NormalTextField
+                    text={phoneNumber}
+                    onChange={onChangePhoneNumber}
+                    isInvalid={emptyPhoneNumber}
+                    placeholder="Phone Number (e.g., 0123456789)"
+                  />
+                </AdminEmptyInput>
               </div>
             </div>
 
             {type === "Add" && (
-              <div className="flex w-5xl gap-x-10 mt-4">
+              <div className="flex w-5xl gap-x-10">
                 <div className="flex-1">
-                  <ShortTextInput
-                    headerText="Password"
-                    placeHolderText=""
-                    isEmpty={emptyPassword}
-                    onChange={onChangePassword}
-                    value={password}
-                  />
+                  <AdminEmptyInput isInvalid={emptyPassword}>
+                    <PasswordTextField
+                      password={password}
+                      onChange={onChangePassword}
+                      invalidPassword={emptyPassword}
+                      placeholder="Password"
+                    />
+                  </AdminEmptyInput>
                   {!isPasswordMatched && (
                     <p className="text-red-500 mt-1">Passwords do not match</p>
                   )}
                 </div>
                 <div className="flex-1">
-                  <ShortTextInput
-                    headerText="Confirm Password"
-                    placeHolderText=""
-                    isEmpty={emptyConfirmPassword}
-                    onChange={onChangeConfirmPassword}
-                    value={confirmPassword}
-                  />
+                  <AdminEmptyInput isInvalid={emptyConfirmPassword}>
+                    <PasswordTextField
+                      password={confirmPassword}
+                      onChange={onChangeConfirmPassword}
+                      invalidPassword={emptyConfirmPassword}
+                      placeholder="Confirm Password"
+                    />
+                  </AdminEmptyInput>
                 </div>
               </div>
             )}
 
             {!isAdmin && (
               <>
-                <div className="flex w-5xl gap-x-10 mt-4">
+                <div className="flex w-5xl gap-x-10">
                   <div className="flex-1">
-                    <SingleSelect
-                      headerText="Select Student Programme"
-                      options={programmeOptions}
-                      value={programme}
-                      isEmpty={emptyProgramme}
-                      onChange={onChangeProgramme}
-                    />
+                    <AdminEmptyInput isInvalid={emptyProgramme}>
+                      <SingleFilter
+                        placeholder="Select Student Programme"
+                        options={programmeOptions}
+                        value={programme}
+                        isInvalid={emptyProgramme}
+                        onChange={onChangeProgramme}
+                      />
+                    </AdminEmptyInput>
                   </div>
                   <div className="flex-1">
-                    <SingleSelect
-                      headerText="Select Student Course"
-                      options={courseOptions}
-                      value={course}
-                      isEmpty={emptyCourse}
-                      onChange={onChangeCourse}
-                    />
+                    <AdminEmptyInput isInvalid={emptyCourse}>
+                      <SingleFilter
+                        placeholder="Select Student Course"
+                        options={courseOptions}
+                        value={course}
+                        isInvalid={emptyCourse}
+                        onChange={onChangeCourse}
+                      />
+                    </AdminEmptyInput>
                   </div>
                 </div>
 
-                <div className="flex w-5xl gap-x-10 mt-4">
+                <div className="flex w-5xl gap-x-10">
                   <div className="flex-1">
-                    <SingleSelect
-                      headerText="Select Student Intake"
-                      options={programmeIntakeOptions}
-                      value={programmeIntake}
-                      isEmpty={emptyProgrammeIntake}
-                      onChange={onChangeProgrammeIntake}
-                    />
+                    <AdminEmptyInput isInvalid={emptyProgrammeIntake}>
+                      <SingleFilter
+                        placeholder="Select Student Intake"
+                        options={programmeIntakeOptions}
+                        value={programmeIntake}
+                        isInvalid={emptyProgrammeIntake}
+                        onChange={onChangeProgrammeIntake}
+                      />
+                    </AdminEmptyInput>
                   </div>
                 </div>
               </>
@@ -637,23 +653,23 @@ export default function AdminUserForm({
 
             {!isAdmin && (
               <>
-                <div className="flex w-5xl gap-x-10 mt-4">
+                <div className="flex w-5xl gap-x-10">
                   <div className="flex-1">
-                    <SingleSelect
-                      headerText={`Select Student Status`}
+                    <SingleFilter
+                      placeholder="Select Student Status"
                       options={statusOptions}
                       value={status}
-                      isEmpty={emptyStatus}
+                      isInvalid={emptyStatus}
                       onChange={onChangeStatus}
                     />
                   </div>
 
                   <div className="flex-1">
-                    <SingleSelect
-                      headerText="Select Course Status"
+                    <SingleFilter
+                      placeholder="Select Course Status"
                       options={courseStatusOptions}
                       value={courseStatus}
-                      isEmpty={emptyCourseStatus}
+                      isInvalid={emptyCourseStatus}
                       onChange={onChangeCourseStatus}
                     />
                   </div>
