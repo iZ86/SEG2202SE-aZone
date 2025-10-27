@@ -19,8 +19,8 @@ import {
   updateStudentById,
 } from "../api/admin-users";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
-import type { Programme, ProgrammeIntake } from "@datatypes/programme";
-import type { Course } from "@datatypes/course";
+import type { Programme, ProgrammeIntake } from "@datatypes/programmeType";
+import type { Course } from "@datatypes/courseType";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
 import PasswordTextField from "@components/PasswordTextField";

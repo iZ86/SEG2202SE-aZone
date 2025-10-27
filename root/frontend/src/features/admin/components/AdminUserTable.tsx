@@ -7,7 +7,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
-import type { User } from "@datatypes/user";
+import type { User } from "@datatypes/userType";
 
 export default function AdminUserTable() {
   const [users, setUsers] = useState<User[]>([]);
