@@ -99,18 +99,39 @@ export default class UserController {
     }
   }
 
-  async updateUserById(req: Request, res: Response) {
-    const userId: number = parseInt(req.params.userId);
+  async updateStudentById(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
-    const status: boolean = req.body.status;
+    const userStatus: number = req.body.userStatus;
+    const programmeId: number = req.body.programmeId;
+    const courseId: number = req.body.courseId;
+    const programmeIntakeId: number = req.body.programmeIntakeId;
+    const courseStatus: number = req.body.courseStatus;
 
-    const userResponse: boolean = await UserService.isUserExist(userId);
     if (!studentId || isNaN(studentId)) {
       return res.sendError.badRequest("Invalid studentId");
     }
+
+    const userResponse: boolean = await UserService.isUserExist(studentId);
+
+    if (!userResponse) {
+      return res.sendError.notFound("Invalid userId");
+    }
+
+    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus, programmeId, courseId, programmeIntakeId, courseStatus);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
 
   async updateAdminById(req: Request, res: Response) {
     const adminId: number = parseInt(req.params.adminId);
