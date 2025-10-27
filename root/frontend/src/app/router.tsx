@@ -5,6 +5,8 @@ import Enrollment from "@routes/Enrollment"
 import AdminDashboard from "@routes/admin/AdminDashboard";
 import AdminLogin from "@routes/admin/AdminLogin";
 import AdminUser from "@routes/admin/AdminUser";
+import AdminCreateUser from "@routes/admin/AdminCreateUser";
+import AdminEditUser from "@routes/admin/AdminEditUser";
 
 const routes = [
   {
@@ -30,6 +32,14 @@ const routes = [
   {
     path: "/admin/users",
     element: <AdminUser />,
+  },
+  {
+    path: "/admin/users/create",
+    element: <AdminCreateUser />,
+  },
+  {
+    path: "/admin/users/:id/edit",
+    element: <AdminEditUser />,
   },
 ];
 
