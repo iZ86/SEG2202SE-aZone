@@ -12,8 +12,8 @@ interface IUserService {
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
-  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<UserData>>;
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>>;
+  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
@@ -91,7 +91,15 @@ class UserService implements IUserService {
     return true;
   }
 
-  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean): Promise<Result<UserData>> {
+  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: boolean, programmeId: number, courseId: number, programmeIntakeId: number, courseStatus: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+    const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
+    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
+
+    if (!course || !programme || !programmeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid courseId, programmeId, or programmeIntakeId");
+    }
+
     const hashedPassword: string = await argon2.hash(password, {
       type: argon2.argon2id,
       memoryCost: 2 ** 16,
@@ -103,13 +111,13 @@ class UserService implements IUserService {
 
     const response: ResultSetHeader = await UserRepository.createStudent(createUserResponse.insertId);
 
-    const student: UserData | undefined = await UserRepository.getStudentById(response.insertId);
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.createStudentCourseProgrammeIntake(response.insertId, courseId, programmeIntakeId, courseStatus);
 
-    if (!student) {
+    if (!studentCourseProgrammeIntakeResponse.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student created not found");
     }
 
-    return Result.succeed(student, "Student create success");
+    return Result.succeed(studentCourseProgrammeIntakeResponse.getData(), "Student create success");
   }
 
   async updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, status: boolean): Promise<Result<UserData>> {

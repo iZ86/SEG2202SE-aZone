@@ -22,9 +22,26 @@ export const createStudentValidator: any = [
     .trim()
     .notEmpty().withMessage('Missing password')
     .isString().withMessage('Password must be string'),
-  body('status')
-    .notEmpty().withMessage('Missing status')
-    .isIn([0, 1]).withMessage('Status must be 1 or 0'),
+  body('userStatus')
+    .trim()
+    .notEmpty().withMessage('Missing userStatus')
+    .isIn([1, 0]).withMessage('userStatus must be 1 or 0'),
+  body('programmeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeId')
+    .isNumeric().withMessage('programmeId must be numeric'),
+  body('courseId')
+    .trim()
+    .notEmpty().withMessage('Missing courseId')
+    .isNumeric().withMessage('courseId must be numeric'),
+  body('programmeIntakeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeIntakeId')
+    .isNumeric().withMessage('programmeIntakeId must be numeric'),
+  body('courseStatus')
+    .trim()
+    .notEmpty().withMessage('Missing courseStatus')
+    .isIn([0, 1]).withMessage('courseStatus must be 1 or 0'),
   validate,
 ];
 
