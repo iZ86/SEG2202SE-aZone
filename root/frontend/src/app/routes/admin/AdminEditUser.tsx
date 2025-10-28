@@ -1,5 +1,5 @@
 import AdminNavbar from "@components/admin/AdminNavbar";
-import AdminUserForm from "@features/admin/components/AdminUserForm";
+import AdminUserForm from "@features/admin/components/UserForm";
 import { useParams } from "react-router-dom";
 
 export default function AdminEditUser() {
