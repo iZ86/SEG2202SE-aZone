@@ -337,7 +337,7 @@ export default function AdminUserForm({
       return;
     }
 
-    const options = data.map((programme: Programme) => ({
+    const options = data.programmes.map((programme: Programme) => ({
       value: programme.programmeId,
       label: programme.programmeName,
     }));
@@ -489,7 +489,7 @@ export default function AdminUserForm({
   }, [navigate, type, id, setupEditStudentForm, setupEditAdminForm, isAdmin]);
 
   useEffect(() => {
-    if (programme.value === 0 || !authToken) {
+    if (programme.value <= 0 || !authToken) {
       setCourseOptions([]);
       return;
     }
