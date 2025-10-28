@@ -6,7 +6,7 @@ import SmallButton from "@components/SmallButton";
 import type { Programme } from "@datatypes/programmeType";
 import { deleteProgrammeByIdAPI, getAllProgrammesAPI } from "../api/programmes";
 
-export default function AdminProgrammeTable() {
+export default function ProgrammeTable() {
   const [programmes, setProgrammes] = useState<Programme[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [authToken, setAuthToken] = useState<string | null>(null);

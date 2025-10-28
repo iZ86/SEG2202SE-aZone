@@ -1,5 +1,5 @@
 import AdminNavbar from "@components/admin/AdminNavbar";
-import AdminUserForm from "@features/admin/components/UserForm";
+import UserForm from "@features/admin/components/UserForm";
 import { useParams } from "react-router-dom";
 
 export default function AdminEditUser() {
@@ -21,7 +21,7 @@ export default function AdminEditUser() {
 
       {/* Main Content */}
       <main className="px-6 py-6 flex-1">
-        <AdminUserForm type="Edit" id={idNumber} />
+        <UserForm type="Edit" id={idNumber} />
       </main>
     </div>
   );

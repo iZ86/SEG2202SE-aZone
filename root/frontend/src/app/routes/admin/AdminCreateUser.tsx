@@ -1,5 +1,5 @@
 import AdminNavbar from "@components/admin/AdminNavbar";
-import AdminUserForm from "@features/admin/components/UserForm";
+import UserForm from "@features/admin/components/UserForm";
 
 export default function AdminCreateUser() {
   return (
@@ -9,7 +9,7 @@ export default function AdminCreateUser() {
 
       {/* Main Content */}
       <main className="px-6 py-6 flex-1">
-        <AdminUserForm type="Add" />
+        <UserForm type="Add" />
       </main>
     </div>
   );

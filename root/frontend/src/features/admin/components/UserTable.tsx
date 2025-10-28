@@ -7,7 +7,7 @@ import SmallButton from "@components/SmallButton";
 import type { User } from "@datatypes/userType";
 import { getAllAdminsAPI } from "../api/admins";
 
-export default function AdminUserTable({
+export default function UserTable({
   activeTab,
 }: {
   activeTab: User["role"];

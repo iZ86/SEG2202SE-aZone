@@ -1,6 +1,6 @@
 import AdminNavbar from "@components/admin/AdminNavbar";
 import type { User } from "@datatypes/userType";
-import AdminUserTable from "@features/admin/components/UserTable";
+import UserTable from "@features/admin/components/UserTable";
 import { useState } from "react";
 
 export default function AdminUser() {
@@ -28,7 +28,7 @@ export default function AdminUser() {
             </button>
           ))}
         </div>
-        <AdminUserTable activeTab={activeTab} />
+        <UserTable activeTab={activeTab} />
       </main>
     </div>
   );
