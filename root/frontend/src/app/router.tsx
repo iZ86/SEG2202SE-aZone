@@ -10,6 +10,9 @@ import AdminEditUser from "@routes/admin/AdminEditUser";
 import AdminProgramme from "@routes/admin/AdminProgramme";
 import AdminEditProgramme from "@routes/admin/AdminEditProgramme";
 import AdminCreateProgramme from "@routes/admin/AdminCreateProgramme";
+import AdminCourse from "@routes/admin/AdminCourse";
+import AdminCreateCourse from "@routes/admin/AdminCreateCourse";
+import AdminEditCourse from "@routes/admin/AdminEditCourse";
 
 const routes = [
   {
@@ -55,6 +58,18 @@ const routes = [
   {
     path: "/admin/programmes/:id/edit",
     element: <AdminEditProgramme />,
+  },
+  {
+    path: "/admin/courses",
+    element: <AdminCourse />,
+  },
+  {
+    path: "/admin/courses/create",
+    element: <AdminCreateCourse />,
+  },
+  {
+    path: "/admin/courses/:id/edit",
+    element: <AdminEditCourse />,
   },
 ];
 

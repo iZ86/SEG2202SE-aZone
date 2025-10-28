@@ -59,6 +59,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               label: "Programmes",
               key: "programmes",
             },
+            {
+              to: "/admin/courses",
+              label: "Courses",
+              key: "courses",
+            },
           ].map((item) => (
             <Link
               key={item.key}
