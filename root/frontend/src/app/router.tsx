@@ -1,12 +1,15 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GuestLogin from "@routes/GuestLogin";
 import Dashboard from "@routes/Dashboard";
-import Enrollment from "@routes/Enrollment"
+import Enrollment from "@routes/Enrollment";
 import AdminDashboard from "@routes/admin/AdminDashboard";
 import AdminLogin from "@routes/admin/AdminLogin";
 import AdminUser from "@routes/admin/AdminUser";
 import AdminCreateUser from "@routes/admin/AdminCreateUser";
 import AdminEditUser from "@routes/admin/AdminEditUser";
+import AdminProgramme from "@routes/admin/AdminProgramme";
+import AdminEditProgramme from "@routes/admin/AdminEditProgramme";
+import AdminCreateProgramme from "@routes/admin/AdminCreateProgramme";
 
 const routes = [
   {
@@ -40,6 +43,18 @@ const routes = [
   {
     path: "/admin/users/:id/edit",
     element: <AdminEditUser />,
+  },
+  {
+    path: "/admin/programmes",
+    element: <AdminProgramme />,
+  },
+  {
+    path: "/admin/programmes/create",
+    element: <AdminCreateProgramme />,
+  },
+  {
+    path: "/admin/programmes/:id/edit",
+    element: <AdminEditProgramme />,
   },
 ];
 
