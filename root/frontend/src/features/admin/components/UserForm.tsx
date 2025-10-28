@@ -22,10 +22,13 @@ import PasswordTextField from "@components/PasswordTextField";
 import SingleFilter from "@components/SingleFilter";
 import AdminEmptyInput from "@components/admin/AdminEmptyInput";
 import { getAdminByIdAPI, updateAdminByIdAPI } from "../api/admins";
-import { getAllProgrammesAPI, getProgrammeIntakesByProgrammeIdAPI } from "../api/programmes";
+import {
+  getAllProgrammesAPI,
+  getProgrammeIntakesByProgrammeIdAPI,
+} from "../api/programmes";
 import { getCoursesByProgrammeIdAPI } from "../api/courses";
 
-export default function AdminUserForm({
+export default function UserForm({
   type,
   id = 0,
 }: {
