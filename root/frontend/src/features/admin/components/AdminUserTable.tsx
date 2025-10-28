@@ -64,12 +64,15 @@ export default function AdminUserTable() {
       return;
     }
     setAuthToken(token);
-    fetchUsers(token);
   }, [fetchUsers, navigate]);
+
+  useEffect(() => {
+    if (!authToken) return;
+    fetchUsers(authToken, currentPage);
+  }, [authToken, currentPage, fetchUsers]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchUsers(authToken as string, page);
   };
 
   return (
@@ -103,16 +106,6 @@ export default function AdminUserTable() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
-        {/* <SingleSelect
-          isEmpty={false}
-          options={[
-            { value: 1, label: "Active" },
-            { value: 0, label: "Inactive" },
-          ]}
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e?.value)}
-        /> */}
 
         <SmallButton
           buttonText="Create New Student"
@@ -203,7 +196,7 @@ export default function AdminUserTable() {
             </table>
           </div>
         </div>
-        {totalPages > 1 && (
+        {totalPages && (
           <div className="mt-4 flex justify-end">
             <Pagination
               totalPages={totalPages}
