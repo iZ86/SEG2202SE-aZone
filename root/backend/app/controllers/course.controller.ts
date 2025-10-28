@@ -15,9 +15,13 @@ export default class CourseController {
     const query: string = req.query.query as string || "";
 
     const response: Result<CourseData[]> = await CourseService.getAllCourses(query, pageSize, page);
+    const courseCount: Result<number> = await CourseService.getCourseCount(query);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        courses: response.getData(),
+        courseCount: courseCount.isSuccess() ? courseCount.getData() : 0,
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

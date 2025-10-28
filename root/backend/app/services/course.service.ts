@@ -11,6 +11,7 @@ interface ICourseService {
   createCourse(courseName: string, programmeId: number): Promise<Result<CourseData>>;
   updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseData>>;
   deleteCourseById(courseId: number): Promise<Result<null>>;
+  getCourseCount(query: string): Promise<Result<number>>;
   getCourseSubjectByCourseId(courseId: number, query: string, pageSize: number, page: number): Promise<Result<CourseSubjectData[]>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
@@ -72,6 +73,12 @@ class CourseService implements ICourseService {
     await CourseRepository.deleteCourseById(courseId);
 
     return Result.succeed(null, "Course delete success");
+  }
+
+  async getCourseCount(query: string = ""): Promise<Result<number>> {
+    const courseCount: number = await CourseRepository.getCourseCount(query);
+
+    return Result.succeed(courseCount ? courseCount : 0, "Course count retrieve success");
   }
 
   async getCourseSubjectByCourseId(courseId: number, query: string = "", pageSize: number, page: number): Promise<Result<CourseSubjectData[]>> {

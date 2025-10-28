@@ -1,6 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { CourseData, CourseSubjectData } from "../models/course-model";
+import { TotalCount } from "../models/general-model";
 
 interface ICourseRepository {
   getAllCourses(query: string, pageSize: number, page: number): Promise<CourseData[]>;
@@ -9,6 +10,7 @@ interface ICourseRepository {
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
+  getCourseCount(query: string): Promise<number>;
   getCourseSubjectByCourseId(courseId: number, query: string, pageSize: number, page: number): Promise<CourseSubjectData[]>;
   getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
@@ -24,8 +26,8 @@ class CourseRepository implements ICourseRepository {
         "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
-        "WHERE c.courseName LIKE ? " +
-        "OR p.programmeName LIKE ? " +
+        "WHERE c.courseId LIKE ? " +
+        "OR c.courseName LIKE ? " +
         "LIMIT ? OFFSET ?;",
         [
           "%" + query + "%",
@@ -113,6 +115,26 @@ class CourseRepository implements ICourseRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getCourseCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM COURSE c " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "WHERE c.courseId LIKE ? " +
+        "OR c.courseName LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });
