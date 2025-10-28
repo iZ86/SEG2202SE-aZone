@@ -13,9 +13,13 @@ export default class ProgrammeController {
     const query: string = req.query.query as string || "";
 
     const response: Result<ProgrammeData[]> = await ProgrammeService.getAllProgrammes(query, pageSize, page);
+    const programmeCount: Result<number> = await ProgrammeService.getProgrammeCount(query);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        programmes: response.getData(),
+        programmeCount: programmeCount.isSuccess() ? programmeCount.getData() : 0,
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

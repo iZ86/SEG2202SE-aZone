@@ -1,6 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
 import databaseConn from "../database/db-connection";
+import { TotalCount } from "../models/general-model";
 
 interface IProgrammeRepository {
   getAllProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
@@ -10,10 +11,11 @@ interface IProgrammeRepository {
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
   getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
-  getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>
+  getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartPeriod: Date, semesterEndPeriod: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
+  getProgrammeCount(query: string): Promise<number>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -197,6 +199,25 @@ class ProgrammeRepository implements IProgrammeRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getProgrammeCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM PROGRAMME " +
+        "WHERE programmeId LIKE ? " +
+        "OR programmeName LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });

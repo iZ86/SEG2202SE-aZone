@@ -1,6 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, UserCount, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { TotalCount } from "../models/general-model";
 
 interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -129,7 +130,7 @@ class UserRepository implements IUserRepostory {
 
   getStudentCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<UserCount[]>(
+      databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
@@ -153,7 +154,7 @@ class UserRepository implements IUserRepostory {
 
   getAdminCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<UserCount[]>(
+      databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
