@@ -1,22 +1,23 @@
 import { Pencil } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import {
-  getAllAdminsAPI,
-  getAllStudentCourseProgrammeIntakesAPI,
-} from "../api/admin-users";
+import { getAllStudentCourseProgrammeIntakesAPI } from "../api/students";
 import { Link, useNavigate } from "react-router-dom";
 import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { User } from "@datatypes/userType";
+import { getAllAdminsAPI } from "../api/admins";
 
-export default function AdminUserTable() {
+export default function AdminUserTable({
+  activeTab,
+}: {
+  activeTab: User["role"];
+}) {
   const [users, setUsers] = useState<User[]>([]);
-  const [activeTab, setActiveTab] = useState<User["role"]>("Student");
   const [searchTerm, setSearchTerm] = useState("");
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize: number = 15;
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(15);
   const navigate = useNavigate();
 
   const fetchUsers = useCallback(
@@ -52,7 +53,7 @@ export default function AdminUserTable() {
       setUsers(data.users);
       setTotalPages(Math.ceil(data.userCount / pageSize));
     },
-    [activeTab, searchTerm]
+    [activeTab, searchTerm, pageSize]
   );
 
   useEffect(() => {
@@ -71,29 +72,13 @@ export default function AdminUserTable() {
     fetchUsers(authToken, currentPage);
   }, [authToken, currentPage, fetchUsers]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (page: number, pageSize: number) => {
     setCurrentPage(page);
+    setPageSize(pageSize);
   };
 
   return (
     <>
-      {/* Role filtering controls */}
-      <div className="flex space-x-8 border-b border-gray-300 mt-6">
-        {(["Student", "Admin"] as User["role"][]).map((role) => (
-          <button
-            key={role}
-            className={`pb-2 font-semibold cursor-pointer ${
-              activeTab === role
-                ? "border-b-2 border-blue-600 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab(role)}
-          >
-            {role}
-          </button>
-        ))}
-      </div>
-
       <div className="flex items-center space-x-4 mt-4">
         <input
           type="text"
@@ -107,14 +92,16 @@ export default function AdminUserTable() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <SmallButton
-          buttonText="Create New Student"
-          backgroundColor="bg-blue-500"
-          hoverBgColor="hover:bg-blue-600"
-          link="/admin/users/create"
-          textColor="text-white"
-          submit={false}
-        />
+        {activeTab === "Student" && (
+          <SmallButton
+            buttonText="Create New Student"
+            backgroundColor="bg-blue-500"
+            hoverBgColor="hover:bg-blue-600"
+            link="/admin/users/create"
+            textColor="text-white"
+            submit={false}
+          />
+        )}
       </div>
 
       <section className="mt-4">

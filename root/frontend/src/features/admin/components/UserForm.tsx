@@ -9,15 +9,10 @@ import {
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { SingleValue } from "react-select";
 import {
-  createStudent,
-  getAdminByIdAPI,
-  getAllProgrammesAPI,
-  getCoursesByProgrammeIdAPI,
-  getProgrammeIntakesByProgrammeIdAPI,
+  createStudentAPI,
   getStudentCourseProgrammeIntakeByStudentIdAPI,
-  updateAdminById,
-  updateStudentById,
-} from "../api/admin-users";
+  updateStudentByIdAPI,
+} from "../api/students";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import type { Programme, ProgrammeIntake } from "@datatypes/programmeType";
 import type { Course } from "@datatypes/courseType";
@@ -26,6 +21,9 @@ import NormalTextField from "@components/NormalTextField";
 import PasswordTextField from "@components/PasswordTextField";
 import SingleFilter from "@components/SingleFilter";
 import AdminEmptyInput from "@components/admin/AdminEmptyInput";
+import { getAdminByIdAPI, updateAdminByIdAPI } from "../api/admins";
+import { getAllProgrammesAPI, getProgrammeIntakesByProgrammeIdAPI } from "../api/programmes";
+import { getCoursesByProgrammeIdAPI } from "../api/courses";
 
 export default function AdminUserForm({
   type,
@@ -131,7 +129,7 @@ export default function AdminUserForm({
     let response: Response | undefined;
 
     if (type === "Add") {
-      response = await createStudent(
+      response = await createStudentAPI(
         authToken as string,
         firstName,
         lastName,
@@ -146,7 +144,7 @@ export default function AdminUserForm({
       );
     } else if (type === "Edit") {
       if (isAdmin) {
-        response = await updateAdminById(
+        response = await updateAdminByIdAPI(
           authToken as string,
           id,
           firstName,
@@ -155,7 +153,7 @@ export default function AdminUserForm({
           phoneNumber
         );
       } else {
-        response = await updateStudentById(
+        response = await updateStudentByIdAPI(
           authToken as string,
           id,
           firstName,
