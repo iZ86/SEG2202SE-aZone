@@ -12,12 +12,17 @@ export const createAndUpdateSubjectBodyValidator: any = [
     .isString().withMessage('subjectCode must be string'),
   body('description')
     .trim()
-    .notEmpty().withMessage('Missing description')
+    .optional()
     .isString().withMessage('description must be string')
     .isLength({ max: 300 }).withMessage('description cannot exceed 300 characters'),
   body('creditHours')
     .trim()
     .notEmpty().withMessage('Missing creditHours')
     .isNumeric().withMessage('creditHours must be numeric'),
+  body('courseIds')
+    .isArray({ min: 1 }).withMessage('courseIds must be an array and at least one value')
+    .notEmpty().withMessage('Array cannot be empty'),
+  body('courseIds.*')
+    .isNumeric().withMessage('All items must be numeric'),
   validate,
 ];

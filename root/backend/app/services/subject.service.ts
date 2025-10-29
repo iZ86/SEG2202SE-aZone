@@ -3,13 +3,15 @@ import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { SubjectData } from "../models/subject-model";
 import SubjectRepository from "../repositories/subject.repository";
+import CourseRepository from "../repositories/course.repository";
+import { CourseSubjectData } from "../models/course-model";
 
 interface ISubjectService {
   getAllSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectData[]>>;
   getSubjectById(subjectId: number): Promise<Result<SubjectData>>;
-  createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<SubjectData>>;
-  updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<SubjectData>>;
-  deleteSubjectById(subjectId: number): Promise<Result<null>>;
+  createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
+  updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
+  deleteSubjectById(subjectId: number): Promise<Result<null>>; getSubjectCount(query: string): Promise<Result<number>>;
 }
 
 class SubjectService implements ISubjectService {
@@ -29,9 +31,18 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subject, "Subject retrieve success");
   }
 
-  async createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<SubjectData>> {
+  async createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>> {
     const response: ResultSetHeader = await SubjectRepository.createSubject(subjectCode, subjectName, description, creditHours);
-    const subject: SubjectData | undefined = await SubjectRepository.getSubjectById(response.insertId);
+
+    if (courseIds && courseIds.length > 0) {
+      await Promise.all(
+        courseIds.map((courseId) =>
+          CourseRepository.createCourseSubject(courseId, response.insertId)
+        )
+      );
+    }
+
+    const subject: CourseSubjectData[] | undefined = await CourseRepository.getCourseSubjectBySubjectId(response.insertId);
 
     if (!subject) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject created not found");
@@ -40,12 +51,22 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subject, "Subject create success");
   }
 
-  async updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<Result<SubjectData>> {
+  async updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>> {
     await SubjectRepository.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours);
-    const subject: SubjectData |undefined = await SubjectRepository.getSubjectById(subjectId);
+    await CourseRepository.deleteCourseSubjectByAndSubjectId(subjectId);
+
+    if (courseIds && courseIds.length > 0) {
+      await Promise.all(
+        courseIds.map((courseId) =>
+          CourseRepository.createCourseSubject(courseId, subjectId)
+        )
+      );
+    }
+
+    const subject: CourseSubjectData[] | undefined = await CourseRepository.getCourseSubjectBySubjectId(subjectId);
 
     if (!subject) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject updated not found");
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject created not found");
     }
 
     return Result.succeed(subject, "Subject update success");
@@ -55,6 +76,12 @@ class SubjectService implements ISubjectService {
     await SubjectRepository.deleteSubjectById(subjectId);
 
     return Result.succeed(null, "Subject delete success");
+  }
+
+  async getSubjectCount(query: string = ""): Promise<Result<number>> {
+    const subjectCount: number = await SubjectRepository.getSubjectCount(query);
+
+    return Result.succeed(subjectCount ? subjectCount : 0, "Subject count retrieve success");
   }
 }
 

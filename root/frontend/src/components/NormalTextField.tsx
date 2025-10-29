@@ -32,6 +32,15 @@ export default function NormalTextField({
     minLength?: number;
   };
   switch (placeholder) {
+    case "Subject Code (e.g., SEG1024)":
+      attributes = {
+        type: "text",
+        pattern: "^[A-Z]{3}\\d{4}$", // 3 uppercase letters + 4 digits
+        title: "Subject code must be in the format ABC1234",
+        maxLength: 7,
+        minLength: 7,
+      };
+      break;
     case "Email (e.g., john@example.com)":
       attributes = { type: "email" };
       break;

@@ -1,28 +1,29 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { CourseData, CourseSubjectData } from "../models/course-model";
+import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/course-model";
 import { TotalCount } from "../models/general-model";
 
 interface ICourseRepository {
-  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseData[]>;
-  getCourseById(courseId: number): Promise<CourseData | undefined>;
-  getCoursesByProgrammeId(programmeId: number): Promise<CourseData[] | undefined>;
+  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]>;
+  getCourseById(courseId: number): Promise<CourseProgrammeData | undefined>;
+  getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined>;
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
   getCourseCount(query: string): Promise<number>;
-  getCourseSubjectByCourseId(courseId: number, query: string, pageSize: number, page: number): Promise<CourseSubjectData[]>;
+  getCourseSubjectBySubjectId(subjectId: number): Promise<CourseSubjectData[]>
   getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined>;
+  getCourseSubjectCount(query: string): Promise<number>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
   createCourseSubject(courseId: number, subjectId: number): Promise<ResultSetHeader>;
-  deleteCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<ResultSetHeader>;
+  deleteCourseSubjectByAndSubjectId(subjectId: number): Promise<ResultSetHeader>;
 }
 
 class CourseRepository implements ICourseRepository {
-  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseData[]> {
+  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      databaseConn.query<CourseData[]>(
+      databaseConn.query<CourseProgrammeData[]>(
         "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
@@ -43,9 +44,9 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseById(courseId: number): Promise<CourseData | undefined> {
+  getCourseById(courseId: number): Promise<CourseProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<CourseData[]>(
+      databaseConn.query<CourseProgrammeData[]>(
         "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
@@ -61,9 +62,9 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCoursesByProgrammeId(programmeId: number): Promise<CourseData[] | undefined> {
+  getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<CourseData[]>(
+      databaseConn.query<CourseProgrammeData[]>(
         "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
@@ -140,27 +141,16 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseSubjectByCourseId(courseId: number, query: string, pageSize: number, page: number): Promise<CourseSubjectData[]> {
-    const offset: number = (page - 1) * pageSize;
+  getCourseSubjectBySubjectId(subjectId: number): Promise<CourseSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseSubjectData[]>(
-        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName, s.* " +
+        "SELECT c.courseId, c.courseName, s.* " +
         "FROM COURSE c " +
-        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "INNER JOIN COURSE_SUBJECT cs ON c.courseId = cs.courseId " +
         "INNER JOIN SUBJECT s ON cs.subjectId = s.subjectId " +
-        "WHERE c.courseId = ? " +
-        "AND (s.subjectName LIKE ? " +
-        "OR s.subjectCode LIKE ? " +
-        "OR s.creditHours LIKE ?) " +
-        "LIMIT ? OFFSET ?;",
+        "WHERE cs.subjectId = ?;",
         [
-          courseId,
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          pageSize,
-          offset,
+          subjectId
         ],
         (err, res) => {
           if (err) reject(err);
@@ -173,13 +163,13 @@ class CourseRepository implements ICourseRepository {
   getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseSubjectData[]>(
-        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName, s.* " +
+        "SELECT c.courseId, c.courseName, s.* " +
         "FROM COURSE c " +
-        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "INNER JOIN COURSE_SUBJECT cs ON c.courseId = cs.courseId " +
         "INNER JOIN SUBJECT s ON cs.subjectId = s.subjectId " +
         "WHERE c.courseId = ? " +
-        "AND s.subjectId = ?;",
+        "AND s.subjectId = ? ",
+        "GROUP BY s.subjectId;" +
         [
           courseId,
           subjectId,
@@ -187,6 +177,30 @@ class CourseRepository implements ICourseRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res?.[0]);
+        }
+      );
+    });
+  }
+
+  getCourseSubjectCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(DISTINCT s.subjectId) AS totalCount " +
+        "FROM COURSE c " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "INNER JOIN COURSE_SUBJECT cs ON c.courseId = cs.courseId " +
+        "INNER JOIN SUBJECT s ON cs.subjectId = s.subjectId " +
+        "WHERE s.subjectId LIKE ? " +
+        "OR s.subjectName LIKE ? " +
+        "OR s.subjectCode LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });
@@ -228,11 +242,11 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  deleteCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<ResultSetHeader> {
+  deleteCourseSubjectByAndSubjectId(subjectId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "DELETE FROM COURSE_SUBJECT WHERE courseId = ? AND subjectId = ?;",
-        [courseId, subjectId],
+        "DELETE FROM COURSE_SUBJECT WHERE subjectId = ?;",
+        [subjectId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

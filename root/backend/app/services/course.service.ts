@@ -1,32 +1,30 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { CourseData, CourseSubjectData } from "../models/course-model";
+import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/course-model";
 import CourseRepository from "../repositories/course.repository";
 
 interface ICourseService {
-  getAllCourses(query: string, pageSize: number, page: number): Promise<Result<CourseData[]>>;
-  getCourseById(courseId: number): Promise<Result<CourseData>>;
-  getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseData[]>>;
-  createCourse(courseName: string, programmeId: number): Promise<Result<CourseData>>;
-  updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseData>>;
-  deleteCourseById(courseId: number): Promise<Result<null>>;
+  getAllCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>>;
+  getCourseById(courseId: number): Promise<Result<CourseProgrammeData>>;
+  getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
+  createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
+  updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   getCourseCount(query: string): Promise<Result<number>>;
-  getCourseSubjectByCourseId(courseId: number, query: string, pageSize: number, page: number): Promise<Result<CourseSubjectData[]>>;
+  getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseData[]>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
-  deleteCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<Result<null>>;
 }
 
 class CourseService implements ICourseService {
-  async getAllCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseData[]>> {
-    const courses: CourseData[] = await CourseRepository.getAllCourses(query, pageSize, page);
+  async getAllCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
+    const courses: CourseProgrammeData[] = await CourseRepository.getAllCourses(query, pageSize, page);
 
     return Result.succeed(courses, "Courses retrieve success");
   }
 
-  async getCourseById(courseId: number): Promise<Result<CourseData>> {
-    const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
+  async getCourseById(courseId: number): Promise<Result<CourseProgrammeData>> {
+    const course: CourseProgrammeData | undefined = await CourseRepository.getCourseById(courseId);
 
     if (!course) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
@@ -35,8 +33,8 @@ class CourseService implements ICourseService {
     return Result.succeed(course, "Course retrieve success");
   }
 
-  async getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseData[]>> {
-    const courses: CourseData[] | undefined = await CourseRepository.getCoursesByProgrammeId(programmeId);
+  async getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>> {
+    const courses: CourseProgrammeData[] | undefined = await CourseRepository.getCoursesByProgrammeId(programmeId);
 
     if (!courses) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
@@ -45,10 +43,10 @@ class CourseService implements ICourseService {
     return Result.succeed(courses, "Courses retrieve success");
   }
 
-  async createCourse(courseName: string, programmeId: number): Promise<Result<CourseData>> {
+  async createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
     const response: ResultSetHeader = await CourseRepository.createCourse(courseName, programmeId);
 
-    const course: CourseData | undefined = await CourseRepository.getCourseById(response.insertId);
+    const course: CourseProgrammeData | undefined = await CourseRepository.getCourseById(response.insertId);
 
     if (!course) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course created not found");
@@ -57,10 +55,10 @@ class CourseService implements ICourseService {
     return Result.succeed(course, "Course create success");
   }
 
-  async updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseData>> {
+  async updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
     await CourseRepository.updateCourseById(courseId, programmeId, courseName);
 
-    const course: CourseData | undefined = await CourseRepository.getCourseById(courseId);
+    const course: CourseProgrammeData | undefined = await CourseRepository.getCourseById(courseId);
 
     if (!course) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course updated not found");
@@ -81,8 +79,8 @@ class CourseService implements ICourseService {
     return Result.succeed(courseCount ? courseCount : 0, "Course count retrieve success");
   }
 
-  async getCourseSubjectByCourseId(courseId: number, query: string = "", pageSize: number, page: number): Promise<Result<CourseSubjectData[]>> {
-    const courseSubject: CourseSubjectData[] = await CourseRepository.getCourseSubjectByCourseId(courseId, query, pageSize, page);
+  async getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseData[]>> {
+    const courseSubject: CourseData[] = await CourseRepository.getCourseSubjectBySubjectId(subjectId);
 
     if (!courseSubject.length) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course subject not found");
@@ -107,12 +105,6 @@ class CourseService implements ICourseService {
     }
 
     return Result.succeed(courseSubject, "Course subject create success");
-  }
-
-  async deleteCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<Result<null>> {
-    await CourseRepository.deleteCourseSubjectByCourseIdAndSubjectId(courseId, subjectId);
-
-    return Result.succeed(null, "Course subject delete success");
   }
 }
 
