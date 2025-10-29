@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
-import { deleteCourseById, getAllCoursesAPI } from "../api/courses";
 import type { Course } from "@datatypes/courseType";
+import { deleteCourseByIdAPI, getAllCoursesAPI } from "../api/courses";
 
 export default function CourseTable() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -70,7 +70,7 @@ export default function CourseTable() {
     );
     if (!confirmDelete) return;
 
-    const response = await deleteCourseById(authToken, courseId);
+    const response = await deleteCourseByIdAPI(authToken, courseId);
     if (response && response.ok) {
       navigate("/admin/courses");
       fetchCourses(authToken, currentPage);

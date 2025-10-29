@@ -86,7 +86,7 @@ export const updateCourseByIdAPI = async (token: string, courseId: number, cours
   }
 };
 
-export const deleteCourseById = async (token: string, courseId: number): Promise<Response | undefined> => {
+export const deleteCourseByIdAPI = async (token: string, courseId: number): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/courses/${courseId}`,
       {
