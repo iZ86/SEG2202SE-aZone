@@ -7,7 +7,7 @@ export function MultiFilter({
   icon = undefined,
   options,
   value,
-  isEmpty,
+  isInvalid,
   onChange,
   width = "full",
   minWidth = "48",
@@ -17,7 +17,7 @@ export function MultiFilter({
   icon?: ReactElement;
   options: reactSelectOptionType[];
   value: reactSelectOptionType[];
-  isEmpty: boolean;
+  isInvalid: boolean;
   onChange: (choice: MultiValue<reactSelectOptionType>) => void;
   width?: string;
   minWidth?: string;
@@ -46,10 +46,10 @@ export function MultiFilter({
           classNames={{
             control: () => `${
               value.length === 0 && !isFocused
-                ? isEmpty
+                ? isInvalid
                   ? "text-red-tomato border-red-tomato"
                   : "text-gray-davy border-gray-davy"
-                : isEmpty
+                : isInvalid
                 ? "text-red-tomato border-red-tomato"
                 : "text-blue-marian border-blue-marian"
             }
@@ -79,18 +79,15 @@ export function MultiFilter({
             setIsFocused(false);
           }}
         />
-        {isEmpty && (
-          <p className="text-red-tomato pl-2">This field is required.</p>
-        )}
         <div
           className={`flex justify-center items-center gap-x-2 absolute bg-white max-h-3 left-3 px-1 pointer-events-none transition-all
                     ${
                       value.length === 0 && !isFocused
                         ? `top-4.5 ${
-                            isEmpty ? "text-red-tomato" : "text-gray-davy"
+                            isInvalid ? "text-red-tomato" : "text-gray-davy"
                           }`
                         : `-top-1.5 ${
-                            isEmpty ? "text-red-tomato" : "text-blue-marian"
+                            isInvalid ? "text-red-tomato" : "text-blue-marian"
                           }`
                     }`}
         >
