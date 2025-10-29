@@ -46,18 +46,18 @@ export default function SingleFilter({
               value.value === -1 && !isFocused
                 ? isInvalid
                   ? "text-red-tomato border-red-tomato"
-                  : "text-gray-davy border-gray-davy"
+                  : "border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority"
                 : isInvalid
                 ? "text-red-tomato border-red-tomato"
-                : "text-blue-marian border-blue-marian"
+                : "border-blue-air-superiority text-blue-air-superiority"
             }
             px-4 h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} border-2 rounded-2xl outline-hidden`,
             menu: () =>
-              `text-gray-davy bg-white border-blue-marian border-2 mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-2xl p-2`,
+              `text-blue-air-superiority bg-white border-blue-air-superiority focus:text-blue-air-superiority border-2 mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-2xl p-2`,
             option: (state) =>
               `${
                 state.isFocused ? "bg-neutral-200" : "bg-white"
-              } py-2 px-4 rounded-xl text-davy-gray`,
+              } py-2 px-4 rounded-xl border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority`,
             valueContainer: () => "flex gap-x-2 gap-y-2",
           }}
           unstyled
@@ -77,11 +77,15 @@ export default function SingleFilter({
           className={`flex justify-center items-center gap-x-2 absolute left-3 bg-white px-1 pointer-events-none transition-all
                     ${
                       value.value === -1 && !isFocused
-                        ? `top-3 ${
-                            isInvalid ? "text-red-tomato" : "text-gray-davy"
+                        ? `top-3 transition-all peer-focus:-top-3 ${
+                            isInvalid
+                              ? "text-red-tomato"
+                              : "peer-focus:text-blue-air-superiority"
                           }`
-                        : `-top-3 ${
-                            isInvalid ? "text-red-tomato" : "text-blue-marian"
+                        : `peer-focus:transition-all -top-3 ${
+                            isInvalid
+                              ? "text-red-tomato"
+                              : "text-blue-air-superiority"
                           }`
                     }`}
         >

@@ -48,22 +48,22 @@ export function MultiFilter({
               value.length === 0 && !isFocused
                 ? isInvalid
                   ? "text-red-tomato border-red-tomato"
-                  : "text-gray-davy border-gray-davy"
+                  : "border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority"
                 : isInvalid
                 ? "text-red-tomato border-red-tomato"
-                : "text-blue-marian border-blue-marian"
+                : "border-blue-air-superiority text-blue-air-superiority"
             }
             px-4 w-${width} max-w-${maxWidth} min-w-${minWidth} border-2 rounded-2xl outline-hidden ${
               value.length > 0 ? "py-1.5" : undefined
             }`,
             menu: () =>
-              `text-gray-davy bg-white border-2 border-blue-marian mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-2xl p-2`,
+              `text-blue-air-superiority bg-white border-blue-air-superiority focus:text-blue-air-superiority border-2 border-blue-marian mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-2xl p-2`,
             option: (state) =>
               `${
                 state.isFocused ? "bg-neutral-200" : "bg-white"
-              } py-2 px-4 rounded-xl text-davy-gray`,
+              } py-2 px-4 rounded-xl border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority`,
             multiValue: () =>
-              "flex gap-x-1 bg-neutral-200 text-davy-gray py-1 px-4 rounded-xl",
+              "flex gap-x-1 bg-neutral-200 text-blue-air-superiority py-1 px-4 rounded-xl",
             valueContainer: () => "flex gap-x-2 gap-y-2",
           }}
           unstyled
@@ -84,10 +84,14 @@ export function MultiFilter({
                     ${
                       value.length === 0 && !isFocused
                         ? `top-4.5 ${
-                            isInvalid ? "text-red-tomato" : "text-gray-davy"
+                            isInvalid
+                              ? "text-red-tomato"
+                              : "peer-focus:text-blue-air-superiority"
                           }`
                         : `-top-1.5 ${
-                            isInvalid ? "text-red-tomato" : "text-blue-marian"
+                            isInvalid
+                              ? "text-red-tomato"
+                              : "text-blue-air-superiority"
                           }`
                     }`}
         >
