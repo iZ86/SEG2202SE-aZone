@@ -14,19 +14,12 @@ import {
   updateStudentByIdAPI,
 } from "../api/students";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
-import type { Programme, ProgrammeIntake } from "@datatypes/programmeType";
-import type { Course } from "@datatypes/courseType";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
 import PasswordTextField from "@components/PasswordTextField";
 import SingleFilter from "@components/SingleFilter";
 import AdminEmptyInput from "@components/admin/AdminEmptyInput";
 import { getAdminByIdAPI, updateAdminByIdAPI } from "../api/admins";
-import {
-  getAllProgrammesAPI,
-  getProgrammeIntakesByProgrammeIdAPI,
-} from "../api/programmes";
-import { getCoursesByProgrammeIdAPI } from "../api/courses";
 
 export default function UserForm({
   type,
@@ -59,25 +52,8 @@ export default function UserForm({
       label: "",
     }
   );
-  const [courseStatus, setCourseStatus] = useState<reactSelectOptionType>({
-    value: 1,
-    label: "Active",
-  });
   const statusOptions: reactSelectOptionType[] = [
     { value: 0, label: "Inactive" },
-    { value: 1, label: "Active" },
-  ];
-  const [programmeOptions, setProgrammeOptions] = useState<
-    reactSelectOptionType[]
-  >([]);
-  const [courseOptions, setCourseOptions] = useState<reactSelectOptionType[]>(
-    []
-  );
-  const [programmeIntakeOptions, setProgrammeIntakeOptions] = useState<
-    reactSelectOptionType[]
-  >([]);
-  const courseStatusOptions: reactSelectOptionType[] = [
-    { value: 0, label: "Completed" },
     { value: 1, label: "Active" },
   ];
 
@@ -88,10 +64,9 @@ export default function UserForm({
   const [emptyPhoneNumber, setEmptyPhoneNumber] = useState(false);
   const [emptyPassword, setEmptyPassword] = useState(false);
   const [emptyConfirmPassword, setEmptyConfirmPassword] = useState(false);
-  const [emptyProgramme, setEmptyProgramme] = useState(false);
-  const [emptyCourse, setEmptyCourse] = useState(false);
-  const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
-  const [emptyCourseStatus, setEmptyCourseStatus] = useState(false);
+  const [emptyProgramme] = useState(false);
+  const [emptyCourse] = useState(false);
+  const [emptyProgrammeIntake] = useState(false);
 
   const [isPasswordMatched, setIsPasswordMatched] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -140,10 +115,6 @@ export default function UserForm({
         phoneNumber,
         password,
         status.value,
-        programme.value,
-        course.value,
-        programmeIntake.value,
-        courseStatus.value
       );
     } else if (type === "Edit") {
       if (isAdmin) {
@@ -164,11 +135,7 @@ export default function UserForm({
           email,
           phoneNumber,
           password,
-          status.value,
-          programme.value,
-          course.value,
-          programmeIntake.value,
-          courseStatus.value
+          status.value
         );
       }
     }
@@ -201,23 +168,6 @@ export default function UserForm({
     if (phoneNumber === "") {
       setEmptyPhoneNumber(true);
       emptyInput = true;
-    }
-
-    if (!isAdmin) {
-      if (!programme.value || programme.value === -1) {
-        setEmptyProgramme(true);
-        emptyInput = true;
-      }
-
-      if (!course.value || course.value === -1) {
-        setEmptyCourse(true);
-        emptyInput = true;
-      }
-
-      if (!programmeIntake.value || programmeIntake.value === -1) {
-        setEmptyProgrammeIntake(true);
-        emptyInput = true;
-      }
     }
 
     if (type === "Add") {
@@ -287,121 +237,6 @@ export default function UserForm({
     setConfirmPassword(onChangeConfirmPassword);
   }
 
-  function onChangeProgramme(
-    onChangeProgramme: SingleValue<reactSelectOptionType>
-  ) {
-    if (!onChangeProgramme) {
-      return;
-    }
-    setProgramme(onChangeProgramme);
-    setEmptyProgramme(false);
-  }
-
-  function onChangeCourse(onChangeCourse: SingleValue<reactSelectOptionType>) {
-    if (!onChangeCourse) {
-      return;
-    }
-    setCourse(onChangeCourse);
-    setEmptyCourse(false);
-  }
-
-  function onChangeProgrammeIntake(
-    onChangeProgrammeIntake: SingleValue<reactSelectOptionType>
-  ) {
-    if (!onChangeProgrammeIntake) {
-      return;
-    }
-    setProgrammeIntake(onChangeProgrammeIntake);
-    setEmptyProgrammeIntake(false);
-  }
-
-  function onChangeCourseStatus(
-    onChangeCourseStatus: SingleValue<reactSelectOptionType>
-  ) {
-    if (!onChangeCourseStatus) {
-      return;
-    }
-    setCourseStatus(onChangeCourseStatus);
-    setEmptyCourseStatus(false);
-  }
-
-  async function getAllProgrammes(token: string) {
-    const response: Response | undefined = await getAllProgrammesAPI(token);
-
-    if (!response?.ok) {
-      setProgrammeOptions([]);
-      return;
-    }
-
-    const { data } = await response.json();
-
-    if (!data || data.length === 0) {
-      setProgrammeOptions([]);
-      return;
-    }
-
-    const options = data.programmes.map((programme: Programme) => ({
-      value: programme.programmeId,
-      label: programme.programmeName,
-    }));
-
-    setProgrammeOptions(options);
-  }
-
-  async function getCoursesByProgrammeId(token: string, programmeId: number) {
-    const response: Response | undefined = await getCoursesByProgrammeIdAPI(
-      token,
-      programmeId
-    );
-
-    if (!response?.ok) {
-      setCourseOptions([]);
-      return;
-    }
-
-    const { data } = await response.json();
-
-    if (!data || data.length === 0) {
-      setCourseOptions([]);
-      return;
-    }
-
-    const options = data.map((course: Course) => ({
-      value: course.courseId,
-      label: course.courseName,
-    }));
-
-    setCourseOptions(options);
-  }
-
-  async function getProgrammeIntakesByProgrammeId(
-    token: string,
-    programmeId: number
-  ) {
-    const response: Response | undefined =
-      await getProgrammeIntakesByProgrammeIdAPI(token, programmeId);
-
-    if (!response?.ok) {
-      setProgrammeIntakeOptions([]);
-      return;
-    }
-
-    const { data } = await response.json();
-
-    if (!data || data.length === 0) {
-      setProgrammeIntakeOptions([]);
-      return;
-    }
-
-    const options = data.map((programmeIntake: ProgrammeIntake) => ({
-      value: programmeIntake.programmeIntakeId,
-      label:
-        programmeIntake.intakeId + " - Semester " + programmeIntake.semester,
-    }));
-
-    setProgrammeIntakeOptions(options);
-  }
-
   const setupEditStudentForm = useCallback(
     async (token: string, studentId: number) => {
       const response: Response | undefined =
@@ -434,10 +269,6 @@ export default function UserForm({
       setProgrammeIntake({
         value: data.programmeIntakeId,
         label: data.intakeId + " - Semester " + data.semester,
-      });
-      setCourseStatus({
-        value: data.courseStatus,
-        label: data.courseStatus === 1 ? "Active" : "Completed",
       });
     },
     [navigate]
@@ -480,7 +311,6 @@ export default function UserForm({
     }
 
     setAuthToken(token);
-    getAllProgrammes(token);
 
     if (type === "Edit" && id > 0) {
       if (isAdmin) {
@@ -490,29 +320,6 @@ export default function UserForm({
       }
     }
   }, [navigate, type, id, setupEditStudentForm, setupEditAdminForm, isAdmin]);
-
-  useEffect(() => {
-    if (programme.value <= 0 || !authToken) {
-      setCourseOptions([]);
-      return;
-    }
-
-    getCoursesByProgrammeId(authToken, programme.value);
-    getProgrammeIntakesByProgrammeId(authToken, programme.value);
-
-    if (skipReset.current) {
-      skipReset.current = false;
-    } else {
-      setCourse({
-        value: -1,
-        label: "",
-      });
-      setProgrammeIntake({
-        value: -1,
-        label: "",
-      });
-    }
-  }, [authToken, programme]);
 
   return (
     <section className="flex-1 bg-white rounded-lg border">
@@ -533,8 +340,11 @@ export default function UserForm({
         <hr className="border-slate-200 w-full border" />
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
-          <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex w-5xl gap-x-10">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-6 gap-y-8 flex flex-col justify-center items-center"
+          >
+            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
               <div className="flex-1">
                 <AdminEmptyInput isInvalid={emptyFirstName}>
                   <NormalTextField
@@ -558,7 +368,7 @@ export default function UserForm({
               </div>
             </div>
 
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10  gap-y-8 sm:gap-y-0">
               <div className="flex-1">
                 <AdminEmptyInput isInvalid={emptyEmail}>
                   <NormalTextField
@@ -582,7 +392,7 @@ export default function UserForm({
             </div>
 
             {type === "Add" && (
-              <div className="flex w-5xl gap-x-10">
+              <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                 <div className="flex-1">
                   <AdminEmptyInput isInvalid={emptyPassword}>
                     <PasswordTextField
@@ -611,50 +421,7 @@ export default function UserForm({
 
             {!isAdmin && (
               <>
-                <div className="flex w-5xl gap-x-10">
-                  <div className="flex-1">
-                    <AdminEmptyInput isInvalid={emptyProgramme}>
-                      <SingleFilter
-                        placeholder="Select Student Programme"
-                        options={programmeOptions}
-                        value={programme}
-                        isInvalid={emptyProgramme}
-                        onChange={onChangeProgramme}
-                      />
-                    </AdminEmptyInput>
-                  </div>
-                  <div className="flex-1">
-                    <AdminEmptyInput isInvalid={emptyCourse}>
-                      <SingleFilter
-                        placeholder="Select Student Course"
-                        options={courseOptions}
-                        value={course}
-                        isInvalid={emptyCourse}
-                        onChange={onChangeCourse}
-                      />
-                    </AdminEmptyInput>
-                  </div>
-                </div>
-
-                <div className="flex w-5xl gap-x-10">
-                  <div className="flex-1">
-                    <AdminEmptyInput isInvalid={emptyProgrammeIntake}>
-                      <SingleFilter
-                        placeholder="Select Student Intake"
-                        options={programmeIntakeOptions}
-                        value={programmeIntake}
-                        isInvalid={emptyProgrammeIntake}
-                        onChange={onChangeProgrammeIntake}
-                      />
-                    </AdminEmptyInput>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {!isAdmin && (
-              <>
-                <div className="flex w-5xl gap-x-10">
+                <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
                     <SingleFilter
                       placeholder="Select Student Status"
@@ -664,29 +431,48 @@ export default function UserForm({
                       onChange={onChangeStatus}
                     />
                   </div>
-
-                  <div className="flex-1">
-                    <SingleFilter
-                      placeholder="Select Course Status"
-                      options={courseStatusOptions}
-                      value={courseStatus}
-                      isInvalid={emptyCourseStatus}
-                      onChange={onChangeCourseStatus}
-                    />
-                  </div>
                 </div>
+
+                {type === "Edit" && (
+                  <>
+                    <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+                      <div className="flex-1">
+                        <NormalTextField
+                          placeholder="Student Programme (Non-editable)"
+                          text={programme.label}
+                          isInvalid={emptyProgramme}
+                          onChange={() => {}}
+                          isDisabled={true}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <NormalTextField
+                          placeholder="Student Course (Non-editable)"
+                          text={course.label}
+                          isInvalid={emptyCourse}
+                          onChange={() => {}}
+                          isDisabled={true}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+                      <div className="flex-1">
+                        <NormalTextField
+                          placeholder="Student Intake (Non-editable)"
+                          text={programmeIntake.label}
+                          isInvalid={emptyProgrammeIntake}
+                          onChange={() => {}}
+                          isDisabled={true}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             )}
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/users"
-              />
+            <div className="justify-center flex mt-10 gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Student"
@@ -695,6 +481,14 @@ export default function UserForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/users"
               />
             </div>
           </form>

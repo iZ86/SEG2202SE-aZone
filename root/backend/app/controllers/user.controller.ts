@@ -7,6 +7,7 @@ import CourseService from "../services/course.service";
 import ProgrammeService from "../services/programme.service";
 import { CourseData } from "../models/course-model";
 import { ProgrammeIntakeData } from "../models/programme-model";
+import { ResultSetHeader } from "mysql2";
 
 export default class UserController {
   async getAllAdmins(req: Request, res: Response) {
@@ -35,9 +36,13 @@ export default class UserController {
     const query: string = req.query.query as string;
 
     const response: Result<UserData[]> = await UserService.getAllStudents(query, pageSize, page);
+    const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        users: response.getData(),
+        userCount: userCount.isSuccess() ? userCount.getData() : 0,
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -91,12 +96,8 @@ export default class UserController {
     const email: string = req.body.email;
     const password: string = req.body.password;
     const userStatus: number = req.body.userStatus;
-    const programmeId: number = req.body.programmeId;
-    const courseId: number = req.body.courseId;
-    const programmeIntakeId: number = req.body.programmeIntakeId;
-    const courseStatus: number = req.body.courseStatus;
 
-    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus, programmeId, courseId, programmeIntakeId, courseStatus);
+    const response: Result<ResultSetHeader> = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -115,10 +116,6 @@ export default class UserController {
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
     const userStatus: number = req.body.userStatus;
-    const programmeId: number = req.body.programmeId;
-    const courseId: number = req.body.courseId;
-    const programmeIntakeId: number = req.body.programmeIntakeId;
-    const courseStatus: number = req.body.courseStatus;
 
     if (!studentId || isNaN(studentId)) {
       return res.sendError.badRequest("Invalid studentId");
@@ -130,7 +127,7 @@ export default class UserController {
       return res.sendError.notFound("Invalid userId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus, programmeId, courseId, programmeIntakeId, courseStatus);
+    const response: Result<UserData | undefined> = await UserService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());

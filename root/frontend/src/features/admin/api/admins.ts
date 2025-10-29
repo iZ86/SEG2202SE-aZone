@@ -30,7 +30,6 @@ export const getAdminByIdAPI = async (token: string, adminId: number): Promise<R
   }
 };
 
-
 export const updateAdminByIdAPI = async (token: string, adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/users/admins/${adminId}`,

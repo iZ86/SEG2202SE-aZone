@@ -1,17 +1,13 @@
 import { Pencil } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { getAllStudentCourseProgrammeIntakesAPI } from "../api/students";
+import { getAllStudentsAPI } from "../api/students";
 import { Link, useNavigate } from "react-router-dom";
 import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { User } from "@datatypes/userType";
 import { getAllAdminsAPI } from "../api/admins";
 
-export default function UserTable({
-  activeTab,
-}: {
-  activeTab: User["role"];
-}) {
+export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -26,12 +22,7 @@ export default function UserTable({
 
       switch (activeTab) {
         case "Student":
-          response = await getAllStudentCourseProgrammeIntakesAPI(
-            token,
-            pageSize,
-            page,
-            searchTerm
-          );
+          response = await getAllStudentsAPI(token, pageSize, page, searchTerm);
           break;
         case "Admin":
           response = await getAllAdminsAPI(token, pageSize, page, searchTerm);
@@ -79,7 +70,7 @@ export default function UserTable({
 
   return (
     <>
-      <div className="flex items-center space-x-4 mt-4">
+      <div className="items-center space-x-4 mt-4 sm:flex">
         <input
           type="text"
           placeholder={`${
@@ -87,20 +78,22 @@ export default function UserTable({
               ? "Search with Student ID, name, email or course name..."
               : "Search with Admin ID, name or email..."
           }`}
-          className="grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
+          className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
         {activeTab === "Student" && (
-          <SmallButton
-            buttonText="Create New Student"
-            backgroundColor="bg-blue-500"
-            hoverBgColor="hover:bg-blue-600"
-            link="/admin/users/create"
-            textColor="text-white"
-            submit={false}
-          />
+          <div className="mt-4 sm:mt-0">
+            <SmallButton
+              buttonText="Create New Student"
+              backgroundColor="bg-blue-500"
+              hoverBgColor="hover:bg-blue-600"
+              link="/admin/users/create"
+              textColor="text-white"
+              submit={false}
+            />
+          </div>
         )}
       </div>
 
@@ -118,14 +111,6 @@ export default function UserTable({
                   <th className="px-6 py-4 font-medium">Name</th>
                   <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Phone Number</th>
-                  {activeTab === "Student" ? (
-                    <>
-                      <th className="px-6 py-4 font-medium">Course</th>
-                      <th className="px-6 py-4 font-medium">
-                        Semester - Intake
-                      </th>
-                    </>
-                  ) : null}
                   <th className="px-6 py-4 font-medium">Status</th>
                   <th className="px-6 py-4 font-medium">Edit</th>
                 </tr>
@@ -142,20 +127,12 @@ export default function UserTable({
                   <tr key={`${user.email}`} className="text-sm">
                     <td className="px-6 py-5">{user.userId}</td>
                     <td className="px-6 py-5">
-                      {user.firstName} {user.lastName}
+                      {user.lastName} {user.firstName}
                     </td>
                     <td className="px-6 py-5 text-indigo-600 hover:underline cursor-pointer">
                       {user.email}
                     </td>
                     <td className="px-6 py-5">{user.phoneNumber}</td>
-                    {activeTab === "Student" ? (
-                      <>
-                        <td className="px-6 py-5">{user.courseName}</td>
-                        <td className="px-6 py-5">
-                          {user.semester} - {user.intakeId}
-                        </td>
-                      </>
-                    ) : null}
                     <td className="px-6 py-5">
                       <span
                         className={`font-bold px-4 py-2 ${
