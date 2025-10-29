@@ -3,11 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
-import type { Course } from "@datatypes/courseType";
 import { deleteCourseByIdAPI, getAllCoursesAPI } from "../api/courses";
+import type { CourseProgramme } from "@datatypes/courseType";
 
 export default function CourseTable() {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<CourseProgramme[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -51,7 +51,7 @@ export default function CourseTable() {
       return;
     }
     setAuthToken(token);
-  }, [fetchCourses, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     if (!authToken) return;
