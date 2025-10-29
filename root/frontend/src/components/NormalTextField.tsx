@@ -14,6 +14,7 @@ export default function NormalTextField({
   width = "full",
   minWidth = "48",
   maxWidth = "74",
+  isDisabled = false,
 }: {
   text: string;
   onChange: (value: string) => void;
@@ -23,6 +24,7 @@ export default function NormalTextField({
   width?: string;
   minWidth?: string;
   maxWidth?: string;
+  isDisabled?: boolean;
 }) {
   let attributes: {
     type: string;
@@ -62,6 +64,7 @@ export default function NormalTextField({
         className={`relative w-${width} max-w-${maxWidth} min-w-${minWidth} text-base text-gray-battleship`}
       >
         <input
+          disabled={isDisabled}
           {...attributes}
           value={text}
           className={`min-h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} rounded-2xl border-2 px-4 outline-hidden peer
