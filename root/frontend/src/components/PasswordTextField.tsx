@@ -30,7 +30,7 @@ export default function PasswordTextField({
       >
         <input
           type={isVisible ? "text" : "password"}
-          pattern="^{8,}$" // Regex: at least 8 characters.
+          pattern="^.{8,}$" // Regex: at least 8 characters.
           title="Password must be at least 8 characters long."
           minLength={8}
           className={`min-h-12 w-${width} max-w-${maxWidth} rounded-2xl border-2 px-4 outline-hidden peer
