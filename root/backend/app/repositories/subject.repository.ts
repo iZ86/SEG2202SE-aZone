@@ -1,6 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { SubjectData } from "../models/subject-model";
+import { TotalCount } from "../models/general-model";
 
 interface ISubjectRepository {
   getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
@@ -8,6 +9,7 @@ interface ISubjectRepository {
   createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   deleteSubjectById(subjectId: number): Promise<ResultSetHeader>;
+  getSubjectCount(query: string): Promise<number>;
 }
 
 class SubjectRepository implements ISubjectRepository {
@@ -17,9 +19,9 @@ class SubjectRepository implements ISubjectRepository {
       databaseConn.query<SubjectData[]>(
         "SELECT * " +
         "FROM SUBJECT " +
-        "WHERE subjectName LIKE ? " +
+        "WHERE subjectId LIKE ? " +
+        "OR subjectName LIKE ? " +
         "OR subjectCode LIKE ? " +
-        "OR creditHours LIKE ? " +
         "LIMIT ? OFFSET ?;",
         [
           "%" + query + "%",
@@ -89,6 +91,27 @@ class SubjectRepository implements ISubjectRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getSubjectCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM SUBJECT " +
+        "WHERE subjectId LIKE ? " +
+        "OR subjectName LIKE ? " +
+        "OR subjectCode LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });
