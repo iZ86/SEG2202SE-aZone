@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import validate from "../middlewares/validate";
 
-export const createAndUpdateSubjectBodyValidator: any = [
+export const createAndUpdateSubjectValidator: any = [
   body('subjectName')
     .trim()
     .notEmpty().withMessage('Missing subjectName')

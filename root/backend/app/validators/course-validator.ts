@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import validate from "../middlewares/validate";
 
-export const createAndUpdateCourseBodyValidator: any = [
+export const createAndUpdateCourseValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
     .isNumeric().withMessage('programmeId must be number'),
@@ -13,7 +13,7 @@ export const createAndUpdateCourseBodyValidator: any = [
 ];
 
 
-export const createCourseSubjectBodyValidator: any = [
+export const createCourseSubjectValidator: any = [
   body('courseId')
     .notEmpty().withMessage('Missing courseId')
     .isNumeric().withMessage('courseId must be number'),

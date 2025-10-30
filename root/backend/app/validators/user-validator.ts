@@ -73,7 +73,7 @@ export const updateAdminValidator: any = [
   validate,
 ];
 
-export const createStudentCourseProgrammeIntakeBodyValidator: any = [
+export const createStudentCourseProgrammeIntakeValidator: any = [
   body('studentId')
     .trim()
     .notEmpty().withMessage('Missing studentId')
