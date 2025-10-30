@@ -72,3 +72,19 @@ export const updateAdminValidator: any = [
     .matches(/^01\d{8,9}$/).withMessage("phoneNumber must start with 01 and contain 10-11 digits"),
   validate,
 ];
+
+export const createStudentCourseProgrammeIntakeBodyValidator: any = [
+  body('studentId')
+    .trim()
+    .notEmpty().withMessage('Missing studentId')
+    .isNumeric().withMessage('studentId must be numeric'),
+  body('programmeIntakeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeIntakeId')
+    .isNumeric().withMessage('programmeIntakeId must be numeric'),
+  body('courseId')
+    .trim()
+    .notEmpty().withMessage('Missing courseId')
+    .isNumeric().withMessage('courseId must be numeric'),
+  validate,
+];
