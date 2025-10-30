@@ -221,7 +221,7 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -237,7 +237,6 @@ export default class UserController {
     const studentId: number = req.body.studentId;
     const courseId: number = req.body.courseId;
     const programmeIntakeId: number = req.body.programmeIntakeId;
-    const status: number = req.body.status;
 
     const studentResponse: Result<UserData> = await UserService.getStudentById(studentId);
     const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
@@ -247,7 +246,13 @@ export default class UserController {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId, or courseId, or programmeIntakeId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, status);
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
+
+    if (studentCourseProgrammeIntakeResponse.getData()) {
+      return res.sendError.badRequest("Active course exist");
+    }
+
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -277,7 +282,7 @@ export default class UserController {
       return res.sendError.notFound("Invalid studentId, or courseId, or programmeIntakeId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData> = await UserService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -289,21 +294,22 @@ export default class UserController {
     }
   }
 
-  async deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(req: Request, res: Response) {
+  async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
-    const status: number = parseInt(req.params.status);
+    const courseId: number = parseInt(req.params.courseId);
+    const programmeIntakeId: number = parseInt(req.params.programmeIntakeId);
 
-    if (!studentId || isNaN(studentId) || !status || !isNaN(status)) {
-      return res.sendError.badRequest("Invalid studentId or status");
+    if (!studentId || isNaN(studentId) || !courseId || isNaN(courseId) || !programmeIntakeId || isNaN(programmeIntakeId)) {
+      return res.sendError.badRequest("Invalid studentId or courseId or programmeIntakeId");
     }
 
-    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (!studentCourseProgrammeIntake.isSuccess()) {
       return res.sendError.notFound("Student course programme intake not found");
     }
 
-    const response: Result<null> = await UserService.deleteStudentCourseProgrammeIntakeByStudentIdAndStatus(studentId, status);
+    const response: Result<null> = await UserService.deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
