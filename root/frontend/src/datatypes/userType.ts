@@ -5,6 +5,11 @@ export type User = {
   email: string;
   phoneNumber: string;
   userStatus: number;
+  role: "Student" | "Admin";
+};
+
+export type StudentCourseProgrammeIntake = {
+  studentId: number;
   courseId: number;
   courseName: string;
   programmeIntakeId: number;
@@ -15,5 +20,4 @@ export type User = {
   semesterStartPeriod: string;
   semesterEndPeriod: string;
   courseStatus: number;
-  role: "Student" | "Admin";
-};
+}
