@@ -41,7 +41,7 @@ export default function StudentSideBar({ page }: { page: string }) {
 
         {/* Nav Links */}
         <nav className="flex flex-col mt-2">
-          {[{ to: "/admin", label: "Dashboard", key: "dashboard" }].map(
+          {[{ to: "/", label: "Dashboard", key: "dashboard" }].map(
             (item) => (
               <Link
                 key={item.key}
