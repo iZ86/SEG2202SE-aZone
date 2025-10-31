@@ -1,6 +1,7 @@
 import { VenueData } from "../models/venue-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
+import { TotalCount } from "../models/general-model";
 
 interface IVenueRepository {
   getAllVenues(query: string, pageSize: number, page: number): Promise<VenueData[]>;
@@ -8,6 +9,7 @@ interface IVenueRepository {
   createVenue(venue: string): Promise<ResultSetHeader>;
   updateVenueById(venueId: number, venue: string): Promise<ResultSetHeader>;
   deleteVenueById(venueId: number): Promise<ResultSetHeader>;
+  getVenueCount(query: string): Promise<number>;
 }
 
 class VenueRepository implements IVenueRepository {
@@ -85,6 +87,25 @@ class VenueRepository implements IVenueRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getVenueCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM VENUE " +
+        "WHERE venueId LIKE ? " +
+        "OR venue LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });

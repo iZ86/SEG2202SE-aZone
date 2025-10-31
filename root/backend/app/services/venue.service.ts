@@ -9,6 +9,7 @@ interface IInterfaceService {
   createVenue(venue: string): Promise<Result<VenueData>>;
   updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>>;
   deleteVenueById(venueId: number): Promise<Result<null>>;
+  getVenueCount(query: string): Promise<Result<number>>;
 }
 
 class InterfaceService implements IInterfaceService {
@@ -56,6 +57,12 @@ class InterfaceService implements IInterfaceService {
     await VenueRepository.deleteVenueById(venueId);
 
     return Result.succeed(null, "Venue delete success");
+  }
+
+  async getVenueCount(query: string = ""): Promise<Result<number>> {
+    const venueCount: number = await VenueRepository.getVenueCount(query);
+
+    return Result.succeed(venueCount ? venueCount : 0, "Venue count retrieve success");
   }
 }
 

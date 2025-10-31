@@ -11,9 +11,13 @@ export default class VenueController {
     const query: string = req.query.query as string || "";
 
     const response: Result<VenueData[]> = await VenueService.getAllVenues(query, pageSize, page);
+    const venueCount: Result<number> = await VenueService.getVenueCount(query);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        venues: response.getData(),
+        venueCount: venueCount.isSuccess() ? venueCount.getData() : 0,
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
