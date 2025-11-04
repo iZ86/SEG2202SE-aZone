@@ -20,6 +20,7 @@ export default function ProgrammeForm({
   const [programmeName, setProgrammeName] = useState("");
 
   const [emptyProgrammeName, setEmptyProgrammeName] = useState(false);
+  const [invalidProgrammeName, setInvalidProgrammeName] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -55,6 +56,12 @@ export default function ProgrammeForm({
       );
     }
 
+    if (response && response.status === 409) {
+      setIsLoading(false);
+      setInvalidProgrammeName(true);
+      return;
+    }
+
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/programmes");
@@ -76,6 +83,7 @@ export default function ProgrammeForm({
   function onChangeProgrammeName(onChangeProgrammeName: string) {
     if (onChangeProgrammeName !== "") {
       setEmptyProgrammeName(false);
+      setInvalidProgrammeName(false);
     }
     setProgrammeName(onChangeProgrammeName);
   }
@@ -136,11 +144,15 @@ export default function ProgrammeForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyProgrammeName}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyProgrammeName}
+                  isInvalid={invalidProgrammeName}
+                  invalidMessage="Programme Name already exists."
+                >
                   <NormalTextField
                     text={programmeName}
                     onChange={onChangeProgrammeName}
-                    isInvalid={emptyProgrammeName}
+                    isInvalid={emptyProgrammeName || invalidProgrammeName}
                     placeholder="Programme Name"
                   />
                 </AdminInputFieldWrapper>

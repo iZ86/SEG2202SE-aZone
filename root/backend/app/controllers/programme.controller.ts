@@ -76,10 +76,14 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
-    const isProgrammeNameDuplicated: Result<ProgrammeData> = await ProgrammeService.getProgrammeByName(programmeName);
+    const isProgrammeNameBelongsToProgrammeId: Result<ProgrammeData> = await ProgrammeService.getProgrammeByIdAndName(programmeId, programmeName);
 
-    if (isProgrammeNameDuplicated.isSuccess()) {
-      return res.sendError.conflict("Programme name duplciated");
+    if (!isProgrammeNameBelongsToProgrammeId.isSuccess()) {
+      const isProgrammeNameDuplicated: Result<ProgrammeData> = await ProgrammeService.getProgrammeByName(programmeName);
+
+      if (isProgrammeNameDuplicated.isSuccess()) {
+        return res.sendError.conflict("Programme name duplciated");
+      }
     }
 
     const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
