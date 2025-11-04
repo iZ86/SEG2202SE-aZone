@@ -8,6 +8,7 @@ interface IUserRepostory {
   getAllStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
   getStudentById(studentId: number): Promise<UserData | undefined>; getStudentByEmail(email: string): Promise<UserData | undefined>;
+  getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined>;
   getAdminById(adminId: number): Promise<UserData | undefined>;
   getAdminCount(query: string): Promise<number>;
   getStudentCount(query: string): Promise<number>;
@@ -120,6 +121,23 @@ class UserRepository implements IUserRepostory {
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email = ?;",
         [email],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserData[]>(
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "FROM REGISTERED_USER ru " +
+        "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
+        "WHERE ru.email = ? " +
+        "AND s.studentId = ?;",
+        [email, studentId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);

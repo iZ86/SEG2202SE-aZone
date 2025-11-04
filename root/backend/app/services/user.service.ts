@@ -11,6 +11,8 @@ interface IUserService {
   getUserById(userId: number): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
+  getStudentByEmail(email: string): Promise<Result<UserData>>;
+  getStudentByIdAndEmail(studentId: number, email: string): Promise<Result<UserData>>;
   isUserExist(userId: number): Promise<boolean>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<ResultSetHeader>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData | undefined>>;
@@ -55,9 +57,18 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-
   async getStudentByEmail(email: string): Promise<Result<UserData>> {
     const student: UserData | undefined = await UserRepository.getStudentByEmail(email);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
+    }
+
+    return Result.succeed(student, "Student retrieve success");
+  }
+
+  async getStudentByIdAndEmail(studentId: number, email: string): Promise<Result<UserData>> {
+    const student: UserData | undefined = await UserRepository.getStudentByIdAndEmail(studentId, email);
 
     if (!student) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");

@@ -127,6 +127,20 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId");
     }
 
+    /**
+     * Check if the user is using the email before updating
+     * If user is using the old email, doesn't needs to check if the email is duplicated
+     */
+    const isEmailBelongsToUser = await UserService.getStudentByIdAndEmail(studentId, email);
+
+    if (!isEmailBelongsToUser.isSuccess()) {
+      const isEmailDuplicated: Result<UserData> = await UserService.getStudentByEmail(email);
+
+      if (isEmailDuplicated.isSuccess()) {
+        return res.sendError.conflict("Email already exist");
+      }
+    }
+
     const userResponse: boolean = await UserService.isUserExist(studentId);
 
     if (!userResponse) {
