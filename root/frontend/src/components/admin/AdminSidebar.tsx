@@ -70,6 +70,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               key: "subjects",
             },
             {
+              to: "/admin/intakes",
+              label: "Intakes",
+              key: "intakes",
+            },
+            {
               to: "/admin/venues",
               label: "Venues",
               key: "venues",

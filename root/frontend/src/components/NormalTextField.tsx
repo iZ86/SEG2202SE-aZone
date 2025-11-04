@@ -54,6 +54,15 @@ export default function NormalTextField({
         maxLength: 11,
       };
       break;
+    case "Intake ID":
+      attributes = {
+        type: "text",
+        pattern: "^\\d{6}$",
+        title: "Intake ID must be in the format YYYYMM",
+        maxLength: 6,
+        minLength: 6,
+      };
+      break;
     default:
       attributes = { type: "text" };
   }

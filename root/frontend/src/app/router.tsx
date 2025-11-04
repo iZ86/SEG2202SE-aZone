@@ -16,6 +16,9 @@ import AdminEditCourse from "@routes/admin/AdminEditCourse";
 import AdminSubject from "@routes/admin/AdminSubject";
 import AdminCreateSubject from "@routes/admin/AdminCreateSubject";
 import AdminEditSubject from "@routes/admin/AdminEditSubject";
+import AdminIntake from "@routes/admin/AdminIntake";
+import AdminCreateIntake from "@routes/admin/AdminCreateIntake";
+import AdminEditIntake from "@routes/admin/AdminEditIntake";
 import AdminVenue from "@routes/admin/AdminVenue";
 import AdminCreateVenue from "@routes/admin/AdminCreateVenue";
 import AdminEditVenue from "@routes/admin/AdminEditVenue";
@@ -88,6 +91,18 @@ const routes = [
   {
     path: "/admin/subjects/:id/edit",
     element: <AdminEditSubject />,
+  },
+  {
+    path: "/admin/intakes",
+    element: <AdminIntake />,
+  },
+  {
+    path: "/admin/intakes/create",
+    element: <AdminCreateIntake />,
+  },
+  {
+    path: "/admin/intakes/:id/edit",
+    element: <AdminEditIntake />,
   },
   {
     path: "/admin/venues",
