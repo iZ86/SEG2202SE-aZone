@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
-import AdminEmptyInput from "@components/admin/AdminEmptyInput";
+import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import {
   createVenueAPI,
   getVenueByIdAPI,
@@ -132,14 +132,14 @@ export default function VenueForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyVenue}>
+                <AdminInputFieldWrapper isEmpty={emptyVenue}>
                   <NormalTextField
                     text={venue}
                     onChange={onChangeVenue}
                     isInvalid={emptyVenue}
                     placeholder="Venue Name"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
             </div>
 

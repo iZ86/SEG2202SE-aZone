@@ -21,7 +21,7 @@ import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
 import PasswordTextField from "@components/PasswordTextField";
 import SingleFilter from "@components/SingleFilter";
-import AdminEmptyInput from "@components/admin/AdminEmptyInput";
+import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import { getAdminByIdAPI, updateAdminByIdAPI } from "../api/admins";
 import type { Programme, ProgrammeIntake } from "@datatypes/programmeType";
 import type { Course } from "@datatypes/courseType";
@@ -637,75 +637,75 @@ export default function UserForm({
           >
             <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyFirstName}>
+                <AdminInputFieldWrapper isEmpty={emptyFirstName}>
                   <NormalTextField
                     text={firstName}
                     onChange={onChangeFirstName}
                     isInvalid={emptyFirstName}
                     placeholder="First Name"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
 
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyLastName}>
+                <AdminInputFieldWrapper isEmpty={emptyLastName}>
                   <NormalTextField
                     text={lastName}
                     onChange={onChangeLastName}
                     isInvalid={emptyLastName}
                     placeholder="Last Name"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10  gap-y-8 sm:gap-y-0">
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyEmail}>
+                <AdminInputFieldWrapper isEmpty={emptyEmail}>
                   <NormalTextField
                     text={email}
                     onChange={onChangeEmail}
                     isInvalid={emptyEmail}
                     placeholder="Email (e.g., john@example.com)"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyPhoneNumber}>
+                <AdminInputFieldWrapper isEmpty={emptyPhoneNumber}>
                   <NormalTextField
                     text={phoneNumber}
                     onChange={onChangePhoneNumber}
                     isInvalid={emptyPhoneNumber}
                     placeholder="Phone Number (e.g., 0123456789)"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
             </div>
 
             {type === "Add" && (
               <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                 <div className="flex-1">
-                  <AdminEmptyInput isInvalid={emptyPassword}>
+                  <AdminInputFieldWrapper isEmpty={emptyPassword}>
                     <PasswordTextField
                       password={password}
                       onChange={onChangePassword}
                       invalidPassword={emptyPassword}
                       placeholder="Password"
                     />
-                  </AdminEmptyInput>
+                  </AdminInputFieldWrapper>
                   {!isPasswordMatched && (
                     <p className="text-red-500 mt-1">Passwords do not match</p>
                   )}
                 </div>
                 <div className="flex-1">
-                  <AdminEmptyInput isInvalid={emptyConfirmPassword}>
+                  <AdminInputFieldWrapper isEmpty={emptyConfirmPassword}>
                     <PasswordTextField
                       password={confirmPassword}
                       onChange={onChangeConfirmPassword}
                       invalidPassword={emptyConfirmPassword}
                       placeholder="Confirm Password"
                     />
-                  </AdminEmptyInput>
+                  </AdminInputFieldWrapper>
                 </div>
               </div>
             )}
@@ -758,8 +758,8 @@ export default function UserForm({
                 </h1>
                 <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
-                    <AdminEmptyInput
-                      isInvalid={
+                    <AdminInputFieldWrapper
+                      isEmpty={
                         emptyProgramme || isStudentCourseProgrammeIntakeExist
                       }
                     >
@@ -772,11 +772,11 @@ export default function UserForm({
                         }
                         onChange={onChangeProgramme}
                       />
-                    </AdminEmptyInput>
+                    </AdminInputFieldWrapper>
                   </div>
                   <div className="flex-1">
-                    <AdminEmptyInput
-                      isInvalid={
+                    <AdminInputFieldWrapper
+                      isEmpty={
                         emptyCourse || isStudentCourseProgrammeIntakeExist
                       }
                     >
@@ -789,14 +789,14 @@ export default function UserForm({
                         }
                         onChange={onChangeCourse}
                       />
-                    </AdminEmptyInput>
+                    </AdminInputFieldWrapper>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
-                    <AdminEmptyInput
-                      isInvalid={
+                    <AdminInputFieldWrapper
+                      isEmpty={
                         emptyProgrammeIntake ||
                         isStudentCourseProgrammeIntakeExist
                       }
@@ -811,7 +811,7 @@ export default function UserForm({
                         }
                         onChange={onChangeProgrammeIntake}
                       />
-                    </AdminEmptyInput>
+                    </AdminInputFieldWrapper>
                   </div>
                 </div>
 

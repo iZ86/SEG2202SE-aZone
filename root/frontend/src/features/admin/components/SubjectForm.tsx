@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
-import AdminEmptyInput from "@components/admin/AdminEmptyInput";
+import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import { getAllCoursesAPI } from "../api/courses";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import type { MultiValue } from "react-select";
@@ -253,40 +253,40 @@ export default function SubjectForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptySubjectName}>
+                <AdminInputFieldWrapper isEmpty={emptySubjectName}>
                   <NormalTextField
                     text={subjectName}
                     onChange={onChangeSubjectName}
                     isInvalid={emptySubjectName}
                     placeholder="Subject Name"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptySubjectCode}>
+                <AdminInputFieldWrapper isEmpty={emptySubjectCode}>
                   <NormalTextField
                     text={subjectCode}
                     onChange={onChangeSubjectCode}
                     isInvalid={emptySubjectCode}
                     placeholder="Subject Code (e.g., SEG1024)"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
             </div>
 
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyCreditHours}>
+                <AdminInputFieldWrapper isEmpty={emptyCreditHours}>
                   <NormalTextField
                     text={creditHours}
                     onChange={onChangeCreditHours}
                     isInvalid={emptyCreditHours}
                     placeholder="Credit Hours (1 - 10)"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyCourse}>
+                <AdminInputFieldWrapper isEmpty={emptyCourse}>
                   <MultiFilter
                     placeholder="Select Subject's Course"
                     options={courseOptions}
@@ -294,7 +294,7 @@ export default function SubjectForm({
                     isInvalid={emptyCourse}
                     onChange={onChangeCourse}
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
             </div>
 

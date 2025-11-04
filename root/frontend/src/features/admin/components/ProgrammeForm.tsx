@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
-import AdminEmptyInput from "@components/admin/AdminEmptyInput";
+import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import {
   createProgrammeAPI,
   getProgrammeByIdAPI,
@@ -136,14 +136,14 @@ export default function ProgrammeForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminEmptyInput isInvalid={emptyProgrammeName}>
+                <AdminInputFieldWrapper isEmpty={emptyProgrammeName}>
                   <NormalTextField
                     text={programmeName}
                     onChange={onChangeProgrammeName}
                     isInvalid={emptyProgrammeName}
                     placeholder="Programme Name"
                   />
-                </AdminEmptyInput>
+                </AdminInputFieldWrapper>
               </div>
             </div>
 
