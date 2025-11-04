@@ -17,7 +17,7 @@ export type StudentCourseProgrammeIntake = {
   programmeName: string;
   intakeId: number;
   semester: string;
-  semesterStartPeriod: string;
-  semesterEndPeriod: string;
+  semesterStartDate: string;
+  semesterEndDate: string;
   courseStatus: number;
 }

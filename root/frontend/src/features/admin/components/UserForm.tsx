@@ -890,11 +890,11 @@ export default function UserForm({
                                 </td>
                                 <td className="px-6 py-5">
                                   {new Date(
-                                    student.semesterStartPeriod
+                                    student.semesterStartDate
                                   ).toLocaleDateString()}{" "}
                                   -{" "}
                                   {new Date(
-                                    student.semesterEndPeriod
+                                    student.semesterEndDate
                                   ).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-5">

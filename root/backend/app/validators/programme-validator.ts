@@ -19,11 +19,11 @@ export const createAndUpdateProgrammeIntakeValidator: any = [
   body('semester')
     .notEmpty().withMessage('Missing semester')
     .isNumeric().withMessage('semester must be numeric'),
-  body('semesterStartPeriod')
-    .notEmpty().withMessage('Missing semesterStartPeriod')
-    .isDate().withMessage('semesterStartPeriod must be (YYYY-MM-DD) format'),
-  body('semesterEndPeriod')
-    .notEmpty().withMessage('Missing semesterEndPeriod')
-    .isDate().withMessage('semesterEndPeriod must be (YYYY-MM-DD) format'),
+  body('semesterStartDate')
+    .notEmpty().withMessage('Missing semesterStartDate')
+    .isDate().withMessage('semesterStartDate must be (YYYY-MM-DD) format'),
+  body('semesterEndDate')
+    .notEmpty().withMessage('Missing semesterEndDate')
+    .isDate().withMessage('semesterEndDate must be (YYYY-MM-DD) format'),
   validate,
 ];

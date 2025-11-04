@@ -21,6 +21,6 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   programmeName: string;
   intakeId: number;
   semester: number;
-  semesterStartPeriod: Date;
-  semesterEndPeriod: Date;
+  semesterStartDate: Date;
+  semesterEndDate: Date;
 }
