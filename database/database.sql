@@ -196,7 +196,7 @@ INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`) VALUES
 (8, 2, 'Diploma in Finance'),
 (9, 2, 'Diploma in Business Administration');
 
-INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `semester`, `semesterStartPeriod`, `semesterEndPeriod`) VALUES
+INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `semester`, `semesterStartDate`, `semesterEndDate`) VALUES
 (1, 1, 202509, 4, '2025-09-22', '2026-01-16'),
 (2, 2, 202508, 1, '2025-08-16', '2025-12-12'),
 (3, 1, 202504, 5, '2025-04-09', '2025-08-06');
