@@ -27,7 +27,7 @@ CREATE TABLE SUBJECT (
     subjectId INT AUTO_INCREMENT PRIMARY KEY,
     subjectCode VARCHAR(50) NOT NULL,
     subjectName VARCHAR(255) NOT NULL,
-    description TEXT,
+    description VARCHAR(3000),
     creditHours INT
 );
 
