@@ -313,7 +313,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status AS courseStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
@@ -347,7 +347,7 @@ class UserRepository implements IUserRepostory {
   getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status AS courseStatus " +
+        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
         "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
         "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
@@ -370,7 +370,7 @@ class UserRepository implements IUserRepostory {
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData[] | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartPeriod, pi.semesterEndPeriod, scpi.status AS courseStatus " +
+        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
         "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
         "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
