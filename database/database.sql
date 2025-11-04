@@ -147,7 +147,7 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
         ON DELETE CASCADE,
     FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
         ON DELETE CASCADE,
-    PRIMARY KEY (studentId, courseId, programmeIntakeId, status)
+    PRIMARY KEY (studentId, courseId, programmeIntakeId)
 );
 
 -- DATA MANIPULATION LANGUAGE --
