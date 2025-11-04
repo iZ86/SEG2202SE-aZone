@@ -33,8 +33,8 @@ CREATE TABLE SUBJECT (
 
 CREATE TABLE ENROLLMENT (
     enrollmentId INT AUTO_INCREMENT PRIMARY KEY,
-    enrollmentStartDateTime DATETIME,
-    enrollmentEndDateTime DATETIME
+    enrollmentStartDateTime DATETIME NOT NULL,
+    enrollmentEndDateTime DATETIME NOT NULL
 );
 
 CREATE TABLE ADMIN (
