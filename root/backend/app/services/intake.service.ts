@@ -9,6 +9,7 @@ interface IInterfaceService {
   createIntake(intakeId: number): Promise<Result<IntakeData>>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>>;
   deleteIntakeById(intakeId: number): Promise<Result<null>>;
+  getIntakeCount(query: string): Promise<Result<number>>;
 }
 
 class InterfaceService implements IInterfaceService {
@@ -56,6 +57,12 @@ class InterfaceService implements IInterfaceService {
     await IntakeRepository.deleteIntakeById(intakeId);
 
     return Result.succeed(null, "Intake delete success");
+  }
+
+  async getIntakeCount(query: string = ""): Promise<Result<number>> {
+    const intakeCount: number = await IntakeRepository.getIntakeCount(query);
+
+    return Result.succeed(intakeCount ? intakeCount : 0, "Intake count retrieve success");
   }
 }
 

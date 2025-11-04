@@ -1,6 +1,7 @@
 import { IntakeData } from "../models/intake-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
+import { TotalCount } from "../models/general-model";
 
 interface IIntakeRepository {
   getAllIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]>;
@@ -8,6 +9,7 @@ interface IIntakeRepository {
   createIntake(intakeId: number): Promise<ResultSetHeader>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader>;
   deleteIntakeById(intakeId: number): Promise<ResultSetHeader>;
+  getIntakeCount(query: string): Promise<number>;
 }
 
 class IntakeRepository implements IIntakeRepository {
@@ -83,6 +85,23 @@ class IntakeRepository implements IIntakeRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getIntakeCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM INTAKE " +
+        "WHERE intakeId LIKE ?;",
+        [
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });
