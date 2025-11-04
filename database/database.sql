@@ -124,7 +124,8 @@ CREATE TABLE ENROLLMENT_SUBJECT (
     FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
         ON DELETE CASCADE,
     FOREIGN KEY (dayId) REFERENCES DAY(dayId)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    UNIQUE (enrollmentId, subjectId, classTypeId, venueId, startTime, endTime, dayId)
 );
 
 CREATE TABLE SUBJECT_STATUS (
