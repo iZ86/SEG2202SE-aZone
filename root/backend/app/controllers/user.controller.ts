@@ -131,7 +131,7 @@ export default class UserController {
      * Check if the user is using the email before updating
      * If user is using the old email, doesn't needs to check if the email is duplicated
      */
-    const isEmailBelongsToUser = await UserService.getStudentByIdAndEmail(studentId, email);
+    const isEmailBelongsToUser: Result<UserData> = await UserService.getStudentByIdAndEmail(studentId, email);
 
     if (!isEmailBelongsToUser.isSuccess()) {
       const isEmailDuplicated: Result<UserData> = await UserService.getStudentByEmail(email);
