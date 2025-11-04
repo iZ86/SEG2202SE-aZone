@@ -45,16 +45,6 @@ class UserService implements IUserService {
     return Result.succeed(user, "User retrieve success");
   }
 
-  async getAdminById(adminId: number): Promise<Result<UserData>> {
-    const admin: UserData | undefined = await UserRepository.getAdminById(adminId);
-
-    if (!admin) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Admin not found");
-    }
-
-    return Result.succeed(admin, "Admin retrieve success");
-  }
-
   async getStudentById(studentId: number): Promise<Result<UserData>> {
     const student: UserData | undefined = await UserRepository.getStudentById(studentId);
 
@@ -63,6 +53,27 @@ class UserService implements IUserService {
     }
 
     return Result.succeed(student, "Student retrieve success");
+  }
+
+
+  async getStudentByEmail(email: string): Promise<Result<UserData>> {
+    const student: UserData | undefined = await UserRepository.getStudentByEmail(email);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
+    }
+
+    return Result.succeed(student, "Student retrieve success");
+  }
+
+  async getAdminById(adminId: number): Promise<Result<UserData>> {
+    const admin: UserData | undefined = await UserRepository.getAdminById(adminId);
+
+    if (!admin) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Admin not found");
+    }
+
+    return Result.succeed(admin, "Admin retrieve success");
   }
 
   async getUserCount(query: string = "", role: ENUM_USER_ROLE): Promise<Result<number>> {

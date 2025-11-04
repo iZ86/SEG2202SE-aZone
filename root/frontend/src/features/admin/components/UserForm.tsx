@@ -93,6 +93,7 @@ export default function UserForm({
   const [emptyProgramme, setEmptyProgramme] = useState(false);
   const [emptyCourse, setEmptyCourse] = useState(false);
   const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
   const [
     isStudentCourseProgrammeIntakeExist,
     setIsStudentCourseProgrammeIntakeExist,
@@ -167,6 +168,12 @@ export default function UserForm({
       }
     } else {
       navigate("/admin/users");
+      return;
+    }
+
+    if (response && response.status === 409) {
+      setIsLoading(false);
+      setInvalidEmail(true);
       return;
     }
 
@@ -661,11 +668,11 @@ export default function UserForm({
 
             <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10  gap-y-8 sm:gap-y-0">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyEmail}>
+                <AdminInputFieldWrapper isEmpty={emptyEmail} isInvalid={invalidEmail} invalidMessage="Email already exists.">
                   <NormalTextField
                     text={email}
                     onChange={onChangeEmail}
-                    isInvalid={emptyEmail}
+                    isInvalid={emptyEmail || invalidEmail}
                     placeholder="Email (e.g., john@example.com)"
                   />
                 </AdminInputFieldWrapper>

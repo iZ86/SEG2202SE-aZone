@@ -97,6 +97,12 @@ export default class UserController {
     const password: string = req.body.password;
     const userStatus: number = req.body.userStatus;
 
+    const isEmailDuplicated: Result<UserData> = await UserService.getStudentByEmail(email);
+
+    if (isEmailDuplicated.isSuccess()) {
+      return res.sendError.conflict("Email already exist");
+    }
+
     const response: Result<ResultSetHeader> = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
 
     if (response.isSuccess()) {
