@@ -68,7 +68,7 @@ CREATE TABLE PROGRAMME_INTAKE (
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
         ON DELETE CASCADE,
-    UNIQUE (programmeIntakeId, programmeId, intakeId, semester)
+    UNIQUE (programmeId, intakeId, semester)
 );
 
 CREATE TABLE COURSE_SUBJECT (
