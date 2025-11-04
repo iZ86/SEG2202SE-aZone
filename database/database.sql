@@ -51,7 +51,7 @@ CREATE TABLE STUDENT (
 
 CREATE TABLE COURSE (
     courseId INT AUTO_INCREMENT PRIMARY KEY,
-    programmeId INT,
+    programmeId INT NOT NULL,
     courseName VARCHAR(255) NOT NULL,
     FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE
@@ -59,11 +59,11 @@ CREATE TABLE COURSE (
 
 CREATE TABLE PROGRAMME_INTAKE (
     programmeIntakeId INT AUTO_INCREMENT PRIMARY KEY,
-    programmeId INT,
-    intakeId INT,
-    semester INT,
-    semesterStartPeriod DATE,
-    semesterEndPeriod DATE,
+    programmeId INT NOT NULL,
+    intakeId INT NOT NULL,
+    semester INT NOT NULL,
+    semesterStartPeriod DATE NOT NULL,
+    semesterEndPeriod DATE NOT NULL,
     FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
@@ -93,22 +93,22 @@ CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
 
 CREATE TABLE CLASSTYPE (
     classTypeId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    classType VARCHAR(255)
+    classType VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE VENUE (
     venueId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    venue VARCHAR(255)
+    venue VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE ENROLLMENT_SUBJECT (
     enrollmentSubjectId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    enrollmentId INT,
-    subjectId INT,
-    classTypeId INT,
-    venueId INT,
-    startTime TIME,
-    endTime TIME,
+    enrollmentId INT NOT NULL,
+    subjectId INT NOT NULL,
+    classTypeId INT NOT NULL,
+    venueId INT NOT NULL,
+    startTime TIME NOT NULL,
+    endTime TIME NOT NULL,
     FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
         ON DELETE CASCADE,
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
@@ -121,13 +121,13 @@ CREATE TABLE ENROLLMENT_SUBJECT (
 
 CREATE TABLE SUBJECT_STATUS (
     subjectStatusId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    subjectStatus VARCHAR(255)
+    subjectStatus VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE STUDENT_ENROLLMENT_SUBJECT (
-    studentId INT,
-    enrollmentSubjectId INT,
-    subjectStatusId INT,
+    studentId INT NOT NULL,
+    enrollmentSubjectId INT NOT NULL,
+    subjectStatusId INT NOT NULL,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (enrollmentSubjectId) REFERENCES ENROLLMENT_SUBJECT(enrollmentSubjectId)
@@ -137,10 +137,10 @@ CREATE TABLE STUDENT_ENROLLMENT_SUBJECT (
 );
 
 CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
-    studentId INT,
-    courseId INT,
-    programmeIntakeId INT,
-    status INT DEFAULT 1,
+    studentId INT NOT NULL,
+    courseId INT NOT NULL,
+    programmeIntakeId INT NOT NULL,
+    status INT DEFAULT 1 NOT NULL,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
