@@ -41,7 +41,23 @@ export default function StudentSideBar({ page }: { page: string }) {
 
         {/* Nav Links */}
         <nav className="flex flex-col mt-2">
-          {[{ to: "/admin", label: "Dashboard", key: "dashboard" }].map(
+          {[{ to: "/dashboard", label: "Dashboard", key: "dashboard" }].map(
+            (item) => (
+              <Link
+                key={item.key}
+                to={item.to}
+                className={`${page === item.key
+                    ? "font-bold bg-gray-800 text-white"
+                    : "text-white"
+                  } text-white hover:bg-gray-700 px-6 py-3 transition`}
+                onClick={() => setIsOpen(false)}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+
+          {[{ to: "/finance", label: "Finance", key: "finance" }].map(
             (item) => (
               <Link
                 key={item.key}

@@ -7,6 +7,7 @@ import AdminLogin from "@routes/admin/AdminLogin";
 import AdminUser from "@routes/admin/AdminUser";
 import AdminCreateUser from "@routes/admin/AdminCreateUser";
 import AdminEditUser from "@routes/admin/AdminEditUser";
+import StudentFinance from "@routes/student/StudentFinance";
 
 const routes = [
   {
@@ -20,6 +21,10 @@ const routes = [
   {
     path: "/enrollment",
     element: <Enrollment />,
+  },
+  {
+    path: "/finance",
+    element: <StudentFinance />,
   },
   {
     path: "/admin/login",
