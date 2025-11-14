@@ -2,3 +2,6 @@
 # Visual Paradigm backup files
 *.bak_*
 *.vpp.lck
+
+# macOS system files
+*.DS_Store
