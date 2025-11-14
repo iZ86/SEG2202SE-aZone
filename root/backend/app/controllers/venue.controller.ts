@@ -102,7 +102,7 @@ export default class VenueController {
     const response = await VenueService.deleteVenueById(venueId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.delete(response.getMessage());
+      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
