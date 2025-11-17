@@ -58,6 +58,12 @@ export default class SubjectController {
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
 
+    const isSubjectNameDuplicated: Result<SubjectData> = await SubjectService.getSubjectByName(subjectName);
+
+    if (isSubjectNameDuplicated.isSuccess()) {
+      return res.sendError.conflict("Subject name duplciated");
+    }
+
     const response = await SubjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
 
     if (response.isSuccess()) {

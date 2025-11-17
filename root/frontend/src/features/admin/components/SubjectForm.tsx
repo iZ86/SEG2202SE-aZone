@@ -33,6 +33,8 @@ export default function SubjectForm({
   const [emptyCreditHours, setEmptyCreditHours] = useState(false);
   const [emptyCourse, setEmptyCourse] = useState(false);
 
+  const [invalidSubjectName, setInvalidSubjectName] = useState(false);
+
   const [courseOptions, setCourseOptions] = useState<reactSelectOptionType[]>(
     []
   );
@@ -85,6 +87,12 @@ export default function SubjectForm({
         description,
         course.map((c) => c.value)
       );
+    }
+
+    if (response && response.status === 409) {
+      setIsLoading(false);
+      setInvalidSubjectName(true);
+      return;
     }
 
     if (response && response.ok) {
@@ -253,11 +261,15 @@ export default function SubjectForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptySubjectName}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptySubjectName}
+                  isInvalid={invalidSubjectName}
+                  invalidMessage="Subject Name already exists."
+                >
                   <NormalTextField
                     text={subjectName}
                     onChange={onChangeSubjectName}
-                    isInvalid={emptySubjectName}
+                    isInvalid={emptySubjectName || invalidSubjectName}
                     placeholder="Subject Name"
                   />
                 </AdminInputFieldWrapper>
