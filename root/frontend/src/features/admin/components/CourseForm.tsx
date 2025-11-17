@@ -31,6 +31,8 @@ export default function CourseForm({
   const [emptyCourseName, setEmptyCourseName] = useState(false);
   const [emptyProgramme, setEmptyProgramme] = useState(false);
 
+  const [invalidCourseName, setInvalidCourseName] = useState(false);
+
   const [programmeOptions, setProgrammeOptions] = useState<
     reactSelectOptionType[]
   >([]);
@@ -72,6 +74,12 @@ export default function CourseForm({
         courseName,
         programme.value
       );
+    }
+
+    if (response && response.status === 409) {
+      setIsLoading(false);
+      setInvalidCourseName(true);
+      return;
     }
 
     if (response && response.ok) {
@@ -198,11 +206,15 @@ export default function CourseForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyCourseName}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyCourseName}
+                  isInvalid={invalidCourseName}
+                  invalidMessage="Course Name already exists."
+                >
                   <NormalTextField
                     text={courseName}
                     onChange={onChangeCourseName}
-                    isInvalid={emptyCourseName}
+                    isInvalid={emptyCourseName || invalidCourseName}
                     placeholder="Course Name"
                   />
                 </AdminInputFieldWrapper>

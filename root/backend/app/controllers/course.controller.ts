@@ -72,6 +72,12 @@ export default class CourseController {
     const courseName: string = req.body.courseName;
     const programmeId: number = req.body.programmeId;
 
+    const isCourseNameDuplicated: Result<CourseData> = await CourseService.getCourseByName(courseName);
+
+    if (isCourseNameDuplicated.isSuccess()) {
+      return res.sendError.conflict("Course name duplciated");
+    }
+
     const programmeResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
 
     if (!programmeResponse.isSuccess()) {
