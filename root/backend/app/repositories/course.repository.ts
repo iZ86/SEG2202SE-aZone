@@ -68,7 +68,7 @@ class CourseRepository implements ICourseRepository {
       databaseConn.query<CourseData[]>(
         "SELECT courseId, courseName " +
         "FROM COURSE " +
-        "WHERE courseName = ?;",
+        "WHERE courseName COLLATE utf8mb4_general_ci = ?;",
         [courseName],
         (err, res) => {
           if (err) reject(err);

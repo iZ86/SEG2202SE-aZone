@@ -64,7 +64,7 @@ class ProgrammeRepository implements IProgrammeRepository {
       databaseConn.query<ProgrammeData[]>(
         "SELECT programmeId, programmeName " +
         "FROM PROGRAMME " +
-        "WHERE programmeName = ?;",
+        "WHERE programmeName COLLATE utf8mb4_general_ci = ?;",
         [programmeName],
         (err, res) => {
           if (err) reject(err);
