@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 /** TBD: A042.
  * Do whatever you want, iZ86 will handle API.
  */
@@ -10,19 +12,19 @@ export default function SubjectInformationPanel() {
   ];
 
   return (
-    <div className="shadow-lg m-5 p-2 rounded-lg bg-white">
-      <div className="flex justify-between items-center m-5 w-2xl">
+    <div className="shadow-lg p-6 rounded-lg bg-white">
+      <div className="flex justify-between items-center w-full">
         <h2 className="text-black font-bold">My Subjects</h2>
-        <a href="https://www.youtube.com/" className="text-[#666666]">
+        <Link to="/enrollment" className="text-[#666666]">
           more &gt;
-        </a>
+        </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-5 m-5 text-black">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-black mt-4">
         {subjects.map((subject) => (
           <div
             key={subject.code}
-            className={`border-l-4 ${subject.color} p-3 pl-5 shadow-xl rounded-lg`}
+            className={`border-l-4 ${subject.color} p-3 pl-5 shadow-xl rounded-lg bg-black/5`}
           >
             <h5>{subject.creditHours} Credit Hours</h5>
             <p className="font-bold">

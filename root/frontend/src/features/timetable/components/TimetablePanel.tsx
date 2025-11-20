@@ -89,40 +89,63 @@ export default function TimetablePanel() {
   ];
 
   return (
-    <div className="bg-white shadow-lg rounded-md m-5 p-7">
-      <div className="text-black flex justify-between mb-8">
+    <div className="bg-white shadow-lg rounded-md p-7">
+      <div className="text-black flex flex-col sm:flex-row justify-between mb-8">
         <h2 className="text-black font-bold">
-        My Weekly Timetable (13 October 2025 - 17 October 2025)
+          My Weekly Timetable (13 October 2025 - 17 October 2025)
         </h2>
-        <div className="flex">
-          <button className="bg-[#E5E5E5] px-6 rounded-l-2xl hover:bg-gray-100 cursor-pointer">Previous</button>
-          <button className="bg-[#E5E5E5] px-6 py-4 hover:bg-gray-100 cursor-pointer">Current Week</button>
-          <button className="bg-[#E5E5E5] px-6 rounded-r-2xl hover:bg-gray-100 cursor-pointer">Next</button>
+        <div className="flex mt-4 sm:mt-0">
+          <button className="bg-[#E5E5E5] px-6 rounded-l-2xl hover:bg-gray-100 cursor-pointer">
+            Previous
+          </button>
+          <button className="bg-[#E5E5E5] px-4 py-3 hover:bg-gray-100 cursor-pointer">
+            Current Week
+          </button>
+          <button className="bg-[#E5E5E5] px-6 rounded-r-2xl hover:bg-gray-100 cursor-pointer">
+            Next
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-6">
-        {days.map(days => (
-          <div key={days} className="text-black font-semibold bg-[#E7ECEF] py-3 rounded-t-lg text-center">
-            {days}
-          </div>
-        ))}
+      <div className="overflow-x-auto">
+        <div className="grid grid-cols-7 gap-x-36 gap-y-6 xl:gap-6  min-w-[700px]">
+          {days.map((days) => (
+            <div
+              key={days}
+              className="text-black font-semibold bg-white-antiflash py-3 rounded-t-lg text-center min-w-32"
+            >
+              {days}
+            </div>
+          ))}
 
-        {days.map(days => (
-        <div key={days} className="space-y-2">
-          {classes.filter(c => c.day === days).map((classItem, index) => (
-              <div key={index} className={`${classItem.color} border-l-5 py-3 px-2 rounded-lg text-sm`}>
-              <p className="font-bold">{classItem.time}</p>
-              <p className="font-bold text-black mt-2">{classItem.code} - {classItem.name}</p>
-              <p className="font-bold text-[#666666] mt-5">Venue: {classItem.venue}</p>
-              <p className="font-bold text-[#666666]">Grouping: {classItem.grouping}</p>
-              <p className="font-bold text-[#666666]">Lecturer: {classItem.lecturer}</p>
+          {days.map((days) => (
+            <div key={days} className="space-y-2 min-w-32">
+              {classes
+                .filter((c) => c.day === days)
+                .map((classItem, index) => (
+                  <div
+                    key={index}
+                    className={`${classItem.color} border-l-5 py-3 px-2 rounded-lg text-sm`}
+                  >
+                    <p className="font-bold">{classItem.time}</p>
+                    <p className="font-bold text-black mt-2">
+                      {classItem.code} - {classItem.name}
+                    </p>
+                    <p className="font-bold text-[#666666] mt-5">
+                      Venue: {classItem.venue}
+                    </p>
+                    <p className="font-bold text-[#666666]">
+                      Grouping: {classItem.grouping}
+                    </p>
+                    <p className="font-bold text-[#666666]">
+                      Lecturer: {classItem.lecturer}
+                    </p>
+                  </div>
+                ))}
             </div>
           ))}
         </div>
-      ))}
       </div>
-      
     </div>
   );
 }

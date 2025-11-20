@@ -9,11 +9,11 @@ export default function StudentInformationPanel() {
     { label: "Intake", value: "202509" },
     { label: "Study Mode", value: "Full Time" },
     { label: "Current Semester", value: "4" },
-    { label: "Semester Period", value: "22 Sep 2025 to 16 Jan 2026" },
+    { label: "Semester Period", value: "22 Sep 2025 - 16 Jan 2026" },
   ];
 
   return (
-    <div className="flex text-black m-5 p-6 bg-white shadow-lg rounded-lg w-full gap-4">
+    <div className="flex text-black p-6 bg-white shadow-lg rounded-lg gap-4">
       <div>
         <h2 className="font-semibold pb-5">Isaac Yeow Ming (2301838)</h2>
 
