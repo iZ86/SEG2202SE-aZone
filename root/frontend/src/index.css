@@ -5,9 +5,11 @@
 @theme {
   --color-blue-yinmn: #274C77;
   --color-blue-air-superiority: #6096BA;
+  --color-gray-charcoal: #555555;
   --color-gray-battleship: #8B8C89;
   --color-white-antiflash: #E7ECEF;
   --color-red-tomato: #EF6351;
+  --color-platinum: #E7ECEF;
 
   --font-poppins: "Poppins", sans-serif;
   --font-nunito-sans: "Nunito Sans", sans-serif;
@@ -71,11 +73,15 @@ h6 {
   line-height: 16.5px;
 }
 
-p {
+p, label {
   font-size: 16px;
   line-height: 24px;
+}
+  
+p {
   font-family: "Nunito Sans", sans-serif;
 }
+
 
 @media (prefers-color-scheme: light) {
   :root {
