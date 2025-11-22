@@ -6,6 +6,7 @@ import { TotalCount } from "../models/general-model";
 interface ISubjectRepository {
   getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
   getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
+  getSubjectByName(subjectName: string): Promise<SubjectData | undefined>;
   createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   deleteSubjectById(subjectId: number): Promise<ResultSetHeader>;
@@ -47,6 +48,21 @@ class SubjectRepository implements ISubjectRepository {
         [
           subjectId,
         ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getSubjectByName(subjectName: string): Promise<SubjectData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<SubjectData[]>(
+        "SELECT * " +
+        "FROM SUBJECT " +
+        "WHERE subjectName COLLATE utf8mb4_general_ci = ?;",
+        [subjectName],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);

@@ -9,7 +9,8 @@ import { CourseSubjectData } from "../models/course-model";
 interface ISubjectService {
   getAllSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectData[]>>;
   getSubjectById(subjectId: number): Promise<Result<SubjectData>>;
-  createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
+  getSubjectByName(subjectName: string): Promise<Result<SubjectData>>;
+  createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
   deleteSubjectById(subjectId: number): Promise<Result<null>>; getSubjectCount(query: string): Promise<Result<number>>;
 }
@@ -31,7 +32,17 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subject, "Subject retrieve success");
   }
 
-  async createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>> {
+  async getSubjectByName(subjectName: string): Promise<Result<SubjectData>> {
+    const subject: SubjectData | undefined = await SubjectRepository.getSubjectByName(subjectName);
+
+    if (!subject) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject not found");
+    }
+
+    return Result.succeed(subject, "Subject retrieve success");
+  }
+
+  async createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>> {
     const response: ResultSetHeader = await SubjectRepository.createSubject(subjectCode, subjectName, description, creditHours);
 
     if (courseIds && courseIds.length > 0) {

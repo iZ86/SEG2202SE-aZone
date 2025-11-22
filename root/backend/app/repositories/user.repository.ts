@@ -7,7 +7,8 @@ interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getAllStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
-  getStudentById(studentId: number): Promise<UserData | undefined>; getStudentByEmail(email: string): Promise<UserData | undefined>;
+  getStudentById(studentId: number): Promise<UserData | undefined>;
+  getStudentByEmail(email: string): Promise<UserData | undefined>;
   getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined>;
   getAdminById(adminId: number): Promise<UserData | undefined>;
   getAdminCount(query: string): Promise<number>;
@@ -119,7 +120,7 @@ class UserRepository implements IUserRepostory {
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
-        "WHERE ru.email = ?;",
+        "WHERE ru.email COLLATE utf8mb4_general_ci = ?;",
         [email],
         (err, res) => {
           if (err) reject(err);
@@ -420,7 +421,7 @@ class UserRepository implements IUserRepostory {
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET courseId = ?, programmeIntakeId = ?, status = ?" +
+        "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET courseId = ?, programmeIntakeId = ?, status = ? " +
         "WHERE studentId = ?",
         [courseId, programmeIntakeId, status, studentId],
         (err, res) => {

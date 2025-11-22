@@ -6,12 +6,13 @@ import { TotalCount } from "../models/general-model";
 interface ICourseRepository {
   getAllCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]>;
   getCourseById(courseId: number): Promise<CourseProgrammeData | undefined>;
+  getCourseByName(courseName: string): Promise<CourseData | undefined>;
   getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined>;
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
   getCourseCount(query: string): Promise<number>;
-  getCourseSubjectBySubjectId(subjectId: number): Promise<CourseSubjectData[]>
+  getCourseSubjectBySubjectId(subjectId: number): Promise<CourseSubjectData[]>;
   getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined>;
   getCourseSubjectCount(query: string): Promise<number>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
@@ -57,6 +58,21 @@ class CourseRepository implements ICourseRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res?.[0]);
+        }
+      );
+    });
+  }
+
+  getCourseByName(courseName: string): Promise<CourseData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<CourseData[]>(
+        "SELECT courseId, courseName " +
+        "FROM COURSE " +
+        "WHERE courseName COLLATE utf8mb4_general_ci = ?;",
+        [courseName],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
         }
       );
     });

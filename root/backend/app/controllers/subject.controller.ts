@@ -58,6 +58,12 @@ export default class SubjectController {
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
 
+    const isSubjectNameDuplicated: Result<SubjectData> = await SubjectService.getSubjectByName(subjectName);
+
+    if (isSubjectNameDuplicated.isSuccess()) {
+      return res.sendError.conflict("Subject name duplciated");
+    }
+
     const response = await SubjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
 
     if (response.isSuccess()) {
@@ -123,7 +129,7 @@ export default class SubjectController {
     const response = await SubjectService.deleteSubjectById(subjectId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.delete(response.getMessage());
+      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

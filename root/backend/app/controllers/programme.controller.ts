@@ -120,7 +120,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.deleteProgrammeById(programmeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.delete(response.getMessage());
+      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -265,7 +265,7 @@ export default class ProgrammeController {
     const response = await ProgrammeService.deleteProgrammeIntakeById(programmeIntakeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.delete(response.getMessage());
+      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

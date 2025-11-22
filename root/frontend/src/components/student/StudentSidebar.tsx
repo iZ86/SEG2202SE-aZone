@@ -18,15 +18,17 @@ export default function StudentSideBar({ page }: { page: string }) {
 
       {/* Overlay (click to close) */}
       <div
-        className={`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 z-40 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-          }`}
+        className={`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 z-40 ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
         onClick={() => setIsOpen(false)}
       />
 
       {/* Sidebar Drawer */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-blue-yinmn shadow-xl z-50 transform transition-transform duration-300 text-white ${isOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-blue-yinmn shadow-xl z-50 transform transition-transform duration-300 text-white ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         {/* Header with close button */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
@@ -41,21 +43,27 @@ export default function StudentSideBar({ page }: { page: string }) {
 
         {/* Nav Links */}
         <nav className="flex flex-col mt-2">
-          {[{ to: "/admin", label: "Dashboard", key: "dashboard" }].map(
-            (item) => (
-              <Link
-                key={item.key}
-                to={item.to}
-                className={`${page === item.key
-                    ? "font-bold bg-gray-800 text-white"
-                    : "text-white"
-                  } text-white hover:bg-gray-700 px-6 py-3 transition`}
-                onClick={() => setIsOpen(false)}
-              >
-                {item.label}
-              </Link>
-            )
-          )}
+          {[
+            { to: "/", label: "Dashboard", key: "dashboard" },
+            {
+              to: "/enrollment",
+              label: "Enrollment",
+              key: "enrollment",
+            },
+          ].map((item) => (
+            <Link
+              key={item.key}
+              to={item.to}
+              className={`${
+                page === item.key
+                  ? "font-bold bg-gray-800 text-white"
+                  : "text-white"
+              } text-white hover:bg-gray-700 px-6 py-3 transition`}
+              onClick={() => setIsOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
 
           {/* Sign out button */}
           <button

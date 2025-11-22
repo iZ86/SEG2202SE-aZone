@@ -114,7 +114,7 @@ export default class IntakeController {
     const response = await IntakeService.deleteIntakeById(intakeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.delete(response.getMessage());
+      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

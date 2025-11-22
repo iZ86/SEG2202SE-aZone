@@ -20,7 +20,7 @@ declare module 'express-serve-static-core' {
     sendSuccess: {
       ok(data: any, message?: string): void;
       create(data: any, message?: string): void;
-      delete(message?: string): void;
+      delete(): void;
     };
 
     sendError: {
@@ -60,11 +60,8 @@ export function enhanceResponse(req: Request, res: Response, next: NextFunction)
       });
     },
 
-    delete(message = "Delete") {
-      return r.status(204).json({
-        success: true,
-        message,
-      });
+    delete() {
+      return r.status(204).end();
     },
   };
 
