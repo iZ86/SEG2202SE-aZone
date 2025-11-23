@@ -11,6 +11,7 @@ CREATE TABLE REGISTERED_USER (
     email VARCHAR(350) UNIQUE NOT NULL,
     phoneNumber VARCHAR(20),
     password VARCHAR(255) NOT NULL,
+    profilePictureUrl VARCHAR(255),
     status INT DEFAULT 1 NOT NULL
 );
 
