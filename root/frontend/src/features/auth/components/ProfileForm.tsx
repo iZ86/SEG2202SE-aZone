@@ -81,7 +81,9 @@ export default function ProfileForm({
       setUserId(data.userId);
       setFirstName(data.firstName);
       setLastName(data.lastName);
+      setEmailInput(data.email);
       setEmail(data.email);
+      setPhoneNumberInput(data.phoneNumber);
       setPhoneNumber(data.phoneNumber);
       setProfilePictureUrl(data.profilePictureUrl || "");
     },
@@ -157,13 +159,7 @@ export default function ProfileForm({
     const response = await updateMeAPI(authToken, emailInput, phoneNumberInput);
 
     if (response && response.ok) {
-      const { data } = await response.json();
-
-      setEmail(data.email);
-      setPhoneNumber(data.phoneNumber);
-
-      setEmailInput("");
-      setPhoneNumberInput("");
+      await getMe(authToken);
 
       setIsUserInformationUpdating(false);
       toast.success("Information Updated!");
@@ -218,7 +214,7 @@ export default function ProfileForm({
             <img
               className="w-32 h-32 rounded-full object-cover border-4 border-indigo-400 shadow-md"
               src={profilePictureUrl}
-              alt={`${firstName + " " + lastName}'s profile`}
+              alt={`${lastName + " " + firstName}'s profile`}
             />
             <p className="text-lg font-bold mt-3 text-gray-900">
               {lastName + " " + firstName}
