@@ -32,7 +32,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
         "WHERE ru.userId LIKE ? " +
@@ -60,7 +60,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.userId LIKE ? " +
@@ -87,7 +87,7 @@ class UserRepository implements IUserRepostory {
   getUserById(userId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT userId, firstName, lastName, email, phoneNumber, status " +
+        "SELECT userId, firstName, lastName, email, phoneNumber, profilePictureUrl, status AS userStatus " +
         "FROM REGISTERED_USER " +
         "WHERE userId = ?;",
         [userId],
@@ -102,7 +102,7 @@ class UserRepository implements IUserRepostory {
   getStudentById(studentId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.profilePictureUrl, ru.status AS userStatus " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE s.studentId = ?;",
@@ -118,7 +118,7 @@ class UserRepository implements IUserRepostory {
   getStudentByEmail(email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email COLLATE utf8mb4_general_ci = ?;",
@@ -134,7 +134,7 @@ class UserRepository implements IUserRepostory {
   getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email = ? " +
@@ -151,7 +151,7 @@ class UserRepository implements IUserRepostory {
   getAdminById(adminId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
         "WHERE a.adminId = ?;",
