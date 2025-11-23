@@ -17,6 +17,7 @@ interface IUserService {
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData | undefined>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
+  updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
@@ -154,6 +155,14 @@ class UserService implements IUserService {
     await UserRepository.deleteUserById(userId);
 
     return Result.succeed(null, "User delete success");
+  }
+
+  async updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>> {
+    await UserRepository.updateUserProfilePictureById(userId, profilePictureUrl);
+
+    const userResponse: UserData | undefined = await UserRepository.getUserById(userId);
+
+    return Result.succeed(userResponse, "User update success");
   }
 
   async getAllStudentCourseProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {

@@ -19,6 +19,7 @@ interface IUserRepostory {
   createStudent(studentId: number): Promise<ResultSetHeader>;
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
+  updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>; getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>; updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader>;
@@ -302,6 +303,20 @@ class UserRepository implements IUserRepostory {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM REGISTERED_USER WHERE userId = ?;",
         [userId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  };
+
+  updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE REGISTERED_USER SET profilePictureUrl = ? " +
+        "WHERE userId = ?;",
+        [profilePictureUrl, userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
