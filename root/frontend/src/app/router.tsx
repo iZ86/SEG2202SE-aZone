@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GuestLogin from "@routes/GuestLogin";
 import Dashboard from "@routes/Dashboard";
 import Enrollment from "@routes/Enrollment";
+import ProgrammeHistory from "@routes/ProgrammeHistory";
 import AdminDashboard from "@routes/admin/AdminDashboard";
 import AdminLogin from "@routes/admin/AdminLogin";
 import AdminUser from "@routes/admin/AdminUser";
@@ -38,8 +39,13 @@ const routes = [
     element: <Enrollment />,
   },
   {
+<<<<<<< HEAD
+    path: "/programme-history",
+    element: <ProgrammeHistory />,
+=======
     path: "/profile",
     element: <StudentProfile />,
+>>>>>>> eb14eeb3923a4c3ed0bf12105434e9a156e5073c
   },
   {
     path: "/admin/login",
