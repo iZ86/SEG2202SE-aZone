@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export default function MediumButton({
   buttonText, submit = false, backgroundColor = "bg-blue-air-superiority", hoverBgColor = "hover:bg-blue-yinmn", borderColor = "", textColor = "text-white", link = "", onClick = undefined
 }: {
-  buttonText: string, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, onClick?: () => {}
+  buttonText: string, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, onClick?: () => void
 }) {
 
   const commonClasses = `font-nunito-sans px-6 py-3 ${backgroundColor} ${textColor} font-bold text-xl flex justify-center items-center rounded-md ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
