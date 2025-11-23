@@ -6,6 +6,7 @@ import programmeRoute from "./programme.route";
 import intakeRoute from "./intake.route";
 import subjectRoute from "./subject.route";
 import venueRoute from "./venue.route";
+import storageRoute from "./storage.route";
 
 export default class Routes {
   constructor(app: Application) {
@@ -16,5 +17,6 @@ export default class Routes {
     app.use("/api/v1/intakes", intakeRoute);
     app.use("/api/v1/subjects", subjectRoute);
     app.use("/api/v1/venues", venueRoute);
+    app.use("/api/v1/storages", storageRoute);
   }
 }
