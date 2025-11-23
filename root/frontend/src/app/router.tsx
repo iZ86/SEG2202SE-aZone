@@ -22,6 +22,7 @@ import AdminEditIntake from "@routes/admin/AdminEditIntake";
 import AdminVenue from "@routes/admin/AdminVenue";
 import AdminCreateVenue from "@routes/admin/AdminCreateVenue";
 import AdminEditVenue from "@routes/admin/AdminEditVenue";
+import StudentProfile from "@routes/StudentProfile";
 
 const routes = [
   {
@@ -35,6 +36,10 @@ const routes = [
   {
     path: "/enrollment",
     element: <Enrollment />,
+  },
+  {
+    path: "/profile",
+    element: <StudentProfile />,
   },
   {
     path: "/admin/login",
