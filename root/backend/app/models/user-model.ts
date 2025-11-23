@@ -6,6 +6,7 @@ export interface UserData extends RowDataPacket {
   lastName: string;
   email: string;
   phoneNumber: string;
+  profilePictureUrl: string;
 }
 
 export interface StudentCourseProgrammeIntakeData extends RowDataPacket {

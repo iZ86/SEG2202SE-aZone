@@ -11,11 +11,3 @@ export interface BasicAdminLoginData extends RowDataPacket {
   email: string;
   password: string;
 }
-
-export interface UserData extends RowDataPacket {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-}
