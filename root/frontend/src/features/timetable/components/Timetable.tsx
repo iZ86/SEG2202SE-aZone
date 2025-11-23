@@ -100,7 +100,7 @@ export default function Timetable({headerBgColor = "bg-white"}: {headerBgColor?:
         ))}
 
         {days.map((days) => (
-          <div key={days} className="space-y-2 min-w-32">
+          <div key={days} className="space-y-4 min-w-32">
             {classes
               .filter((c) => c.day === days)
               .map((classItem, index) => (
