@@ -1,10 +1,11 @@
 import argon2 from "argon2";
 import { Result } from "../../libs/Result";
-import { BasicAdminLoginData, BasicStudentLoginData, UserData } from "../models/auth-model";
+import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth-model";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import jwt from "jsonwebtoken";
 import AuthRepository from "../repositories/auth.repository";
 import UserRepository from "../repositories/user.repository";
+import { UserData } from "../models/user-model";
 
 interface IAuthService {
   loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>>;

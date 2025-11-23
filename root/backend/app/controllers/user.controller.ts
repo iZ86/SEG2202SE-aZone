@@ -213,6 +213,22 @@ export default class UserController {
     }
   }
 
+  async updateUserProfilePictureById(req: Request, res: Response) {
+    const profilePictureUrl: string = req.body.profilePictureUrl;
+    const userId: number = req.user.userId;
+
+    const response: Result<UserData | undefined> = await UserService.updateUserProfilePictureById(userId, profilePictureUrl);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
   async getAllStudentCourseProgrammeIntakes(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;

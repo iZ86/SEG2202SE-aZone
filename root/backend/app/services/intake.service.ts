@@ -3,7 +3,7 @@ import { ENUM_ERROR_CODE } from "../enums/enums";
 import { IntakeData } from "../models/intake-model";
 import IntakeRepository from "../repositories/intake.repository";
 
-interface IInterfaceService {
+interface IIntakeService {
   getAllIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeData[]>>;
   getIntakeById(intakeId: number): Promise<Result<IntakeData>>;
   createIntake(intakeId: number): Promise<Result<IntakeData>>;
@@ -12,7 +12,7 @@ interface IInterfaceService {
   getIntakeCount(query: string): Promise<Result<number>>;
 }
 
-class InterfaceService implements IInterfaceService {
+class IntakeService implements IIntakeService {
   async getAllIntakes(query: string = "", pageSize: number, page: number): Promise<Result<IntakeData[]>> {
     const intakes: IntakeData[] = await IntakeRepository.getAllIntakes(query, pageSize, page);
 
@@ -66,4 +66,4 @@ class InterfaceService implements IInterfaceService {
   }
 }
 
-export default new InterfaceService();
+export default new IntakeService();
