@@ -317,7 +317,7 @@ export default function StudentEnrollment() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                           {SELECTED_SUBJECTS.map((subject, index) => {
                             return (
-                              <div className="bg-white bg-white p-8 flex flex-col gap-y-8 rounded-2xl mr-4">
+                              <div className="bg-white p-8 flex flex-col gap-y-8 rounded-2xl mr-4">
                                 <div className="flex flex-wrap gap-y-4">
                                   <div className="flex gap-x-8 flex-wrap items-start mr-auto gap-y-4">
                                     <div className="bg-white-antiflash p-2 rounded-sm">

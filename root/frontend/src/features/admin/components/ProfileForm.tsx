@@ -7,7 +7,7 @@ import {
   uploadBlobAPI,
 } from "@features/general/api/storage";
 import { updateMeAPI } from "../../general/api/user";
-import { Mail, Phone, User } from "lucide-react";
+import { Mail, Phone, UploadCloud, User } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
 import { toast } from "react-toastify";
@@ -268,9 +268,8 @@ export default function ProfileForm() {
             <div className="flex justify-end">
               <SmallButton
                 onClick={handleUploadProfilePicture}
-                buttonText={
-                  isPictureUploading ? "Uploading..." : "Upload & Save"
-                }
+                Icon={UploadCloud}
+                buttonText={isPictureUploading ? "Uploading..." : "Upload"}
               />
             </div>
           </div>

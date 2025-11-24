@@ -22,11 +22,22 @@ export default function SmallButton({
   borderColor?: string;
   textColor?: string;
   link?: string;
-  hasPadding?: boolean;  
+  hasPadding?: boolean;
   onClick?: () => void;
 }) {
-  const commonClasses = `font-nunito-sans ${Icon ? (hasPadding ? "pl-2 pr-4" : undefined) : (hasPadding ? "px-4" : undefined)} ${hasPadding ? "py-2" : undefined} ${backgroundColor} ${textColor} font-bold text-base flex justify-center items-center rounded-sm ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor
-    } cursor-pointer`;
+  const commonClasses = `font-nunito-sans ${
+    Icon
+      ? hasPadding
+        ? "pl-2 pr-4"
+        : undefined
+      : hasPadding
+      ? "px-4"
+      : undefined
+  } ${
+    hasPadding ? "py-2" : undefined
+  } ${backgroundColor} ${textColor} font-bold text-base flex  gap-x-2 justify-center items-center rounded-sm ${hoverBgColor} ${
+    borderColor.length === 0 ? "" : "border-2 " + borderColor
+  } cursor-pointer`;
 
   if (link.length > 0) {
     return (
@@ -37,7 +48,11 @@ export default function SmallButton({
     );
   } else {
     return (
-      <button type={`${submit ? "submit" : "button"}`} className={commonClasses} onClick={onClick}>
+      <button
+        type={`${submit ? "submit" : "button"}`}
+        className={commonClasses}
+        onClick={onClick}
+      >
         {Icon ? <Icon /> : undefined}
         <span>{buttonText}</span>
       </button>

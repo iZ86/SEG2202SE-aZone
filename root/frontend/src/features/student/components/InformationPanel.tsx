@@ -39,7 +39,7 @@ export default function InformationPanel() {
         <img
           src={student.profilePictureUrl}
           alt="profile"
-          className="w-40 h-50 rounded-md mt-3"
+          className="w-40 h-50 object-cover rounded-md mt-3"
         />
       </div>
     </div>

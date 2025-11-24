@@ -93,14 +93,6 @@ export default function AdminSideBar({ page }: { page: string }) {
               {item.label}
             </Link>
           ))}
-
-          {/* Sign out button */}
-          <button
-            className="hover:text-red-400 hover:bg-gray-700 px-6 py-3 text-left transition cursor-pointer"
-            onClick={() => setIsOpen(false)}
-          >
-            Sign out
-          </button>
         </nav>
       </aside>
     </>
