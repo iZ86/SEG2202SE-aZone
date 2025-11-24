@@ -1,11 +1,37 @@
 import SubjectInformationPanel from "@features/subjects/components/SubjectInformationPanel";
-import StudentInformationPanel from "@features/student/components/InformationPanel";
-import TimetablePanel from "@features/timetable/components/TimetablePanel";
+import Timetable from "@features/timetable/components/Timetable";
 import StudentNavbar from "@components/student/StudentNavbar";
 import SmallButton from "@components/SmallButton";
+import InformationPanel from "@features/student/components/InformationPanel";
 
-/** TBD: A042 */
-export default function StudentDashboard() {
+
+function TimetablePanel() {
+  
+  return (
+    <div className="bg-white shadow-lg rounded-md p-7">
+      <div className="text-black flex flex-col sm:flex-row justify-between mb-8">
+        <h2 className="text-black font-bold">
+          My Weekly Timetable (13 October 2025 - 17 October 2025)
+        </h2>
+        <div className="flex mt-4 sm:mt-0">
+          <button className="bg-[#E5E5E5] px-6 rounded-l-2xl hover:bg-gray-100 cursor-pointer">
+            Previous
+          </button>
+          <button className="bg-[#E5E5E5] px-4 py-3 hover:bg-gray-100 cursor-pointer">
+            Current Week
+          </button>
+          <button className="bg-[#E5E5E5] px-6 rounded-r-2xl hover:bg-gray-100 cursor-pointer">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <Timetable headerBgColor="bg-white-antiflash"/>
+    </div>
+  );
+}
+
+export default function Dashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-white-antiflash">
       <StudentNavbar page="dashboard" />
@@ -25,7 +51,7 @@ export default function StudentDashboard() {
         </div>
         <div className="flex flex-col sm:flex-row gap-x-5 gap-y-4 sm:gap-y-0 mt-4 w-full">
           <SubjectInformationPanel />
-          <StudentInformationPanel />
+          <InformationPanel />
         </div>
         <div className="mt-4">
           <TimetablePanel />
