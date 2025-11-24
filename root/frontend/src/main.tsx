@@ -20,6 +20,5 @@ createRoot(document.getElementById("root")!).render(
       theme="light"
       transition={Bounce}
     />
-    ;
   </StrictMode>
 );
