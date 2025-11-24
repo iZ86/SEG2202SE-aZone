@@ -80,7 +80,7 @@ const SELECTED_SUBJECTS = [
 /** This button is needed for popping up the modal. */
 function ChooseSubjectButton() {
   return (
-    <Button className="font-nunito-sans px-4 py-2 bg-blue-air-superiority text-white font-bold text-base flex justify-center items-center rounded-sm hover:bg-blue-yinmn cursor-pointer">
+    <Button className="font-nunito-sans ml-auto px-4 py-2 bg-blue-air-superiority text-white font-bold text-base flex justify-center items-center rounded-sm hover:bg-blue-yinmn cursor-pointer">
       Choose
     </Button>
   );
@@ -164,10 +164,10 @@ export default function StudentEnrollment() {
               <div
                 key={index}
                 onClick={() => setSelected(index)}
-                className={`flex items-center justify-between p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white
+                className={`flex flex-wrap gap-y-4 items-center p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white
                             ${selected === index ? "border-2 border-blue-500" : "hover:shadow-md border border-transparent"}`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 mr-auto w-sm">
                   <div className="p-3 bg-gray-100 rounded-lg">
                     <ClipboardList className="text-gray-700 w-6 h-6" />
                   </div>
