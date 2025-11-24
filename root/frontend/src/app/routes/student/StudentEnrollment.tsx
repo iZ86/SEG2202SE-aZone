@@ -64,7 +64,7 @@ function EnrollmentSelection({
 
 
 
-export default function Enrollment() {
+export default function StudentEnrollment() {
   const [selected, setSelected] = useState(0);
 
   // for display only
