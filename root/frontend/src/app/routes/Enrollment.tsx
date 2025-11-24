@@ -1,8 +1,9 @@
 import StudentNavbar from "@components/student/StudentNavbar";
-import { Search, ClipboardList } from "lucide-react";
+import { Search, ClipboardList, Trash2, SquarePen, Book, ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogTrigger, Modal, ModalOverlay, Button } from "react-aria-components";
 import MediumButton from "@components/MediumButton";
+import Timetable from "@features/timetable/components/Timetable";
 
 
 const LECTURES = [
@@ -12,6 +13,68 @@ const LECTURES = [
 const TUTORIALS = [
   ["Group 1", "Monday 12:00 PM - 2.00 PM"],
   ["Group 2", "Wednesday 12:00 PM - 2.00 PM"]
+]
+
+const SELECTED_SUBJECTS = [
+  {
+    subjectName: "ABC123 - Database Fundamental II",
+    creditHours: 4,
+    selectedClassTypes: [
+      {
+        classType: "Lecture",
+        group: 1,
+        day: "Monday",
+        startTime: "10.00AM",
+        endTime: "12.00PM"
+      },
+      {
+        classType: "Tutorial",
+        group: 2,
+        day: "Wednesday",
+        startTime: "12.00PM",
+        endTime: "2.00PM"
+      }
+    ]
+  },
+  {
+    subjectName: "ABC123 - Database Fundamental II",
+    creditHours: 4,
+    selectedClassTypes: [
+      {
+        classType: "Lecture",
+        group: 1,
+        day: "Monday",
+        startTime: "10.00AM",
+        endTime: "12.00PM"
+      },
+      {
+        classType: "Tutorial",
+        group: 2,
+        day: "Wednesday",
+        startTime: "12.00PM",
+        endTime: "2.00PM"
+      }
+    ]
+  },{
+    subjectName: "ABC123 - Database Fundamental II",
+    creditHours: 4,
+    selectedClassTypes: [
+      {
+        classType: "Lecture",
+        group: 1,
+        day: "Monday",
+        startTime: "10.00AM",
+        endTime: "12.00PM"
+      },
+      {
+        classType: "Tutorial",
+        group: 2,
+        day: "Wednesday",
+        startTime: "12.00PM",
+        endTime: "2.00PM"
+      }
+    ]
+  }
 ]
 
 /** This button is needed for popping up the modal. */
@@ -127,7 +190,7 @@ export default function Enrollment() {
           absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex jusitfy-center items-center p-6
           ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
           ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
-        `}>
+          `}>
               <Modal
                 className={({ isEntering, isExiting }) => `
             flex text-center max-w-8/10 mx-auto
@@ -182,9 +245,91 @@ export default function Enrollment() {
           </div>
         </div>
 
-        <button className="fixed bottom-30 right-10 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-all">
-          <ClipboardList className="w-6 h-6" />
-        </button>
+        <DialogTrigger>
+          <Button className="fixed bottom-30 right-10 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-all cursor-pointer">
+            <ClipboardList className="w-6 h-6" />
+          </Button>
+          <ModalOverlay isDismissable
+            className={({ isEntering, isExiting }) => `
+          absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex pl-[10%]
+          ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
+          ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
+        `}>
+            <Modal
+              className={({ isEntering, isExiting }) => `
+            flex text-center w-full
+            ${isEntering ? 'animate-in zoom-in-95 ease-out duration-300' : ''}
+            ${isExiting ? 'animate-out zoom-out-95 ease-in duration-200' : ''}
+          `}>
+              <Dialog
+                role="alertdialog"
+                className="bg-white-antiflash w-full flex flex-col overflow-auto"
+              >
+                {({ close }) => (
+                  <div className="flex flex-col px-12 py-8 gap-y-8 text-black max-h-screen overflow-auto text-left font-semibold">
+                    <div className="flex justify-start">
+                      <MediumButton buttonText="Back" textColor="text-gray-battleship" backgroundColor="bg-white-antiflash" hoverBgColor="hover:bg-white-antiflash" Icon={ChevronLeft} hasPadding={false} onClick={close} />
+                    </div>
+                    <div className="flex flex-col gap-y-16">
+                      <div className="flex flex-col gap-y-8">
+                        <h1>Preview Timetable</h1>
+                        <Timetable />
+                      </div>
+                      <div className="flex flex-col gap-y-8">
+                        <h1>Selected Subjects</h1>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {SELECTED_SUBJECTS.map((subject, index) => {
+                            return (
+                              <div className="bg-white bg-white p-8 flex flex-col gap-y-8 rounded-2xl mr-4">
+                                <div className="flex flex-wrap gap-y-4">
+                                  <div className="flex gap-x-8 flex-wrap items-start mr-auto gap-y-4">
+                                    <div className="bg-white-antiflash p-2 rounded-sm">
+                                      <Book className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                      <p>{subject.subjectName}</p>
+                                      <p className="text-gray-battleship">{"Credit Hours: " + subject.creditHours}</p>
+                                    </div>
+                                  </div>
+
+                                  <Trash2 className="w-6 h-6 text-red-tomato ml-auto" />
+                                </div>
+
+                                <div className="flex flex-wrap gap-y-4">
+                                  <div className="flex flex-col gap-y-2 max-w-xs mr-auto">
+                                    {subject.selectedClassTypes.map((selectedClassType) => {
+                                      return (
+                                        <p>
+                                          {selectedClassType.classType + " Group " + selectedClassType.group +
+                                            ", " + selectedClassType.day + " " + selectedClassType.startTime + " - " + selectedClassType.endTime
+                                          }
+                                        </p>
+                                      );
+                                    })}
+                                  </div>
+                                  <SquarePen className="w-6 h-6 ml-auto" />
+
+                                </div>
+                              </div>
+                            );
+                          })}
+
+
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+                )}
+              </Dialog>
+            </Modal>
+          </ModalOverlay>
+
+        </DialogTrigger>
+
       </main>
 
     </div>
