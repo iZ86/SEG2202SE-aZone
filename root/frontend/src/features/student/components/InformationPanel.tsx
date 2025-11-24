@@ -1,9 +1,9 @@
-import profile from "@images/char kuey teow.jpg";
-/** TBD: A042.
- * Do whatever you want, iZ86 will handle API.
- */
-export default function StudentInformationPanel() {
-  /** TODO: Fill in this with the appropriate components. */
+import { useStudent } from "../hooks/useStudent";
+import LoadingOverlay from "@components/LoadingOverlay";
+
+export default function InformationPanel() {
+  const { student, loading } = useStudent();
+
   const studentInfo = [
     { label: "Programme", value: "Bachelor of Software Engineering" },
     { label: "Intake", value: "202509" },
@@ -12,10 +12,16 @@ export default function StudentInformationPanel() {
     { label: "Semester Period", value: "22 Sep 2025 - 16 Jan 2026" },
   ];
 
+  if (loading || !student) {
+    return <LoadingOverlay />;
+  }
+
   return (
     <div className="flex text-black p-6 bg-white shadow-lg rounded-lg gap-4">
       <div>
-        <h2 className="font-semibold pb-5">Isaac Yeow Ming (2301838)</h2>
+        <h2 className="font-semibold pb-5">
+          {student.lastName + " " + student.firstName} ({student.userId})
+        </h2>
 
         <div className="space-y-3">
           {studentInfo.map((info) => (
@@ -31,7 +37,7 @@ export default function StudentInformationPanel() {
 
       <div>
         <img
-          src={profile}
+          src={student.profilePictureUrl}
           alt="profile"
           className="w-40 h-50 rounded-md mt-3"
         />
