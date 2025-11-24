@@ -11,6 +11,7 @@ export default function SmallButton({
   borderColor = "",
   textColor = "text-white",
   link = "",
+  hasPadding = true,
   onClick = undefined,
 }: {
   buttonText: string;
@@ -21,9 +22,10 @@ export default function SmallButton({
   borderColor?: string;
   textColor?: string;
   link?: string;
+  hasPadding?: boolean;  
   onClick?: () => void;
 }) {
-  const commonClasses = `font-nunito-sans ${Icon ? "pl-2 pr-4" : "px-4"} py-2 ${backgroundColor} ${textColor} font-bold text-base flex justify-center items-center rounded-sm ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor
+  const commonClasses = `font-nunito-sans ${Icon ? (hasPadding ? "pl-2 pr-4" : undefined) : (hasPadding ? "px-4" : undefined)} ${hasPadding ? "py-2" : undefined} ${backgroundColor} ${textColor} font-bold text-base flex justify-center items-center rounded-sm ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor
     } cursor-pointer`;
 
   if (link.length > 0) {

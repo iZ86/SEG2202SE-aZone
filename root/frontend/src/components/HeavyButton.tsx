@@ -4,12 +4,12 @@ import type { LucideIcon } from "lucide-react";
 
 /** Heavy button format. */
 export default function HeavyButton({
-  buttonText, Icon = undefined, submit = false, backgroundColor = "bg-blue-air-superiority", hoverBgColor = "hover:bg-blue-yinmn", borderColor = "", textColor = "text-white", link = "", onClick = undefined
+  buttonText, Icon = undefined, submit = false, backgroundColor = "bg-blue-air-superiority", hoverBgColor = "hover:bg-blue-yinmn", borderColor = "", textColor = "text-white", link = "", hasPadding = true, onClick = undefined
 }: {
-  buttonText: string, Icon?: LucideIcon, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, onClick?: () => {}
+  buttonText: string, Icon?: LucideIcon, submit?: boolean, backgroundColor?: string, hoverBgColor?: string, borderColor?: string, textColor?: string, link?: string, hasPadding?: boolean, onClick?: () => {}
 }) {
 
-  const commonClasses = `font-nunito-sans ${Icon ? "pl-6 pr-8" : "px-8"} py-4 ${backgroundColor} ${textColor} font-bold text-2xl flex justify-center items-center rounded-lg ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
+  const commonClasses = `font-nunito-sans ${Icon ? (hasPadding ? "pl-6 pr-8" : undefined) : (hasPadding ? "px-8" : undefined)} ${hasPadding ? "py-4" : undefined} ${backgroundColor} ${textColor} font-bold text-2xl flex justify-center items-center rounded-lg ${hoverBgColor} ${borderColor.length === 0 ? "" : "border-2 " + borderColor} cursor-pointer`
 
   if (link.length > 0) {
     return (
