@@ -139,7 +139,7 @@ export default function StudentEnrollment() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white-antiflash">
+    <div className="flex flex-col min-h-screen bg-white-antiflash pb-40">
       <StudentNavbar page="enrollment" />
 
 
