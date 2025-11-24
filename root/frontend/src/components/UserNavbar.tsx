@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import aZoneLogoWhite from "@images/aZone-logo-white.png";
-import UserAvatar from "@features/auth/components/UserAvatar";
+import StudentAvatar from "@features/student/components/Avatar";
+import AdminAvatar from "@features/admin/components/Avatar";
 
 export default function UserNavbar({
   userRole,
@@ -12,7 +13,6 @@ export default function UserNavbar({
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
   const handleSignOut = () => {
     if (userRole === 2) {
       localStorage.removeItem("aZoneAdminAuthToken");
@@ -37,38 +37,32 @@ export default function UserNavbar({
         <img src={aZoneLogoWhite} alt="aZone White Logo" />
       </div>
 
-      {userRole === 2 ? (
-        <div className="flex items-center gap-x-4">
-          <span className="font-semibold">Admin</span>
-        </div>
-      ) : (
-        <div className="relative">
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="focus:outline-none"
-          >
-            <UserAvatar />
-          </button>
+      <div className="relative">
+        <button
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className="focus:outline-none"
+        >
+          {userRole === 2 ? <AdminAvatar /> : <StudentAvatar />}
+        </button>
 
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-blue-yinmn rounded-md shadow-lg z-50 border border-gray-200 tex-white font-medium">
-              <Link
-                to="/profile"
-                onClick={() => setIsDropdownOpen(false)}
-                className="block px-4 py-2 hover:bg-blue-air-superiority transition-colors rounded-t-md"
-              >
-                Profile
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="block w-full text-left px-4 py-2 hover:bg-blue-air-superiority transition-colors rounded-b-md"
-              >
-                Sign Out
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+        {isDropdownOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-blue-yinmn rounded-md shadow-lg z-50 border border-gray-200 tex-white font-medium">
+            <Link
+              to={`${userRole === 2 ? "/admin/profile" : "/profile"}`}
+              onClick={() => setIsDropdownOpen(false)}
+              className="block px-4 py-2 hover:bg-blue-air-superiority transition-colors rounded-t-md"
+            >
+              Profile
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="block w-full text-left px-4 py-2 hover:bg-blue-air-superiority transition-colors rounded-b-md"
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }
