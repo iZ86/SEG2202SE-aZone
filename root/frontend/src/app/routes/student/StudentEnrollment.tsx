@@ -287,7 +287,7 @@ export default function StudentEnrollment() {
           </Button>
           <ModalOverlay isDismissable
             className={({ isEntering, isExiting }) => `
-          absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex pl-[10%]
+          fixed inset-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex pl-[10%]
           ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
           ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
         `}>
