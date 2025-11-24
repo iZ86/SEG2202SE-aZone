@@ -187,19 +187,19 @@ export default function Enrollment() {
             ))}
             <ModalOverlay isDismissable
               className={({ isEntering, isExiting }) => `
-          absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex jusitfy-center items-center p-6
+          absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex flex-col justify-center
           ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
           ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
           `}>
               <Modal
                 className={({ isEntering, isExiting }) => `
-            flex text-center max-w-8/10 mx-auto
+            flex flex-col text-center max-h-screen overflow-auto pointer-events-none
             ${isEntering ? 'animate-in zoom-in-95 ease-out duration-300' : ''}
             ${isExiting ? 'animate-out zoom-out-95 ease-in duration-200' : ''}
           `}>
                 <Dialog
                   role="alertdialog"
-                  className="bg-white rounded-2xl flex flex-col"
+                  className="bg-white rounded-2xl flex flex-col mx-auto pointer-events-auto"
                 >
                   {({ close }) => (
                     <div className="flex flex-col">
