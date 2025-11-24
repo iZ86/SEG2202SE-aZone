@@ -1,7 +1,7 @@
 import StudentNavbar from "@components/student/StudentNavbar";
 import StudentProgrammeTable from "@features/student/components/ProgrammeHistoryTable";
 
-export default function StudentProgramme() {
+export default function StudentProgrammeHistory() {
     return (
         <div className="flex flex-col min-h-screen bg-white-antiflash">
             <StudentNavbar page="programmes" />
