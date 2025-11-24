@@ -1,8 +1,8 @@
 import SubjectInformationPanel from "@features/subjects/components/SubjectInformationPanel";
-import StudentInformationPanel from "@features/student/components/StudentInformationPanel";
 import Timetable from "@features/timetable/components/Timetable";
 import StudentNavbar from "@components/student/StudentNavbar";
 import SmallButton from "@components/SmallButton";
+import InformationPanel from "@features/student/components/InformationPanel";
 
 
 function TimetablePanel() {
@@ -51,7 +51,7 @@ export default function Dashboard() {
         </div>
         <div className="flex flex-col sm:flex-row gap-x-5 gap-y-4 sm:gap-y-0 mt-4 w-full">
           <SubjectInformationPanel />
-          <StudentInformationPanel />
+          <InformationPanel />
         </div>
         <div className="mt-4">
           <TimetablePanel />

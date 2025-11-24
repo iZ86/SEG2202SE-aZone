@@ -19,6 +19,7 @@ interface IUserRepostory {
   createStudent(studentId: number): Promise<ResultSetHeader>;
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
+  updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>; getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>; updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader>;
@@ -31,7 +32,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
         "WHERE ru.userId LIKE ? " +
@@ -59,7 +60,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.userId LIKE ? " +
@@ -86,7 +87,7 @@ class UserRepository implements IUserRepostory {
   getUserById(userId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT userId, firstName, lastName, email, phoneNumber, status " +
+        "SELECT userId, firstName, lastName, email, phoneNumber, profilePictureUrl, status AS userStatus " +
         "FROM REGISTERED_USER " +
         "WHERE userId = ?;",
         [userId],
@@ -101,7 +102,7 @@ class UserRepository implements IUserRepostory {
   getStudentById(studentId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.profilePictureUrl, ru.status AS userStatus " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE s.studentId = ?;",
@@ -117,7 +118,7 @@ class UserRepository implements IUserRepostory {
   getStudentByEmail(email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email COLLATE utf8mb4_general_ci = ?;",
@@ -133,7 +134,7 @@ class UserRepository implements IUserRepostory {
   getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email = ? " +
@@ -150,7 +151,7 @@ class UserRepository implements IUserRepostory {
   getAdminById(adminId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
         "WHERE a.adminId = ?;",
@@ -302,6 +303,20 @@ class UserRepository implements IUserRepostory {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM REGISTERED_USER WHERE userId = ?;",
         [userId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  };
+
+  updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE REGISTERED_USER SET profilePictureUrl = ? " +
+        "WHERE userId = ?;",
+        [profilePictureUrl, userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

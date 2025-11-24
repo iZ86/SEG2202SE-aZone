@@ -88,3 +88,11 @@ export const createStudentCourseProgrammeIntakeValidator: any = [
     .isNumeric().withMessage('courseId must be numeric'),
   validate,
 ];
+
+export const updateUserProfilePictureValidator: any = [
+  body('profilePictureUrl')
+    .trim()
+    .notEmpty().withMessage('Missing profilePictureUrl')
+    .isString().withMessage('profilePictureUrl must be string'),
+  validate,
+];

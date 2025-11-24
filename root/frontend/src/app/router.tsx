@@ -1,7 +1,5 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import GuestLogin from "@routes/GuestLogin";
-import Dashboard from "@routes/Dashboard";
-import Enrollment from "@routes/Enrollment";
 import AdminDashboard from "@routes/admin/AdminDashboard";
 import AdminLogin from "@routes/admin/AdminLogin";
 import AdminUser from "@routes/admin/AdminUser";
@@ -22,99 +20,147 @@ import AdminEditIntake from "@routes/admin/AdminEditIntake";
 import AdminVenue from "@routes/admin/AdminVenue";
 import AdminCreateVenue from "@routes/admin/AdminCreateVenue";
 import AdminEditVenue from "@routes/admin/AdminEditVenue";
+import StudentProfile from "@routes/student/StudentProfile";
+import StudentProvider from "../features/student/components/Provider";
+import AdminProvider from "@features/admin/components/Provider";
+import AdminProfile from "@routes/admin/AdminProfile";
+import StudentDashboard from "@routes/student/StudentDashboard";
+import StudentEnrollment from "@routes/student/StudentEnrollment";
+import StudentProgrammeHistory from "@routes/student/StudentProgrammeHistory";
+
+const StudentLayout = () => (
+  <StudentProvider>
+    <Outlet />
+  </StudentProvider>
+);
+
+const AdminLayout = () => (
+  <AdminProvider>
+    <Outlet />
+  </AdminProvider>
+);
 
 const routes = [
+  // Guest routes
   {
     path: "/login",
     element: <GuestLogin />,
   },
   {
-    path: "/",
-    element: <Dashboard />,
-  },
-  {
-    path: "/enrollment",
-    element: <Enrollment />,
-  },
-  {
     path: "/admin/login",
     element: <AdminLogin />,
   },
+
+  // Student routes
+  {
+    path: "/",
+    element: <StudentLayout />,
+    children: [
+      {
+        path: "/",
+        element: <StudentDashboard />,
+      },
+      {
+        path: "/enrollment",
+        element: <StudentEnrollment />,
+      },
+      {
+        path: "/programme-history",
+        element: <StudentProgrammeHistory />,
+      },
+      {
+        path: "/profile",
+        element: <StudentProfile />,
+      },
+    ],
+  },
+
+  // Admin Routes
   {
     path: "/admin",
-    element: <AdminDashboard />,
-  },
-  {
-    path: "/admin/users",
-    element: <AdminUser />,
-  },
-  {
-    path: "/admin/users/create",
-    element: <AdminCreateUser />,
-  },
-  {
-    path: "/admin/users/:id/edit",
-    element: <AdminEditUser />,
-  },
-  {
-    path: "/admin/programmes",
-    element: <AdminProgramme />,
-  },
-  {
-    path: "/admin/programmes/create",
-    element: <AdminCreateProgramme />,
-  },
-  {
-    path: "/admin/programmes/:id/edit",
-    element: <AdminEditProgramme />,
-  },
-  {
-    path: "/admin/courses",
-    element: <AdminCourse />,
-  },
-  {
-    path: "/admin/courses/create",
-    element: <AdminCreateCourse />,
-  },
-  {
-    path: "/admin/courses/:id/edit",
-    element: <AdminEditCourse />,
-  },
-  {
-    path: "/admin/subjects",
-    element: <AdminSubject />,
-  },
-  {
-    path: "/admin/subjects/create",
-    element: <AdminCreateSubject />,
-  },
-  {
-    path: "/admin/subjects/:id/edit",
-    element: <AdminEditSubject />,
-  },
-  {
-    path: "/admin/intakes",
-    element: <AdminIntake />,
-  },
-  {
-    path: "/admin/intakes/create",
-    element: <AdminCreateIntake />,
-  },
-  {
-    path: "/admin/intakes/:id/edit",
-    element: <AdminEditIntake />,
-  },
-  {
-    path: "/admin/venues",
-    element: <AdminVenue />,
-  },
-  {
-    path: "/admin/venues/create",
-    element: <AdminCreateVenue />,
-  },
-  {
-    path: "/admin/venues/:id/edit",
-    element: <AdminEditVenue />,
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "/admin",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "/admin/users",
+        element: <AdminUser />,
+      },
+      {
+        path: "/admin/users/create",
+        element: <AdminCreateUser />,
+      },
+      {
+        path: "/admin/users/:id/edit",
+        element: <AdminEditUser />,
+      },
+      {
+        path: "/admin/programmes",
+        element: <AdminProgramme />,
+      },
+      {
+        path: "/admin/programmes/create",
+        element: <AdminCreateProgramme />,
+      },
+      {
+        path: "/admin/programmes/:id/edit",
+        element: <AdminEditProgramme />,
+      },
+      {
+        path: "/admin/courses",
+        element: <AdminCourse />,
+      },
+      {
+        path: "/admin/courses/create",
+        element: <AdminCreateCourse />,
+      },
+      {
+        path: "/admin/courses/:id/edit",
+        element: <AdminEditCourse />,
+      },
+      {
+        path: "/admin/subjects",
+        element: <AdminSubject />,
+      },
+      {
+        path: "/admin/subjects/create",
+        element: <AdminCreateSubject />,
+      },
+      {
+        path: "/admin/subjects/:id/edit",
+        element: <AdminEditSubject />,
+      },
+      {
+        path: "/admin/intakes",
+        element: <AdminIntake />,
+      },
+      {
+        path: "/admin/intakes/create",
+        element: <AdminCreateIntake />,
+      },
+      {
+        path: "/admin/intakes/:id/edit",
+        element: <AdminEditIntake />,
+      },
+      {
+        path: "/admin/venues",
+        element: <AdminVenue />,
+      },
+      {
+        path: "/admin/venues/create",
+        element: <AdminCreateVenue />,
+      },
+      {
+        path: "/admin/venues/:id/edit",
+        element: <AdminEditVenue />,
+      },
+      {
+        path: "/admin/profile",
+        element: <AdminProfile />,
+      },
+    ],
   },
 ];
 

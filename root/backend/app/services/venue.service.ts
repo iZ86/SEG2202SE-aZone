@@ -3,7 +3,7 @@ import { ENUM_ERROR_CODE } from "../enums/enums";
 import { VenueData } from "../models/venue-model";
 import VenueRepository from "../repositories/venue.repository";
 
-interface IInterfaceService {
+interface IVenueService {
   getAllVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
   getVenueById(venueId: number): Promise<Result<VenueData>>;
   createVenue(venue: string): Promise<Result<VenueData>>;
@@ -12,7 +12,7 @@ interface IInterfaceService {
   getVenueCount(query: string): Promise<Result<number>>;
 }
 
-class InterfaceService implements IInterfaceService {
+class VenueService implements IVenueService {
   async getAllVenues(query: string = "", pageSize: number, page: number): Promise<Result<VenueData[]>> {
     const venues: VenueData[] = await VenueRepository.getAllVenues(query, pageSize, page);
 
@@ -66,4 +66,4 @@ class InterfaceService implements IInterfaceService {
   }
 }
 
-export default new InterfaceService();
+export default new VenueService();

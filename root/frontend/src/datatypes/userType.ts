@@ -4,8 +4,9 @@ export type User = {
   lastName: string;
   email: string;
   phoneNumber: string;
+  profilePictureUrl: string;
   userStatus: number;
-  role: "Student" | "Admin";
+  role?: "Student" | "Admin";
 };
 
 export type StudentCourseProgrammeIntake = {
