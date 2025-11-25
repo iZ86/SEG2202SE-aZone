@@ -10,7 +10,8 @@ import { UserData } from "../models/user-model";
 interface IAuthService {
   loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>>;
   loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>>;
-  getMe(userId: number, role: ENUM_USER_ROLE): Promise<Result<UserData>>;
+  getStudentMe(studentId: number): Promise<Result<UserData>>;
+  getAdminMe(adminId: number): Promise<Result<UserData>>;
   updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>>;
 }
 
@@ -73,28 +74,28 @@ class AuthService implements IAuthService {
     return Result.succeed({ token: token }, "Login success");
   }
 
-  async getMe(userId: number, role: ENUM_USER_ROLE): Promise<Result<UserData>> {
-    let user: UserData | undefined;
-    switch (role) {
-      case ENUM_USER_ROLE.STUDENT:
-        user = await UserRepository.getStudentById(userId);
-        break;
-
-      case ENUM_USER_ROLE.ADMIN:
-        user = await UserRepository.getAdminById(userId);
-        break;
-
-      default:
-        return Result.fail(ENUM_ERROR_CODE.INVALID_DATA, "Invalid data");
-    }
-
-    if (!user) {
+  /** Gets student personal information. */
+  async getStudentMe(studentId: number): Promise<Result<UserData>> {
+    let studentData: UserData | undefined = await UserRepository.getStudentById(studentId);
+    if (!studentData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get user");
     }
 
-    return Result.succeed(user, "Get me success");
+    return Result.succeed(studentData, "Get me success");
+
   }
 
+  /** Gets admin personal information. */
+  async getAdminMe(adminId: number): Promise<Result<UserData>> {
+    let adminData: UserData | undefined = await UserRepository.getAdminById(adminId);
+    if (!adminData) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get user");
+    }
+
+    return Result.succeed(adminData, "Get me success");
+  }
+
+  /** Did not separate this to two different methods for student and admin because it takes all userId. */
   async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
     await AuthRepository.updateMe(userId, phoneNumber, email);
     const user: UserData | undefined = await UserRepository.getUserById(userId);

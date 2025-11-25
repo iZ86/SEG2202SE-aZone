@@ -34,11 +34,17 @@ export default class AuthController {
     }
   }
 
+  /** Gets personal information of user. */
   async getMe(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
     const isAdmin: boolean = req.user.isAdmin as boolean;
+    let response = undefined;
 
-    const response = await AuthService.getMe(userId, isAdmin ? ENUM_USER_ROLE.ADMIN : ENUM_USER_ROLE.STUDENT);
+    if (isAdmin) {
+      response = await AuthService.getAdminMe(userId);
+    } else {
+      response = await AuthService.getStudentMe(userId);
+    }
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());

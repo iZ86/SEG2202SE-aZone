@@ -7,9 +7,16 @@ export default class StorageController {
   async uploadBlob(req: Request, res: Response) {
     const blobReadWriteToken: string = process.env.BLOB_READ_WRITE_TOKEN as string;
 
-    const userData = await authService.getMe(
-      req.user.userId,
-      req.user.isAdmin ? ENUM_USER_ROLE.ADMIN : ENUM_USER_ROLE.STUDENT);
+
+    const userId: number = req.user.userId as number;
+    const isAdmin: boolean = req.user.isAdmin as boolean;
+    let userData = undefined;
+
+    if (isAdmin) {
+      userData = await authService.getAdminMe(userId);
+    } else {
+      userData = await authService.getStudentMe(userId);
+    }
 
     const existingUserProfilePictureUrl: string = (await userData).getData().profilePictureUrl;
 
