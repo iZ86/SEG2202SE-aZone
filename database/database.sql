@@ -256,3 +256,6 @@ INSERT INTO `SUBJECT_STATUS` (`subjectStatusId`, `subjectStatus`) VALUES
 (1, 'Active'),
 (2, 'Exempted'),
 (3, 'Completed');
+
+INSERT INTO `VENUE` (`venue`) VALUES
+('UW-8-6');
