@@ -268,3 +268,8 @@ INSERT INTO `DAY` (`dayId`, `day`) VALUES
 (5, 'Friday'),
 (6, 'Saturday'),
 (7, 'Sunday');
+
+INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
+(1, 1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
+(1, 1, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
+(1, 2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
