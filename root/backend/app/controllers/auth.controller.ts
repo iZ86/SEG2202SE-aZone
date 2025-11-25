@@ -58,7 +58,7 @@ export default class AuthController {
     }
   }
 
-  async udpateMe(req: Request, res: Response) {
+  async updateMe(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
