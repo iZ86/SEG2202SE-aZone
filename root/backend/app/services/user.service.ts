@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
 import UserRepository from "../repositories/user.repository";
 
 interface IUserService {
@@ -23,6 +23,7 @@ interface IUserService {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
+  getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
 }
 
 class UserService implements IUserService {
@@ -226,6 +227,16 @@ class UserService implements IUserService {
     await UserRepository.deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
 
     return Result.succeed(null, "Student course programme intake delete success");
+  }
+
+  async getStudentInformationById(studentId: number): Promise<Result<StudentInformation>> {
+    const studentInformation: StudentInformation | undefined = await UserRepository.getStudentInformationById(studentId);
+
+    if (!studentInformation) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student information not found");
+    }
+
+    return Result.succeed(studentInformation, "Student information retrieve success");
   }
 }
 

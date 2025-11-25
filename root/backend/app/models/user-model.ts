@@ -9,6 +9,16 @@ export interface UserData extends RowDataPacket {
   profilePictureUrl: string;
 }
 
+/** Gets non personal information, such as latest course, intake, etc. */
+export interface StudentInformation extends RowDataPacket {
+  courseName: string;
+  intake: number;
+  semesterStartDate: Date;
+  semesterEndDate: Date;
+  studyMode: string;
+  status: number;
+}
+
 export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   studentId: number;
   firstName: string;
