@@ -99,7 +99,7 @@ CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
     PRIMARY KEY (programmeIntakeId, enrollmentId)
 );
 
-CREATE TABLE CLASSTYPE (
+CREATE TABLE CLASS_TYPE (
     classTypeId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     classType VARCHAR(255) NOT NULL
 );
@@ -129,7 +129,7 @@ CREATE TABLE ENROLLMENT_SUBJECT (
         ON DELETE CASCADE,
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
         ON DELETE CASCADE,
-    FOREIGN KEY (classTypeId) REFERENCES CLASSTYPE(classTypeId)
+    FOREIGN KEY (classTypeId) REFERENCES CLASS_TYPE(classTypeId)
         ON DELETE CASCADE,
     FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
         ON DELETE CASCADE,
@@ -173,7 +173,7 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
 -- DATA MANIPULATION LANGUAGE --
 -- The password is encrypted with "abc" --
 -- All of the users have the same password "test123"
-INSERT INTO `CLASSTYPE` (`classTypeId`, `classType`) VALUES
+INSERT INTO `CLASS_TYPE` (`classTypeId`, `classType`) VALUES
 (1, 'Lecture'),
 (2, 'Practical'),
 (3, 'Tutorial'),
