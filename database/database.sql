@@ -259,3 +259,12 @@ INSERT INTO `SUBJECT_STATUS` (`subjectStatusId`, `subjectStatus`) VALUES
 
 INSERT INTO `VENUE` (`venue`) VALUES
 ('UW-8-6');
+
+INSERT INTO `DAY` (`dayId`, `day`) VALUES
+(1, 'Monday'),
+(2, 'Tuesday'),
+(3, 'Wednesday'),
+(4, 'Thursday'),
+(5, 'Friday'),
+(6, 'Saturday'),
+(7, 'Sunday');
