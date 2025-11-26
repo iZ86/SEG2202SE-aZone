@@ -29,7 +29,8 @@ CREATE TABLE SUBJECT (
     subjectCode VARCHAR(50) NOT NULL,
     subjectName VARCHAR(255) NOT NULL,
     description VARCHAR(3000),
-    creditHours INT NOT NULL
+    creditHours INT NOT NULL,
+    UNIQUE (subjectCode, subjectName)
 );
 
 CREATE TABLE ENROLLMENT (
