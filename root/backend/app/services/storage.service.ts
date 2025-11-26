@@ -2,7 +2,6 @@ import { Request } from "express";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { handleUpload } from '@vercel/blob/client';
-import UserRepository from "../repositories/user.repository";
 import { del } from "@vercel/blob";
 
 interface IStorageService {
