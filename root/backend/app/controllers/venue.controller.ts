@@ -80,6 +80,16 @@ export default class VenueController {
       return res.sendError.notFound("Invalid venueId");
     }
 
+    const isVenueBelongsToVenueId: Result<VenueData> = await venueService.getVenueByIdAndVenue(venueId, venue);
+
+    if (!isVenueBelongsToVenueId.isSuccess()) {
+      const isVenueDuplicated: Result<VenueData> = await venueService.getVenueByVenue(venue);
+
+      if (isVenueDuplicated.isSuccess()) {
+        return res.sendError.conflict("Venue duplciated");
+      }
+    }
+
     const response = await venueService.updateVenueById(venueId, venue);
 
     if (response.isSuccess()) {

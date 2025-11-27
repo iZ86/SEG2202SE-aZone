@@ -1,3 +1,4 @@
+import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { VenueData } from "../models/venue-model";
@@ -64,7 +65,11 @@ class VenueService implements IVenueService {
   }
 
   async updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>> {
-    await venueRepository.updateVenueById(venueId, venue);
+    const updateVenueResponse: ResultSetHeader = await venueRepository.updateVenueById(venueId, venue);
+
+    if (updateVenueResponse.affectedRows === 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to update venue");
+    }
 
     const venueResponse: VenueData | undefined = await venueRepository.getVenueById(venueId);
 
