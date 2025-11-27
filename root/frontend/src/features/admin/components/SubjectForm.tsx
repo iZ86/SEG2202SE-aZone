@@ -35,7 +35,7 @@ export default function SubjectForm({
   const [emptyCreditHours, setEmptyCreditHours] = useState(false);
   const [emptyCourse, setEmptyCourse] = useState(false);
 
-  const [invalidSubjectName, setInvalidSubjectName] = useState(false);
+  const [invalidSubjectCode, setInvalidSubjectCode] = useState(false);
 
   const [courseOptions, setCourseOptions] = useState<reactSelectOptionType[]>(
     []
@@ -93,8 +93,8 @@ export default function SubjectForm({
 
     if (response && response.status === 409) {
       setIsLoading(false);
-      setInvalidSubjectName(true);
-      toast.error("Subject name existed");
+      setInvalidSubjectCode(true);
+      toast.error("Subject code existed");
       return;
     }
 
@@ -269,25 +269,25 @@ export default function SubjectForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminInputFieldWrapper
-                  isEmpty={emptySubjectName}
-                  isInvalid={invalidSubjectName}
-                  invalidMessage="Subject Name already exists."
-                >
+                <AdminInputFieldWrapper isEmpty={emptySubjectName}>
                   <NormalTextField
                     text={subjectName}
                     onChange={onChangeSubjectName}
-                    isInvalid={emptySubjectName || invalidSubjectName}
+                    isInvalid={emptySubjectName}
                     placeholder="Subject Name"
                   />
                 </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptySubjectCode}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptySubjectCode}
+                  isInvalid={invalidSubjectCode}
+                  invalidMessage="Subject Code already exists."
+                >
                   <NormalTextField
                     text={subjectCode}
                     onChange={onChangeSubjectCode}
-                    isInvalid={emptySubjectCode}
+                    isInvalid={emptySubjectCode || invalidSubjectCode}
                     placeholder="Subject Code (e.g., SEG1024)"
                   />
                 </AdminInputFieldWrapper>

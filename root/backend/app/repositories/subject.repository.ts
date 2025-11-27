@@ -6,7 +6,8 @@ import { TotalCount } from "../models/general-model";
 interface ISubjectRepository {
   getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
   getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
-  getSubjectByName(subjectName: string): Promise<SubjectData | undefined>;
+  getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined>;
+  getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined>;
   createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader>;
   deleteSubjectById(subjectId: number): Promise<ResultSetHeader>;
@@ -56,13 +57,29 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectByName(subjectName: string): Promise<SubjectData | undefined> {
+  getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<SubjectData[]>(
         "SELECT * " +
         "FROM SUBJECT " +
-        "WHERE subjectName COLLATE utf8mb4_general_ci = ?;",
-        [subjectName],
+        "WHERE subjectCode COLLATE utf8mb4_general_ci = ?;",
+        [subjectCode],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<SubjectData[]>(
+        "SELECT * " +
+        "FROM SUBJECT " +
+        "WHERE subjectCode COLLATE utf8mb4_general_ci = ? " +
+        "AND subjectId = ?;",
+        [subjectCode, subjectId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);

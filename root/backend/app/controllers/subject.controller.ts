@@ -58,10 +58,10 @@ export default class SubjectController {
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
 
-    const isSubjectNameDuplicated: Result<SubjectData> = await subjectService.getSubjectByName(subjectName);
+    const isSubjectNameDuplicated: Result<SubjectData> = await subjectService.getSubjectBySubjectCode(subjectCode);
 
     if (isSubjectNameDuplicated.isSuccess()) {
-      return res.sendError.conflict("Subject name duplciated");
+      return res.sendError.conflict("Subject code duplciated");
     }
 
     const response = await subjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
@@ -88,6 +88,12 @@ export default class SubjectController {
       return res.sendError.badRequest("Invalid subjectId");
     }
 
+    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+
+    if (!subjectResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid subjectId");
+    }
+
     if (
       !Array.isArray(courseIds) ||
       courseIds.length === 0 ||
@@ -96,10 +102,14 @@ export default class SubjectController {
       return res.sendError.badRequest("Invalid or missing courseIds");
     }
 
-    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    const isSubjectCodeBelongsToSubjectId: Result<SubjectData> = await subjectService.getSubjectByIdAndSubjectCode(subjectId, subjectCode);
 
-    if (!subjectResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid subjectId");
+    if (!isSubjectCodeBelongsToSubjectId.isSuccess()) {
+      const isSubjectNameDuplicated: Result<SubjectData> = await subjectService.getSubjectBySubjectCode(subjectCode);
+
+      if (isSubjectNameDuplicated.isSuccess()) {
+        return res.sendError.conflict("Subject code duplciated");
+      }
     }
 
     const response = await subjectService.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours, courseIds);
