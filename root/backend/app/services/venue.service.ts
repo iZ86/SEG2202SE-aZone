@@ -6,6 +6,8 @@ import VenueRepository from "../repositories/venue.repository";
 interface IVenueService {
   getAllVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
   getVenueById(venueId: number): Promise<Result<VenueData>>;
+  getVenueByVenue(venue: string): Promise<Result<VenueData>>;
+  getVenueByIdAndVenue(venueId: number, venue: string): Promise<Result<VenueData>>;
   createVenue(venue: string): Promise<Result<VenueData>>;
   updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>>;
   deleteVenueById(venueId: number): Promise<Result<null>>;
@@ -27,6 +29,26 @@ class VenueService implements IVenueService {
     }
 
     return Result.succeed(venue, "Venue retrieve success");
+  }
+
+  async getVenueByVenue(venue: string): Promise<Result<VenueData>> {
+    const venueData: VenueData | undefined = await VenueRepository.getVenueByVenue(venue);
+
+    if (!venueData) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
+    }
+
+    return Result.succeed(venueData, "Venue retrieve success");
+  }
+
+  async getVenueByIdAndVenue(venueId: number, venue: string): Promise<Result<VenueData>> {
+    const venueData: VenueData | undefined = await VenueRepository.getVenueByIdAndVenue(venueId, venue);
+
+    if (!venueData) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
+    }
+
+    return Result.succeed(venueData, "Venue retrieve success");
   }
 
   async createVenue(venue: string): Promise<Result<VenueData>> {
