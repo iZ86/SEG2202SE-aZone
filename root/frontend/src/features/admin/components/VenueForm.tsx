@@ -22,6 +22,8 @@ export default function VenueForm({
 
   const [emptyVenue, setEmptyVenue] = useState(false);
 
+  const [invalidVenue, setInvalidVenue] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -52,7 +54,13 @@ export default function VenueForm({
       response = await updateVenueByIdAPI(authToken as string, id, venue);
     }
 
+    if (response && response.status === 409) {
+      setIsLoading(false);
+      setInvalidVenue(true);
       toast.error("Venue Existed");
+      return;
+    }
+
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/venues");
@@ -136,11 +144,15 @@ export default function VenueForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex w-5xl gap-x-10">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyVenue}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyVenue}
+                  isInvalid={invalidVenue}
+                  invalidMessage="Venue existed"
+                >
                   <NormalTextField
                     text={venue}
                     onChange={onChangeVenue}
-                    isInvalid={emptyVenue}
+                    isInvalid={emptyVenue || invalidVenue}
                     placeholder="Venue Name"
                   />
                 </AdminInputFieldWrapper>
