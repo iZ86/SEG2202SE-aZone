@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import ProgrammeService from "../services/programme.service";
-import IntakeService from "../services/intake.service";
+import programmeService from "../services/programme.service";
+import intakeService from "../services/intake.service";
 import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
 import { IntakeData } from "../models/intake-model";
 
@@ -12,8 +12,8 @@ export default class ProgrammeController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<ProgrammeData[]> = await ProgrammeService.getAllProgrammes(query, pageSize, page);
-    const programmeCount: Result<number> = await ProgrammeService.getProgrammeCount(query);
+    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammes(query, pageSize, page);
+    const programmeCount: Result<number> = await programmeService.getProgrammeCount(query);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -35,7 +35,7 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
-    const response: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+    const response: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -50,13 +50,13 @@ export default class ProgrammeController {
   async createProgramme(req: Request, res: Response) {
     const programmeName: string = req.body.programmeName;
 
-    const isProgrammeNameDuplicated: Result<ProgrammeData> = await ProgrammeService.getProgrammeByName(programmeName);
+    const isProgrammeNameDuplicated: Result<ProgrammeData> = await programmeService.getProgrammeByName(programmeName);
 
     if (isProgrammeNameDuplicated.isSuccess()) {
       return res.sendError.conflict("Programme name duplciated");
     }
 
-    const response = await ProgrammeService.createProgramme(programmeName);
+    const response = await programmeService.createProgramme(programmeName);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -76,23 +76,23 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
-    const isProgrammeNameBelongsToProgrammeId: Result<ProgrammeData> = await ProgrammeService.getProgrammeByIdAndName(programmeId, programmeName);
+    const isProgrammeNameBelongsToProgrammeId: Result<ProgrammeData> = await programmeService.getProgrammeByIdAndName(programmeId, programmeName);
 
     if (!isProgrammeNameBelongsToProgrammeId.isSuccess()) {
-      const isProgrammeNameDuplicated: Result<ProgrammeData> = await ProgrammeService.getProgrammeByName(programmeName);
+      const isProgrammeNameDuplicated: Result<ProgrammeData> = await programmeService.getProgrammeByName(programmeName);
 
       if (isProgrammeNameDuplicated.isSuccess()) {
         return res.sendError.conflict("Programme name duplciated");
       }
     }
 
-    const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+    const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
     if (!programme.isSuccess()) {
       return res.sendError.notFound("Invalid programmeId");
     }
 
-    const response = await ProgrammeService.updateProgrammeById(programmeId, programmeName);
+    const response = await programmeService.updateProgrammeById(programmeId, programmeName);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -111,13 +111,13 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
-    const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+    const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
     if (!programme.isSuccess()) {
       return res.sendError.notFound("Invalid programmeId");
     }
 
-    const response = await ProgrammeService.deleteProgrammeById(programmeId);
+    const response = await programmeService.deleteProgrammeById(programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();
@@ -134,7 +134,7 @@ export default class ProgrammeController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<ProgrammeData[]> = await ProgrammeService.getAllProgrammeIntakes(query, pageSize, page);
+    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammeIntakes(query, pageSize, page);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -153,7 +153,7 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
-    const response: Result<ProgrammeData[]> = await ProgrammeService.getProgrammeIntakesByProgrammeId(programmeId);
+    const response: Result<ProgrammeData[]> = await programmeService.getProgrammeIntakesByProgrammeId(programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -172,7 +172,7 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeIntakeId");
     }
 
-    const response: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+    const response: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -191,15 +191,15 @@ export default class ProgrammeController {
     const semesterStartDate: Date = req.body.semesterStartDate;
     const semesterEndDate: Date = req.body.semesterEndDate;
 
-    const programmeIdResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+    const programmeIdResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
-    const intakeIdResponse: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+    const intakeIdResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (!programmeIdResponse.isSuccess() || !intakeIdResponse.isSuccess()) {
       return res.sendError.notFound("Invalid programmeId or intakeId");
     }
 
-    const response = await ProgrammeService.createProgrammeIntake(programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
+    const response = await programmeService.createProgrammeIntake(programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -225,17 +225,17 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeIntakeId");
     }
 
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
 
-    const programmeIdResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+    const programmeIdResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
-    const intakeIdResponse: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+    const intakeIdResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (!programmeIntakeResponse.isSuccess() || !programmeIdResponse.isSuccess() || !intakeIdResponse.isSuccess()) {
       return res.sendError.notFound("Invalid programmeIntakeId, or programmeId, or intakeId");
     }
 
-    const response = await ProgrammeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
+    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -256,13 +256,13 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeIntakeId");
     }
 
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
 
     if (!programmeIntakeResponse.isSuccess()) {
       return res.sendError.notFound("Invalid programmeIntakeId");
     }
 
-    const response = await ProgrammeService.deleteProgrammeIntakeById(programmeIntakeId);
+    const response = await programmeService.deleteProgrammeIntakeById(programmeIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();

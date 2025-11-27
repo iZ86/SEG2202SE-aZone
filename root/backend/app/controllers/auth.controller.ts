@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import AuthService from "../services/auth.service";
+import authService from "../services/auth.service";
 
 export default class AuthController {
   async login(req: Request, res: Response) {
@@ -12,11 +12,11 @@ export default class AuthController {
 
     switch (role) {
       case ENUM_USER_ROLE.STUDENT:
-        response = await AuthService.loginStudent(userId, password);
+        response = await authService.loginStudent(userId, password);
         break;
 
       case ENUM_USER_ROLE.ADMIN:
-        response = await AuthService.loginAdmin(userId, password);
+        response = await authService.loginAdmin(userId, password);
         break;
       default:
         return res.sendError.internal("Unexpected login error");
@@ -41,9 +41,9 @@ export default class AuthController {
     let response = undefined;
 
     if (isAdmin) {
-      response = await AuthService.getAdminMe(userId);
+      response = await authService.getAdminMe(userId);
     } else {
-      response = await AuthService.getStudentMe(userId);
+      response = await authService.getStudentMe(userId);
     }
 
     if (response.isSuccess()) {
@@ -63,7 +63,7 @@ export default class AuthController {
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
 
-    const response = await AuthService.updateMe(userId, phoneNumber, email);
+    const response = await authService.updateMe(userId, phoneNumber, email);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());

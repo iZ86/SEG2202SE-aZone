@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { VenueData } from "../models/venue-model";
-import VenueService from "../services/venue.service";
+import venueService from "../services/venue.service";
 
 export default class VenueController {
   async getAllVenues(req: Request, res: Response) {
@@ -10,8 +10,8 @@ export default class VenueController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<VenueData[]> = await VenueService.getAllVenues(query, pageSize, page);
-    const venueCount: Result<number> = await VenueService.getVenueCount(query);
+    const response: Result<VenueData[]> = await venueService.getAllVenues(query, pageSize, page);
+    const venueCount: Result<number> = await venueService.getVenueCount(query);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -33,7 +33,7 @@ export default class VenueController {
       return res.sendError.badRequest("Invalid venueId");
     }
 
-    const response: Result<VenueData> = await VenueService.getVenueById(venueId);
+    const response: Result<VenueData> = await venueService.getVenueById(venueId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -48,7 +48,7 @@ export default class VenueController {
   async createVenue(req: Request, res: Response) {
     const venue: string = req.body.venue;
 
-    const response: Result<VenueData> = await VenueService.createVenue(venue);
+    const response: Result<VenueData> = await venueService.createVenue(venue);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -68,13 +68,13 @@ export default class VenueController {
       return res.sendError.badRequest("Invalid venueId");
     }
 
-    const venueResponse: Result<VenueData> = await VenueService.getVenueById(venueId);
+    const venueResponse: Result<VenueData> = await venueService.getVenueById(venueId);
 
     if (!venueResponse.isSuccess()) {
       return res.sendError.notFound("Invalid venueId");
     }
 
-    const response = await VenueService.updateVenueById(venueId, venue);
+    const response = await venueService.updateVenueById(venueId, venue);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -93,13 +93,13 @@ export default class VenueController {
       return res.sendError.badRequest("Invalid venueId");
     }
 
-    const venueResponse: Result<VenueData> = await VenueService.getVenueById(venueId);
+    const venueResponse: Result<VenueData> = await venueService.getVenueById(venueId);
 
     if (!venueResponse.isSuccess()) {
       return res.sendError.notFound("Invalid venueId");
     }
 
-    const response = await VenueService.deleteVenueById(venueId);
+    const response = await venueService.deleteVenueById(venueId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();

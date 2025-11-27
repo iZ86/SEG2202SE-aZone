@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import CourseService from "../services/course.service";
+import courseService from "../services/course.service";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 import { ProgrammeData } from "../models/programme-model";
-import ProgrammeService from "../services/programme.service";
+import programmeService from "../services/programme.service";
 import { SubjectData } from "../models/subject-model";
-import SubjectService from "../services/subject.service";
+import subjectService from "../services/subject.service";
 
 export default class CourseController {
   async getAllCourses(req: Request, res: Response) {
@@ -14,8 +14,8 @@ export default class CourseController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<CourseData[]> = await CourseService.getAllCourses(query, pageSize, page);
-    const courseCount: Result<number> = await CourseService.getCourseCount(query);
+    const response: Result<CourseData[]> = await courseService.getAllCourses(query, pageSize, page);
+    const courseCount: Result<number> = await courseService.getCourseCount(query);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -37,7 +37,7 @@ export default class CourseController {
       return res.sendError.badRequest("Invalid courseId");
     }
 
-    const response: Result<CourseData> = await CourseService.getCourseById(courseId);
+    const response: Result<CourseData> = await courseService.getCourseById(courseId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -56,7 +56,7 @@ export default class CourseController {
       return res.sendError.badRequest("Invalid courseId");
     }
 
-    const response: Result<CourseData[]> = await CourseService.getCoursesByProgrammeId(programmeId);
+    const response: Result<CourseData[]> = await courseService.getCoursesByProgrammeId(programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -72,19 +72,19 @@ export default class CourseController {
     const courseName: string = req.body.courseName;
     const programmeId: number = req.body.programmeId;
 
-    const isCourseNameDuplicated: Result<CourseData> = await CourseService.getCourseByName(courseName);
+    const isCourseNameDuplicated: Result<CourseData> = await courseService.getCourseByName(courseName);
 
     if (isCourseNameDuplicated.isSuccess()) {
       return res.sendError.conflict("Course name duplciated");
     }
 
-    const programmeResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+    const programmeResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
     if (!programmeResponse.isSuccess()) {
       return res.sendError.notFound(programmeResponse.getMessage());
     }
 
-    const response = await CourseService.createCourse(courseName, programmeId);
+    const response = await courseService.createCourse(courseName, programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -105,14 +105,14 @@ export default class CourseController {
       return res.sendError.badRequest("Invalid courseId");
     }
 
-    const programmeResponse: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
-    const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
+    const programmeResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
+    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
 
     if (!programmeResponse.isSuccess() || !courseResponse.isSuccess()) {
       return res.sendError.notFound("Invalid programmeId, or courseId");
     }
 
-    const response = await CourseService.updateCourseById(courseId, courseName, programmeId);
+    const response = await courseService.updateCourseById(courseId, courseName, programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -131,13 +131,13 @@ export default class CourseController {
       return res.sendError.badRequest("Invalid courseId");
     }
 
-    const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
+    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
 
     if (!courseResponse.isSuccess()) {
       return res.sendError.notFound("Invalid courseId");
     }
 
-    const response = await CourseService.deleteCourseById(courseId);
+    const response = await courseService.deleteCourseById(courseId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();
@@ -153,21 +153,21 @@ export default class CourseController {
     const courseId: number = req.body.courseId;
     const subjectId: number = req.body.subjectId;
 
-    const courseIdResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
+    const courseIdResponse: Result<CourseData> = await courseService.getCourseById(courseId);
 
-    const subjectIdResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
+    const subjectIdResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
 
     if (!courseIdResponse.isSuccess() || !subjectIdResponse.isSuccess()) {
       return res.sendError.notFound("Invalid courseId or subjectId");
     }
 
-    const isCourseSubjectExist: boolean = await CourseService.isCourseSubjectExist(courseId, subjectId);
+    const isCourseSubjectExist: boolean = await courseService.isCourseSubjectExist(courseId, subjectId);
 
     if (isCourseSubjectExist) {
       return res.sendError.notFound("Course subject already exist");
     }
 
-    const response = await CourseService.createCourseSubject(courseId, subjectId);
+    const response = await courseService.createCourseSubject(courseId, subjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());

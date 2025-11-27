@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
-import UserService from "../services/user.service";
-import CourseService from "../services/course.service";
-import ProgrammeService from "../services/programme.service";
+import userService from "../services/user.service";
+import courseService from "../services/course.service";
+import programmeService from "../services/programme.service";
 import { CourseData } from "../models/course-model";
 import { ProgrammeIntakeData } from "../models/programme-model";
 import { ResultSetHeader } from "mysql2";
@@ -15,8 +15,8 @@ export default class UserController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<UserData[]> = await UserService.getAllAdmins(query, pageSize, page);
-    const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.ADMIN);
+    const response: Result<UserData[]> = await userService.getAllAdmins(query, pageSize, page);
+    const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.ADMIN);
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
         users: response.getData(),
@@ -35,8 +35,8 @@ export default class UserController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
 
-    const response: Result<UserData[]> = await UserService.getAllStudents(query, pageSize, page);
-    const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
+    const response: Result<UserData[]> = await userService.getAllStudents(query, pageSize, page);
+    const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -58,7 +58,7 @@ export default class UserController {
       return res.sendError.badRequest("Invalid adminId");
     }
 
-    const response: Result<UserData> = await UserService.getAdminById(adminId);
+    const response: Result<UserData> = await userService.getAdminById(adminId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -77,7 +77,7 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId");
     }
 
-    const response: Result<UserData> = await UserService.getStudentById(studentId);
+    const response: Result<UserData> = await userService.getStudentById(studentId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -97,13 +97,13 @@ export default class UserController {
     const password: string = req.body.password;
     const userStatus: number = req.body.userStatus;
 
-    const isEmailDuplicated: Result<UserData> = await UserService.getStudentByEmail(email);
+    const isEmailDuplicated: Result<UserData> = await userService.getStudentByEmail(email);
 
     if (isEmailDuplicated.isSuccess()) {
       return res.sendError.conflict("Email already exist");
     }
 
-    const response: Result<ResultSetHeader> = await UserService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
+    const response: Result<ResultSetHeader> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -131,23 +131,23 @@ export default class UserController {
      * Check if the user is using the email before updating
      * If user is using the old email, doesn't needs to check if the email is duplicated
      */
-    const isEmailBelongsToUser: Result<UserData> = await UserService.getStudentByIdAndEmail(studentId, email);
+    const isEmailBelongsToUser: Result<UserData> = await userService.getStudentByIdAndEmail(studentId, email);
 
     if (!isEmailBelongsToUser.isSuccess()) {
-      const isEmailDuplicated: Result<UserData> = await UserService.getStudentByEmail(email);
+      const isEmailDuplicated: Result<UserData> = await userService.getStudentByEmail(email);
 
       if (isEmailDuplicated.isSuccess()) {
         return res.sendError.conflict("Email already exist");
       }
     }
 
-    const userResponse: boolean = await UserService.isUserExist(studentId);
+    const userResponse: boolean = await userService.isUserExist(studentId);
 
     if (!userResponse) {
       return res.sendError.notFound("Invalid userId");
     }
 
-    const response: Result<UserData | undefined> = await UserService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
+    const response: Result<UserData | undefined> = await userService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -170,13 +170,13 @@ export default class UserController {
       return res.sendError.badRequest("Invalid adminId");
     }
 
-    const userResponse: boolean = await UserService.isUserExist(adminId);
+    const userResponse: boolean = await userService.isUserExist(adminId);
 
     if (!userResponse) {
       return res.sendError.notFound("Invalid userId");
     }
 
-    const response: Result<UserData> = await UserService.updateAdminById(adminId, firstName, lastName, email, phoneNumber);
+    const response: Result<UserData> = await userService.updateAdminById(adminId, firstName, lastName, email, phoneNumber);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -195,13 +195,13 @@ export default class UserController {
       return res.sendError.badRequest("Invalid userId");
     }
 
-    const userResponse: boolean = await UserService.isUserExist(userId);
+    const userResponse: boolean = await userService.isUserExist(userId);
 
     if (!userResponse) {
       return res.sendError.notFound("Invalid userId");
     }
 
-    const response: Result<null> = await UserService.deleteUserById(userId);
+    const response: Result<null> = await userService.deleteUserById(userId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();
@@ -217,7 +217,7 @@ export default class UserController {
     const profilePictureUrl: string = req.body.profilePictureUrl;
     const userId: number = req.user.userId;
 
-    const response: Result<UserData | undefined> = await UserService.updateUserProfilePictureById(userId, profilePictureUrl);
+    const response: Result<UserData | undefined> = await userService.updateUserProfilePictureById(userId, profilePictureUrl);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -234,8 +234,8 @@ export default class UserController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getAllStudentCourseProgrammeIntakes(query, pageSize, page);
-    const userCount: Result<number> = await UserService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getAllStudentCourseProgrammeIntakes(query, pageSize, page);
+    const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -257,7 +257,7 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -274,21 +274,21 @@ export default class UserController {
     const courseId: number = req.body.courseId;
     const programmeIntakeId: number = req.body.programmeIntakeId;
 
-    const studentResponse: Result<UserData> = await UserService.getStudentById(studentId);
-    const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
+    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
 
     if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId, or courseId, or programmeIntakeId");
     }
 
-    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await userService.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
 
     if (studentCourseProgrammeIntakeResponse.getData()) {
       return res.sendError.badRequest("Active course exist");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -310,15 +310,15 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId");
     }
 
-    const studentResponse: Result<UserData> = await UserService.getStudentById(studentId);
-    const courseResponse: Result<CourseData> = await CourseService.getCourseById(courseId);
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await ProgrammeService.getProgrammeIntakeById(programmeIntakeId);
+    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
+    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
 
     if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
       return res.sendError.notFound("Invalid studentId, or courseId, or programmeIntakeId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -339,13 +339,13 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId or courseId or programmeIntakeId");
     }
 
-    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await UserService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (!studentCourseProgrammeIntake.isSuccess()) {
       return res.sendError.notFound("Student course programme intake not found");
     }
 
-    const response: Result<null> = await UserService.deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
+    const response: Result<null> = await userService.deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -360,7 +360,7 @@ export default class UserController {
   async getStudentInformationById(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
 
-    const response: Result<StudentInformation> = await UserService.getStudentInformationById(userId);
+    const response: Result<StudentInformation> = await userService.getStudentInformationById(userId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData())
