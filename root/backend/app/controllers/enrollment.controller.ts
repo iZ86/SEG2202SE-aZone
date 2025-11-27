@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { EnrollmentData } from "../models/enrollment-model";
-import EnrollmentService from "../services/enrollment.service";
+import enrollmentService from "../services/enrollment.service";
 
 export default class EnrollmentController {
   async getAllEnrollments(req: Request, res: Response) {
@@ -10,8 +10,8 @@ export default class EnrollmentController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<EnrollmentData[]> = await EnrollmentService.getAllEnrollments(query, pageSize, page);
-    const enrollmentCount: Result<number> = await EnrollmentService.getEnrollmentCount(query);
+    const response: Result<EnrollmentData[]> = await enrollmentService.getAllEnrollments(query, pageSize, page);
+    const enrollmentCount: Result<number> = await enrollmentService.getEnrollmentCount(query);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -33,7 +33,7 @@ export default class EnrollmentController {
       return res.sendError.badRequest("Invalid enrollmentId");
     }
 
-    const response: Result<EnrollmentData> = await EnrollmentService.getEnrollmentById(enrollmentId);
+    const response: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -49,13 +49,13 @@ export default class EnrollmentController {
     const enrollmentStartDateTime: Date = req.body.enrollmentStartDateTime;
     const enrollmentEndDateTime: Date = req.body.enrollmentEndDateTime;
 
-    const isDateTimeDuplicated: Result<EnrollmentData> = await EnrollmentService.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
+    const isDateTimeDuplicated: Result<EnrollmentData> = await enrollmentService.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
 
     if (isDateTimeDuplicated.isSuccess()) {
       return res.sendError.conflict("enrollmentStartDateTime and enrollmentEndDateTime existed");
     }
 
-    const response: Result<EnrollmentData> = await EnrollmentService.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
+    const response: Result<EnrollmentData> = await enrollmentService.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -76,13 +76,13 @@ export default class EnrollmentController {
       return res.sendError.badRequest("Invalid enrollmentId");
     }
 
-    const enrollmentResponse: Result<EnrollmentData> = await EnrollmentService.getEnrollmentById(enrollmentId);
+    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
 
     if (!enrollmentResponse.isSuccess()) {
       return res.sendError.notFound("Invalid enrollmentId");
     }
 
-    const response = await EnrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+    const response = await enrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -101,13 +101,13 @@ export default class EnrollmentController {
       return res.sendError.badRequest("Invalid enrollmentId");
     }
 
-    const enrollmentResponse: Result<EnrollmentData> = await EnrollmentService.getEnrollmentById(enrollmentId);
+    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
 
     if (!enrollmentResponse.isSuccess()) {
       return res.sendError.notFound("Invalid enrollmentId");
     }
 
-    const response = await EnrollmentService.deleteEnrollmentById(enrollmentId);
+    const response = await enrollmentService.deleteEnrollmentById(enrollmentId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();
