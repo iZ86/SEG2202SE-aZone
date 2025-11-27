@@ -55,7 +55,7 @@ const SELECTED_SUBJECTS = [
         endTime: "2.00PM"
       }
     ]
-  },{
+  }, {
     subjectName: "ABC123 - Database Fundamental II",
     creditHours: 4,
     selectedClassTypes: [
@@ -80,7 +80,7 @@ const SELECTED_SUBJECTS = [
 /** This button is needed for popping up the modal. */
 function ChooseSubjectButton() {
   return (
-    <Button className="font-nunito-sans px-4 py-2 bg-blue-air-superiority text-white font-bold text-base flex justify-center items-center rounded-sm hover:bg-blue-yinmn cursor-pointer">
+    <Button className="font-nunito-sans ml-auto px-4 py-2 bg-blue-air-superiority text-white font-bold text-base flex justify-center items-center rounded-sm hover:bg-blue-yinmn cursor-pointer">
       Choose
     </Button>
   );
@@ -139,7 +139,7 @@ export default function StudentEnrollment() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white-antiflash">
+    <div className="flex flex-col min-h-screen bg-white-antiflash pb-40">
       <StudentNavbar page="enrollment" />
 
 
@@ -164,10 +164,10 @@ export default function StudentEnrollment() {
               <div
                 key={index}
                 onClick={() => setSelected(index)}
-                className={`flex items-center justify-between p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white
+                className={`flex flex-wrap gap-y-4 items-center p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white
                             ${selected === index ? "border-2 border-blue-500" : "hover:shadow-md border border-transparent"}`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 mr-auto w-sm">
                   <div className="p-3 bg-gray-100 rounded-lg">
                     <ClipboardList className="text-gray-700 w-6 h-6" />
                   </div>
@@ -187,7 +187,7 @@ export default function StudentEnrollment() {
             ))}
             <ModalOverlay isDismissable
               className={({ isEntering, isExiting }) => `
-          absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex flex-col justify-center
+          fixed inset-0 w-full min-h-screen z-20 bg-black/50 isolate flex flex-col justify-center
           ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
           ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
           `}>
@@ -241,7 +241,43 @@ export default function StudentEnrollment() {
             <h4 className="text-black font-semibold">
               Total Subjects Selected: {selected !== null ? 1 : 0} | Total Credit Hours Selected: {selected !== null ? subjects[selected]?.credits : 0}
             </h4>
-            <MediumButton buttonText="Submit Enrollment" submit={true} />
+            <DialogTrigger>
+              <Button className="font-nunito-sans px-6 py-3 bg-blue-air-superiority text-white font-bold text-xl flex gap-x-2 justify-center items-center rounded-md hover:bg-blue-yinmn  cursor-pointer">
+                Submit Enrollment
+              </Button>
+              <ModalOverlay isDismissable
+                className={({ isEntering, isExiting }) => `
+          fixed inset-0 w-full min-h-screen z-20 bg-black/50 isolate flex flex-col justify-center
+          ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
+          ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
+          `}>
+                <Modal
+                  className={({ isEntering, isExiting }) => `
+            flex flex-col text-center max-h-screen overflow-auto pointer-events-none mx-6
+            ${isEntering ? 'animate-in zoom-in-95 ease-out duration-300' : ''}
+            ${isExiting ? 'animate-out zoom-out-95 ease-in duration-200' : ''}
+          `}>
+                  <Dialog
+                    role="alertdialog"
+                    className="bg-white rounded-2xl flex flex-col mx-auto pointer-events-auto"
+                  >
+                    {({ close }) => (
+                      <div className="flex flex-col items-center text-black gap-y-8 p-8">
+                        <div className="flex flex-col items-center gap-y-4">
+                          <h2 className="font-bold">Are you sure you want to enroll in these subjects?</h2>
+                          <p>You may change your choice after confirmation.</p>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4">
+                          <MediumButton buttonText="Cancel" backgroundColor="bg-red-tomato" hoverBgColor="hover:bg-red-500" onClick={close} />
+                          <MediumButton buttonText="Confirm" onClick={close} />
+                        </div>
+                      </div>
+                    )}
+                  </Dialog>
+                </Modal>
+              </ModalOverlay>
+
+            </DialogTrigger>
           </div>
         </div>
 
@@ -251,7 +287,7 @@ export default function StudentEnrollment() {
           </Button>
           <ModalOverlay isDismissable
             className={({ isEntering, isExiting }) => `
-          absolute top-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex pl-[10%]
+          fixed inset-0 left-0 w-full min-h-screen z-20 bg-black/50 isolate flex pl-[10%]
           ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
           ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
         `}>

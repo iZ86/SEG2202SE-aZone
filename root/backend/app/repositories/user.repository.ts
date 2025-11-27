@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, UserData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 
 interface IUserRepostory {
@@ -25,6 +25,7 @@ interface IUserRepostory {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>; updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader>;
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
+  getStudentInformationById(studentId: number) : Promise<StudentInformation|undefined>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -458,6 +459,26 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getStudentInformationById(studentId: number) : Promise<StudentInformation|undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentInformation[]>(
+        "SELECT c.courseName, pi.intakeId as 'intake', pi.semester, pi.semesterStartDate, " +
+        "pi.semesterEndDate, sm.studyMode, scpi.status " +
+        "FROM STUDENT s " +
+        "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
+        "INNER JOIN COURSE c on scpi.courseId = c.courseId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = PI.programmeIntakeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE s.studentId = ?;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
         }
       );
     });

@@ -58,10 +58,16 @@ CREATE TABLE COURSE (
         ON DELETE CASCADE
 );
 
+CREATE TABLE STUDY_MODE (
+    studyModeId INT AUTO_INCREMENT PRIMARY KEY,
+    studyMode VARCHAR(255) NOT NULL UNIQUE
+);
+
 CREATE TABLE PROGRAMME_INTAKE (
     programmeIntakeId INT AUTO_INCREMENT PRIMARY KEY,
     programmeId INT NOT NULL,
     intakeId INT NOT NULL,
+    studyModeId INT NOT NULL,
     semester INT NOT NULL,
     semesterStartDate DATE NOT NULL,
     semesterEndDate DATE NOT NULL,
@@ -69,6 +75,7 @@ CREATE TABLE PROGRAMME_INTAKE (
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
         ON DELETE CASCADE,
+    FOREIGN KEY (studyModeId) REFERENCES STUDY_MODE(studyModeId),
     UNIQUE (programmeId, intakeId, semester)
 );
 
@@ -92,7 +99,7 @@ CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
     PRIMARY KEY (programmeIntakeId, enrollmentId)
 );
 
-CREATE TABLE CLASSTYPE (
+CREATE TABLE CLASS_TYPE (
     classTypeId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     classType VARCHAR(255) NOT NULL
 );
@@ -116,11 +123,13 @@ CREATE TABLE ENROLLMENT_SUBJECT (
     startTime TIME NOT NULL,
     endTime TIME NOT NULL,
     dayId INT NOT NULL,
+    numberOfSeats INT NOT NULL,
+    grouping INT NOT NULL,
     FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
         ON DELETE CASCADE,
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
         ON DELETE CASCADE,
-    FOREIGN KEY (classTypeId) REFERENCES CLASSTYPE(classTypeId)
+    FOREIGN KEY (classTypeId) REFERENCES CLASS_TYPE(classTypeId)
         ON DELETE CASCADE,
     FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
         ON DELETE CASCADE,
@@ -164,7 +173,7 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
 -- DATA MANIPULATION LANGUAGE --
 -- The password is encrypted with "abc" --
 -- All of the users have the same password "test123"
-INSERT INTO `CLASSTYPE` (`classTypeId`, `classType`) VALUES
+INSERT INTO `CLASS_TYPE` (`classTypeId`, `classType`) VALUES
 (1, 'Lecture'),
 (2, 'Practical'),
 (3, 'Tutorial'),
@@ -197,10 +206,14 @@ INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`) VALUES
 (8, 2, 'Diploma in Finance'),
 (9, 2, 'Diploma in Business Administration');
 
-INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `semester`, `semesterStartDate`, `semesterEndDate`) VALUES
-(1, 1, 202509, 4, '2025-09-22', '2026-01-16'),
-(2, 2, 202508, 1, '2025-08-16', '2025-12-12'),
-(3, 1, 202504, 5, '2025-04-09', '2025-08-06');
+INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
+("Full Time"),
+("Part Time");
+
+INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`) VALUES
+(1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16'),
+(2, 2, 202508, 1, 1, '2025-08-16', '2025-12-12'),
+(3, 1, 202504, 1, 5, '2025-04-09', '2025-08-06');
 
 INSERT INTO `ENROLLMENT_PROGRAMME_INTAKE` (`programmeIntakeId`, `enrollmentId`) VALUES (1, 1);
 
@@ -243,3 +256,31 @@ INSERT INTO `SUBJECT_STATUS` (`subjectStatusId`, `subjectStatus`) VALUES
 (1, 'Active'),
 (2, 'Exempted'),
 (3, 'Completed');
+
+INSERT INTO `VENUE` (`venue`) VALUES
+('UW-8-6');
+
+INSERT INTO `DAY` (`dayId`, `day`) VALUES
+(1, 'Monday'),
+(2, 'Tuesday'),
+(3, 'Wednesday'),
+(4, 'Thursday'),
+(5, 'Friday'),
+(6, 'Saturday'),
+(7, 'Sunday');
+
+INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
+(1, 1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
+(1, 1, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
+(1, 2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
+
+INSERT INTO `STUDENT_ENROLLMENT_SUBJECT` (`studentId`, `enrollmentSubjectId` ,`subjectStatusId`) VALUES
+(23049679, 1, 1),
+(23049679, 2, 1),
+(23049679, 3, 1),
+(23055155, 1, 1),
+(23055155, 2, 1),
+(23055155, 3, 1),
+(23056138, 1, 1),
+(23056138, 2, 1),
+(23056138, 3, 1);

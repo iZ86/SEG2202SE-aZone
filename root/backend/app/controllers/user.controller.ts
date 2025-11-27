@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
 import UserService from "../services/user.service";
 import CourseService from "../services/course.service";
 import ProgrammeService from "../services/programme.service";
@@ -356,4 +356,21 @@ export default class UserController {
       }
     }
   }
+
+  async getStudentInformationById(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+
+    const response: Result<StudentInformation> = await UserService.getStudentInformationById(userId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData())
+    } else {
+      switch(response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+ 
 }
