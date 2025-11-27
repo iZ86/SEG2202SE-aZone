@@ -34,4 +34,6 @@ export type EnrollmentSubject = {
   endTime: Date;
   dayId: number;
   day: string;
+  numberOfSeats: number;
+  grouping: number;
 };
