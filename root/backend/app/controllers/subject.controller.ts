@@ -4,7 +4,7 @@ import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
 import { SubjectData } from "../models/subject-model";
 import courseService from "../services/course.service";
-import { CourseData, CourseSubjectData } from "../models/course-model";
+import { CourseData } from "../models/course-model";
 
 export default class SubjectController {
   async getAllSubjects(req: Request, res: Response) {
