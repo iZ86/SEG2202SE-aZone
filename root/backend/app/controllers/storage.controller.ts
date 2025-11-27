@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import StorageService from "../services/storage.service";
+import storageService from "../services/storage.service";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import authService from "../services/auth.service";
 
@@ -21,10 +21,10 @@ export default class StorageController {
     const existingUserProfilePictureUrl: string = (await userData).getData().profilePictureUrl;
 
     if (existingUserProfilePictureUrl) {
-      await StorageService.deleteBlob(existingUserProfilePictureUrl, blobReadWriteToken);
+      await storageService.deleteBlob(existingUserProfilePictureUrl, blobReadWriteToken);
     }
 
-    const response = await StorageService.uploadBlob(req, blobReadWriteToken);
+    const response = await storageService.uploadBlob(req, blobReadWriteToken);
 
     if (response.isSuccess()) {
       return res.status(200).json({

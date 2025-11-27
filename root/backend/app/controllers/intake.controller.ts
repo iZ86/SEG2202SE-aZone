@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { IntakeData } from "../models/intake-model";
-import IntakeService from "../services/intake.service";
+import intakeService from "../services/intake.service";
 
 export default class IntakeController {
   async getAllIntakes(req: Request, res: Response) {
@@ -10,8 +10,8 @@ export default class IntakeController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<IntakeData[]> = await IntakeService.getAllIntakes(query, pageSize, page);
-    const intakeCount: Result<number> = await IntakeService.getIntakeCount(query);
+    const response: Result<IntakeData[]> = await intakeService.getAllIntakes(query, pageSize, page);
+    const intakeCount: Result<number> = await intakeService.getIntakeCount(query);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -33,7 +33,7 @@ export default class IntakeController {
       return res.sendError.badRequest("Invalid intakeId");
     }
 
-    const response: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+    const response: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -48,13 +48,13 @@ export default class IntakeController {
   async createIntake(req: Request, res: Response) {
     const intakeId: number = req.body.intakeId;
 
-    const isIntakeDuplicated: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+    const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (isIntakeDuplicated.isSuccess()) {
       return res.sendError.conflict("intakeId existed");
     }
 
-    const response = await IntakeService.createIntake(intakeId);
+    const response = await intakeService.createIntake(intakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -74,19 +74,19 @@ export default class IntakeController {
       return res.sendError.badRequest("Invalid intakeId");
     }
 
-    const isIntakeDuplicated: Result<IntakeData> = await IntakeService.getIntakeById(newIntakeId);
+    const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(newIntakeId);
 
     if (isIntakeDuplicated.isSuccess()) {
       return res.sendError.conflict("intakeId existed");
     }
 
-    const intakeResponse: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+    const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (!intakeResponse.isSuccess()) {
       return res.sendError.notFound("Invalid intakeId");
     }
 
-    const response = await IntakeService.updateIntakeById(intakeId, newIntakeId);
+    const response = await intakeService.updateIntakeById(intakeId, newIntakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -105,13 +105,13 @@ export default class IntakeController {
       return res.sendError.badRequest("Invalid intakeId");
     }
 
-    const intakeResponse: Result<IntakeData> = await IntakeService.getIntakeById(intakeId);
+    const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (!intakeResponse.isSuccess()) {
       return res.sendError.notFound("Invalid intakeId");
     }
 
-    const response = await IntakeService.deleteIntakeById(intakeId);
+    const response = await intakeService.deleteIntakeById(intakeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();

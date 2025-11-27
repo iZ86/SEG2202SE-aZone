@@ -29,7 +29,8 @@ CREATE TABLE SUBJECT (
     subjectCode VARCHAR(50) NOT NULL,
     subjectName VARCHAR(255) NOT NULL,
     description VARCHAR(3000),
-    creditHours INT NOT NULL
+    creditHours INT NOT NULL,
+    UNIQUE (subjectCode, subjectName)
 );
 
 CREATE TABLE ENROLLMENT (
@@ -114,10 +115,26 @@ CREATE TABLE DAY(
     day VARCHAR(9) NOT NULL
 );
 
+CREATE TABLE LECTURER_TITLE (
+    lecturerTitleId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    lecturerTitle VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE LECTURER (
+    lecturerId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    firstName VARCHAR(255) NOT NULL,
+    lastName VARCHAR(255) NOT NULL,
+    lecturerTitleId INT NOT NULL,
+    email VARCHAR(350),
+    phoneNumber VARCHAR(20),
+    FOREIGN KEY (lecturerTitleId) REFERENCES LECTURER_TITLE(lecturerTitleId)
+);
+
 CREATE TABLE ENROLLMENT_SUBJECT (
     enrollmentSubjectId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     enrollmentId INT NOT NULL,
     subjectId INT NOT NULL,
+    lecturerId INT NOT NULL,
     classTypeId INT NOT NULL,
     venueId INT NOT NULL,
     startTime TIME NOT NULL,
@@ -129,6 +146,7 @@ CREATE TABLE ENROLLMENT_SUBJECT (
         ON DELETE CASCADE,
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
         ON DELETE CASCADE,
+    FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId),
     FOREIGN KEY (classTypeId) REFERENCES CLASS_TYPE(classTypeId)
         ON DELETE CASCADE,
     FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
@@ -269,10 +287,20 @@ INSERT INTO `DAY` (`dayId`, `day`) VALUES
 (6, 'Saturday'),
 (7, 'Sunday');
 
-INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
-(1, 1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
-(1, 1, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
-(1, 2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
+INSERT INTO `LECTURER_TITLE` (`lecturerTitleId`, `lecturerTitle`) VALUES
+(1, "None"),
+(2, "DR"),
+(3, "PROF."),
+(4, "ASSOC. PROF.");
+
+INSERT INTO `LECTURER` (`lecturerId`, `firstName`, `lastName`, `lecturerTitleId`, `email`, `phoneNumber`) VALUES
+(1, "Emily", "Johnson", 1, "emilyJohnson@m.co", "0111111111"),
+(2, "Johnson", "Emily", 2, "johnsonEmily@m.co", "022222222");
+
+INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `lecturerId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
+(1, 1, 1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
+(1, 1, 1, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
+(1, 2, 2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
 
 INSERT INTO `STUDENT_ENROLLMENT_SUBJECT` (`studentId`, `enrollmentSubjectId` ,`subjectStatusId`) VALUES
 (23049679, 1, 1),

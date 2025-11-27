@@ -1,7 +1,7 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { IntakeData } from "../models/intake-model";
-import IntakeRepository from "../repositories/intake.repository";
+import intakeRepository from "../repositories/intake.repository";
 
 interface IIntakeService {
   getAllIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeData[]>>;
@@ -14,13 +14,13 @@ interface IIntakeService {
 
 class IntakeService implements IIntakeService {
   async getAllIntakes(query: string = "", pageSize: number, page: number): Promise<Result<IntakeData[]>> {
-    const intakes: IntakeData[] = await IntakeRepository.getAllIntakes(query, pageSize, page);
+    const intakes: IntakeData[] = await intakeRepository.getAllIntakes(query, pageSize, page);
 
     return Result.succeed(intakes, "Intakes retrieve success");
   }
 
   async getIntakeById(intakeId: number): Promise<Result<IntakeData>> {
-    const intake: IntakeData | undefined = await IntakeRepository.getIntakeById(intakeId);
+    const intake: IntakeData | undefined = await intakeRepository.getIntakeById(intakeId);
 
     if (!intake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake not found");
@@ -30,9 +30,9 @@ class IntakeService implements IIntakeService {
   }
 
   async createIntake(intakeId: number): Promise<Result<IntakeData>> {
-    const response = await IntakeRepository.createIntake(intakeId);
+    const response = await intakeRepository.createIntake(intakeId);
 
-    const intake: IntakeData | undefined = await IntakeRepository.getIntakeById(response.insertId);
+    const intake: IntakeData | undefined = await intakeRepository.getIntakeById(response.insertId);
 
     if (!intake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake created not found");
@@ -42,9 +42,9 @@ class IntakeService implements IIntakeService {
   }
 
   async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>> {
-    await IntakeRepository.updateIntakeById(intakeId, newIntakeId);
+    await intakeRepository.updateIntakeById(intakeId, newIntakeId);
 
-    const intake: IntakeData | undefined = await IntakeRepository.getIntakeById(newIntakeId);
+    const intake: IntakeData | undefined = await intakeRepository.getIntakeById(newIntakeId);
 
     if (!intake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake updated not found");
@@ -54,13 +54,13 @@ class IntakeService implements IIntakeService {
   }
 
   async deleteIntakeById(intakeId: number): Promise<Result<null>> {
-    await IntakeRepository.deleteIntakeById(intakeId);
+    await intakeRepository.deleteIntakeById(intakeId);
 
     return Result.succeed(null, "Intake delete success");
   }
 
   async getIntakeCount(query: string = ""): Promise<Result<number>> {
-    const intakeCount: number = await IntakeRepository.getIntakeCount(query);
+    const intakeCount: number = await intakeRepository.getIntakeCount(query);
 
     return Result.succeed(intakeCount ? intakeCount : 0, "Intake count retrieve success");
   }

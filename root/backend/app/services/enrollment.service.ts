@@ -1,7 +1,7 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { EnrollmentData } from "../models/enrollment-model";
-import EnrollmentRepository from "../repositories/enrollment.repository";
+import enrollmentRepository from "../repositories/enrollment.repository";
 
 interface IEnrollmentService {
   getAllEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentData[]>>;
@@ -14,13 +14,13 @@ interface IEnrollmentService {
 
 class EnrollmentService implements IEnrollmentService {
   async getAllEnrollments(query: string = "", pageSize: number, page: number): Promise<Result<EnrollmentData[]>> {
-    const enrollments: EnrollmentData[] = await EnrollmentRepository.getAllEnrollments(query, pageSize, page);
+    const enrollments: EnrollmentData[] = await enrollmentRepository.getAllEnrollments(query, pageSize, page);
 
     return Result.succeed(enrollments, "Enrollments retrieve success");
   }
 
   async getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>> {
-    const enrollment: EnrollmentData | undefined = await EnrollmentRepository.getEnrollmentById(enrollmentId);
+    const enrollment: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentById(enrollmentId);
 
     if (!enrollment) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment not found");
@@ -30,9 +30,9 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   async createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
-    const response = await EnrollmentRepository.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
+    const response = await enrollmentRepository.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
 
-    const enrollmentResponse: EnrollmentData | undefined = await EnrollmentRepository.getEnrollmentById(response.insertId);
+    const enrollmentResponse: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentById(response.insertId);
 
     if (!enrollmentResponse) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment created not found");
@@ -42,9 +42,9 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   async updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
-    await EnrollmentRepository.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+    await enrollmentRepository.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
 
-    const enrollmentResponse: EnrollmentData | undefined = await EnrollmentRepository.getEnrollmentById(enrollmentId);
+    const enrollmentResponse: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentById(enrollmentId);
 
     if (!enrollmentResponse) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment updated not found");
@@ -54,19 +54,19 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   async deleteEnrollmentById(enrollmentId: number): Promise<Result<null>> {
-    await EnrollmentRepository.deleteEnrollmentById(enrollmentId);
+    await enrollmentRepository.deleteEnrollmentById(enrollmentId);
 
     return Result.succeed(null, "Enrollment delete success");
   }
 
   async getEnrollmentCount(query: string = ""): Promise<Result<number>> {
-    const enrollmentCount: number = await EnrollmentRepository.getEnrollmentCount(query);
+    const enrollmentCount: number = await enrollmentRepository.getEnrollmentCount(query);
 
     return Result.succeed(enrollmentCount ? enrollmentCount : 0, "Enrollment count retrieve success");
   }
 
   async getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
-    const enrollment: EnrollmentData | undefined = await EnrollmentRepository.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
+    const enrollment: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
 
     if (!enrollment) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment not found");

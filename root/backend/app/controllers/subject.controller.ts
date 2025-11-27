@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import SubjectService from "../services/subject.service";
+import subjectService from "../services/subject.service";
 import { SubjectData } from "../models/subject-model";
 import courseService from "../services/course.service";
-import { CourseData, CourseSubjectData } from "../models/course-model";
+import { CourseData } from "../models/course-model";
 
 export default class SubjectController {
   async getAllSubjects(req: Request, res: Response) {
@@ -12,8 +12,8 @@ export default class SubjectController {
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<SubjectData[]> = await SubjectService.getAllSubjects(query, pageSize, page);
-    const subjectCount: Result<number> = await SubjectService.getSubjectCount(query);
+    const response: Result<SubjectData[]> = await subjectService.getAllSubjects(query, pageSize, page);
+    const subjectCount: Result<number> = await subjectService.getSubjectCount(query);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
@@ -35,7 +35,7 @@ export default class SubjectController {
       return res.sendError.badRequest("Invalid subjectId");
     }
 
-    const response: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
+    const response: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
     const courseSubjectResponse: Result<CourseData[]> = await courseService.getCourseSubjectBySubjectId(subjectId);
 
     if (response.isSuccess()) {
@@ -58,13 +58,13 @@ export default class SubjectController {
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
 
-    const isSubjectNameDuplicated: Result<SubjectData> = await SubjectService.getSubjectByName(subjectName);
+    const isSubjectNameDuplicated: Result<SubjectData> = await subjectService.getSubjectByName(subjectName);
 
     if (isSubjectNameDuplicated.isSuccess()) {
       return res.sendError.conflict("Subject name duplciated");
     }
 
-    const response = await SubjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
+    const response = await subjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -96,13 +96,13 @@ export default class SubjectController {
       return res.sendError.badRequest("Invalid or missing courseIds");
     }
 
-    const subjectResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
+    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
 
     if (!subjectResponse.isSuccess()) {
       return res.sendError.notFound("Invalid subjectId");
     }
 
-    const response = await SubjectService.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours, courseIds);
+    const response = await subjectService.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours, courseIds);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -116,7 +116,7 @@ export default class SubjectController {
 
   async deleteSubjectById(req: Request, res: Response) {
     const subjectId: number = parseInt(req.params.subjectId as string);
-    const subjectResponse: Result<SubjectData> = await SubjectService.getSubjectById(subjectId);
+    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
 
     if (!subjectId || isNaN(subjectId)) {
       return res.sendError.badRequest("Invalid subjectId");
@@ -126,7 +126,7 @@ export default class SubjectController {
       return res.sendError.notFound("Invalid subjectId");
     }
 
-    const response = await SubjectService.deleteSubjectById(subjectId);
+    const response = await subjectService.deleteSubjectById(subjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();
