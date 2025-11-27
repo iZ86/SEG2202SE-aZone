@@ -174,6 +174,10 @@ export default function SubjectForm({
     }
   }
 
+  function onChangeDescription(onChangeDescription: string) {
+    setDescription(onChangeDescription);
+  }
+
   async function getAllCourses(token: string) {
     const response: Response | undefined = await getAllCoursesAPI(token);
 
@@ -311,6 +315,17 @@ export default function SubjectForm({
                     onChange={onChangeCourse}
                   />
                 </AdminInputFieldWrapper>
+              </div>
+            </div>
+
+            <div className="flex w-5xl gap-x-10">
+              <div className="flex-1">
+                <NormalTextField
+                  text={description}
+                  onChange={onChangeDescription}
+                  isInvalid={false}
+                  placeholder="Description"
+                />
               </div>
             </div>
 
