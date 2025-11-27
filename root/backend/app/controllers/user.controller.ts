@@ -285,7 +285,7 @@ export default class UserController {
     const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await UserService.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
 
     if (studentCourseProgrammeIntakeResponse.getData()) {
-      return res.sendError.badRequest("Active course exist");
+      return res.sendError.conflict("Active course exist");
     }
 
     const response: Result<StudentCourseProgrammeIntakeData[]> = await UserService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
@@ -372,5 +372,5 @@ export default class UserController {
     }
   }
 
- 
+
 }
