@@ -75,6 +75,9 @@ export default function EnrollmentTable() {
       fetchEnrollments(authToken, currentPage);
       toast.success(`Deleted enrollent period ${enrollmentId}`);
       return;
+    } else {
+      toast.error(`Failed to delete enrollment period ${enrollmentId}`);
+      return;
     }
   };
 

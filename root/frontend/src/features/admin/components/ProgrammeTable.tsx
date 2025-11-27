@@ -5,6 +5,7 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { Programme } from "@datatypes/programmeType";
 import { deleteProgrammeByIdAPI, getAllProgrammesAPI } from "../api/programmes";
+import { toast } from "react-toastify";
 
 export default function ProgrammeTable() {
   const [programmes, setProgrammes] = useState<Programme[]>([]);
@@ -74,6 +75,11 @@ export default function ProgrammeTable() {
     if (response && response.ok) {
       navigate("/admin/programmes");
       fetchProgrammes(authToken, currentPage);
+      toast.success(`Programme ${programmeId} deleted`);
+      return;
+    } else {
+      toast.error(`Failed to delete programme ${programmeId}`);
+      return;
     }
   };
 

@@ -14,6 +14,7 @@ import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import type { SingleValue } from "react-select";
 import type { Programme } from "@datatypes/programmeType";
 import SingleFilter from "@components/SingleFilter";
+import { toast } from "react-toastify";
 
 export default function CourseForm({
   type,
@@ -79,12 +80,14 @@ export default function CourseForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidCourseName(true);
+      toast.error("Course name existed");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/courses");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} course`);
       return;
     }
   }
@@ -154,6 +157,7 @@ export default function CourseForm({
 
       if (!response?.ok) {
         navigate("/admin/courses");
+        toast.error("Failed to fetch course");
         return;
       }
 

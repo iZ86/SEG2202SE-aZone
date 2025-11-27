@@ -5,6 +5,7 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import { deleteVenueByIdAPI, getAllVenuesAPI } from "../api/venues";
 import type { Venue } from "@datatypes/venueType";
+import { toast } from "react-toastify";
 
 export default function VenueTable() {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -74,6 +75,11 @@ export default function VenueTable() {
     if (response && response.ok) {
       navigate("/admin/venues");
       fetchVenues(authToken, currentPage);
+      toast.success(`Deleted venue ${venueId}`);
+      return;
+    } else {
+      toast.error(`Failed to delete venue ${venueId}`);
+      return;
     }
   };
 

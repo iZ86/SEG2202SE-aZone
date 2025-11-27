@@ -87,7 +87,6 @@ export default function EnrollmentForm({
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/enrollments");
-
       toast.success(
         `${type === "Add" ? "Created new" : "Updated"} enrollment period`
       );
@@ -132,6 +131,7 @@ export default function EnrollmentForm({
 
       if (!response?.ok) {
         navigate("/admin/enrollments");
+        toast.error("Failed to fetch enrollment");
         return;
       }
 

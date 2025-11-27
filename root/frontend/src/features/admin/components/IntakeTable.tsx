@@ -6,6 +6,7 @@ import SmallButton from "@components/SmallButton";
 import { deleteIntakeByIdAPI } from "../api/intakes";
 import type { Intake } from "@datatypes/intakeType";
 import { getAllIntakesAPI } from "../api/intakes";
+import { toast } from "react-toastify";
 
 export default function IntakeTable() {
   const [intakes, setIntakes] = useState<Intake[]>([]);
@@ -75,6 +76,11 @@ export default function IntakeTable() {
     if (response && response.ok) {
       navigate("/admin/intakes");
       fetchIntakes(authToken, currentPage);
+      toast.success(`Delete intake ${intakeId}`);
+      return;
+    } else {
+      toast.error(`Failed to delete intake ${intakeId}`);
+      return;
     }
   };
 

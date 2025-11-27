@@ -9,6 +9,7 @@ import {
   getVenueByIdAPI,
   updateVenueByIdAPI,
 } from "../api/venues";
+import { toast } from "react-toastify";
 
 export default function VenueForm({
   type,
@@ -51,9 +52,11 @@ export default function VenueForm({
       response = await updateVenueByIdAPI(authToken as string, id, venue);
     }
 
+      toast.error("Venue Existed");
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/venues");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} venue`);
       return;
     }
   }
@@ -85,6 +88,7 @@ export default function VenueForm({
 
       if (!response?.ok) {
         navigate("/admin/venues");
+        toast.error("Failed to fetch venue");
         return;
       }
       const { data } = await response.json();

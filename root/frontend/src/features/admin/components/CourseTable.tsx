@@ -5,6 +5,7 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import { deleteCourseByIdAPI, getAllCoursesAPI } from "../api/courses";
 import type { CourseProgramme } from "@datatypes/courseType";
+import { toast } from "react-toastify";
 
 export default function CourseTable() {
   const [courses, setCourses] = useState<CourseProgramme[]>([]);
@@ -74,6 +75,11 @@ export default function CourseTable() {
     if (response && response.ok) {
       navigate("/admin/courses");
       fetchCourses(authToken, currentPage);
+      toast.success(`Deleted Course ${courseId}`);
+      return;
+    } else {
+      toast.error(`Failed to delete course ${courseId}`);
+      return;
     }
   };
 

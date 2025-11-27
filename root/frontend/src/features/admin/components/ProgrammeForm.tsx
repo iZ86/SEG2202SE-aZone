@@ -9,6 +9,7 @@ import {
   getProgrammeByIdAPI,
   updateProgrammeByIdAPI,
 } from "../api/programmes";
+import { toast } from "react-toastify";
 
 export default function ProgrammeForm({
   type,
@@ -59,12 +60,16 @@ export default function ProgrammeForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidProgrammeName(true);
+      toast.error("Programme Name already exists!");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/programmes");
+      toast.success(
+        `${type === "Add" ? "Created new" : "Updated"} programme`
+      );
       return;
     }
   }
@@ -97,6 +102,7 @@ export default function ProgrammeForm({
 
       if (!response?.ok) {
         navigate("/admin/programmes");
+        toast.error("Failed to fetch programme");
         return;
       }
       const { data } = await response.json();

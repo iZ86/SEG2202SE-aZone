@@ -14,6 +14,7 @@ import {
   updateSubjectByIdAPI,
 } from "../api/subjects";
 import type { Course } from "@datatypes/courseType";
+import { toast } from "react-toastify";
 
 export default function SubjectForm({
   type,
@@ -92,12 +93,14 @@ export default function SubjectForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidSubjectName(true);
+      toast.error("Subject name existed");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/subjects");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} subject`);
       return;
     }
   }
@@ -202,6 +205,7 @@ export default function SubjectForm({
 
       if (!response?.ok) {
         navigate("/admin/subjects");
+        toast.error("Failed to fetch subject");
         return;
       }
 

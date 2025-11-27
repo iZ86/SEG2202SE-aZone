@@ -9,6 +9,7 @@ import {
   updateIntakeByIdAPI,
 } from "../api/intakes";
 import YearMonthPicker from "@components/YearMonthPicker";
+import { toast } from "react-toastify";
 
 export default function IntakeForm({
   type,
@@ -59,12 +60,14 @@ export default function IntakeForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidIntakeId(true);
+      toast.error("IntakeId existed");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/intakes");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} intake`);
       return;
     }
   }
@@ -97,6 +100,7 @@ export default function IntakeForm({
 
       if (!response?.ok) {
         navigate("/admin/intakes");
+        toast.error("Failed to fetch intake");
         return;
       }
 

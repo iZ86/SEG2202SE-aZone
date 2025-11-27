@@ -5,6 +5,7 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { Subject } from "@datatypes/subjectType";
 import { deleteSubjectByIdAPI, getAllSubjectsAPI } from "../api/subjects";
+import { toast } from "react-toastify";
 
 export default function SubjectTable() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -74,6 +75,11 @@ export default function SubjectTable() {
     if (response && response.ok) {
       navigate("/admin/subjects");
       fetchSubjects(authToken, currentPage);
+      toast.success(`Deleted subject ${subjectId}`);
+      return;
+    } else {
+      toast.error(`Failed to delete subject ${subjectId}`);
+      return;
     }
   };
 
