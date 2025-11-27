@@ -2,12 +2,13 @@ import { useEffect, useState, type ReactNode } from "react";
 import { getMeAPI } from "@features/general/api/user";
 import type { User } from "@datatypes/userType";
 import { StudentContext } from "../hooks/useStudent";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Provider({ children }: { children: ReactNode }) {
   const [authToken, setAuthToken] = useState("");
   const [student, setStudent] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchStudent() {
@@ -16,7 +17,7 @@ export default function Provider({ children }: { children: ReactNode }) {
         sessionStorage.getItem("aZoneStudentAuthToken");
 
       if (!token) {
-        <Navigate to={"/login"} replace />;
+        navigate("/login");
         return;
       }
 
@@ -27,7 +28,7 @@ export default function Provider({ children }: { children: ReactNode }) {
       if (!response || !response.ok) {
         console.error("Failed to fetch student");
 
-        <Navigate to={"/login"} replace />;
+        navigate("/login");
         return;
       }
 
@@ -38,7 +39,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     }
 
     fetchStudent();
-  }, []);
+  }, [navigate]);
 
   return (
     <StudentContext.Provider value={{ authToken, student, loading }}>
