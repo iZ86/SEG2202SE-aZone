@@ -32,7 +32,7 @@ class VenueService implements IVenueService {
   }
 
   async getVenueByVenue(venue: string): Promise<Result<VenueData>> {
-    const venueData: VenueData | undefined = await VenueRepository.getVenueByVenue(venue);
+    const venueData: VenueData | undefined = await venueRepository.getVenueByVenue(venue);
 
     if (!venueData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
@@ -42,7 +42,7 @@ class VenueService implements IVenueService {
   }
 
   async getVenueByIdAndVenue(venueId: number, venue: string): Promise<Result<VenueData>> {
-    const venueData: VenueData | undefined = await VenueRepository.getVenueByIdAndVenue(venueId, venue);
+    const venueData: VenueData | undefined = await venueRepository.getVenueByIdAndVenue(venueId, venue);
 
     if (!venueData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
