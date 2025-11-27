@@ -75,6 +75,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               key: "intakes",
             },
             {
+              to: "/admin/enrollments",
+              label: "Enrollment Periods",
+              key: "enrollments",
+            },
+            {
               to: "/admin/venues",
               label: "Venues",
               key: "venues",
