@@ -510,7 +510,8 @@ class UserRepository implements IUserRepostory {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentClassData[]>(
         "SELECT es.enrollmentSubjectId, es.startTime, es.endTime, s.subjectId, s.subjectCode, " +
-        "s.subjectName, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, lt.lecturerTitle, " + 
+        "s.subjectName, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
+        "lt.lecturerTitleId, lt.lecturerTitle, " + 
         "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, es.grouping, d.dayId, d.day " +
         "FROM STUDENT_ENROLLMENT_SUBJECT ses " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON ses.enrollmentSubjectId = es.enrollmentSubjectId " +

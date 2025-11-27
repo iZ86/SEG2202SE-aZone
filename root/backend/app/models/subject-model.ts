@@ -24,8 +24,8 @@ export interface StudentClassData extends RowDataPacket {
   subjectCode: string;
   subjectName: string;
   lecturerId: number;
-  firstName: string;
-  lastName: string;
+  lecturerFirstName: string;
+  lecturerLastName: string;
   lecturerTitleId: number;
   lecturerTitle: string;
   email: string;
