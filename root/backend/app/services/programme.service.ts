@@ -2,7 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
-import ProgrammeRepository from "../repositories/programme.repository";
+import programmeRepository from "../repositories/programme.repository";
 
 interface IProgrammeService {
   getAllProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeData[]>>;
@@ -23,13 +23,13 @@ interface IProgrammeService {
 
 class ProgrammeService implements IProgrammeService {
   async getAllProgrammes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeData[]>> {
-    const programmes: ProgrammeData[] = await ProgrammeRepository.getAllProgrammes(query, pageSize, page);
+    const programmes: ProgrammeData[] = await programmeRepository.getAllProgrammes(query, pageSize, page);
 
     return Result.succeed(programmes, "Programmes retrieve success");
   }
 
   async getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>> {
-    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
+    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeById(programmeId);
 
     if (!programme) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme not found");
@@ -39,7 +39,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>> {
-    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeByName(programmeName);
+    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeByName(programmeName);
 
     if (!programme) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme not found");
@@ -49,7 +49,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
-    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeByIdAndName(programmeId, programmeName);
+    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeByIdAndName(programmeId, programmeName);
 
     if (!programme) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme not found");
@@ -59,9 +59,9 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
-    const response: ResultSetHeader = await ProgrammeRepository.createProgramme(programmeName);
+    const response: ResultSetHeader = await programmeRepository.createProgramme(programmeName);
 
-    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(response.insertId);
+    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeById(response.insertId);
 
     if (!programme) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme created not found");
@@ -71,8 +71,8 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
-    await ProgrammeRepository.updateProgrammeById(programmeId, programmeName);
-    const programme: ProgrammeData | undefined = await ProgrammeRepository.getProgrammeById(programmeId);
+    await programmeRepository.updateProgrammeById(programmeId, programmeName);
+    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeById(programmeId);
 
     if (!programme) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme updated not found");
@@ -82,25 +82,25 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async deleteProgrammeById(programmeId: number): Promise<Result<null>> {
-    await ProgrammeRepository.deleteProgrammeById(programmeId);
+    await programmeRepository.deleteProgrammeById(programmeId);
 
     return Result.succeed(null, "Programme delete success");
   }
 
   async getAllProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeIntakeData[]>> {
-    const programmeIntakesData: ProgrammeIntakeData[] = await ProgrammeRepository.getAllProgrammeIntakes(query, pageSize, page);
+    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getAllProgrammeIntakes(query, pageSize, page);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
   }
 
   async getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>> {
-    const programmeIntakesData: ProgrammeIntakeData[] = await ProgrammeRepository.getProgrammeIntakesByProgrammeId(programmeId);
+    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByProgrammeId(programmeId);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
   }
 
   async getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>> {
-    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(programmeIntakeId);
 
     if (!programmeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
@@ -110,9 +110,9 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>> {
-    const response: ResultSetHeader = await ProgrammeRepository.createProgrammeIntake(programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
+    const response: ResultSetHeader = await programmeRepository.createProgrammeIntake(programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
 
-    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(response.insertId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(response.insertId);
 
     if (!programmeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake created not found");
@@ -122,9 +122,9 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>> {
-    await ProgrammeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
+    await programmeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
 
-    const programmeIntake: ProgrammeIntakeData | undefined = await ProgrammeRepository.getProgrammeIntakeById(programmeIntakeId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(programmeIntakeId);
 
     if (!programmeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake updated not found");
@@ -134,13 +134,13 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>> {
-    await ProgrammeRepository.deleteProgrammeIntakeById(programmeIntakeId);
+    await programmeRepository.deleteProgrammeIntakeById(programmeIntakeId);
 
     return Result.succeed(null, "Programme Intake delete success");
   }
 
   async getProgrammeCount(query: string = ""): Promise<Result<number>> {
-    const programmeCount: number = await ProgrammeRepository.getProgrammeCount(query);
+    const programmeCount: number = await programmeRepository.getProgrammeCount(query);
 
     return Result.succeed(programmeCount ? programmeCount : 0, "Programme count retrieve success");
   }

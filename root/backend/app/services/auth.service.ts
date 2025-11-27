@@ -3,8 +3,8 @@ import { Result } from "../../libs/Result";
 import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth-model";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import jwt from "jsonwebtoken";
-import AuthRepository from "../repositories/auth.repository";
-import UserRepository from "../repositories/user.repository";
+import authRepository from "../repositories/auth.repository";
+import userRepository from "../repositories/user.repository";
 import { UserData } from "../models/user-model";
 
 interface IAuthService {
@@ -17,7 +17,7 @@ interface IAuthService {
 
 class AuthService implements IAuthService {
   async loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>> {
-    const basicStudentLoginData: BasicStudentLoginData | undefined = await AuthRepository.getBasicStudentLoginData(studentId);
+    const basicStudentLoginData: BasicStudentLoginData | undefined = await authRepository.getBasicStudentLoginData(studentId);
 
     // Return fail if studentId invalid
     if (!basicStudentLoginData) {
@@ -46,7 +46,7 @@ class AuthService implements IAuthService {
   }
 
   async loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>> {
-    const basicAdminLoginData: BasicAdminLoginData | undefined = await AuthRepository.getBasicAdminLoginData(userId);
+    const basicAdminLoginData: BasicAdminLoginData | undefined = await authRepository.getBasicAdminLoginData(userId);
 
     // Return fail if studentId invalid
     if (!basicAdminLoginData) {
@@ -76,7 +76,7 @@ class AuthService implements IAuthService {
 
   /** Gets student personal information. */
   async getStudentMe(studentId: number): Promise<Result<UserData>> {
-    let studentData: UserData | undefined = await UserRepository.getStudentById(studentId);
+    let studentData: UserData | undefined = await userRepository.getStudentById(studentId);
     if (!studentData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get user");
     }
@@ -87,7 +87,7 @@ class AuthService implements IAuthService {
 
   /** Gets admin personal information. */
   async getAdminMe(adminId: number): Promise<Result<UserData>> {
-    let adminData: UserData | undefined = await UserRepository.getAdminById(adminId);
+    let adminData: UserData | undefined = await userRepository.getAdminById(adminId);
     if (!adminData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get user");
     }
@@ -97,8 +97,8 @@ class AuthService implements IAuthService {
 
   /** Did not separate this to two different methods for student and admin because it takes all userId. */
   async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
-    await AuthRepository.updateMe(userId, phoneNumber, email);
-    const user: UserData | undefined = await UserRepository.getUserById(userId);
+    await authRepository.updateMe(userId, phoneNumber, email);
+    const user: UserData | undefined = await userRepository.getUserById(userId);
 
     if (!user) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get updated user");

@@ -1,7 +1,7 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { VenueData } from "../models/venue-model";
-import VenueRepository from "../repositories/venue.repository";
+import venueRepository from "../repositories/venue.repository";
 
 interface IVenueService {
   getAllVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
@@ -14,13 +14,13 @@ interface IVenueService {
 
 class VenueService implements IVenueService {
   async getAllVenues(query: string = "", pageSize: number, page: number): Promise<Result<VenueData[]>> {
-    const venues: VenueData[] = await VenueRepository.getAllVenues(query, pageSize, page);
+    const venues: VenueData[] = await venueRepository.getAllVenues(query, pageSize, page);
 
     return Result.succeed(venues, "Venues retrieve success");
   }
 
   async getVenueById(venueId: number): Promise<Result<VenueData>> {
-    const venue: VenueData | undefined = await VenueRepository.getVenueById(venueId);
+    const venue: VenueData | undefined = await venueRepository.getVenueById(venueId);
 
     if (!venue) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
@@ -30,9 +30,9 @@ class VenueService implements IVenueService {
   }
 
   async createVenue(venue: string): Promise<Result<VenueData>> {
-    const response = await VenueRepository.createVenue(venue);
+    const response = await venueRepository.createVenue(venue);
 
-    const venueResponse: VenueData | undefined = await VenueRepository.getVenueById(response.insertId);
+    const venueResponse: VenueData | undefined = await venueRepository.getVenueById(response.insertId);
 
     if (!venueResponse) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue created not found");
@@ -42,9 +42,9 @@ class VenueService implements IVenueService {
   }
 
   async updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>> {
-    await VenueRepository.updateVenueById(venueId, venue);
+    await venueRepository.updateVenueById(venueId, venue);
 
-    const venueResponse: VenueData | undefined = await VenueRepository.getVenueById(venueId);
+    const venueResponse: VenueData | undefined = await venueRepository.getVenueById(venueId);
 
     if (!venueResponse) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue updated not found");
@@ -54,13 +54,13 @@ class VenueService implements IVenueService {
   }
 
   async deleteVenueById(venueId: number): Promise<Result<null>> {
-    await VenueRepository.deleteVenueById(venueId);
+    await venueRepository.deleteVenueById(venueId);
 
     return Result.succeed(null, "Venue delete success");
   }
 
   async getVenueCount(query: string = ""): Promise<Result<number>> {
-    const venueCount: number = await VenueRepository.getVenueCount(query);
+    const venueCount: number = await venueRepository.getVenueCount(query);
 
     return Result.succeed(venueCount ? venueCount : 0, "Venue count retrieve success");
   }
