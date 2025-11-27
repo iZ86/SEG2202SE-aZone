@@ -2,6 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { StudentCourseProgrammeIntakeData, StudentInformation, UserData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
+import { StudentSubjectData } from "../models/subject-model";
 
 interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -26,6 +27,7 @@ interface IUserRepostory {
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number) : Promise<StudentInformation|undefined>;
+  getStudentActiveSubjectsById(studentId: number): Promise<StudentSubjectData[]>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -482,6 +484,25 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
+  }
+  
+  getStudentActiveSubjectsById(studentId: number): Promise<StudentSubjectData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentSubjectData[]>(
+        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours " +
+        "FROM STUDENT_ENROLLMENT_SUBJECT ses " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON ses.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
+        "WHERE ses.subjectStatusId = 1 " +
+        "AND ses.studentId = ? " +
+        "ORDER BY s.subjectId;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      )
+    })
   }
 }
 

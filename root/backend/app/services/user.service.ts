@@ -4,6 +4,7 @@ import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
+import { StudentSubjectData } from "../models/subject-model";
 
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
@@ -24,6 +25,7 @@ interface IUserService {
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
+  getStudentActiveSubjectsById(studentId: number): Promise<Result<StudentSubjectData[]>>;
 }
 
 class UserService implements IUserService {
@@ -238,6 +240,12 @@ class UserService implements IUserService {
 
     return Result.succeed(studentInformation, "Student information retrieve success");
   }
+
+  async getStudentActiveSubjectsById(studentId: number): Promise<Result<StudentSubjectData[]>> {
+    const studentActiveSubjects : StudentSubjectData[] = await userRepository.getStudentActiveSubjectsById(studentId);
+    return Result.succeed(studentActiveSubjects, "Student active subjects retrieve success");
+  }
+  
 }
 
 export default new UserService();

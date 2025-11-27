@@ -8,6 +8,7 @@ import programmeService from "../services/programme.service";
 import { CourseData } from "../models/course-model";
 import { ProgrammeIntakeData } from "../models/programme-model";
 import { ResultSetHeader } from "mysql2";
+import { StudentSubjectData } from "../models/subject-model";
 
 export default class UserController {
   async getAllAdmins(req: Request, res: Response) {
@@ -372,5 +373,16 @@ export default class UserController {
     }
   }
 
+  async getStudentActiveSubjectsById(req: Request, res: Response) {
+    const userId: number = req.user.userId
+
+    const response: Result<StudentSubjectData[]> = await userService.getStudentActiveSubjectsById(userId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      throw new Error("user.controller.ts, getStudentActiveSubjectsById failed.");
+    }
+  }
  
 }
