@@ -33,6 +33,7 @@ import {
 } from "../api/programmes";
 import { getCoursesByProgrammeIdAPI } from "../api/courses";
 import { toast } from "react-toastify";
+import { useAdmin } from "../hooks/useAdmin";
 
 export default function UserForm({
   type,
@@ -102,11 +103,11 @@ export default function UserForm({
 
   const [isPasswordMatched, setIsPasswordMatched] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const skipReset = useRef(false);
   const [searchParams] = useSearchParams();
   const isAdmin: boolean = searchParams.get("admin") === "true";
+  const { authToken, admin, loading } = useAdmin();
 
   async function handleSubmitUser(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -586,25 +587,26 @@ export default function UserForm({
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
+    if (!authToken) return;
 
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-
-    setAuthToken(token);
-    getAllProgrammes(token);
+    getAllProgrammes(authToken);
 
     if (type === "Edit" && id > 0) {
       if (isAdmin) {
-        setupEditAdminForm(token, id);
+        setupEditAdminForm(authToken, id);
       } else {
-        setupEditStudentForm(token, id);
+        setupEditStudentForm(authToken, id);
       }
     }
-  }, [navigate, type, id, setupEditStudentForm, setupEditAdminForm, isAdmin]);
+  }, [
+    navigate,
+    type,
+    id,
+    setupEditStudentForm,
+    setupEditAdminForm,
+    isAdmin,
+    authToken,
+  ]);
 
   useEffect(() => {
     if (programme.value <= 0 || !authToken) {
@@ -628,6 +630,10 @@ export default function UserForm({
       });
     }
   }, [authToken, programme]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <section className="flex-1 bg-white rounded-lg border">
