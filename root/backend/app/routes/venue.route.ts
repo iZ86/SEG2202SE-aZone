@@ -4,7 +4,7 @@ import VenueController from "../controllers/venue.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
 import { createAndUpdateVenueValidator } from "../validators/venue-validator";
 
-class CourseRoute {
+class VenueRoute {
   router = Router();
   controller = new VenueController();
 
@@ -21,4 +21,4 @@ class CourseRoute {
   }
 }
 
-export default new CourseRoute().router;
+export default new VenueRoute().router;
