@@ -364,7 +364,7 @@ export default class UserController {
     const response: Result<StudentInformation> = await userService.getStudentInformationById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData())
+      return res.sendSuccess.ok(response.getData(), response.getMessage())
     } else {
       switch(response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
