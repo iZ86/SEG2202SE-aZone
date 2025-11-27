@@ -9,6 +9,7 @@ import {
   getProgrammeByIdAPI,
   updateProgrammeByIdAPI,
 } from "../api/programmes";
+import { useAdmin } from "../hooks/useAdmin";
 import { toast } from "react-toastify";
 
 export default function ProgrammeForm({
@@ -24,8 +25,8 @@ export default function ProgrammeForm({
   const [invalidProgrammeName, setInvalidProgrammeName] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -113,20 +114,18 @@ export default function ProgrammeForm({
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
+    if (!authToken) {
       return;
     }
 
-    setAuthToken(token);
-
     if (type === "Edit" && id > 0) {
-      setupEditProgrammeForm(token, id);
+      setupEditProgrammeForm(authToken, id);
     }
-  }, [navigate, type, id, setupEditProgrammeForm]);
+  }, [type, id, setupEditProgrammeForm, authToken]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <section className="flex-1 bg-white rounded-lg border">

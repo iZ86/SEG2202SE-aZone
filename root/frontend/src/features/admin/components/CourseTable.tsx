@@ -5,16 +5,18 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import { deleteCourseByIdAPI, getAllCoursesAPI } from "../api/courses";
 import type { CourseProgramme } from "@datatypes/courseType";
+import { useAdmin } from "../hooks/useAdmin";
+import LoadingOverlay from "@components/LoadingOverlay";
 import { toast } from "react-toastify";
 
 export default function CourseTable() {
   const [courses, setCourses] = useState<CourseProgramme[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   const fetchCourses = useCallback(
     async (token: string, page: number = 1) => {
@@ -44,20 +46,13 @@ export default function CourseTable() {
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-    setAuthToken(token);
-  }, [navigate]);
-
-  useEffect(() => {
     if (!authToken) return;
     fetchCourses(authToken, currentPage);
   }, [authToken, currentPage, fetchCourses]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   const handlePageChange = (page: number, pageSize: number) => {
     setCurrentPage(page);

@@ -9,6 +9,7 @@ import {
   getVenueByIdAPI,
   updateVenueByIdAPI,
 } from "../api/venues";
+import { useAdmin } from "../hooks/useAdmin";
 import { toast } from "react-toastify";
 
 export default function VenueForm({
@@ -25,8 +26,8 @@ export default function VenueForm({
   const [invalidVenue, setInvalidVenue] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -107,20 +108,17 @@ export default function VenueForm({
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
+    if (!authToken) {
       return;
     }
-
-    setAuthToken(token);
-
     if (type === "Edit" && id > 0) {
-      setupEditVenueForm(token, id);
+      setupEditVenueForm(authToken, id);
     }
-  }, [navigate, type, id, setupEditVenueForm]);
+  }, [authToken, type, id, setupEditVenueForm]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <section className="flex-1 bg-white rounded-lg border">

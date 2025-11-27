@@ -598,15 +598,7 @@ export default function UserForm({
         setupEditStudentForm(authToken, id);
       }
     }
-  }, [
-    navigate,
-    type,
-    id,
-    setupEditStudentForm,
-    setupEditAdminForm,
-    isAdmin,
-    authToken,
-  ]);
+  }, [type, id, setupEditStudentForm, setupEditAdminForm, isAdmin, authToken]);
 
   useEffect(() => {
     if (programme.value <= 0 || !authToken) {

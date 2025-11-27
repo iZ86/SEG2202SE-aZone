@@ -9,6 +9,7 @@ import {
   updateIntakeByIdAPI,
 } from "../api/intakes";
 import YearMonthPicker from "@components/YearMonthPicker";
+import { useAdmin } from "../hooks/useAdmin";
 import { toast } from "react-toastify";
 
 export default function IntakeForm({
@@ -24,8 +25,8 @@ export default function IntakeForm({
   const [invalidIntakeId, setInvalidIntakeId] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -112,19 +113,18 @@ export default function IntakeForm({
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
+    if (!authToken) {
       return;
     }
 
-    setAuthToken(token);
     if (type === "Edit" && id > 0) {
-      setupEditIntakeForm(token, id);
+      setupEditIntakeForm(authToken, id);
     }
-  }, [navigate, type, id, setupEditIntakeForm]);
+  }, [authToken, type, id, setupEditIntakeForm]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <section className="flex-1 bg-white rounded-lg border">

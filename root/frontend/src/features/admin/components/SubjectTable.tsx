@@ -5,16 +5,18 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { Subject } from "@datatypes/subjectType";
 import { deleteSubjectByIdAPI, getAllSubjectsAPI } from "../api/subjects";
+import { useAdmin } from "../hooks/useAdmin";
+import LoadingOverlay from "@components/LoadingOverlay";
 import { toast } from "react-toastify";
 
 export default function SubjectTable() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   const fetchSubjects = useCallback(
     async (token: string, page: number = 1) => {
@@ -44,20 +46,13 @@ export default function SubjectTable() {
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-    setAuthToken(token);
-  }, [navigate]);
-
-  useEffect(() => {
     if (!authToken) return;
     fetchSubjects(authToken, currentPage);
   }, [authToken, currentPage, fetchSubjects]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   const handlePageChange = (page: number, pageSize: number) => {
     setCurrentPage(page);
