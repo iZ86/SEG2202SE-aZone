@@ -76,6 +76,12 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
+    const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
+
+    if (!programme.isSuccess()) {
+      return res.sendError.notFound("Invalid programmeId");
+    }
+
     const isProgrammeNameBelongsToProgrammeId: Result<ProgrammeData> = await ProgrammeService.getProgrammeByIdAndName(programmeId, programmeName);
 
     if (!isProgrammeNameBelongsToProgrammeId.isSuccess()) {
@@ -84,12 +90,6 @@ export default class ProgrammeController {
       if (isProgrammeNameDuplicated.isSuccess()) {
         return res.sendError.conflict("Programme name duplciated");
       }
-    }
-
-    const programme: Result<ProgrammeData> = await ProgrammeService.getProgrammeById(programmeId);
-
-    if (!programme.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeId");
     }
 
     const response = await ProgrammeService.updateProgrammeById(programmeId, programmeName);
