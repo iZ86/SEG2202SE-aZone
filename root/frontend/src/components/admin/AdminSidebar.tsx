@@ -80,6 +80,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               key: "enrollments",
             },
             {
+              to: "/admin/lecturers",
+              label: "Lecturers",
+              key: "lecturers",
+            },
+            {
               to: "/admin/venues",
               label: "Venues",
               key: "venues",

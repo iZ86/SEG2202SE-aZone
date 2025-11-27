@@ -30,6 +30,9 @@ import StudentProgrammeHistory from "@routes/student/StudentProgrammeHistory";
 import AdminEnrollment from "@routes/admin/AdminEnrollment";
 import AdminCreateEnrollment from "@routes/admin/AdminCreateEnrollment";
 import AdminEditEnrollment from "@routes/admin/AdminEditEnrollment";
+import AdminLecturer from "@routes/admin/AdminLecturer";
+import AdminCreateLecturer from "@routes/admin/AdminCreateLecturer";
+import AdminEditLecturer from "@routes/admin/AdminEditLecturer";
 
 const StudentLayout = () => (
   <StudentProvider>
@@ -158,6 +161,18 @@ const routes = [
       {
         path: "/admin/venues/:id/edit",
         element: <AdminEditVenue />,
+      },
+      {
+        path: "/admin/lecturers",
+        element: <AdminLecturer />,
+      },
+      {
+        path: "/admin/lecturers/create",
+        element: <AdminCreateLecturer />,
+      },
+      {
+        path: "/admin/lecturers/:id/edit",
+        element: <AdminEditLecturer />,
       },
       {
         path: "/admin/enrollments",
