@@ -32,6 +32,7 @@ import {
   getProgrammeIntakesByProgrammeIdAPI,
 } from "../api/programmes";
 import { getCoursesByProgrammeIdAPI } from "../api/courses";
+import { toast } from "react-toastify";
 
 export default function UserForm({
   type,
@@ -174,15 +175,26 @@ export default function UserForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidEmail(true);
+      toast.error("Email already exist!");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/users");
+      toast.success(
+        `${type === "Add" ? "Created new" : "Updated"} ${
+          isAdmin ? "Admin" : "Student"
+        }`
+      );
       return;
     } else {
       navigate("/admin/users");
+      toast.error(
+        `Failed to ${type === "Add" ? "Create new" : "Update"} ${
+          isAdmin ? "Admin" : "Student"
+        }`
+      );
     }
   }
 
@@ -218,9 +230,10 @@ export default function UserForm({
         programmeIntake.value
       );
 
-    if (response?.status === 400) {
+    if (response && response.status === 409) {
       setIsStudentCourseProgrammeIntakeExist(true);
       setIsLoading(false);
+      toast.error("Course existed");
       return;
     } else {
       setIsStudentCourseProgrammeIntakeExist(false);
@@ -228,12 +241,12 @@ export default function UserForm({
 
     if (!response || !response.ok) {
       setIsLoading(false);
-
       return;
     }
 
     setIsLoading(false);
     navigate("/admin/users");
+    toast.success("Updated student's course");
     return;
   }
 
@@ -257,6 +270,7 @@ export default function UserForm({
 
     if (response && response.ok) {
       navigate("/admin/users");
+      toast.success("Deleted course history");
     }
   };
 
@@ -668,7 +682,11 @@ export default function UserForm({
 
             <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10  gap-y-8 sm:gap-y-0">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyEmail} isInvalid={invalidEmail} invalidMessage="Email already exists.">
+                <AdminInputFieldWrapper
+                  isEmpty={emptyEmail}
+                  isInvalid={invalidEmail}
+                  invalidMessage="Email already exists."
+                >
                   <NormalTextField
                     text={email}
                     onChange={onChangeEmail}
@@ -766,9 +784,9 @@ export default function UserForm({
                 <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
                     <AdminInputFieldWrapper
-                      isEmpty={
-                        emptyProgramme || isStudentCourseProgrammeIntakeExist
-                      }
+                      isEmpty={emptyProgramme}
+                      isInvalid={isStudentCourseProgrammeIntakeExist}
+                      invalidMessage="Please Select a Different Programme"
                     >
                       <SingleFilter
                         placeholder="Select Student Programme"
@@ -783,9 +801,9 @@ export default function UserForm({
                   </div>
                   <div className="flex-1">
                     <AdminInputFieldWrapper
-                      isEmpty={
-                        emptyCourse || isStudentCourseProgrammeIntakeExist
-                      }
+                      isEmpty={emptyCourse}
+                      isInvalid={isStudentCourseProgrammeIntakeExist}
+                      invalidMessage="Please Select a Different Course"
                     >
                       <SingleFilter
                         placeholder="Select Student Course"
@@ -803,10 +821,9 @@ export default function UserForm({
                 <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
                     <AdminInputFieldWrapper
-                      isEmpty={
-                        emptyProgrammeIntake ||
-                        isStudentCourseProgrammeIntakeExist
-                      }
+                      isEmpty={emptyProgrammeIntake}
+                      isInvalid={isStudentCourseProgrammeIntakeExist}
+                      invalidMessage="Please Select a Different Intake"
                     >
                       <SingleFilter
                         placeholder="Select Student Intake"
