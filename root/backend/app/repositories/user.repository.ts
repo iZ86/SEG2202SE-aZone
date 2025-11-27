@@ -2,7 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { StudentCourseProgrammeIntakeData, StudentInformation, UserData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
-import { StudentSubjectData } from "../models/subject-model";
+import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
 interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -28,6 +28,7 @@ interface IUserRepostory {
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number) : Promise<StudentInformation|undefined>;
   getStudentActiveSubjectsById(studentId: number): Promise<StudentSubjectData[]>;
+  getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -500,6 +501,31 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      )
+    })
+  }
+
+  getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentClassData[]>(
+        "SELECT es.enrollmentSubjectId, es.startTime, es.endTime, s.subjectId, s.subjectCode, " +
+        "s.subjectName, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, lt.lecturerTitle, " + 
+        "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, es.grouping, d.dayId, d.day " +
+        "FROM STUDENT_ENROLLMENT_SUBJECT ses " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON ses.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON es.venueId = v.venueId " +
+        "INNER JOIN DAY d ON es.dayId = d.dayId " +
+        "WHERE ses.subjectStatusId = 1 " +
+        "AND studentId = ?;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res)
         }
       )
     })

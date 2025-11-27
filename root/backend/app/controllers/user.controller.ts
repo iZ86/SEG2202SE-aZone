@@ -8,7 +8,7 @@ import programmeService from "../services/programme.service";
 import { CourseData } from "../models/course-model";
 import { ProgrammeIntakeData } from "../models/programme-model";
 import { ResultSetHeader } from "mysql2";
-import { StudentSubjectData } from "../models/subject-model";
+import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
 export default class UserController {
   async getAllAdmins(req: Request, res: Response) {
@@ -381,8 +381,19 @@ export default class UserController {
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
-      throw new Error("user.controller.ts, getStudentActiveSubjectsById failed.");
+      throw new Error("user.controller.ts, getStudentActiveSubjectsById failed");
     }
   }
  
+  async getStudentTimetableById(req: Request, res: Response) {
+    const userId: number = req.user.userId
+    
+    const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(userId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      throw new Error("user.controller.ts, getStudentTimetableById failed");
+    }
+  }
 }
