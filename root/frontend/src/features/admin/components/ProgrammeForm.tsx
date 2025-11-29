@@ -68,9 +68,7 @@ export default function ProgrammeForm({
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/programmes");
-      toast.success(
-        `${type === "Add" ? "Created new" : "Updated"} programme`
-      );
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} programme`);
       return;
     }
   }
@@ -147,7 +145,7 @@ export default function ProgrammeForm({
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col sm:flex-row w-xs sm:w-xl md:w-2xl gap-x-10 gap-y-8 sm:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper
                   isEmpty={emptyProgrammeName}
@@ -164,15 +162,7 @@ export default function ProgrammeForm({
               </div>
             </div>
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/programmes"
-              />
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Programme"
@@ -181,6 +171,14 @@ export default function ProgrammeForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/programmes"
               />
             </div>
           </form>

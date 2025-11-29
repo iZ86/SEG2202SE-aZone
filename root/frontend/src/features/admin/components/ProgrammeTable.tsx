@@ -80,23 +80,25 @@ export default function ProgrammeTable() {
 
   return (
     <>
-      <div className="flex items-center space-x-4 mt-4">
+      <div className="items-center space-x-4 mt-4 sm:flex">
         <input
           type="text"
           placeholder="Search with Programme ID, or Programme Name..."
-          className="grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
+          className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <SmallButton
-          buttonText="Create New Programme"
-          backgroundColor="bg-blue-500"
-          hoverBgColor="hover:bg-blue-600"
-          link="/admin/programmes/create"
-          textColor="text-white"
-          submit={false}
-        />
+        <div className="mt-4 sm:mt-0">
+          <SmallButton
+            buttonText="Create New Programme"
+            backgroundColor="bg-blue-500"
+            hoverBgColor="hover:bg-blue-600"
+            link="/admin/programmes/create"
+            textColor="text-white"
+            submit={false}
+          />
+        </div>
       </div>
 
       <section className="mt-4">

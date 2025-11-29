@@ -80,23 +80,24 @@ export default function LecturerTable() {
 
   return (
     <>
-      <div className="flex items-center space-x-4 mt-4">
+      <div className="items-center space-x-4 mt-4 sm:flex">
         <input
           type="text"
           placeholder="Search with Lecturer ID, Lecturer Name, or Lecturer Title..."
-          className="grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
+          className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
-        <SmallButton
-          buttonText="Create New Lecturer"
-          backgroundColor="bg-blue-500"
-          hoverBgColor="hover:bg-blue-600"
-          link="/admin/lecturers/create"
-          textColor="text-white"
-          submit={false}
-        />
+        <div className="mt-4 sm:mt-0">
+          <SmallButton
+            buttonText="Create New Lecturer"
+            backgroundColor="bg-blue-500"
+            hoverBgColor="hover:bg-blue-600"
+            link="/admin/lecturers/create"
+            textColor="text-white"
+            submit={false}
+          />
+        </div>
       </div>
 
       <section className="mt-4">

@@ -654,7 +654,7 @@ export default function UserForm({
             onSubmit={handleSubmitUser}
             className="mt-6 gap-y-8 flex flex-col justify-center items-center"
           >
-            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper isEmpty={emptyFirstName}>
                   <NormalTextField
@@ -678,7 +678,7 @@ export default function UserForm({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10  gap-y-8 sm:gap-y-0">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper
                   isEmpty={emptyEmail}
@@ -706,7 +706,7 @@ export default function UserForm({
             </div>
 
             {type === "Add" && (
-              <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+              <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                 <div className="flex-1">
                   <AdminInputFieldWrapper isEmpty={emptyPassword}>
                     <PasswordTextField
@@ -735,7 +735,7 @@ export default function UserForm({
 
             {!isAdmin && (
               <>
-                <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+                <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                   <div className="flex-1">
                     <SingleFilter
                       placeholder="Select Student Status"
@@ -749,7 +749,7 @@ export default function UserForm({
               </>
             )}
 
-            <div className="justify-center flex mt-10 gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Student"

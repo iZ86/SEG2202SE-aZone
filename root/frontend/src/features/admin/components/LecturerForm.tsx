@@ -264,7 +264,7 @@ export default function LecturerForm({
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper isEmpty={emptyFirstName}>
                   <NormalTextField
@@ -288,7 +288,7 @@ export default function LecturerForm({
               </div>
             </div>
 
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper
                   isEmpty={emptyEmail}
@@ -317,7 +317,7 @@ export default function LecturerForm({
               </div>
             </div>
 
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper isEmpty={emptyPhoneNumber}>
                   <NormalTextField
@@ -329,15 +329,8 @@ export default function LecturerForm({
                 </AdminInputFieldWrapper>
               </div>
             </div>
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/lecturers"
-              />
+
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Lecturer"
@@ -346,6 +339,14 @@ export default function LecturerForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/lecturers"
               />
             </div>
           </form>
