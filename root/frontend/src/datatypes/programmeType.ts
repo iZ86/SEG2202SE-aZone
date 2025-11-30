@@ -8,6 +8,8 @@ export type ProgrammeIntake = {
   programmeId: number;
   programmeName: string;
   intakeId: number;
+  studyModeId: number;
+  studyMode: string;
   semester: number,
   semesterStartDate: Date;
   semesterEndDate: Date;
