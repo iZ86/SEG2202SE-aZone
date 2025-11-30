@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 
 export default class EnrollmentController {
@@ -34,9 +34,13 @@ export default class EnrollmentController {
     }
 
     const response: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
+    const enrollmentProgrammeIntakesResponse: Result<EnrollmentProgrammeIntakeData[]> = await enrollmentService.getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        enrollments: response.getData(),
+        programmeIntakes: enrollmentProgrammeIntakesResponse.getData(),
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
