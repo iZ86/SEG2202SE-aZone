@@ -113,12 +113,18 @@ export default function EnrollmentForm({
   function onChangeEnrollmentStartDateTime(
     value: CalendarDateTime | ZonedDateTime | null
   ) {
+    if (value !== null) {
+      setEmptyEnrollmentStartDateTime(false);
+    }
     setEnrollmentStartDateTime(value);
   }
 
   function onChangeEnrollmentEndDateTime(
     value: CalendarDateTime | ZonedDateTime | null
   ) {
+    if (value !== null) {
+      setEmptyEnrollmentEndDateTime(false);
+    }
     setEnrollmentEndDateTime(value);
   }
 
