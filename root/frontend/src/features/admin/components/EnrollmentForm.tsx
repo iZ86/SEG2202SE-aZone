@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
@@ -128,8 +128,11 @@ export default function EnrollmentForm({
     setEnrollmentEndDateTime(value);
   }
 
-  const setupEditEnrollmentForm = useCallback(
-    async (token: string, enrollmentId: number) => {
+  useEffect(() => {
+    const setupEditEnrollmentForm = async (
+      token: string,
+      enrollmentId: number
+    ) => {
       const response: Response | undefined = await getEnrollmentByIdAPI(
         token,
         enrollmentId
@@ -154,17 +157,13 @@ export default function EnrollmentForm({
           ? parseAbsoluteToLocal(data.enrollmentEndDateTime)
           : null
       );
-    },
-    [navigate]
-  );
 
-  useEffect(() => {
     if (!authToken) return;
 
     if (type === "Edit" && id > 0) {
       setupEditEnrollmentForm(authToken, id);
     }
-  }, [type, id, setupEditEnrollmentForm, authToken]);
+  }, [type, id, navigate, authToken]);
 
   if (loading || !admin) {
     return <LoadingOverlay />;
