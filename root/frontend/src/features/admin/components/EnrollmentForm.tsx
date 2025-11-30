@@ -17,6 +17,11 @@ import {
 import CustomDatePicker from "@components/DatePicker";
 import { useAdmin } from "../hooks/useAdmin";
 import { toast } from "react-toastify";
+import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
+import { getAllProgrammeIntakesAPI } from "../api/programmes";
+import type { ProgrammeIntake } from "@datatypes/programmeType";
+import { MultiFilter } from "@components/MultiFilter";
+import type { MultiValue } from "react-select";
 
 export default function EnrollmentForm({
   type,
@@ -31,10 +36,19 @@ export default function EnrollmentForm({
   const [enrollmentEndDateTime, setEnrollmentEndDateTime] = useState<
     CalendarDateTime | ZonedDateTime | null
   >(null);
+  const [programmeIntakes, setProgrammeIntakes] = useState<
+    reactSelectOptionType[]
+  >([]);
+
   const [emptyEnrollmentStartDateTime, setEmptyEnrollmentStartDateTime] =
     useState(false);
   const [emptyEnrollmentEndDateTime, setEmptyEnrollmentEndDateTime] =
     useState(false);
+  const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
+
+  const [programmeIntakeOptions, setProgrammeIntakeOptions] = useState<
+    reactSelectOptionType[]
+  >([]);
 
   const [invalidEnrollmentDateTimes, setInvalidEnrollmentDateTimes] =
     useState(false);
@@ -49,7 +63,11 @@ export default function EnrollmentForm({
       return;
     }
 
-    if (emptyEnrollmentEndDateTime || emptyEnrollmentStartDateTime) {
+    if (
+      emptyEnrollmentEndDateTime ||
+      emptyEnrollmentStartDateTime ||
+      emptyProgrammeIntake
+    ) {
       setIsLoading(false);
       return;
     }
@@ -66,14 +84,16 @@ export default function EnrollmentForm({
       response = await createEnrollmentAPI(
         authToken as string,
         enrollmentStartDateTime as CalendarDateTime,
-        enrollmentEndDateTime as CalendarDateTime
+        enrollmentEndDateTime as CalendarDateTime,
+        programmeIntakes.map((pi) => pi.value)
       );
     } else if (type === "Edit") {
       response = await updateEnrollmentByIdAPI(
         authToken as string,
         id,
         enrollmentStartDateTime as CalendarDateTime,
-        enrollmentEndDateTime as CalendarDateTime
+        enrollmentEndDateTime as CalendarDateTime,
+        programmeIntakes.map((pi) => pi.value)
       );
     }
 
@@ -107,6 +127,11 @@ export default function EnrollmentForm({
       emptyInput = true;
     }
 
+    if (!programmeIntakes.values || programmeIntakes.length === 0) {
+      setEmptyProgrammeIntake(true);
+      emptyInput = true;
+    }
+
     return emptyInput;
   }
 
@@ -128,6 +153,53 @@ export default function EnrollmentForm({
     setEnrollmentEndDateTime(value);
   }
 
+  function onChangeProgrammeIntake(
+    onChangeProgrammeIntake: MultiValue<reactSelectOptionType>
+  ) {
+    const onChangeProgrammeIntakeValues: reactSelectOptionType[] = [];
+    if (onChangeProgrammeIntake.length !== 0) {
+      setEmptyProgrammeIntake(false);
+    }
+
+    for (let i = 0; i < onChangeProgrammeIntake.length; i++) {
+      onChangeProgrammeIntakeValues.push(onChangeProgrammeIntake[i]);
+    }
+    setProgrammeIntakes(onChangeProgrammeIntakeValues);
+  }
+
+  async function getAllProgrammeIntakes(token: string) {
+    const response: Response | undefined = await getAllProgrammeIntakesAPI(
+      token
+    );
+
+    if (!response?.ok) {
+      setProgrammeIntakeOptions([]);
+      return;
+    }
+
+    const { data } = await response.json();
+
+    if (!data || data.length === 0) {
+      setProgrammeIntakeOptions([]);
+      return;
+    }
+
+    const options = data.map((programmeIntake: ProgrammeIntake) => ({
+      value: programmeIntake.programmeIntakeId,
+      label:
+        programmeIntake.programmeName +
+        " Programme - " +
+        programmeIntake.intakeId +
+        " - Semester " +
+        programmeIntake.semester +
+        " (" +
+        programmeIntake.studyMode +
+        ")",
+    }));
+
+    setProgrammeIntakeOptions(options);
+  }
+
   useEffect(() => {
     const setupEditEnrollmentForm = async (
       token: string,
@@ -147,19 +219,36 @@ export default function EnrollmentForm({
       const { data } = await response.json();
 
       setEnrollmentStartDateTime(
-        data.enrollmentStartDateTime
-          ? parseAbsoluteToLocal(data.enrollmentStartDateTime)
+        data.enrollments.enrollmentStartDateTime
+          ? parseAbsoluteToLocal(data.enrollments.enrollmentStartDateTime)
           : null
       );
 
       setEnrollmentEndDateTime(
-        data.enrollmentEndDateTime
-          ? parseAbsoluteToLocal(data.enrollmentEndDateTime)
+        data.enrollments.enrollmentEndDateTime
+          ? parseAbsoluteToLocal(data.enrollments.enrollmentEndDateTime)
           : null
       );
 
+      setProgrammeIntakes(
+        data.programmeIntakes.map((programmeIntake: ProgrammeIntake) => ({
+          value: programmeIntake.programmeIntakeId,
+          label:
+            programmeIntake.programmeName +
+            " Programme - " +
+            programmeIntake.intakeId +
+            " - Semester " +
+            programmeIntake.semester +
+            " (" +
+            programmeIntake.studyMode +
+            ")",
+        }))
+      );
+    };
+
     if (!authToken) return;
 
+    getAllProgrammeIntakes(authToken);
     if (type === "Edit" && id > 0) {
       setupEditEnrollmentForm(authToken, id);
     }
@@ -219,6 +308,20 @@ export default function EnrollmentForm({
                       emptyEnrollmentEndDateTime || invalidEnrollmentDateTimes
                     }
                     placeholder="Select Enrollment End Date & Time"
+                  />
+                </AdminInputFieldWrapper>
+              </div>
+            </div>
+
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
+              <div className="flex-1">
+                <AdminInputFieldWrapper isEmpty={emptyProgrammeIntake}>
+                  <MultiFilter
+                    placeholder="Select Enrollment Programmes"
+                    options={programmeIntakeOptions}
+                    value={programmeIntakes}
+                    isInvalid={emptyProgrammeIntake}
+                    onChange={onChangeProgrammeIntake}
                   />
                 </AdminInputFieldWrapper>
               </div>
