@@ -130,11 +130,7 @@ export default class ProgrammeController {
   }
 
   async getAllProgrammeIntakes(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
-    const query: string = req.query.query as string || "";
-
-    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammeIntakes(query, pageSize, page);
+    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammeIntakes();
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
