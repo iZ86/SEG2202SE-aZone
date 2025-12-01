@@ -6,14 +6,29 @@ import { Link } from "react-router-dom";
 export default function SubjectInformationPanel() {
   /** TODO: Fill in this with the appropriate components. */
   const subjects = [
-    { code: "ABC666", name: "Software Engineering", creditHours: 4 , color: "border-pink-500"},
-    { code: "AYO123", name: "Database Fundamental II", creditHours: 4 , color: "border-pink-500"},
-    { code: "GG717", name: "Java Programming", creditHours: 4 , color: "border-orange-500"}
+    {
+      code: "ABC666",
+      name: "Software Engineering",
+      creditHours: 4,
+      color: "border-pink-500",
+    },
+    {
+      code: "AYO123",
+      name: "Database Fundamental II",
+      creditHours: 4,
+      color: "border-pink-500",
+    },
+    {
+      code: "GG717",
+      name: "Java Programming",
+      creditHours: 4,
+      color: "border-orange-500",
+    },
   ];
 
   return (
-    <div className="shadow-lg p-6 rounded-lg bg-white">
-      <div className="flex justify-between items-center w-full">
+    <div className="shadow-lg p-6 rounded-lg bg-white w-full">
+      <div className="flex justify-between items-center">
         <h2 className="text-black font-bold">My Subjects</h2>
         <Link to="/enrollment" className="text-[#666666]">
           more &gt;

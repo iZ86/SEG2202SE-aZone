@@ -17,8 +17,16 @@ export default function InformationPanel() {
   }
 
   return (
-    <div className="flex text-black p-6 bg-white shadow-lg rounded-lg gap-4">
-      <div>
+    <div className="flex flex-col sm:flex-row text-black p-6 bg-white shadow-lg rounded-lg gap-4 w-full">
+      <div className="sm:order-2 sm:m-auto justify-center items-center flex">
+        <img
+          src={student.profilePictureUrl}
+          alt="profile"
+          className="w-40 h-50 object-cover rounded-xl mt-3 border-2 border-indigo-400 shadow-md"
+        />
+      </div>
+
+      <div className="order-1 sm:order-1">
         <h2 className="font-semibold pb-5">
           {student.lastName + " " + student.firstName} ({student.userId})
         </h2>
@@ -33,14 +41,6 @@ export default function InformationPanel() {
             </div>
           ))}
         </div>
-      </div>
-
-      <div>
-        <img
-          src={student.profilePictureUrl}
-          alt="profile"
-          className="w-40 h-50 object-cover rounded-md mt-3"
-        />
       </div>
     </div>
   );

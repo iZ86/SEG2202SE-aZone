@@ -4,15 +4,14 @@ import StudentNavbar from "@components/student/StudentNavbar";
 import SmallButton from "@components/SmallButton";
 import InformationPanel from "@features/student/components/InformationPanel";
 
-
 function TimetablePanel() {
-  
   return (
     <div className="bg-white shadow-lg rounded-md p-7">
       <div className="text-black flex flex-col sm:flex-row justify-between mb-8">
-        <h2 className="text-black font-bold">
-          My Weekly Timetable (13 October 2025 - 17 October 2025)
-        </h2>
+        <div className="text-black font-bold flex flex-col sm:flex-row gap-2">
+          <h2>My Weekly Timetable</h2>
+          <h2>(13 October 2025 - 17 October 2025)</h2>
+        </div>
         <div className="flex mt-4 sm:mt-0">
           <button className="bg-[#E5E5E5] px-6 rounded-l-2xl hover:bg-gray-100 cursor-pointer">
             Previous
@@ -25,8 +24,7 @@ function TimetablePanel() {
           </button>
         </div>
       </div>
-
-      <Timetable headerBgColor="bg-white-antiflash"/>
+      <Timetable headerBgColor="bg-white-antiflash" />
     </div>
   );
 }
