@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogTrigger, Modal, ModalOverlay, Button } from "react-aria-components";
 import MediumButton from "@components/MediumButton";
 import Timetable from "@features/timetable/components/Timetable";
-
+import { useStudent } from "@features/student/hooks/useStudent";
 
 const LECTURES = [
   ["Group 1", "Monday 10:00 AM - 12.00 PM"]
@@ -128,6 +128,7 @@ function EnrollmentSelection({
 
 
 export default function StudentEnrollment() {
+  const { authToken } = useStudent();
   const [selected, setSelected] = useState(0);
 
   // for display only
@@ -309,7 +310,7 @@ export default function StudentEnrollment() {
                     <div className="flex flex-col gap-y-16">
                       <div className="flex flex-col gap-y-8">
                         <h1>Preview Timetable</h1>
-                        <Timetable />
+                        <Timetable token={authToken} />
                       </div>
                       <div className="flex flex-col gap-y-8">
                         <h1>Selected Subjects</h1>
