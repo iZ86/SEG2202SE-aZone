@@ -38,13 +38,6 @@ export default function InformationPanel({ token, student }: { token: string, st
 
     setData(responseData.data);
   }
-  const studentInfo = [
-    { label: "Programme", value: "Bachelor of Software Engineering" },
-    { label: "Intake", value: "202509" },
-    { label: "Study Mode", value: "Full Time" },
-    { label: "Current Semester", value: "4" },
-    { label: "Semester Period", value: "22 Sep 2025 - 16 Jan 2026" },
-  ];
 
   function formatDateToDDMMYYYY(date: Date): string {
     const day = date.getDate();
@@ -70,30 +63,15 @@ export default function InformationPanel({ token, student }: { token: string, st
         <h2 className="font-semibold pb-5">
           {student.lastName + " " + student.firstName} ({student.userId})
         </h2>
-
-        {/* <div className="space-y-3">
-          {data.map((info) => (
-            <div key={info.label} className="grid grid-cols-3 gap-15">
-              <span className="text-gray-600">{info.label}</span>
-              <span className="font-medium col-span-2 justify-items-end">
-                {info.value}
-              </span>
-            </div>
-          ))}
-        </div> */}
         <div className="flex flex-col font-bold text-gray-charcoal">
           <LabelAndValue label={"Programme:"} value={data.courseName} />
           <LabelAndValue label={"Intake:"} value={data.intake} />
-
           <LabelAndValue label={"Study Mode:"} value={data.studyMode} />
-
           <LabelAndValue label={"Current Semester:"} value={data.semester} />
-
           <LabelAndValue
             label={"Semester Period:"}
             value={`${formatDateToDDMMYYYY(new Date(data.semesterStartDate))} - ${formatDateToDDMMYYYY(new Date(data.semesterEndDate))}`}
           />
-
 
         </div>
 
