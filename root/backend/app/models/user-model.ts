@@ -34,4 +34,5 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   semester: number;
   semesterStartDate: Date;
   semesterEndDate: Date;
+  courseStatus: number;
 }
