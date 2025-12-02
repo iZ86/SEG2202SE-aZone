@@ -72,11 +72,13 @@ CREATE TABLE PROGRAMME_INTAKE (
     semester INT NOT NULL,
     semesterStartDate DATE NOT NULL,
     semesterEndDate DATE NOT NULL,
+    enrollmentId INT NOT NULL,
     FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
         ON DELETE CASCADE,
     FOREIGN KEY (studyModeId) REFERENCES STUDY_MODE(studyModeId),
+    FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId),
     UNIQUE (programmeId, intakeId, semester)
 );
 
@@ -88,16 +90,6 @@ CREATE TABLE COURSE_SUBJECT (
     FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
         ON DELETE CASCADE,
     PRIMARY KEY (courseId, subjectId)
-);
-
-CREATE TABLE ENROLLMENT_PROGRAMME_INTAKE (
-    programmeIntakeId INT,
-    enrollmentId INT,
-    FOREIGN KEY (programmeIntakeId) REFERENCES PROGRAMME_INTAKE(programmeIntakeId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
-        ON DELETE CASCADE,
-    PRIMARY KEY (programmeIntakeId, enrollmentId)
 );
 
 CREATE TABLE CLASS_TYPE (
@@ -228,12 +220,11 @@ INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
 ("Full Time"),
 ("Part Time");
 
-INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`) VALUES
-(1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16'),
-(2, 2, 202508, 1, 1, '2025-08-16', '2025-12-12'),
-(3, 1, 202504, 1, 5, '2025-04-09', '2025-08-06');
+INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`) VALUES
+(1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1),
+(2, 2, 202508, 1, 1, '2025-08-16', '2025-12-12', 1),
+(3, 1, 202504, 1, 5, '2025-04-09', '2025-08-06', 1);
 
-INSERT INTO `ENROLLMENT_PROGRAMME_INTAKE` (`programmeIntakeId`, `enrollmentId`) VALUES (1, 1);
 
 INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
 (10000001, 'admin', 'admin', 'admin@imail.sunway.edu.my', '-', '$argon2id$v=19$m=65536,t=3,p=1$Is6WCr0RuL4kQlaFSWee7w$ejJPE9Vs0BRYoA4eh5oYGuONU+gq8cnNLcXSeQzwVE0', 1),
