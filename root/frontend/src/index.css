@@ -10,6 +10,14 @@
   --color-white-antiflash: #e7ecef;
   --color-red-tomato: #ef6351;
   --color-platinum: #e7ecef;
+  --color-blush-powder: #f1a3a3;
+  --color-blue-icy: #a3cef1;
+  --color-green-light: #a3f1a3;
+  --color-red: #ff2a2a;
+  --color-orange-amber: #ffa32a;
+  --color-yellow-sunbeam: #ffe92a;
+  --color-green-laser: #2aff2a;
+  --color-blue-digital: #2a6bff;
 
   --font-poppins: "Poppins", sans-serif;
   --font-nunito-sans: "Nunito Sans", sans-serif;
@@ -22,6 +30,9 @@
   --text-xl--line-height: 1.875rem;
   --text-2xl: 1.5rem;
   --text-2xl--line-height: 2.25rem;
+  --spacing-5xs: 12rem;
+  --spacing-4xs: 14rem;
+
 }
 
 :root {
