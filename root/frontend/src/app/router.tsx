@@ -22,6 +22,7 @@ import AdminCreateVenue from "@routes/admin/AdminCreateVenue";
 import AdminEditVenue from "@routes/admin/AdminEditVenue";
 import StudentProfile from "@routes/student/StudentProfile";
 import StudentSubjectListing from "@routes/student/StudentSubjectListing";
+import StudentFeeSummary from "@routes/student/StudentFeeSummary";
 import StudentProvider from "../features/student/components/Provider";
 import AdminProvider from "@features/admin/components/Provider";
 import AdminProfile from "@routes/admin/AdminProfile";
@@ -78,6 +79,10 @@ const routes = [
       {
         path: "/subject-listing",
         element: <StudentSubjectListing />,
+      },
+      {
+        path: "/fees-summary",
+        element: <StudentFeeSummary />,
       },
       {
         path: "/profile",
