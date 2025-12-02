@@ -1,7 +1,6 @@
 import { useState } from "react";
-// ✅ FIXED IMPORT: This goes up 3 folders to find 'components'
 import Pagination from "../../../components/Pagination";
-import SubjectFilterBar from "./SubjectFilterBar";
+import SubjectFilterBar from "./SemesterFilterBar";
 
 interface Subject {
     id: number;
@@ -9,10 +8,8 @@ interface Subject {
     subjectName: string;
     creditHours: number;
     status: "Open" | "Full" | "Closed";
-    semester: number; // ✅ Replaced category with semester
 }
 
-// ✅ UPDATED DATA: Subjects now have a specific 'semester'
 const MOCK_SUBJECTS: Subject[] = [
     {
         id: 1,
@@ -67,20 +64,16 @@ const MOCK_SUBJECTS: Subject[] = [
 export default function SubjectListingTable() {
     const [searchTerm, setSearchTerm] = useState("");
 
-    // ✅ STATE: Now tracking semester instead of category
     const [selectedSemester, setSelectedSemester] = useState("All");
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5;
 
-    // --- FILTER LOGIC ---
     const filteredData = MOCK_SUBJECTS.filter((item) => {
-        // 1. Search Filter
         const matchesSearch =
             item.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             item.subjectCode.toLowerCase().includes(searchTerm.toLowerCase());
 
-        // 2. Semester Filter
         const matchesSemester =
             selectedSemester === "All" ||
             item.semester.toString() === selectedSemester;
