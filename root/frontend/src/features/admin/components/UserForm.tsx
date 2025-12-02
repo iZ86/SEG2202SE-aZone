@@ -109,24 +109,30 @@ export default function UserForm({
   const isAdmin: boolean = searchParams.get("admin") === "true";
   const { authToken, admin, loading } = useAdmin();
 
-  const getStatusBadge = (status: number) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 1:
+      case "Active":
         return (
           <span className="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded-full">
-            Active
+            {status}
           </span>
         );
-      case 2:
+      case "Finished":
         return (
-          <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-full">
-            Exempted
+          <span className="px-2 py-1 text-xs font-semibold text-red-600 bg-red-100 rounded-full">
+            {status}
           </span>
         );
-      case 3:
+      case "Completed":
         return (
           <span className="px-2 py-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full">
-            Completed
+            {status}
+          </span>
+        );
+      case "Dropped":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-full">
+            {status}
           </span>
         );
       default:
@@ -939,7 +945,7 @@ export default function UserForm({
                                   ).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-5">
-                                  {getStatusBadge(student.courseStatus)}
+                                  {getStatusBadge(student.status)}
                                 </td>
                                 <td className="px-6 py-5 text-slate-500 text-center">
                                   <button
