@@ -136,8 +136,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
       databaseConn.query<EnrollmentProgrammeIntakeData[]>(
         "SELECT e.* , pi.*, p.programmeName, sm.studyMode " +
         "FROM ENROLLMENT e " +
-        "INNER JOIN ENROLLMENT_PROGRAMME_INTAKE epi ON e.enrollmentId = epi.enrollmentId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON epi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE e.enrollmentId = ?;",

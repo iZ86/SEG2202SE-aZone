@@ -567,8 +567,7 @@ class UserRepository implements IUserRepostory {
         "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON es.venueId = v.venueId " +
         "INNER JOIN DAY d ON es.dayId = d.dayId " +
-        "INNER JOIN ENROLLMENT_PROGRAMME_INTAKE epi ON e.enrollmentId = epi.enrollmentId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON epi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
         "WHERE ses.studentId = ? " +
         "AND (s.subjectCode LIKE ? " +
@@ -607,8 +606,7 @@ class UserRepository implements IUserRepostory {
         "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON es.venueId = v.venueId " +
         "INNER JOIN DAY d ON es.dayId = d.dayId " +
-        "INNER JOIN ENROLLMENT_PROGRAMME_INTAKE epi ON e.enrollmentId = epi.enrollmentId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON epi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
         "WHERE ses.studentId = ? " +
         "AND (s.subjectCode LIKE ? " +
