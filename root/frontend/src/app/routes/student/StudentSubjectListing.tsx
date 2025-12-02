@@ -2,7 +2,7 @@ import StudentNavbar from "@components/student/StudentNavbar";
 import StudentSubjectListingTable from "@features/student/components/SubjectListingTable";
 import StudentProfileCard from "@features/student/components/ProfileCard";
 
-export default function StudentProgrammeHistory() {
+export default function StudentSubjectListing() {
     return (
         <div className="flex flex-col min-h-screen bg-white-antiflash">
             <StudentNavbar page="programmes" />
