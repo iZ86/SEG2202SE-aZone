@@ -55,6 +55,16 @@ export default function StudentSideBar({ page }: { page: string }) {
               label: "Programme History",
               key: "programme-history",
             },
+            {
+              to: "/subject-listing",
+              label: "Subject Listing",
+              key: "subject-listing",
+            },
+            {
+              to: "/fees-summary",
+              label: "Fees Summary",
+              key: "fees-summary",
+            },
           ].map((item) => (
             <Link
               key={item.key}
