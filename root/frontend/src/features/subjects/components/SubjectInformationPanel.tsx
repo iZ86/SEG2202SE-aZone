@@ -1,18 +1,46 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import type { StudentSubjectData } from "@datatypes/subjectType";
+import { fetchStudentSubjectsAPI } from "@features/subjects/api/studentSubjects";
 
-/** TBD: A042.
- * Do whatever you want, iZ86 will handle API.
- */
-export default function SubjectInformationPanel() {
-  /** TODO: Fill in this with the appropriate components. */
-  const subjects = [
-    { code: "ABC666", name: "Software Engineering", creditHours: 4 , color: "border-pink-500"},
-    { code: "AYO123", name: "Database Fundamental II", creditHours: 4 , color: "border-pink-500"},
-    { code: "GG717", name: "Java Programming", creditHours: 4 , color: "border-orange-500"}
-  ];
+
+
+const CREDITTHEME = [
+  "border-blue-digital",
+  "border-green-laser",
+  "border-yellow-sunbeam",
+  "border-orange-amber",
+  "border-red"
+];
+
+export default function SubjectInformationPanel({ token }: { token: string }) {
+
+  const [data, setData] = useState<StudentSubjectData[]>([]);
+
+  useEffect(() => {
+    fetchStudentSubjects();
+  }, []);
+
+  async function fetchStudentSubjects() {
+    const response: Response | undefined = await fetchStudentSubjectsAPI(token);
+
+    if (!response || !response.ok) {
+      setData([]);
+      return;
+    }
+
+    const responseData = await response.json();
+
+    if (!responseData.data || responseData.data.length === 0) {
+      setData([]);
+      return;
+    }
+
+    setData(responseData.data);
+  }
 
   return (
-    <div className="shadow-lg p-6 rounded-lg bg-white">
+    <div className="shadow-lg p-6 rounded-lg bg-white h-full">
       <div className="flex justify-between items-center w-full">
         <h2 className="text-black font-bold">My Subjects</h2>
         <Link to="/enrollment" className="text-[#666666]">
@@ -21,17 +49,17 @@ export default function SubjectInformationPanel() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-black mt-4">
-        {subjects.map((subject) => (
+        {data.length > 0 ? (data.map((subject) => (
           <div
-            key={subject.code}
-            className={`border-l-4 ${subject.color} p-3 pl-5 shadow-xl rounded-lg bg-black/5`}
+            key={subject.subjectId}
+            className={`border-l-4 ${CREDITTHEME[subject.creditHours - 1]} p-3 pl-5 shadow-xl rounded-lg bg-black/5`}
           >
             <h5>{subject.creditHours} Credit Hours</h5>
             <p className="font-bold">
-              {subject.code} - {subject.name}
+              {subject.subjectCode} - {subject.subjectName}
             </p>
           </div>
-        ))}
+        ))) : undefined}
       </div>
     </div>
   );

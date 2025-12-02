@@ -5,3 +5,11 @@ export type Subject = {
   description: string;
   creditHours: number;
 };
+
+export type StudentSubjectData = {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+}
+
