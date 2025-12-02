@@ -1,5 +1,6 @@
 import StudentNavbar from "@components/student/StudentNavbar";
 import StudentProfileCard from "@features/student/components/ProfileCard";
+import StudentFeeSummaryCard from "@features/student/components/FeeSummaryCard";
 
 export default function StudentFeeSummary() {
     return (
@@ -11,6 +12,10 @@ export default function StudentFeeSummary() {
 
                 <div className="mt-4">
                     <StudentProfileCard />
+                </div>
+
+                <div>
+                    <StudentFeeSummaryCard/>
                 </div>
             </main>
         </div>
