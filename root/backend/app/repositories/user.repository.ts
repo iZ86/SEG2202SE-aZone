@@ -518,6 +518,12 @@ class UserRepository implements IUserRepostory {
         "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, es.grouping, d.dayId, d.day " +
         "FROM STUDENT_ENROLLMENT_SUBJECT ses " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON ses.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON es.venueId = v.venueId " +
+        "INNER JOIN DAY d ON es.dayId = d.dayId " +
         "WHERE ses.subjectStatusId = 1 " +
         "AND studentId = ?;",
         [studentId],
