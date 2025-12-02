@@ -7,7 +7,7 @@ interface Subject {
     subjectCode: string;
     subjectName: string;
     creditHours: number;
-    status: "Open" | "Full" | "Closed";
+    status: "EXEMPTED" | "ACTIVE" | "FINISHED";
 }
 
 const MOCK_SUBJECTS: Subject[] = [
@@ -16,7 +16,7 @@ const MOCK_SUBJECTS: Subject[] = [
         subjectCode: "CSC1024",
         subjectName: "Programming Principles",
         creditHours: 4,
-        status: "Full",
+        status: "ACTIVE",
         semester: 1,
     },
     {
@@ -24,7 +24,7 @@ const MOCK_SUBJECTS: Subject[] = [
         subjectCode: "MTH1114",
         subjectName: "Computer Mathematics",
         creditHours: 3,
-        status: "Open",
+        status: "EXEMPTED",
         semester: 1,
     },
     {
@@ -32,7 +32,7 @@ const MOCK_SUBJECTS: Subject[] = [
         subjectCode: "SEG2202",
         subjectName: "Software Engineering",
         creditHours: 4,
-        status: "Open",
+        status: "EXEMPTED",
         semester: 4,
     },
     {
@@ -40,7 +40,7 @@ const MOCK_SUBJECTS: Subject[] = [
         subjectCode: "MPU3113",
         subjectName: "Hubungan Etnik",
         creditHours: 3,
-        status: "Closed",
+        status: "FINISHED",
         semester: 2,
     },
     {
@@ -48,7 +48,7 @@ const MOCK_SUBJECTS: Subject[] = [
         subjectCode: "CSC3044",
         subjectName: "Artificial Intelligence",
         creditHours: 4,
-        status: "Open",
+        status: "EXEMPTED",
         semester: 4,
     },
     {
@@ -56,7 +56,7 @@ const MOCK_SUBJECTS: Subject[] = [
         subjectCode: "NET1014",
         subjectName: "Networking Principles",
         creditHours: 4,
-        status: "Open",
+        status: "EXEMPTED",
         semester: 2,
     },
 ];
@@ -93,12 +93,12 @@ export default function SubjectListingTable() {
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case "Open":
-                return <span className="px-3 py-1 text-xs font-bold text-green-700 bg-green-100 border border-green-200 rounded-full">OPEN</span>;
-            case "Full":
-                return <span className="px-3 py-1 text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200 rounded-full">FULL</span>;
-            case "Closed":
-                return <span className="px-3 py-1 text-xs font-bold text-red-700 bg-red-100 border border-red-200 rounded-full">CLOSED</span>;
+            case "EXEMPTED":
+                return <span className="px-3 py-1 text-xs font-bold text-green-700 bg-green-100 border border-green-200 rounded-full">EXEMPTED</span>;
+            case "ACTIVE":
+                return <span className="px-3 py-1 text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200 rounded-full">ACTIVE</span>;
+            case "FINISHED":
+                return <span className="px-3 py-1 text-xs font-bold text-red-700 bg-red-100 border border-red-200 rounded-full">FINISHED</span>;
             default:
                 return status;
         }
