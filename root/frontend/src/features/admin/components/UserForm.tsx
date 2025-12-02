@@ -109,6 +109,31 @@ export default function UserForm({
   const isAdmin: boolean = searchParams.get("admin") === "true";
   const { authToken, admin, loading } = useAdmin();
 
+  const getStatusBadge = (status: number) => {
+    switch (status) {
+      case 1:
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded-full">
+            Active
+          </span>
+        );
+      case 2:
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-full">
+            Exempted
+          </span>
+        );
+      case 3:
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full">
+            Completed
+          </span>
+        );
+      default:
+        return status;
+    }
+  };
+
   async function handleSubmitUser(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -526,7 +551,8 @@ export default function UserForm({
 
       // Filter active and history programmes
       const studentCoursesHistory = (data || []).filter(
-        (p: StudentCourseProgrammeIntake) => p.courseStatus === 0
+        (p: StudentCourseProgrammeIntake) =>
+          p.courseStatus === 2 || p.courseStatus === 3
       );
       setStudentCoursesHistory(studentCoursesHistory);
 
@@ -913,17 +939,7 @@ export default function UserForm({
                                   ).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-5">
-                                  <span
-                                    className={`font-bold px-4 py-2 ${
-                                      student.courseStatus
-                                        ? "bg-green-100 text-green-600"
-                                        : "bg-red-100 text-red-600"
-                                    } rounded-xl`}
-                                  >
-                                    {student.courseStatus
-                                      ? "Active"
-                                      : "Inactive"}
-                                  </span>
+                                  {getStatusBadge(student.courseStatus)}
                                 </td>
                                 <td className="px-6 py-5 text-slate-500 text-center">
                                   <button
