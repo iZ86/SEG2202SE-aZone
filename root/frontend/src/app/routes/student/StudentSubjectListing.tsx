@@ -1,6 +1,6 @@
 import StudentNavbar from "@components/student/StudentNavbar";
 import StudentSubjectListingTable from "@features/student/components/SubjectListingTable";
-import StudentInformationPanel from "@features/student/components/ProfileCard";
+import StudentProfileCard from "@features/student/components/ProfileCard";
 
 export default function StudentProgrammeHistory() {
     return (
@@ -11,7 +11,7 @@ export default function StudentProgrammeHistory() {
                 <h1 className="text-black font-bold">Subject Listing</h1>
 
                 <div className="mt-4">
-                    <StudentInformationPanel />
+                    <StudentProfileCard />
                 </div>
                 <StudentSubjectListingTable />
             </main>
