@@ -3,26 +3,12 @@ import { getStudentCourseProgrammeIntakeByStudentIdAPI } from "@features/admin/a
 import { useStudent } from "../hooks/useStudent";
 import { toast } from "react-toastify";
 import LoadingOverlay from "@components/LoadingOverlay";
-
-interface StudentProgrammeHistory {
-  studentId: number;
-  courseId: number;
-  courseName: string;
-  programmeIntakeId: number;
-  programmeId: number;
-  programmeName: string;
-  intakeId: number;
-  semester: number;
-  semesterStartDate: Date;
-  semesterEndDate: Date;
-  courseStatus: number;
-  status: string;
-}
+import type { StudentCourseProgrammeIntake } from "@datatypes/userType";
 
 export default function StudentProgrammeHistoryTable() {
   const { authToken, student, loading } = useStudent();
   const [programmeHistories, setProgrammeHistories] = useState<
-    StudentProgrammeHistory[] | []
+    StudentCourseProgrammeIntake[] | []
   >([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -150,7 +136,7 @@ export default function StudentProgrammeHistoryTable() {
                   </tr>
                 ) : (
                   filteredProgrammeHistories.map(
-                    (programmeHistory: StudentProgrammeHistory) => (
+                    (programmeHistory: StudentCourseProgrammeIntake) => (
                       <tr
                         key={`${programmeHistory.programmeIntakeId}-${programmeHistory.courseId}-${programmeHistory.semester}`}
                         className="text-sm hover:bg-slate-50 transition-colors"
