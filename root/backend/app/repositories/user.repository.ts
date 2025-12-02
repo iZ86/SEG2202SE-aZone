@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, UserData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
@@ -29,6 +29,7 @@ interface IUserRepostory {
   getStudentInformationById(studentId: number) : Promise<StudentInformation|undefined>;
   getStudentActiveSubjectsById(studentId: number): Promise<StudentSubjectData[]>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
+  getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -527,6 +528,23 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res)
+        }
+      )
+    })
+  }
+
+  getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentSemesterStartAndEndData[]>(
+        "SELECT pi.semesterStartDate, pi.semesterEndDate " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
+        "WHERE scpi.studentId = ? " +
+        "AND scpi.status = 1;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
         }
       )
     })

@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
@@ -27,6 +27,7 @@ interface IUserService {
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentActiveSubjectsById(studentId: number): Promise<Result<StudentSubjectData[]>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
+  getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
 }
 
 class UserService implements IUserService {
@@ -250,6 +251,12 @@ class UserService implements IUserService {
   async getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>> {
     const studentTimetable : StudentClassData[] = await userRepository.getStudentTimetableById(studentId);
     return Result.succeed(studentTimetable, "Student timetable retrieve success");
+  }
+
+  async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>> {
+    const studentSemesterStartAndEndData : StudentSemesterStartAndEndData | undefined = await userRepository.getStudentSemesterStartAndEndDateById(studentId);
+
+    return Result.succeed(studentSemesterStartAndEndData, "Student semester start and end date retrieve success");
   }
 }
 

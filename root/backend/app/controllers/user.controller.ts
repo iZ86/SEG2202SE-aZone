@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData } from "../models/user-model";
 import userService from "../services/user.service";
 import courseService from "../services/course.service";
 import programmeService from "../services/programme.service";
@@ -389,9 +389,14 @@ export default class UserController {
     const userId: number = req.user.userId
     
     const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(userId);
+    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(userId);
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+
+    if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {
+      return res.sendSuccess.ok({
+        semesterStartDate: studentSemesterStartAndEndDate.getData()?.semesterStartDate,
+        semesterEndDate: studentSemesterStartAndEndDate.getData()?.semesterEndDate,
+        timetable: response.getData()}, response.getMessage());
     } else {
       throw new Error("user.controller.ts, getStudentTimetableById failed");
     }

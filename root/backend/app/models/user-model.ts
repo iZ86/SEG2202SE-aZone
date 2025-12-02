@@ -39,3 +39,8 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   semesterStartDate: Date;
   semesterEndDate: Date;
 }
+
+export interface StudentSemesterStartAndEndData extends RowDataPacket {
+  semesterStartDate: Date;
+  semesterEndDate: Date;
+}
