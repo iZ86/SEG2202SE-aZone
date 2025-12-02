@@ -229,6 +229,21 @@ export default class UserController {
     }
   }
 
+  async getStudentsCount(req: Request, res: Response) {
+    const response: Result<number> = await userService.getUserCount(undefined, ENUM_USER_ROLE.STUDENT);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok({
+        studentsCount: response.getData() || 0
+      }, response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
   async getAllStudentCourseProgrammeIntakes(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;

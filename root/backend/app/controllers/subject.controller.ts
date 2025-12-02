@@ -147,4 +147,19 @@ export default class SubjectController {
       }
     }
   }
+
+  async getSubjectsCount(req: Request, res: Response) {
+    const response: Result<number> = await subjectService.getSubjectCount();
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok({
+        subjectsCount: response.getData() || 0
+      }, response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
 }

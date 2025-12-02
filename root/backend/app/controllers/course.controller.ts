@@ -180,4 +180,19 @@ export default class CourseController {
       }
     }
   }
+
+  async getCoursesCount(req: Request, res: Response) {
+    const response: Result<number> = await courseService.getCourseCount();
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok({
+        coursesCount: response.getData() || 0
+      }, response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
 }
