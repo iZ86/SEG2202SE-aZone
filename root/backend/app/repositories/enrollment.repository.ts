@@ -25,6 +25,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "SELECT * " +
         "FROM ENROLLMENT " +
         "WHERE enrollmentId LIKE ? " +
+        "ORDER BY enrollmentStartDateTime ASC " +
         "LIMIT ? OFFSET ?;",
         [
           "%" + query + "%",
