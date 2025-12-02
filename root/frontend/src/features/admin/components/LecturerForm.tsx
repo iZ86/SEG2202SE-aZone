@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -47,6 +47,45 @@ export default function LecturerForm({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditLecturerForm = async (token: string, lecturerId: number) => {
+      const response: Response | undefined = await getLecturerByIdAPI(
+        token,
+        lecturerId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/lecturers");
+        toast.error("Failed to fetch lecturer");
+        return;
+      }
+      const { data } = await response.json();
+
+      setFirstName(data.firstName);
+      setLastName(data.lastName);
+      setEmail(data.email);
+      setPhoneNumber(data.phoneNumber);
+      setLecturerTitle({
+        value: data.lecturerTitleId,
+        label: data.lecturerTitle,
+      });
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    getAllLecturerTitles(authToken);
+
+    if (type === "Edit" && id > 0) {
+      setupEditLecturerForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -200,48 +239,6 @@ export default function LecturerForm({
     }));
 
     setLecturerTitleOptions(options);
-  }
-
-  const setupEditLecturerForm = useCallback(
-    async (token: string, lecturerId: number) => {
-      const response: Response | undefined = await getLecturerByIdAPI(
-        token,
-        lecturerId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/lecturers");
-        toast.error("Failed to fetch lecturer");
-        return;
-      }
-      const { data } = await response.json();
-
-      setFirstName(data.firstName);
-      setLastName(data.lastName);
-      setEmail(data.email);
-      setPhoneNumber(data.phoneNumber);
-      setLecturerTitle({
-        value: data.lecturerTitleId,
-        label: data.lecturerTitle,
-      });
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) {
-      return;
-    }
-
-    getAllLecturerTitles(authToken);
-
-    if (type === "Edit" && id > 0) {
-      setupEditLecturerForm(authToken, id);
-    }
-  }, [authToken, type, id, setupEditLecturerForm]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (

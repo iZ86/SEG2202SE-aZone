@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { getMeAPI } from "@features/general/api/user";
 import type { User } from "@datatypes/userType";
 import { StudentContext } from "../hooks/useStudent";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Provider({ children }: { children: ReactNode }) {
   const [authToken, setAuthToken] = useState("");

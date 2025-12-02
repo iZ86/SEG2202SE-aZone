@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -28,6 +28,35 @@ export default function VenueForm({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditVenueForm = async (token: string, venueId: number) => {
+      const response: Response | undefined = await getVenueByIdAPI(
+        token,
+        venueId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/venues");
+        toast.error("Failed to fetch venue");
+        return;
+      }
+      const { data } = await response.json();
+
+      setVenue(data.venue);
+    };
+
+    if (!authToken) {
+      return;
+    }
+    if (type === "Edit" && id > 0) {
+      setupEditVenueForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -86,38 +115,6 @@ export default function VenueForm({
       setEmptyVenue(false);
     }
     setVenue(onChangeVenue);
-  }
-
-  const setupEditVenueForm = useCallback(
-    async (token: string, venueId: number) => {
-      const response: Response | undefined = await getVenueByIdAPI(
-        token,
-        venueId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/venues");
-        toast.error("Failed to fetch venue");
-        return;
-      }
-      const { data } = await response.json();
-
-      setVenue(data.venue);
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) {
-      return;
-    }
-    if (type === "Edit" && id > 0) {
-      setupEditVenueForm(authToken, id);
-    }
-  }, [authToken, type, id, setupEditVenueForm]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (

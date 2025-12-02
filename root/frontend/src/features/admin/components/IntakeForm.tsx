@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
@@ -27,6 +27,37 @@ export default function IntakeForm({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditIntakeForm = async (token: string, intakeId: number) => {
+      const response: Response | undefined = await getIntakeByIdAPI(
+        token,
+        intakeId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/intakes");
+        toast.error("Failed to fetch intake");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setIntakeId(data.intakeId.toString());
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    if (type === "Edit" && id > 0) {
+      setupEditIntakeForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -90,40 +121,6 @@ export default function IntakeForm({
       setInvalidIntakeId(false);
     }
     setIntakeId(onChangeIntakeId);
-  }
-
-  const setupEditIntakeForm = useCallback(
-    async (token: string, intakeId: number) => {
-      const response: Response | undefined = await getIntakeByIdAPI(
-        token,
-        intakeId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/intakes");
-        toast.error("Failed to fetch intake");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setIntakeId(data.intakeId.toString());
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) {
-      return;
-    }
-
-    if (type === "Edit" && id > 0) {
-      setupEditIntakeForm(authToken, id);
-    }
-  }, [authToken, type, id, setupEditIntakeForm]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (

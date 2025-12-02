@@ -12,6 +12,16 @@ export default function StudentProgrammeHistoryTable() {
   >([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    if (!authToken || !student?.userId) return;
+
+    getStudentCourseProgrammeIntakeByStudentId(authToken, student.userId);
+  }, [authToken, student?.userId]);
+
+  if (loading || !student) {
+    return <LoadingOverlay />;
+  }
+
   const filteredProgrammeHistories = programmeHistories.filter((ph) => {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return true;
@@ -80,16 +90,6 @@ export default function StudentProgrammeHistoryTable() {
 
     const { data } = await studentCourseProgrammeIntakeResponse.json();
     setProgrammeHistories(data);
-  }
-
-  useEffect(() => {
-    if (!authToken || !student?.userId) return;
-
-    getStudentCourseProgrammeIntakeByStudentId(authToken, student.userId);
-  }, [authToken, student?.userId]);
-
-  if (loading || !student) {
-    return <LoadingOverlay />;
   }
 
   return (

@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -44,6 +44,49 @@ export default function SubjectForm({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditSubjectForm = async (token: string, subjectId: number) => {
+      const response: Response | undefined = await getSubjectByIdAPI(
+        token,
+        subjectId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/subjects");
+        toast.error("Failed to fetch subject");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setSubjectName(data.subjects.subjectName);
+      setCourse(
+        data.courses.map(
+          (course: { courseId: number; courseName: string }) => ({
+            label: course.courseName,
+            value: course.courseId,
+          })
+        )
+      );
+      setSubjectCode(data.subjects.subjectCode);
+      setCreditHours(data.subjects.creditHours.toString());
+      setDescription(data.subjects.description || "");
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    getAllCourses(authToken);
+    if (type === "Edit" && id > 0) {
+      setupEditSubjectForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -199,52 +242,6 @@ export default function SubjectForm({
     }));
 
     setCourseOptions(options);
-  }
-
-  const setupEditSubjectForm = useCallback(
-    async (token: string, subjectId: number) => {
-      const response: Response | undefined = await getSubjectByIdAPI(
-        token,
-        subjectId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/subjects");
-        toast.error("Failed to fetch subject");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setSubjectName(data.subjects.subjectName);
-      setCourse(
-        data.courses.map(
-          (course: { courseId: number; courseName: string }) => ({
-            label: course.courseName,
-            value: course.courseId,
-          })
-        )
-      );
-      setSubjectCode(data.subjects.subjectCode);
-      setCreditHours(data.subjects.creditHours.toString());
-      setDescription(data.subjects.description || "");
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) {
-      return;
-    }
-
-    getAllCourses(authToken);
-    if (type === "Edit" && id > 0) {
-      setupEditSubjectForm(authToken, id);
-    }
-  }, [authToken, type, id, setupEditSubjectForm]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (

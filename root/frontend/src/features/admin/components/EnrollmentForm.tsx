@@ -56,6 +56,64 @@ export default function EnrollmentForm({
   const { authToken, admin, loading } = useAdmin();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const setupEditEnrollmentForm = async (
+      token: string,
+      enrollmentId: number
+    ) => {
+      const response: Response | undefined = await getEnrollmentByIdAPI(
+        token,
+        enrollmentId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/enrollments");
+        toast.error("Failed to fetch enrollment");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setEnrollmentStartDateTime(
+        data.enrollments.enrollmentStartDateTime
+          ? parseAbsoluteToLocal(data.enrollments.enrollmentStartDateTime)
+          : null
+      );
+
+      setEnrollmentEndDateTime(
+        data.enrollments.enrollmentEndDateTime
+          ? parseAbsoluteToLocal(data.enrollments.enrollmentEndDateTime)
+          : null
+      );
+
+      setProgrammeIntakes(
+        data.programmeIntakes.map((programmeIntake: ProgrammeIntake) => ({
+          value: programmeIntake.programmeIntakeId,
+          label:
+            programmeIntake.programmeName +
+            " Programme - " +
+            programmeIntake.intakeId +
+            " - Semester " +
+            programmeIntake.semester +
+            " (" +
+            programmeIntake.studyMode +
+            ")",
+        }))
+      );
+    };
+
+    if (!authToken) return;
+
+    getAllProgrammeIntakes(authToken);
+    if (type === "Edit" && id > 0) {
+      setupEditEnrollmentForm(authToken, id);
+    }
+  }, [type, id, navigate, authToken]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -198,64 +256,6 @@ export default function EnrollmentForm({
     }));
 
     setProgrammeIntakeOptions(options);
-  }
-
-  useEffect(() => {
-    const setupEditEnrollmentForm = async (
-      token: string,
-      enrollmentId: number
-    ) => {
-      const response: Response | undefined = await getEnrollmentByIdAPI(
-        token,
-        enrollmentId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/enrollments");
-        toast.error("Failed to fetch enrollment");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setEnrollmentStartDateTime(
-        data.enrollments.enrollmentStartDateTime
-          ? parseAbsoluteToLocal(data.enrollments.enrollmentStartDateTime)
-          : null
-      );
-
-      setEnrollmentEndDateTime(
-        data.enrollments.enrollmentEndDateTime
-          ? parseAbsoluteToLocal(data.enrollments.enrollmentEndDateTime)
-          : null
-      );
-
-      setProgrammeIntakes(
-        data.programmeIntakes.map((programmeIntake: ProgrammeIntake) => ({
-          value: programmeIntake.programmeIntakeId,
-          label:
-            programmeIntake.programmeName +
-            " Programme - " +
-            programmeIntake.intakeId +
-            " - Semester " +
-            programmeIntake.semester +
-            " (" +
-            programmeIntake.studyMode +
-            ")",
-        }))
-      );
-    };
-
-    if (!authToken) return;
-
-    getAllProgrammeIntakes(authToken);
-    if (type === "Edit" && id > 0) {
-      setupEditEnrollmentForm(authToken, id);
-    }
-  }, [type, id, navigate, authToken]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (

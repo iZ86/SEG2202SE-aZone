@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -42,6 +42,42 @@ export default function CourseForm({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditCourseForm = async (token: string, courseId: number) => {
+      const response: Response | undefined = await getCourseByIdAPI(
+        token,
+        courseId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/courses");
+        toast.error("Failed to fetch course");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setCourseName(data.courseName);
+      setProgramme({
+        label: data.programmeName,
+        value: data.programmeId,
+      });
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    getAllProgrammes(authToken);
+    if (type === "Edit" && id > 0) {
+      setupEditCourseForm(authToken, id);
+    }
+  }, [type, id, authToken, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -147,45 +183,6 @@ export default function CourseForm({
     }));
 
     setProgrammeOptions(options);
-  }
-
-  const setupEditCourseForm = useCallback(
-    async (token: string, courseId: number) => {
-      const response: Response | undefined = await getCourseByIdAPI(
-        token,
-        courseId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/courses");
-        toast.error("Failed to fetch course");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setCourseName(data.courseName);
-      setProgramme({
-        label: data.programmeName,
-        value: data.programmeId,
-      });
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) {
-      return;
-    }
-
-    getAllProgrammes(authToken);
-    if (type === "Edit" && id > 0) {
-      setupEditCourseForm(authToken, id);
-    }
-  }, [type, id, setupEditCourseForm, authToken]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (

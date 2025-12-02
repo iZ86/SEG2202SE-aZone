@@ -1,11 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { SingleValue } from "react-select";
 import {
@@ -108,6 +102,133 @@ export default function UserForm({
   const [searchParams] = useSearchParams();
   const isAdmin: boolean = searchParams.get("admin") === "true";
   const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditStudentForm = async (token: string, studentId: number) => {
+      const studentCourseProgrammeIntakeResponse: Response | undefined =
+        await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
+      const studentResponse: Response | undefined = await getStudentByIdAPI(
+        token,
+        studentId
+      );
+
+      if (!studentCourseProgrammeIntakeResponse?.ok || !studentResponse?.ok) {
+        navigate("/admin/users");
+        return;
+      }
+
+      const studentDataJson = await studentResponse.json();
+      const studentData = studentDataJson.data;
+      const { data } = await studentCourseProgrammeIntakeResponse.json();
+
+      skipReset.current = true;
+
+      setFirstName(studentData.firstName);
+      setLastName(studentData.lastName);
+      setEmail(studentData.email);
+      setPhoneNumber(studentData.phoneNumber);
+      setStatus({
+        value: studentData.userStatus ? 1 : 0,
+        label: studentData.userStatus ? "Active" : "Inactive",
+      });
+
+      // Filter active and history programmes
+      const studentCoursesHistory = (data || []).filter(
+        (p: StudentCourseProgrammeIntake) =>
+          p.courseStatus === 2 || p.courseStatus === 3
+      );
+      setStudentCoursesHistory(studentCoursesHistory);
+
+      const activeProgrammes = (data || [])
+        .filter((p: StudentCourseProgrammeIntake) => p.courseStatus === 1)
+        .map((programme: Programme) => ({
+          value: programme.programmeId,
+          label: programme.programmeName,
+        }));
+      setProgramme(activeProgrammes[0] || { value: -1, label: "" });
+
+      // Filter active and history courses
+      const activeCourses = (data || [])
+        .filter((c: StudentCourseProgrammeIntake) => c.courseStatus === 1)
+        .map((course: Course) => ({
+          value: course.courseId,
+          label: course.courseName,
+        }));
+      setCourse(activeCourses[0] || { value: -1, label: "" });
+
+      // Filter active and history programme intakes
+      const activeProgrammeIntakes = (data || [])
+        .filter((i: StudentCourseProgrammeIntake) => i.courseStatus === 1)
+        .map((intake: ProgrammeIntake) => ({
+          value: intake.programmeIntakeId,
+          label: intake.intakeId + " - Semester " + intake.semester,
+        }));
+      setProgrammeIntake(activeProgrammeIntakes[0] || { value: -1, label: "" });
+    };
+
+    const setupEditAdminForm = async (token: string, adminId: number) => {
+      const response: Response | undefined = await getAdminByIdAPI(
+        token,
+        adminId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/users");
+        return;
+      }
+      const { data } = await response.json();
+
+      skipReset.current = true;
+
+      setFirstName(data.firstName);
+      setLastName(data.lastName);
+      setEmail(data.email);
+      setPhoneNumber(data.phoneNumber);
+      setStatus({
+        value: data.userStatus ? 1 : 0,
+        label: data.userStatus ? "Active" : "Inactive",
+      });
+    };
+
+    if (!authToken) return;
+
+    getAllProgrammes(authToken);
+
+    if (type === "Edit" && id > 0) {
+      if (isAdmin) {
+        setupEditAdminForm(authToken, id);
+      } else {
+        setupEditStudentForm(authToken, id);
+      }
+    }
+  }, [type, id, isAdmin, authToken, navigate]);
+
+  useEffect(() => {
+    if (programme.value <= 0 || !authToken) {
+      setCourseOptions([]);
+      return;
+    }
+
+    getCoursesByProgrammeId(authToken, programme.value);
+    getProgrammeIntakesByProgrammeId(authToken, programme.value);
+
+    if (skipReset.current) {
+      skipReset.current = false;
+    } else {
+      setCourse({
+        value: -1,
+        label: "",
+      });
+      setProgrammeIntake({
+        value: -1,
+        label: "",
+      });
+    }
+  }, [authToken, programme]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -524,139 +645,6 @@ export default function UserForm({
     }));
 
     setProgrammeIntakeOptions(options);
-  }
-
-  const setupEditStudentForm = useCallback(
-    async (token: string, studentId: number) => {
-      const studentCourseProgrammeIntakeResponse: Response | undefined =
-        await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
-      const studentResponse: Response | undefined = await getStudentByIdAPI(
-        token,
-        studentId
-      );
-
-      if (!studentCourseProgrammeIntakeResponse?.ok || !studentResponse?.ok) {
-        navigate("/admin/users");
-        return;
-      }
-
-      const studentDataJson = await studentResponse.json();
-      const studentData = studentDataJson.data;
-      const { data } = await studentCourseProgrammeIntakeResponse.json();
-
-      skipReset.current = true;
-
-      setFirstName(studentData.firstName);
-      setLastName(studentData.lastName);
-      setEmail(studentData.email);
-      setPhoneNumber(studentData.phoneNumber);
-      setStatus({
-        value: studentData.userStatus ? 1 : 0,
-        label: studentData.userStatus ? "Active" : "Inactive",
-      });
-
-      // Filter active and history programmes
-      const studentCoursesHistory = (data || []).filter(
-        (p: StudentCourseProgrammeIntake) =>
-          p.courseStatus === 2 || p.courseStatus === 3
-      );
-      setStudentCoursesHistory(studentCoursesHistory);
-
-      const activeProgrammes = (data || [])
-        .filter((p: StudentCourseProgrammeIntake) => p.courseStatus === 1)
-        .map((programme: Programme) => ({
-          value: programme.programmeId,
-          label: programme.programmeName,
-        }));
-      setProgramme(activeProgrammes[0] || { value: -1, label: "" });
-
-      // Filter active and history courses
-      const activeCourses = (data || [])
-        .filter((c: StudentCourseProgrammeIntake) => c.courseStatus === 1)
-        .map((course: Course) => ({
-          value: course.courseId,
-          label: course.courseName,
-        }));
-      setCourse(activeCourses[0] || { value: -1, label: "" });
-
-      // Filter active and history programme intakes
-      const activeProgrammeIntakes = (data || [])
-        .filter((i: StudentCourseProgrammeIntake) => i.courseStatus === 1)
-        .map((intake: ProgrammeIntake) => ({
-          value: intake.programmeIntakeId,
-          label: intake.intakeId + " - Semester " + intake.semester,
-        }));
-      setProgrammeIntake(activeProgrammeIntakes[0] || { value: -1, label: "" });
-    },
-    [navigate]
-  );
-
-  const setupEditAdminForm = useCallback(
-    async (token: string, adminId: number) => {
-      const response: Response | undefined = await getAdminByIdAPI(
-        token,
-        adminId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/users");
-        return;
-      }
-      const { data } = await response.json();
-
-      skipReset.current = true;
-
-      setFirstName(data.firstName);
-      setLastName(data.lastName);
-      setEmail(data.email);
-      setPhoneNumber(data.phoneNumber);
-      setStatus({
-        value: data.userStatus ? 1 : 0,
-        label: data.userStatus ? "Active" : "Inactive",
-      });
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) return;
-
-    getAllProgrammes(authToken);
-
-    if (type === "Edit" && id > 0) {
-      if (isAdmin) {
-        setupEditAdminForm(authToken, id);
-      } else {
-        setupEditStudentForm(authToken, id);
-      }
-    }
-  }, [type, id, setupEditStudentForm, setupEditAdminForm, isAdmin, authToken]);
-
-  useEffect(() => {
-    if (programme.value <= 0 || !authToken) {
-      setCourseOptions([]);
-      return;
-    }
-
-    getCoursesByProgrammeId(authToken, programme.value);
-    getProgrammeIntakesByProgrammeId(authToken, programme.value);
-
-    if (skipReset.current) {
-      skipReset.current = false;
-    } else {
-      setCourse({
-        value: -1,
-        label: "",
-      });
-      setProgrammeIntake({
-        value: -1,
-        label: "",
-      });
-    }
-  }, [authToken, programme]);
-
-  if (loading || !admin) {
-    return <LoadingOverlay />;
   }
 
   return (
