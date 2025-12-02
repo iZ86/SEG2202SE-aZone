@@ -11,5 +11,10 @@ export const createAndUpdateEnrollmentValidator: any = [
     .trim()
     .notEmpty().withMessage('Missing enrollmentEndDateTime')
     .isISO8601().withMessage("enrollmentEndDateTime must be date time"),
+  body('programmeIntakeIds')
+    .isArray({ min: 1 }).withMessage('programmeIntakeIds must be an array and at least one value')
+    .notEmpty().withMessage('Array cannot be empty'),
+  body('programmeIntakeIds.*')
+    .isNumeric().withMessage('All items must be numeric'),
   validate,
 ];

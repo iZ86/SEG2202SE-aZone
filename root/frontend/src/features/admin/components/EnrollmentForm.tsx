@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
@@ -17,6 +17,11 @@ import {
 import CustomDatePicker from "@components/DatePicker";
 import { useAdmin } from "../hooks/useAdmin";
 import { toast } from "react-toastify";
+import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
+import { getAllProgrammeIntakesAPI } from "../api/programmes";
+import type { ProgrammeIntake } from "@datatypes/programmeType";
+import { MultiFilter } from "@components/MultiFilter";
+import type { MultiValue } from "react-select";
 
 export default function EnrollmentForm({
   type,
@@ -31,16 +36,83 @@ export default function EnrollmentForm({
   const [enrollmentEndDateTime, setEnrollmentEndDateTime] = useState<
     CalendarDateTime | ZonedDateTime | null
   >(null);
+  const [programmeIntakes, setProgrammeIntakes] = useState<
+    reactSelectOptionType[]
+  >([]);
+
   const [emptyEnrollmentStartDateTime, setEmptyEnrollmentStartDateTime] =
     useState(false);
   const [emptyEnrollmentEndDateTime, setEmptyEnrollmentEndDateTime] =
     useState(false);
+  const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
+
+  const [programmeIntakeOptions, setProgrammeIntakeOptions] = useState<
+    reactSelectOptionType[]
+  >([]);
 
   const [invalidEnrollmentDateTimes, setInvalidEnrollmentDateTimes] =
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { authToken, admin, loading } = useAdmin();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const setupEditEnrollmentForm = async (
+      token: string,
+      enrollmentId: number
+    ) => {
+      const response: Response | undefined = await getEnrollmentByIdAPI(
+        token,
+        enrollmentId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/enrollments");
+        toast.error("Failed to fetch enrollment");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setEnrollmentStartDateTime(
+        data.enrollments.enrollmentStartDateTime
+          ? parseAbsoluteToLocal(data.enrollments.enrollmentStartDateTime)
+          : null
+      );
+
+      setEnrollmentEndDateTime(
+        data.enrollments.enrollmentEndDateTime
+          ? parseAbsoluteToLocal(data.enrollments.enrollmentEndDateTime)
+          : null
+      );
+
+      setProgrammeIntakes(
+        data.programmeIntakes.map((programmeIntake: ProgrammeIntake) => ({
+          value: programmeIntake.programmeIntakeId,
+          label:
+            programmeIntake.programmeName +
+            " Programme - " +
+            programmeIntake.intakeId +
+            " - Semester " +
+            programmeIntake.semester +
+            " (" +
+            programmeIntake.studyMode +
+            ")",
+        }))
+      );
+    };
+
+    if (!authToken) return;
+
+    getAllProgrammeIntakes(authToken);
+    if (type === "Edit" && id > 0) {
+      setupEditEnrollmentForm(authToken, id);
+    }
+  }, [type, id, navigate, authToken]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,7 +121,11 @@ export default function EnrollmentForm({
       return;
     }
 
-    if (emptyEnrollmentEndDateTime || emptyEnrollmentStartDateTime) {
+    if (
+      emptyEnrollmentEndDateTime ||
+      emptyEnrollmentStartDateTime ||
+      emptyProgrammeIntake
+    ) {
       setIsLoading(false);
       return;
     }
@@ -66,14 +142,16 @@ export default function EnrollmentForm({
       response = await createEnrollmentAPI(
         authToken as string,
         enrollmentStartDateTime as CalendarDateTime,
-        enrollmentEndDateTime as CalendarDateTime
+        enrollmentEndDateTime as CalendarDateTime,
+        programmeIntakes.map((pi) => pi.value)
       );
     } else if (type === "Edit") {
       response = await updateEnrollmentByIdAPI(
         authToken as string,
         id,
         enrollmentStartDateTime as CalendarDateTime,
-        enrollmentEndDateTime as CalendarDateTime
+        enrollmentEndDateTime as CalendarDateTime,
+        programmeIntakes.map((pi) => pi.value)
       );
     }
 
@@ -87,7 +165,6 @@ export default function EnrollmentForm({
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/enrollments");
-
       toast.success(
         `${type === "Add" ? "Created new" : "Updated"} enrollment period`
       );
@@ -108,60 +185,77 @@ export default function EnrollmentForm({
       emptyInput = true;
     }
 
+    if (!programmeIntakes.values || programmeIntakes.length === 0) {
+      setEmptyProgrammeIntake(true);
+      emptyInput = true;
+    }
+
     return emptyInput;
   }
 
   function onChangeEnrollmentStartDateTime(
     value: CalendarDateTime | ZonedDateTime | null
   ) {
+    if (value !== null) {
+      setEmptyEnrollmentStartDateTime(false);
+    }
     setEnrollmentStartDateTime(value);
   }
 
   function onChangeEnrollmentEndDateTime(
     value: CalendarDateTime | ZonedDateTime | null
   ) {
+    if (value !== null) {
+      setEmptyEnrollmentEndDateTime(false);
+    }
     setEnrollmentEndDateTime(value);
   }
 
-  const setupEditEnrollmentForm = useCallback(
-    async (token: string, enrollmentId: number) => {
-      const response: Response | undefined = await getEnrollmentByIdAPI(
-        token,
-        enrollmentId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/enrollments");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setEnrollmentStartDateTime(
-        data.enrollmentStartDateTime
-          ? parseAbsoluteToLocal(data.enrollmentStartDateTime)
-          : null
-      );
-
-      setEnrollmentEndDateTime(
-        data.enrollmentEndDateTime
-          ? parseAbsoluteToLocal(data.enrollmentEndDateTime)
-          : null
-      );
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (!authToken) return;
-
-    if (type === "Edit" && id > 0) {
-      setupEditEnrollmentForm(authToken, id);
+  function onChangeProgrammeIntake(
+    onChangeProgrammeIntake: MultiValue<reactSelectOptionType>
+  ) {
+    const onChangeProgrammeIntakeValues: reactSelectOptionType[] = [];
+    if (onChangeProgrammeIntake.length !== 0) {
+      setEmptyProgrammeIntake(false);
     }
-  }, [type, id, setupEditEnrollmentForm, authToken]);
 
-  if (loading || !admin) {
-    return <LoadingOverlay />;
+    for (let i = 0; i < onChangeProgrammeIntake.length; i++) {
+      onChangeProgrammeIntakeValues.push(onChangeProgrammeIntake[i]);
+    }
+    setProgrammeIntakes(onChangeProgrammeIntakeValues);
+  }
+
+  async function getAllProgrammeIntakes(token: string) {
+    const response: Response | undefined = await getAllProgrammeIntakesAPI(
+      token
+    );
+
+    if (!response?.ok) {
+      setProgrammeIntakeOptions([]);
+      return;
+    }
+
+    const { data } = await response.json();
+
+    if (!data || data.length === 0) {
+      setProgrammeIntakeOptions([]);
+      return;
+    }
+
+    const options = data.map((programmeIntake: ProgrammeIntake) => ({
+      value: programmeIntake.programmeIntakeId,
+      label:
+        programmeIntake.programmeName +
+        " Programme - " +
+        programmeIntake.intakeId +
+        " - Semester " +
+        programmeIntake.semester +
+        " (" +
+        programmeIntake.studyMode +
+        ")",
+    }));
+
+    setProgrammeIntakeOptions(options);
   }
 
   return (
@@ -184,7 +278,7 @@ export default function EnrollmentForm({
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper
                   isEmpty={emptyEnrollmentStartDateTime}
@@ -219,15 +313,21 @@ export default function EnrollmentForm({
               </div>
             </div>
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/enrollments"
-              />
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
+              <div className="flex-1">
+                <AdminInputFieldWrapper isEmpty={emptyProgrammeIntake}>
+                  <MultiFilter
+                    placeholder="Select Enrollment Programmes"
+                    options={programmeIntakeOptions}
+                    value={programmeIntakes}
+                    isInvalid={emptyProgrammeIntake}
+                    onChange={onChangeProgrammeIntake}
+                  />
+                </AdminInputFieldWrapper>
+              </div>
+            </div>
+
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit"
@@ -238,6 +338,14 @@ export default function EnrollmentForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/enrollments"
               />
             </div>
           </form>

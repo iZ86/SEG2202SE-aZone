@@ -21,6 +21,8 @@ import AdminVenue from "@routes/admin/AdminVenue";
 import AdminCreateVenue from "@routes/admin/AdminCreateVenue";
 import AdminEditVenue from "@routes/admin/AdminEditVenue";
 import StudentProfile from "@routes/student/StudentProfile";
+import StudentSubjectListing from "@routes/student/StudentSubjectListing";
+import StudentFeeSummary from "@routes/student/StudentFeeSummary";
 import StudentProvider from "../features/student/components/Provider";
 import AdminProvider from "@features/admin/components/Provider";
 import AdminProfile from "@routes/admin/AdminProfile";
@@ -30,6 +32,9 @@ import StudentProgrammeHistory from "@routes/student/StudentProgrammeHistory";
 import AdminEnrollment from "@routes/admin/AdminEnrollment";
 import AdminCreateEnrollment from "@routes/admin/AdminCreateEnrollment";
 import AdminEditEnrollment from "@routes/admin/AdminEditEnrollment";
+import AdminLecturer from "@routes/admin/AdminLecturer";
+import AdminCreateLecturer from "@routes/admin/AdminCreateLecturer";
+import AdminEditLecturer from "@routes/admin/AdminEditLecturer";
 
 const StudentLayout = () => (
   <StudentProvider>
@@ -70,6 +75,14 @@ const routes = [
       {
         path: "/programme-history",
         element: <StudentProgrammeHistory />,
+      },
+      {
+        path: "/subject-listing",
+        element: <StudentSubjectListing />,
+      },
+      {
+        path: "/fees-summary",
+        element: <StudentFeeSummary />,
       },
       {
         path: "/profile",
@@ -158,6 +171,18 @@ const routes = [
       {
         path: "/admin/venues/:id/edit",
         element: <AdminEditVenue />,
+      },
+      {
+        path: "/admin/lecturers",
+        element: <AdminLecturer />,
+      },
+      {
+        path: "/admin/lecturers/create",
+        element: <AdminCreateLecturer />,
+      },
+      {
+        path: "/admin/lecturers/:id/edit",
+        element: <AdminEditLecturer />,
       },
       {
         path: "/admin/enrollments",

@@ -76,6 +76,12 @@ export default class ProgrammeController {
       return res.sendError.badRequest("Invalid programmeId");
     }
 
+    const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
+
+    if (!programme.isSuccess()) {
+      return res.sendError.notFound("Invalid programmeId");
+    }
+
     const isProgrammeNameBelongsToProgrammeId: Result<ProgrammeData> = await programmeService.getProgrammeByIdAndName(programmeId, programmeName);
 
     if (!isProgrammeNameBelongsToProgrammeId.isSuccess()) {
@@ -84,12 +90,6 @@ export default class ProgrammeController {
       if (isProgrammeNameDuplicated.isSuccess()) {
         return res.sendError.conflict("Programme name duplciated");
       }
-    }
-
-    const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
-
-    if (!programme.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeId");
     }
 
     const response = await programmeService.updateProgrammeById(programmeId, programmeName);
@@ -130,11 +130,7 @@ export default class ProgrammeController {
   }
 
   async getAllProgrammeIntakes(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
-    const query: string = req.query.query as string || "";
-
-    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammeIntakes(query, pageSize, page);
+    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammeIntakes();
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());

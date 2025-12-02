@@ -1,11 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { SingleValue } from "react-select";
 import {
@@ -32,6 +26,8 @@ import {
   getProgrammeIntakesByProgrammeIdAPI,
 } from "../api/programmes";
 import { getCoursesByProgrammeIdAPI } from "../api/courses";
+import { toast } from "react-toastify";
+import { useAdmin } from "../hooks/useAdmin";
 
 export default function UserForm({
   type,
@@ -101,11 +97,169 @@ export default function UserForm({
 
   const [isPasswordMatched, setIsPasswordMatched] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const skipReset = useRef(false);
   const [searchParams] = useSearchParams();
   const isAdmin: boolean = searchParams.get("admin") === "true";
+  const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditStudentForm = async (token: string, studentId: number) => {
+      const studentCourseProgrammeIntakeResponse: Response | undefined =
+        await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
+      const studentResponse: Response | undefined = await getStudentByIdAPI(
+        token,
+        studentId
+      );
+
+      if (!studentCourseProgrammeIntakeResponse?.ok || !studentResponse?.ok) {
+        navigate("/admin/users");
+        return;
+      }
+
+      const studentDataJson = await studentResponse.json();
+      const studentData = studentDataJson.data;
+      const { data } = await studentCourseProgrammeIntakeResponse.json();
+
+      skipReset.current = true;
+
+      setFirstName(studentData.firstName);
+      setLastName(studentData.lastName);
+      setEmail(studentData.email);
+      setPhoneNumber(studentData.phoneNumber);
+      setStatus({
+        value: studentData.userStatus ? 1 : 0,
+        label: studentData.userStatus ? "Active" : "Inactive",
+      });
+
+      // Filter active and history programmes
+      const studentCoursesHistory = (data || []).filter(
+        (p: StudentCourseProgrammeIntake) =>
+          p.courseStatus === 2 || p.courseStatus === 3
+      );
+      setStudentCoursesHistory(studentCoursesHistory);
+
+      const activeProgrammes = (data || [])
+        .filter((p: StudentCourseProgrammeIntake) => p.courseStatus === 1)
+        .map((programme: Programme) => ({
+          value: programme.programmeId,
+          label: programme.programmeName,
+        }));
+      setProgramme(activeProgrammes[0] || { value: -1, label: "" });
+
+      // Filter active and history courses
+      const activeCourses = (data || [])
+        .filter((c: StudentCourseProgrammeIntake) => c.courseStatus === 1)
+        .map((course: Course) => ({
+          value: course.courseId,
+          label: course.courseName,
+        }));
+      setCourse(activeCourses[0] || { value: -1, label: "" });
+
+      // Filter active and history programme intakes
+      const activeProgrammeIntakes = (data || [])
+        .filter((i: StudentCourseProgrammeIntake) => i.courseStatus === 1)
+        .map((intake: ProgrammeIntake) => ({
+          value: intake.programmeIntakeId,
+          label: intake.intakeId + " - Semester " + intake.semester,
+        }));
+      setProgrammeIntake(activeProgrammeIntakes[0] || { value: -1, label: "" });
+    };
+
+    const setupEditAdminForm = async (token: string, adminId: number) => {
+      const response: Response | undefined = await getAdminByIdAPI(
+        token,
+        adminId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/users");
+        return;
+      }
+      const { data } = await response.json();
+
+      skipReset.current = true;
+
+      setFirstName(data.firstName);
+      setLastName(data.lastName);
+      setEmail(data.email);
+      setPhoneNumber(data.phoneNumber);
+      setStatus({
+        value: data.userStatus ? 1 : 0,
+        label: data.userStatus ? "Active" : "Inactive",
+      });
+    };
+
+    if (!authToken) return;
+
+    getAllProgrammes(authToken);
+
+    if (type === "Edit" && id > 0) {
+      if (isAdmin) {
+        setupEditAdminForm(authToken, id);
+      } else {
+        setupEditStudentForm(authToken, id);
+      }
+    }
+  }, [type, id, isAdmin, authToken, navigate]);
+
+  useEffect(() => {
+    if (programme.value <= 0 || !authToken) {
+      setCourseOptions([]);
+      return;
+    }
+
+    getCoursesByProgrammeId(authToken, programme.value);
+    getProgrammeIntakesByProgrammeId(authToken, programme.value);
+
+    if (skipReset.current) {
+      skipReset.current = false;
+    } else {
+      setCourse({
+        value: -1,
+        label: "",
+      });
+      setProgrammeIntake({
+        value: -1,
+        label: "",
+      });
+    }
+  }, [authToken, programme]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Active":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded-full">
+            {status}
+          </span>
+        );
+      case "Finished":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-red-600 bg-red-100 rounded-full">
+            {status}
+          </span>
+        );
+      case "Completed":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full">
+            {status}
+          </span>
+        );
+      case "Dropped":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-full">
+            {status}
+          </span>
+        );
+      default:
+        return status;
+    }
+  };
 
   async function handleSubmitUser(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -174,15 +328,26 @@ export default function UserForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidEmail(true);
+      toast.error("Email already exist!");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/users");
+      toast.success(
+        `${type === "Add" ? "Created new" : "Updated"} ${
+          isAdmin ? "Admin" : "Student"
+        }`
+      );
       return;
     } else {
       navigate("/admin/users");
+      toast.error(
+        `Failed to ${type === "Add" ? "Create new" : "Update"} ${
+          isAdmin ? "Admin" : "Student"
+        }`
+      );
     }
   }
 
@@ -218,9 +383,10 @@ export default function UserForm({
         programmeIntake.value
       );
 
-    if (response?.status === 400) {
+    if (response && response.status === 409) {
       setIsStudentCourseProgrammeIntakeExist(true);
       setIsLoading(false);
+      toast.error("Course existed");
       return;
     } else {
       setIsStudentCourseProgrammeIntakeExist(false);
@@ -228,12 +394,12 @@ export default function UserForm({
 
     if (!response || !response.ok) {
       setIsLoading(false);
-
       return;
     }
 
     setIsLoading(false);
     navigate("/admin/users");
+    toast.success("Updated student's course");
     return;
   }
 
@@ -257,6 +423,7 @@ export default function UserForm({
 
     if (response && response.ok) {
       navigate("/admin/users");
+      toast.success("Deleted course history");
     }
   };
 
@@ -480,141 +647,6 @@ export default function UserForm({
     setProgrammeIntakeOptions(options);
   }
 
-  const setupEditStudentForm = useCallback(
-    async (token: string, studentId: number) => {
-      const studentCourseProgrammeIntakeResponse: Response | undefined =
-        await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
-      const studentResponse: Response | undefined = await getStudentByIdAPI(
-        token,
-        studentId
-      );
-
-      if (!studentCourseProgrammeIntakeResponse?.ok || !studentResponse?.ok) {
-        navigate("/admin/users");
-        return;
-      }
-
-      const studentDataJson = await studentResponse.json();
-      const studentData = studentDataJson.data;
-      const { data } = await studentCourseProgrammeIntakeResponse.json();
-
-      skipReset.current = true;
-
-      setFirstName(studentData.firstName);
-      setLastName(studentData.lastName);
-      setEmail(studentData.email);
-      setPhoneNumber(studentData.phoneNumber);
-      setStatus({
-        value: studentData.userStatus ? 1 : 0,
-        label: studentData.userStatus ? "Active" : "Inactive",
-      });
-
-      // Filter active and history programmes
-      const studentCoursesHistory = (data || []).filter(
-        (p: StudentCourseProgrammeIntake) => p.courseStatus === 0
-      );
-      setStudentCoursesHistory(studentCoursesHistory);
-
-      const activeProgrammes = (data || [])
-        .filter((p: StudentCourseProgrammeIntake) => p.courseStatus === 1)
-        .map((programme: Programme) => ({
-          value: programme.programmeId,
-          label: programme.programmeName,
-        }));
-      setProgramme(activeProgrammes[0] || { value: -1, label: "" });
-
-      // Filter active and history courses
-      const activeCourses = (data || [])
-        .filter((c: StudentCourseProgrammeIntake) => c.courseStatus === 1)
-        .map((course: Course) => ({
-          value: course.courseId,
-          label: course.courseName,
-        }));
-      setCourse(activeCourses[0] || { value: -1, label: "" });
-
-      // Filter active and history programme intakes
-      const activeProgrammeIntakes = (data || [])
-        .filter((i: StudentCourseProgrammeIntake) => i.courseStatus === 1)
-        .map((intake: ProgrammeIntake) => ({
-          value: intake.programmeIntakeId,
-          label: intake.intakeId + " - Semester " + intake.semester,
-        }));
-      setProgrammeIntake(activeProgrammeIntakes[0] || { value: -1, label: "" });
-    },
-    [navigate]
-  );
-
-  const setupEditAdminForm = useCallback(
-    async (token: string, adminId: number) => {
-      const response: Response | undefined = await getAdminByIdAPI(
-        token,
-        adminId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/users");
-        return;
-      }
-      const { data } = await response.json();
-
-      skipReset.current = true;
-
-      setFirstName(data.firstName);
-      setLastName(data.lastName);
-      setEmail(data.email);
-      setPhoneNumber(data.phoneNumber);
-      setStatus({
-        value: data.userStatus ? 1 : 0,
-        label: data.userStatus ? "Active" : "Inactive",
-      });
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-
-    setAuthToken(token);
-    getAllProgrammes(token);
-
-    if (type === "Edit" && id > 0) {
-      if (isAdmin) {
-        setupEditAdminForm(token, id);
-      } else {
-        setupEditStudentForm(token, id);
-      }
-    }
-  }, [navigate, type, id, setupEditStudentForm, setupEditAdminForm, isAdmin]);
-
-  useEffect(() => {
-    if (programme.value <= 0 || !authToken) {
-      setCourseOptions([]);
-      return;
-    }
-
-    getCoursesByProgrammeId(authToken, programme.value);
-    getProgrammeIntakesByProgrammeId(authToken, programme.value);
-
-    if (skipReset.current) {
-      skipReset.current = false;
-    } else {
-      setCourse({
-        value: -1,
-        label: "",
-      });
-      setProgrammeIntake({
-        value: -1,
-        label: "",
-      });
-    }
-  }, [authToken, programme]);
-
   return (
     <section className="flex-1 bg-white rounded-lg border">
       {isLoading && <LoadingOverlay />}
@@ -642,7 +674,7 @@ export default function UserForm({
             onSubmit={handleSubmitUser}
             className="mt-6 gap-y-8 flex flex-col justify-center items-center"
           >
-            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper isEmpty={emptyFirstName}>
                   <NormalTextField
@@ -666,9 +698,13 @@ export default function UserForm({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10  gap-y-8 sm:gap-y-0">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyEmail} isInvalid={invalidEmail} invalidMessage="Email already exists.">
+                <AdminInputFieldWrapper
+                  isEmpty={emptyEmail}
+                  isInvalid={invalidEmail}
+                  invalidMessage="Email already exists."
+                >
                   <NormalTextField
                     text={email}
                     onChange={onChangeEmail}
@@ -690,7 +726,7 @@ export default function UserForm({
             </div>
 
             {type === "Add" && (
-              <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+              <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                 <div className="flex-1">
                   <AdminInputFieldWrapper isEmpty={emptyPassword}>
                     <PasswordTextField
@@ -719,7 +755,7 @@ export default function UserForm({
 
             {!isAdmin && (
               <>
-                <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
+                <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                   <div className="flex-1">
                     <SingleFilter
                       placeholder="Select Student Status"
@@ -733,7 +769,7 @@ export default function UserForm({
               </>
             )}
 
-            <div className="justify-center flex mt-10 gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Student"
@@ -766,9 +802,9 @@ export default function UserForm({
                 <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
                     <AdminInputFieldWrapper
-                      isEmpty={
-                        emptyProgramme || isStudentCourseProgrammeIntakeExist
-                      }
+                      isEmpty={emptyProgramme}
+                      isInvalid={isStudentCourseProgrammeIntakeExist}
+                      invalidMessage="Please Select a Different Programme"
                     >
                       <SingleFilter
                         placeholder="Select Student Programme"
@@ -783,9 +819,9 @@ export default function UserForm({
                   </div>
                   <div className="flex-1">
                     <AdminInputFieldWrapper
-                      isEmpty={
-                        emptyCourse || isStudentCourseProgrammeIntakeExist
-                      }
+                      isEmpty={emptyCourse}
+                      isInvalid={isStudentCourseProgrammeIntakeExist}
+                      invalidMessage="Please Select a Different Course"
                     >
                       <SingleFilter
                         placeholder="Select Student Course"
@@ -803,10 +839,9 @@ export default function UserForm({
                 <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
                   <div className="flex-1">
                     <AdminInputFieldWrapper
-                      isEmpty={
-                        emptyProgrammeIntake ||
-                        isStudentCourseProgrammeIntakeExist
-                      }
+                      isEmpty={emptyProgrammeIntake}
+                      isInvalid={isStudentCourseProgrammeIntakeExist}
+                      invalidMessage="Please Select a Different Intake"
                     >
                       <SingleFilter
                         placeholder="Select Student Intake"
@@ -898,17 +933,7 @@ export default function UserForm({
                                   ).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-5">
-                                  <span
-                                    className={`font-bold px-4 py-2 ${
-                                      student.courseStatus
-                                        ? "bg-green-100 text-green-600"
-                                        : "bg-red-100 text-red-600"
-                                    } rounded-xl`}
-                                  >
-                                    {student.courseStatus
-                                      ? "Active"
-                                      : "Inactive"}
-                                  </span>
+                                  {getStatusBadge(student.status)}
                                 </td>
                                 <td className="px-6 py-5 text-slate-500 text-center">
                                   <button

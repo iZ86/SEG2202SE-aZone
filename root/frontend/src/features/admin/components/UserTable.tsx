@@ -1,20 +1,21 @@
 import { Pencil } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { getAllStudentsAPI } from "../api/students";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { User } from "@datatypes/userType";
 import { getAllAdminsAPI } from "../api/admins";
+import { useAdmin } from "../hooks/useAdmin";
+import LoadingOverlay from "@components/LoadingOverlay";
 
 export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-  const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   const fetchUsers = useCallback(
     async (token: string, page: number = 1) => {
@@ -48,20 +49,13 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-    setAuthToken(token);
-  }, [fetchUsers, navigate]);
-
-  useEffect(() => {
     if (!authToken) return;
     fetchUsers(authToken, currentPage);
   }, [authToken, currentPage, fetchUsers]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   const handlePageChange = (page: number, pageSize: number) => {
     setCurrentPage(page);
@@ -75,8 +69,8 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
           type="text"
           placeholder={`${
             activeTab === "Student"
-              ? "Search with Student ID, name, email or course name..."
-              : "Search with Admin ID, name or email..."
+              ? "Search with Student ID, name, or email..."
+              : "Search with Admin ID, name, or email..."
           }`}
           className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}

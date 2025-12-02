@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
@@ -9,6 +9,8 @@ import {
   updateIntakeByIdAPI,
 } from "../api/intakes";
 import YearMonthPicker from "@components/YearMonthPicker";
+import { useAdmin } from "../hooks/useAdmin";
+import { toast } from "react-toastify";
 
 export default function IntakeForm({
   type,
@@ -23,8 +25,39 @@ export default function IntakeForm({
   const [invalidIntakeId, setInvalidIntakeId] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditIntakeForm = async (token: string, intakeId: number) => {
+      const response: Response | undefined = await getIntakeByIdAPI(
+        token,
+        intakeId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/intakes");
+        toast.error("Failed to fetch intake");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setIntakeId(data.intakeId.toString());
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    if (type === "Edit" && id > 0) {
+      setupEditIntakeForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,12 +92,14 @@ export default function IntakeForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidIntakeId(true);
+      toast.error("IntakeId existed");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/intakes");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} intake`);
       return;
     }
   }
@@ -87,40 +122,6 @@ export default function IntakeForm({
     }
     setIntakeId(onChangeIntakeId);
   }
-
-  const setupEditIntakeForm = useCallback(
-    async (token: string, intakeId: number) => {
-      const response: Response | undefined = await getIntakeByIdAPI(
-        token,
-        intakeId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/intakes");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setIntakeId(data.intakeId.toString());
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-
-    setAuthToken(token);
-    if (type === "Edit" && id > 0) {
-      setupEditIntakeForm(token, id);
-    }
-  }, [navigate, type, id, setupEditIntakeForm]);
 
   return (
     <section className="flex-1 bg-white rounded-lg border">
@@ -158,15 +159,7 @@ export default function IntakeForm({
               />
             </AdminInputFieldWrapper>
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/intakes"
-              />
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Intake"
@@ -175,6 +168,14 @@ export default function IntakeForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/intakes"
               />
             </div>
           </form>

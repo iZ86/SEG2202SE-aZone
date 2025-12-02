@@ -35,3 +35,4 @@ export type StudentInformation = {
   studyMode: string;
   status: number;
 }
+

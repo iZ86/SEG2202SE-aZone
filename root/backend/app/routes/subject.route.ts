@@ -13,6 +13,7 @@ class SubjectRoute {
   }
 
   initializeRoutes() {
+    this.router.get("/count", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getSubjectsCount));
     this.router.get("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getSubjectById));
     this.router.put("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateSubjectValidator, asyncHandler(this.controller.updateSubjectById));
     this.router.delete("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteSubjectById));

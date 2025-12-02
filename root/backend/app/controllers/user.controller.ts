@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSubjectData } from "../models/user-model";
 import userService from "../services/user.service";
 import courseService from "../services/course.service";
 import programmeService from "../services/programme.service";
@@ -230,6 +230,21 @@ export default class UserController {
     }
   }
 
+  async getStudentsCount(req: Request, res: Response) {
+    const response: Result<number> = await userService.getUserCount(undefined, ENUM_USER_ROLE.STUDENT);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok({
+        studentsCount: response.getData() || 0
+      }, response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
   async getAllStudentCourseProgrammeIntakes(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
@@ -261,7 +276,33 @@ export default class UserController {
     const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(
+        response.getData().map((data) => {
+          let statusLabel: string;
+          switch (data.courseStatus) {
+            case ENUM_PROGRAMME_STATUS.ACTIVE:
+              statusLabel = "Active";
+              break;
+            case ENUM_PROGRAMME_STATUS.COMPLETED:
+              statusLabel = "Completed";
+              break;
+            case ENUM_PROGRAMME_STATUS.FINISHED:
+              statusLabel = "Finished";
+              break;
+            case ENUM_PROGRAMME_STATUS.DROPPED:
+              statusLabel = "Dropped";
+              break;
+            default:
+              statusLabel = "Unknown";
+          }
+
+          return {
+            ...data,
+            status: statusLabel,
+          };
+        }),
+        response.getMessage()
+      );
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -286,7 +327,7 @@ export default class UserController {
     const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await userService.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
 
     if (studentCourseProgrammeIntakeResponse.getData()) {
-      return res.sendError.badRequest("Active course exist");
+      return res.sendError.conflict("Active course exist");
     }
 
     const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
@@ -366,7 +407,7 @@ export default class UserController {
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage())
     } else {
-      switch(response.getErrorCode()) {
+      switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
       }
@@ -384,10 +425,10 @@ export default class UserController {
       throw new Error("user.controller.ts, getStudentActiveSubjectsById failed");
     }
   }
- 
+
   async getStudentTimetableById(req: Request, res: Response) {
     const userId: number = req.user.userId
-    
+
     const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(userId);
     const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(userId);
 
@@ -396,9 +437,32 @@ export default class UserController {
       return res.sendSuccess.ok({
         semesterStartDate: studentSemesterStartAndEndDate.getData()?.semesterStartDate,
         semesterEndDate: studentSemesterStartAndEndDate.getData()?.semesterEndDate,
-        timetable: response.getData()}, response.getMessage());
+        timetable: response.getData()
+      }, response.getMessage());
     } else {
       throw new Error("user.controller.ts, getStudentTimetableById failed");
+    }
+  }
+
+  async getAllStudentEnrollmentSubjectById(req: Request, res: Response) {
+    const studentId: number = req.user.userId;
+    const page: number = parseInt(req.query.page as string) || 1;
+    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const query: string = req.query.query as string || "";
+    const semester: number = parseInt(req.query.semester as string) || 0;
+
+    const response: Result<StudentEnrollmentSubjectData[]> = await userService.getAllStudentEnrollmentSubjectById(studentId, semester, query, pageSize, page);
+    const subjectCount: Result<number> = await userService.getStudentEnrollmentSubjectCountById(studentId, semester, query);
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok({
+        subjects: response.getData(),
+        subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
+      }, response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
     }
   }
 }

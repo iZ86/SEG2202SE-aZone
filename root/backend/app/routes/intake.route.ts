@@ -4,7 +4,7 @@ import IntakeController from "../controllers/intake.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
 import { createAndUpdateIntakeValidator } from "../validators/intake-validator";
 
-class CourseRoute {
+class IntakeRoute {
   router = Router();
   controller = new IntakeController();
 
@@ -21,4 +21,4 @@ class CourseRoute {
   }
 }
 
-export default new CourseRoute().router;
+export default new IntakeRoute().router;

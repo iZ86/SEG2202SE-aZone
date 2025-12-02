@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -14,6 +14,8 @@ import {
   updateSubjectByIdAPI,
 } from "../api/subjects";
 import type { Course } from "@datatypes/courseType";
+import { useAdmin } from "../hooks/useAdmin";
+import { toast } from "react-toastify";
 
 export default function SubjectForm({
   type,
@@ -33,15 +35,58 @@ export default function SubjectForm({
   const [emptyCreditHours, setEmptyCreditHours] = useState(false);
   const [emptyCourse, setEmptyCourse] = useState(false);
 
-  const [invalidSubjectName, setInvalidSubjectName] = useState(false);
+  const [invalidSubjectCode, setInvalidSubjectCode] = useState(false);
 
   const [courseOptions, setCourseOptions] = useState<reactSelectOptionType[]>(
     []
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditSubjectForm = async (token: string, subjectId: number) => {
+      const response: Response | undefined = await getSubjectByIdAPI(
+        token,
+        subjectId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/subjects");
+        toast.error("Failed to fetch subject");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setSubjectName(data.subjects.subjectName);
+      setCourse(
+        data.courses.map(
+          (course: { courseId: number; courseName: string }) => ({
+            label: course.courseName,
+            value: course.courseId,
+          })
+        )
+      );
+      setSubjectCode(data.subjects.subjectCode);
+      setCreditHours(data.subjects.creditHours.toString());
+      setDescription(data.subjects.description || "");
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    getAllCourses(authToken);
+    if (type === "Edit" && id > 0) {
+      setupEditSubjectForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -91,13 +136,15 @@ export default function SubjectForm({
 
     if (response && response.status === 409) {
       setIsLoading(false);
-      setInvalidSubjectName(true);
+      setInvalidSubjectCode(true);
+      toast.error("Subject code existed");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/subjects");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} subject`);
       return;
     }
   }
@@ -170,6 +217,10 @@ export default function SubjectForm({
     }
   }
 
+  function onChangeDescription(onChangeDescription: string) {
+    setDescription(onChangeDescription);
+  }
+
   async function getAllCourses(token: string) {
     const response: Response | undefined = await getAllCoursesAPI(token);
 
@@ -193,52 +244,6 @@ export default function SubjectForm({
     setCourseOptions(options);
   }
 
-  const setupEditSubjectForm = useCallback(
-    async (token: string, subjectId: number) => {
-      const response: Response | undefined = await getSubjectByIdAPI(
-        token,
-        subjectId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/subjects");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setSubjectName(data.subjects.subjectName);
-      setCourse(
-        data.courses.map(
-          (course: { courseId: number; courseName: string }) => ({
-            label: course.courseName,
-            value: course.courseId,
-          })
-        )
-      );
-      setSubjectCode(data.subjects.subjectCode);
-      setCreditHours(data.subjects.creditHours.toString());
-      setDescription(data.subjects.description || "");
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-
-    setAuthToken(token);
-    getAllCourses(token);
-    if (type === "Edit" && id > 0) {
-      setupEditSubjectForm(token, id);
-    }
-  }, [navigate, type, id, setupEditSubjectForm]);
-
   return (
     <section className="flex-1 bg-white rounded-lg border">
       {isLoading && <LoadingOverlay />}
@@ -259,34 +264,34 @@ export default function SubjectForm({
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
-                <AdminInputFieldWrapper
-                  isEmpty={emptySubjectName}
-                  isInvalid={invalidSubjectName}
-                  invalidMessage="Subject Name already exists."
-                >
+                <AdminInputFieldWrapper isEmpty={emptySubjectName}>
                   <NormalTextField
                     text={subjectName}
                     onChange={onChangeSubjectName}
-                    isInvalid={emptySubjectName || invalidSubjectName}
+                    isInvalid={emptySubjectName}
                     placeholder="Subject Name"
                   />
                 </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptySubjectCode}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptySubjectCode}
+                  isInvalid={invalidSubjectCode}
+                  invalidMessage="Subject Code already exists."
+                >
                   <NormalTextField
                     text={subjectCode}
                     onChange={onChangeSubjectCode}
-                    isInvalid={emptySubjectCode}
+                    isInvalid={emptySubjectCode || invalidSubjectCode}
                     placeholder="Subject Code (e.g., SEG1024)"
                   />
                 </AdminInputFieldWrapper>
               </div>
             </div>
 
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper isEmpty={emptyCreditHours}>
                   <NormalTextField
@@ -310,15 +315,18 @@ export default function SubjectForm({
               </div>
             </div>
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/subjects"
-              />
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
+              <div className="flex-1">
+                <NormalTextField
+                  text={description}
+                  onChange={onChangeDescription}
+                  isInvalid={false}
+                  placeholder="Description"
+                />
+              </div>
+            </div>
+
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Course"
@@ -327,6 +335,14 @@ export default function SubjectForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/subjects"
               />
             </div>
           </form>

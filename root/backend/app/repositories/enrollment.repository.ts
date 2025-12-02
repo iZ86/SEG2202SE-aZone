@@ -1,4 +1,4 @@
-import { EnrollmentData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -11,6 +11,10 @@ interface IEnrollmentRepository {
   deleteEnrollmentById(enrollmentId: number): Promise<ResultSetHeader>;
   getEnrollmentCount(query: string): Promise<number>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
+  getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<EnrollmentProgrammeIntakeData[]>;
+  getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined>;
+  createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
+  deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -21,6 +25,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "SELECT * " +
         "FROM ENROLLMENT " +
         "WHERE enrollmentId LIKE ? " +
+        "ORDER BY enrollmentStartDateTime ASC " +
         "LIMIT ? OFFSET ?;",
         [
           "%" + query + "%",
@@ -121,6 +126,70 @@ class EnrollmentRepository implements IEnrollmentRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<EnrollmentProgrammeIntakeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentProgrammeIntakeData[]>(
+        "SELECT e.* , pi.*, p.programmeName, sm.studyMode " +
+        "FROM ENROLLMENT e " +
+        "INNER JOIN ENROLLMENT_PROGRAMME_INTAKE epi ON e.enrollmentId = epi.enrollmentId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON epi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE e.enrollmentId = ?;",
+        [enrollmentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentProgrammeIntakeData[]>(
+        "SELECT * " +
+        "FROM ENROLLMENT_PROGRAMME_INTAKE " +
+        "WHERE enrollmentId = ? " +
+        "AND programmeIntakeId = ?;",
+        [enrollmentId, programmeIntakeId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+
+  createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "INSERT INTO ENROLLMENT_PROGRAMME_INTAKE (enrollmentId, programmeIntakeId) " +
+        "VALUES (?, ?);",
+        [enrollmentId, programmeIntakeId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM ENROLLMENT_PROGRAMME_INTAKE " +
+        "WHERE enrollmentId = ?;",
+        [enrollmentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
         }
       );
     });

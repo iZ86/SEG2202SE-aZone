@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -14,6 +14,8 @@ import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import type { SingleValue } from "react-select";
 import type { Programme } from "@datatypes/programmeType";
 import SingleFilter from "@components/SingleFilter";
+import { useAdmin } from "../hooks/useAdmin";
+import { toast } from "react-toastify";
 
 export default function CourseForm({
   type,
@@ -38,8 +40,44 @@ export default function CourseForm({
   >([]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditCourseForm = async (token: string, courseId: number) => {
+      const response: Response | undefined = await getCourseByIdAPI(
+        token,
+        courseId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/courses");
+        toast.error("Failed to fetch course");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      setCourseName(data.courseName);
+      setProgramme({
+        label: data.programmeName,
+        value: data.programmeId,
+      });
+    };
+
+    if (!authToken) {
+      return;
+    }
+
+    getAllProgrammes(authToken);
+    if (type === "Edit" && id > 0) {
+      setupEditCourseForm(authToken, id);
+    }
+  }, [type, id, authToken, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -79,12 +117,14 @@ export default function CourseForm({
     if (response && response.status === 409) {
       setIsLoading(false);
       setInvalidCourseName(true);
+      toast.error("Course name existed");
       return;
     }
 
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/courses");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} course`);
       return;
     }
   }
@@ -145,45 +185,6 @@ export default function CourseForm({
     setProgrammeOptions(options);
   }
 
-  const setupEditCourseForm = useCallback(
-    async (token: string, courseId: number) => {
-      const response: Response | undefined = await getCourseByIdAPI(
-        token,
-        courseId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/courses");
-        return;
-      }
-
-      const { data } = await response.json();
-
-      setCourseName(data.courseName);
-      setProgramme({
-        label: data.programmeName,
-        value: data.programmeId,
-      });
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-
-    setAuthToken(token);
-    getAllProgrammes(token);
-    if (type === "Edit" && id > 0) {
-      setupEditCourseForm(token, id);
-    }
-  }, [navigate, type, id, setupEditCourseForm]);
-
   return (
     <section className="flex-1 bg-white rounded-lg border">
       {isLoading && <LoadingOverlay />}
@@ -204,7 +205,7 @@ export default function CourseForm({
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper
                   isEmpty={emptyCourseName}
@@ -232,15 +233,7 @@ export default function CourseForm({
               </div>
             </div>
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/courses"
-              />
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Course"
@@ -249,6 +242,14 @@ export default function CourseForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/courses"
               />
             </div>
           </form>

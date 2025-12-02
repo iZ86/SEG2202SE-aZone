@@ -5,15 +5,18 @@ import Pagination from "@components/Pagination";
 import SmallButton from "@components/SmallButton";
 import type { Subject } from "@datatypes/subjectType";
 import { deleteSubjectByIdAPI, getAllSubjectsAPI } from "../api/subjects";
+import { useAdmin } from "../hooks/useAdmin";
+import LoadingOverlay from "@components/LoadingOverlay";
+import { toast } from "react-toastify";
 
 export default function SubjectTable() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
 
   const fetchSubjects = useCallback(
     async (token: string, page: number = 1) => {
@@ -43,20 +46,13 @@ export default function SubjectTable() {
   );
 
   useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-    setAuthToken(token);
-  }, [navigate]);
-
-  useEffect(() => {
     if (!authToken) return;
     fetchSubjects(authToken, currentPage);
   }, [authToken, currentPage, fetchSubjects]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   const handlePageChange = (page: number, pageSize: number) => {
     setCurrentPage(page);
@@ -74,28 +70,35 @@ export default function SubjectTable() {
     if (response && response.ok) {
       navigate("/admin/subjects");
       fetchSubjects(authToken, currentPage);
+      toast.success(`Deleted subject ${subjectId}`);
+      return;
+    } else {
+      toast.error(`Failed to delete subject ${subjectId}`);
+      return;
     }
   };
 
   return (
     <>
-      <div className="flex items-center space-x-4 mt-4">
+      <div className="items-center space-x-4 mt-4 sm:flex">
         <input
           type="text"
           placeholder="Search with Subject ID, Subject Name, or Subject Code..."
-          className="grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
+          className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <SmallButton
-          buttonText="Create New Subject"
-          backgroundColor="bg-blue-500"
-          hoverBgColor="hover:bg-blue-600"
-          link="/admin/subjects/create"
-          textColor="text-white"
-          submit={false}
-        />
+        <div className="mt-4 sm:mt-0">
+          <SmallButton
+            buttonText="Create New Subject"
+            backgroundColor="bg-blue-500"
+            hoverBgColor="hover:bg-blue-600"
+            link="/admin/subjects/create"
+            textColor="text-white"
+            submit={false}
+          />
+        </div>
       </div>
 
       <section className="mt-4">

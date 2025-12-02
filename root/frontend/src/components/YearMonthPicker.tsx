@@ -48,7 +48,7 @@ export default function YearMonthPicker({
   ];
 
   return (
-    <DialogTrigger onOpenChange={setIsFocused}>
+    <DialogTrigger isOpen={isFocused} onOpenChange={setIsFocused}>
       <div
         className={`relative w-${width} max-w-${maxWidth} min-w-${minWidth} text-base text-gray-battleship`}
       >
@@ -111,6 +111,7 @@ export default function YearMonthPicker({
                   key={i}
                   onPress={() => {
                     onChange(year + m);
+                    setIsFocused(false);
                   }}
                   className="p-3 rounded-xl border border-gray-300 hover:bg-gray-100 w-20 text-center text-sm"
                 >

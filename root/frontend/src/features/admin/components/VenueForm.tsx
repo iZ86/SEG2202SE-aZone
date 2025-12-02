@@ -1,5 +1,5 @@
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
@@ -9,6 +9,8 @@ import {
   getVenueByIdAPI,
   updateVenueByIdAPI,
 } from "../api/venues";
+import { useAdmin } from "../hooks/useAdmin";
+import { toast } from "react-toastify";
 
 export default function VenueForm({
   type,
@@ -21,9 +23,40 @@ export default function VenueForm({
 
   const [emptyVenue, setEmptyVenue] = useState(false);
 
+  const [invalidVenue, setInvalidVenue] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, admin, loading } = useAdmin();
+
+  useEffect(() => {
+    const setupEditVenueForm = async (token: string, venueId: number) => {
+      const response: Response | undefined = await getVenueByIdAPI(
+        token,
+        venueId
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/venues");
+        toast.error("Failed to fetch venue");
+        return;
+      }
+      const { data } = await response.json();
+
+      setVenue(data.venue);
+    };
+
+    if (!authToken) {
+      return;
+    }
+    if (type === "Edit" && id > 0) {
+      setupEditVenueForm(authToken, id);
+    }
+  }, [authToken, type, id, navigate]);
+
+  if (loading || !admin) {
+    return <LoadingOverlay />;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,9 +84,17 @@ export default function VenueForm({
       response = await updateVenueByIdAPI(authToken as string, id, venue);
     }
 
+    if (response && response.status === 409) {
+      setIsLoading(false);
+      setInvalidVenue(true);
+      toast.error("Venue Existed");
+      return;
+    }
+
     if (response && response.ok) {
       setIsLoading(false);
       navigate("/admin/venues");
+      toast.success(`${type === "Add" ? "Created new" : "Updated"} venue`);
       return;
     }
   }
@@ -76,40 +117,6 @@ export default function VenueForm({
     setVenue(onChangeVenue);
   }
 
-  const setupEditVenueForm = useCallback(
-    async (token: string, venueId: number) => {
-      const response: Response | undefined = await getVenueByIdAPI(
-        token,
-        venueId
-      );
-
-      if (!response?.ok) {
-        navigate("/admin/venues");
-        return;
-      }
-      const { data } = await response.json();
-
-      setVenue(data.venue);
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    const token: string = (localStorage.getItem("aZoneAdminAuthToken") ||
-      sessionStorage.getItem("aZoneAdminAuthToken")) as string;
-
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-
-    setAuthToken(token);
-
-    if (type === "Edit" && id > 0) {
-      setupEditVenueForm(token, id);
-    }
-  }, [navigate, type, id, setupEditVenueForm]);
-
   return (
     <section className="flex-1 bg-white rounded-lg border">
       {isLoading && <LoadingOverlay />}
@@ -130,28 +137,24 @@ export default function VenueForm({
 
         <div className="flex flex-col px-10 py-6 justify-center items-center">
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
-            <div className="flex w-5xl gap-x-10">
+            <div className="flex flex-col sm:flex-row w-xs sm:w-xl md:w-2xl gap-x-10 gap-y-8 sm:gap-y-0">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyVenue}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyVenue}
+                  isInvalid={invalidVenue}
+                  invalidMessage="Venue existed"
+                >
                   <NormalTextField
                     text={venue}
                     onChange={onChangeVenue}
-                    isInvalid={emptyVenue}
+                    isInvalid={emptyVenue || invalidVenue}
                     placeholder="Venue Name"
                   />
                 </AdminInputFieldWrapper>
               </div>
             </div>
 
-            <div className="justify-center flex mt-10 gap-x-10">
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/venues"
-              />
+            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton
                 buttonText={
                   type === "Edit" ? "Save Changes" : "Create New Venue"
@@ -160,6 +163,14 @@ export default function VenueForm({
                 backgroundColor="bg-blue-500"
                 hoverBgColor="hover:bg-blue-600"
                 textColor="text-white"
+              />
+              <MediumButton
+                buttonText="Cancel"
+                submit={false}
+                backgroundColor="bg-slate-400"
+                hoverBgColor="hover:bg-slate-600"
+                textColor="text-white"
+                link="/admin/venues"
               />
             </div>
           </form>

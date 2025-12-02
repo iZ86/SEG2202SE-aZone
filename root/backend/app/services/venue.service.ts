@@ -1,3 +1,4 @@
+import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { VenueData } from "../models/venue-model";
@@ -6,6 +7,8 @@ import venueRepository from "../repositories/venue.repository";
 interface IVenueService {
   getAllVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
   getVenueById(venueId: number): Promise<Result<VenueData>>;
+  getVenueByVenue(venue: string): Promise<Result<VenueData>>;
+  getVenueByIdAndVenue(venueId: number, venue: string): Promise<Result<VenueData>>;
   createVenue(venue: string): Promise<Result<VenueData>>;
   updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>>;
   deleteVenueById(venueId: number): Promise<Result<null>>;
@@ -29,6 +32,26 @@ class VenueService implements IVenueService {
     return Result.succeed(venue, "Venue retrieve success");
   }
 
+  async getVenueByVenue(venue: string): Promise<Result<VenueData>> {
+    const venueData: VenueData | undefined = await venueRepository.getVenueByVenue(venue);
+
+    if (!venueData) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
+    }
+
+    return Result.succeed(venueData, "Venue retrieve success");
+  }
+
+  async getVenueByIdAndVenue(venueId: number, venue: string): Promise<Result<VenueData>> {
+    const venueData: VenueData | undefined = await venueRepository.getVenueByIdAndVenue(venueId, venue);
+
+    if (!venueData) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue not found");
+    }
+
+    return Result.succeed(venueData, "Venue retrieve success");
+  }
+
   async createVenue(venue: string): Promise<Result<VenueData>> {
     const response = await venueRepository.createVenue(venue);
 
@@ -42,7 +65,11 @@ class VenueService implements IVenueService {
   }
 
   async updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>> {
-    await venueRepository.updateVenueById(venueId, venue);
+    const updateVenueResponse: ResultSetHeader = await venueRepository.updateVenueById(venueId, venue);
+
+    if (updateVenueResponse.affectedRows === 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to update venue");
+    }
 
     const venueResponse: VenueData | undefined = await venueRepository.getVenueById(venueId);
 

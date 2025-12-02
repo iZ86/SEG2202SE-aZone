@@ -10,3 +10,10 @@ export enum ENUM_USER_ROLE {
   STUDENT = 1,
   ADMIN = 2,
 }
+
+export enum ENUM_PROGRAMME_STATUS {
+  ACTIVE = 1,
+  COMPLETED = 2,
+  FINISHED = 3,
+  DROPPED = 4,
+}

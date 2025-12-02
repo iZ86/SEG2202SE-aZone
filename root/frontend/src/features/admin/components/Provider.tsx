@@ -2,12 +2,13 @@ import { useEffect, useState, type ReactNode } from "react";
 import { getMeAPI } from "@features/general/api/user";
 import type { User } from "@datatypes/userType";
 import { AdminContext } from "../hooks/useAdmin";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Provider({ children }: { children: ReactNode }) {
   const [authToken, setAuthToken] = useState("");
   const [admin, setAdmin] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchAdmin() {
@@ -16,7 +17,7 @@ export default function Provider({ children }: { children: ReactNode }) {
         sessionStorage.getItem("aZoneAdminAuthToken");
 
       if (!token) {
-        <Navigate to={"/admin/login"} replace />;
+        navigate("/admin/login")
         return;
       }
 
@@ -27,7 +28,7 @@ export default function Provider({ children }: { children: ReactNode }) {
       if (!response || !response.ok) {
         console.error("Failed to fetch admin");
 
-        <Navigate to={"/admin/login"} replace />;
+        navigate("/admin/login");
         return;
       }
 
@@ -38,7 +39,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     }
 
     fetchAdmin();
-  }, []);
+  }, [navigate]);
 
   return (
     <AdminContext.Provider value={{ authToken, admin, loading }}>

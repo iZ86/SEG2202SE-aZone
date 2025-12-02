@@ -50,7 +50,7 @@ export const getEnrollmentsByProgrammeIdAPI = async (token: string, programmeId:
   }
 };
 
-export const createEnrollmentAPI = async (token: string, enrollmentStartDateTime: CalendarDateTime, enrollmentEndDateTime: CalendarDateTime): Promise<Response | undefined> => {
+export const createEnrollmentAPI = async (token: string, enrollmentStartDateTime: CalendarDateTime, enrollmentEndDateTime: CalendarDateTime, programmeIntakeIds: number[]): Promise<Response | undefined> => {
   try {
     return await fetch("http://localhost:8080/api/v1/enrollments",
       {
@@ -62,6 +62,7 @@ export const createEnrollmentAPI = async (token: string, enrollmentStartDateTime
         body: JSON.stringify({
           enrollmentStartDateTime: enrollmentStartDateTime.toString().slice(0, 19).replace('T', ' '),
           enrollmentEndDateTime: enrollmentEndDateTime.toString().slice(0, 19).replace('T', ' '),
+          programmeIntakeIds
         }),
         mode: "cors"
       });
@@ -70,7 +71,7 @@ export const createEnrollmentAPI = async (token: string, enrollmentStartDateTime
   }
 };
 
-export const updateEnrollmentByIdAPI = async (token: string, enrollmentId: number, enrollmentStartDateTime: CalendarDateTime, enrollmentEndDateTime: CalendarDateTime): Promise<Response | undefined> => {
+export const updateEnrollmentByIdAPI = async (token: string, enrollmentId: number, enrollmentStartDateTime: CalendarDateTime, enrollmentEndDateTime: CalendarDateTime, programmeIntakeIds: number[]): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/enrollments/${enrollmentId}`,
       {
@@ -82,6 +83,7 @@ export const updateEnrollmentByIdAPI = async (token: string, enrollmentId: numbe
         body: JSON.stringify({
           enrollmentStartDateTime: enrollmentStartDateTime.toString().slice(0, 19).replace('T', ' '),
           enrollmentEndDateTime: enrollmentEndDateTime.toString().slice(0, 19).replace('T', ' '),
+          programmeIntakeIds
         }),
         mode: "cors"
       });

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 
 export default class EnrollmentController {
@@ -34,9 +34,13 @@ export default class EnrollmentController {
     }
 
     const response: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
+    const enrollmentProgrammeIntakesResponse: Result<EnrollmentProgrammeIntakeData[]> = await enrollmentService.getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok({
+        enrollments: response.getData(),
+        programmeIntakes: enrollmentProgrammeIntakesResponse.getData(),
+      }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -48,6 +52,7 @@ export default class EnrollmentController {
   async createEnrollment(req: Request, res: Response) {
     const enrollmentStartDateTime: Date = req.body.enrollmentStartDateTime;
     const enrollmentEndDateTime: Date = req.body.enrollmentEndDateTime;
+    const programmeIntakeIds: number[] = req.body.programmeIntakeIds;
 
     const isDateTimeDuplicated: Result<EnrollmentData> = await enrollmentService.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
 
@@ -56,6 +61,16 @@ export default class EnrollmentController {
     }
 
     const response: Result<EnrollmentData> = await enrollmentService.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
+
+    await enrollmentService.deleteEnrollmentProgrammeIntakeByEnrollmentId(response.getData().enrollmentId);
+
+    if (programmeIntakeIds && programmeIntakeIds.length > 0) {
+      await Promise.all(
+        programmeIntakeIds.map((programmeIntakeId) =>
+          enrollmentService.createEnrollmentProgrammeIntake(response.getData().enrollmentId, programmeIntakeId)
+        )
+      );
+    }
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -71,6 +86,7 @@ export default class EnrollmentController {
     const enrollmentId: number = parseInt(req.params.enrollmentId as string);
     const enrollmentStartDateTime: Date = req.body.enrollmentStartDateTime;
     const enrollmentEndDateTime: Date = req.body.enrollmentEndDateTime;
+    const programmeIntakeIds: number[] = req.body.programmeIntakeIds;
 
     if (!enrollmentId || isNaN(enrollmentId)) {
       return res.sendError.badRequest("Invalid enrollmentId");
@@ -83,6 +99,16 @@ export default class EnrollmentController {
     }
 
     const response = await enrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+
+    await enrollmentService.deleteEnrollmentProgrammeIntakeByEnrollmentId(response.getData().enrollmentId);
+
+    if (programmeIntakeIds && programmeIntakeIds.length > 0) {
+      await Promise.all(
+        programmeIntakeIds.map((programmeIntakeId) =>
+          enrollmentService.createEnrollmentProgrammeIntake(response.getData().enrollmentId, programmeIntakeId)
+        )
+      );
+    }
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());

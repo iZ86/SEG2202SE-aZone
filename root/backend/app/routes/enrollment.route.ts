@@ -4,7 +4,7 @@ import EnrollmentController from "../controllers/enrollment.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
 import { createAndUpdateEnrollmentValidator } from "../validators/enrollment-validator";
 
-class CourseRoute {
+class EnrollmentRoute {
   router = Router();
   controller = new EnrollmentController();
 
@@ -21,4 +21,4 @@ class CourseRoute {
   }
 }
 
-export default new CourseRoute().router;
+export default new EnrollmentRoute().router;

@@ -12,7 +12,7 @@ interface IProgrammeRepository {
   updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader>;
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
-  getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]>;
+  getAllProgrammeIntakes(): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
@@ -131,27 +131,14 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getAllProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]> {
+  getAllProgrammeIntakes(): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
-      const offset: number = (page - 1) * pageSize;
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, semesterEndDate " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, sm.studyMode, pi.semesterStartDate, pi.semesterEndDate " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
-        "WHERE pi.programmeIntakeId LIKE ? " +
-        "OR p.programmeName LIKE ? " +
-        "OR pi.intakeId LIKE ? " +
-        "OR pi.semester LIKE ? " +
-        "LIMIT ? OFFSET ?;",
-        [
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          pageSize,
-          offset,
-        ],
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId;",
         (err, res) => {
           if (err) reject(err);
           resolve(res);

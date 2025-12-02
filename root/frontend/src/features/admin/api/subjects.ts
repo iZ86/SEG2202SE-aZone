@@ -91,3 +91,19 @@ export const deleteSubjectByIdAPI = async (token: string, subjectId: number): Pr
     console.error(err);
   }
 };
+
+export const getSubjectsCountAPI = async (token: string): Promise<Response | undefined> => {
+  try {
+    return await fetch("http://localhost:8080/api/v1/subjects/count",
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};

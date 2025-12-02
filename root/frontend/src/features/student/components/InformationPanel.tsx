@@ -59,7 +59,6 @@ export default function InformationPanel({ token, student }: { token: string, st
     <div className="flex text-black p-6 bg-white shadow-lg rounded-lg gap-4 flex-wrap h-full">
 
       <div>
-
         <h2 className="font-semibold pb-5">
           {student.lastName + " " + student.firstName} ({student.userId})
         </h2>
@@ -75,14 +74,14 @@ export default function InformationPanel({ token, student }: { token: string, st
 
         </div>
 
-        
+
       </div>
 
-      <div>
+      <div className="sm:m-auto justify-center items-center flex">
         <img
           src={student.profilePictureUrl}
           alt="profile"
-          className="w-40 h-50 object-cover rounded-md mt-3"
+          className="w-40 h-50 object-cover rounded-xl mt-3 border-2 border-indigo-400 shadow-md"
         />
       </div>
     </div>

@@ -8,7 +8,7 @@ import {
 } from "@features/general/api/storage";
 import { updateMeAPI } from "../../general/api/user";
 import { Mail, Phone, UploadCloud, User } from "lucide-react";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
 import { toast } from "react-toastify";
 import { useAdmin } from "../hooks/useAdmin";
@@ -36,26 +36,23 @@ export default function ProfileForm() {
   const [isUserInformationUpadting, setIsUserInformationUpdating] =
     useState(false);
 
-  const onDrop = useCallback(
-    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      setEmptyFile(false);
-      setInvalidFile(false);
+  const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    setEmptyFile(false);
+    setInvalidFile(false);
 
-      if (fileRejections.length > 0) {
-        setInvalidFile(true);
-        setSelectedFile(null);
-        return;
-      }
+    if (fileRejections.length > 0) {
+      setInvalidFile(true);
+      setSelectedFile(null);
+      return;
+    }
 
-      if (acceptedFiles.length === 0) {
-        setEmptyFile(true);
-        return;
-      }
+    if (acceptedFiles.length === 0) {
+      setEmptyFile(true);
+      return;
+    }
 
-      setSelectedFile(acceptedFiles[0]);
-    },
-    []
-  );
+    setSelectedFile(acceptedFiles[0]);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/*": [] },
