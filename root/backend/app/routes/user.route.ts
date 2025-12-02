@@ -15,11 +15,11 @@ class UserRoute {
   initializeRoutes() {
     this.router.delete("/students/:studentId/course/:courseId/programme/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId));
     // this.router.put("/students/course/programme/intake/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, updateStudentCourseProgrammeIntakeValidator, asyncHandler(this.controller.updateStudentCourseProgrammeIntakeById));
-    
+
     /** This route differs from getMe in auth.routes.ts by getting information of the user that is not personal. */
     this.router.get("/students/information", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentInformationById));
 
-    this.router.get("/students/:studentId/course/programme/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentCourseProgrammeIntakeByStudentId));
+    this.router.get("/students/:studentId/course/programme/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentCourseProgrammeIntakeByStudentId));
     this.router.get("/students/course/programme/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getAllStudentCourseProgrammeIntakes));
     this.router.post("/students/course/programme/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createStudentCourseProgrammeIntakeValidator, asyncHandler(this.controller.createStudentCourseProgrammeIntake));
     this.router.get("/students/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentById));

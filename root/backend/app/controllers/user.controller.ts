@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { StudentCourseProgrammeIntakeData, UserData, StudentInformation } from "../models/user-model";
 import userService from "../services/user.service";
@@ -260,7 +260,33 @@ export default class UserController {
     const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(
+        response.getData().map((data) => {
+          let statusLabel: string;
+          switch (data.courseStatus) {
+            case ENUM_PROGRAMME_STATUS.ACTIVE:
+              statusLabel = "Active";
+              break;
+            case ENUM_PROGRAMME_STATUS.COMPLETED:
+              statusLabel = "Completed";
+              break;
+            case ENUM_PROGRAMME_STATUS.FINISHED:
+              statusLabel = "Finished";
+              break;
+            case ENUM_PROGRAMME_STATUS.DROPPED:
+              statusLabel = "Dropped";
+              break;
+            default:
+              statusLabel = "Unknown";
+          }
+
+          return {
+            ...data,
+            status: statusLabel,
+          };
+        }),
+        response.getMessage()
+      );
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -363,9 +389,9 @@ export default class UserController {
     const response: Result<StudentInformation> = await userService.getStudentInformationById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData())
+      return res.sendSuccess.ok(response.getData());
     } else {
-      switch(response.getErrorCode()) {
+      switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
       }
