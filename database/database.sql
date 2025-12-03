@@ -127,6 +127,18 @@ CREATE TABLE ENROLLMENT_SUBJECT (
     enrollmentId INT NOT NULL,
     subjectId INT NOT NULL,
     lecturerId INT NOT NULL,
+    FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
+        ON DELETE CASCADE,
+    FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId)
+        ON DELETE CASCADE,
+    UNIQUE (enrollmentId, subjectId)
+);
+
+CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
+    enrollmentSubjectTypeId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    enrollmentSubjectId INT NOT NULL,
     classTypeId INT NOT NULL,
     venueId INT NOT NULL,
     startTime TIME NOT NULL,
@@ -134,18 +146,15 @@ CREATE TABLE ENROLLMENT_SUBJECT (
     dayId INT NOT NULL,
     numberOfSeats INT NOT NULL,
     grouping INT NOT NULL,
-    FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId)
+    FOREIGN KEY (enrollmentSubjectId) REFERENCES ENROLLMENT_SUBJECT(enrollmentSubjectId)
         ON DELETE CASCADE,
-    FOREIGN KEY (subjectId) REFERENCES SUBJECT(subjectId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId),
     FOREIGN KEY (classTypeId) REFERENCES CLASS_TYPE(classTypeId)
         ON DELETE CASCADE,
     FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
         ON DELETE CASCADE,
     FOREIGN KEY (dayId) REFERENCES DAY(dayId)
         ON DELETE CASCADE,
-    UNIQUE (enrollmentId, subjectId, classTypeId, venueId, startTime, endTime, dayId)
+    UNIQUE (classTypeId, venueId, startTime, endTime, dayId)
 );
 
 CREATE TABLE SUBJECT_STATUS (
@@ -155,15 +164,15 @@ CREATE TABLE SUBJECT_STATUS (
 
 CREATE TABLE STUDENT_ENROLLMENT_SUBJECT (
     studentId INT NOT NULL,
-    enrollmentSubjectId INT NOT NULL,
+    enrollmentSubjectTypeId INT NOT NULL,
     subjectStatusId INT NOT NULL,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
-    FOREIGN KEY (enrollmentSubjectId) REFERENCES ENROLLMENT_SUBJECT(enrollmentSubjectId)
+    FOREIGN KEY (enrollmentSubjectTypeId) REFERENCES ENROLLMENT_SUBJECT_TYPE(enrollmentSubjectTypeId)
         ON DELETE CASCADE,
     FOREIGN KEY (subjectStatusId) REFERENCES SUBJECT_STATUS(subjectStatusId)
         ON DELETE CASCADE,
-    PRIMARY KEY (studentId, enrollmentSubjectId)
+    PRIMARY KEY (studentId, enrollmentSubjectTypeId)
 );
 
 CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
@@ -288,12 +297,17 @@ INSERT INTO `LECTURER` (`lecturerId`, `firstName`, `lastName`, `lecturerTitleId`
 (1, "Emily", "Johnson", 1, "emilyJohnson@m.co", "0111111111"),
 (2, "Johnson", "Emily", 2, "johnsonEmily@m.co", "022222222");
 
-INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `lecturerId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
-(1, 1, 1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
-(1, 1, 1, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
-(1, 2, 2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
+INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `lecturerId`) VALUES
+(1, 1, 1),
+(1, 2, 2),
+(1, 3, 2);
 
-INSERT INTO `STUDENT_ENROLLMENT_SUBJECT` (`studentId`, `enrollmentSubjectId` ,`subjectStatusId`) VALUES
+INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
+(1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
+(1, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
+(1, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
+
+INSERT INTO `STUDENT_ENROLLMENT_SUBJECT` (`studentId`, `enrollmentSubjectTypeId` ,`subjectStatusId`) VALUES
 (23049679, 1, 1),
 (23049679, 2, 1),
 (23049679, 3, 1),
