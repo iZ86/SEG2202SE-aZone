@@ -77,3 +77,10 @@ export interface StudentSemesterStartAndEndData extends RowDataPacket {
   semesterStartDate: Date;
   semesterEndDate: Date;
 }
+
+export interface StudentEnrollmentSchedule extends RowDataPacket {
+  programmeIntakeId: number | null;
+  enrollmentId: number | null;
+  enrollmentStartDateTime: Date | null;
+  enrollmentEndDateTime: Date | null;
+}

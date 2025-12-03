@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentEnrollmentSubjectData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
@@ -32,6 +32,7 @@ interface IUserRepostory {
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
   getAllStudentEnrollmentSubjectById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentEnrollmentSubjectData[]>;
   getStudentEnrollmentSubjectCountById(studentId: number, semester: number, query: string): Promise<number>;
+  getStudentEnrollmentScheduleById(studentId: number): Promise<StudentEnrollmentSchedule>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -629,6 +630,23 @@ class UserRepository implements IUserRepostory {
         }
       );
     });
+  }
+
+  getStudentEnrollmentScheduleById(studentId: number): Promise<StudentEnrollmentSchedule> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentEnrollmentSchedule[]>(
+        "SELECT scpi.programmeIntakeId, e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN ENROLLMENT e ON pi.enrollmentId = e.enrollmentId " +
+        "WHERE scpi.studentId = ?;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      )
+    })
   }
 }
 

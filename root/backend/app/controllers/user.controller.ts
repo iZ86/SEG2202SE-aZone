@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSubjectData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/user-model";
 import userService from "../services/user.service";
 import courseService from "../services/course.service";
 import programmeService from "../services/programme.service";
@@ -463,6 +463,16 @@ export default class UserController {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
       }
+    }
+  }
+
+  async getStudentEnrollmentScheduleById(req: Request, res: Response) {
+    const studentId: number = req.user.userId as number;
+
+    const studentEnrollmentScheduleResponse: Result<StudentEnrollmentSchedule> = await userService.getStudentEnrollmentScheduleById(studentId);
+
+    if (studentEnrollmentScheduleResponse.isSuccess()) {
+      return res.sendSuccess.ok(studentEnrollmentScheduleResponse.getData(), studentEnrollmentScheduleResponse.getMessage());
     }
   }
 }
