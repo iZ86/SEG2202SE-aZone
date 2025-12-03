@@ -162,7 +162,7 @@ CREATE TABLE SUBJECT_STATUS (
     subjectStatus VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE STUDENT_ENROLLMENT_SUBJECT (
+CREATE TABLE STUDENT_ENROLLMENT_SUBJECT_TYPE (
     studentId INT NOT NULL,
     enrollmentSubjectTypeId INT NOT NULL,
     subjectStatusId INT NOT NULL,
@@ -307,7 +307,7 @@ INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectId`, `classTypeId`, `ve
 (3, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
 (2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
 
-INSERT INTO `STUDENT_ENROLLMENT_SUBJECT` (`studentId`, `enrollmentSubjectTypeId` ,`subjectStatusId`) VALUES
+INSERT INTO `STUDENT_ENROLLMENT_SUBJECT_TYPE` (`studentId`, `enrollmentSubjectTypeId` ,`subjectStatusId`) VALUES
 (23049679, 1, 1),
 (23049679, 2, 1),
 (23049679, 3, 1),
