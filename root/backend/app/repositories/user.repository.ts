@@ -506,8 +506,8 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res);
         }
-      )
-    })
+      );
+    });
   }
 
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
@@ -531,10 +531,10 @@ class UserRepository implements IUserRepostory {
         [studentId],
         (err, res) => {
           if (err) reject(err);
-          resolve(res)
+          resolve(res);
         }
-      )
-    })
+      );
+    });
   }
 
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined> {
@@ -550,8 +550,8 @@ class UserRepository implements IUserRepostory {
           if (err) reject(err);
           resolve(res[0]);
         }
-      )
-    })
+      );
+    });
   }
 
   getAllStudentEnrollmentSubjectById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentEnrollmentSubjectData[]> {
