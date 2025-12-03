@@ -495,7 +495,8 @@ class UserRepository implements IUserRepostory {
       databaseConn.query<StudentSubjectData[]>(
         "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours " +
         "FROM STUDENT_ENROLLMENT_SUBJECT ses " +
-        "INNER JOIN ENROLLMENT_SUBJECT es ON ses.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON ses.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
         "WHERE ses.subjectStatusId = 1 " +
         "AND ses.studentId = ? " +
@@ -512,18 +513,19 @@ class UserRepository implements IUserRepostory {
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentClassData[]>(
-        "SELECT es.enrollmentSubjectId, es.startTime, es.endTime, s.subjectId, s.subjectCode, " +
+        "SELECT es.enrollmentSubjectId, est.startTime, est.endTime, s.subjectId, s.subjectCode, " +
         "s.subjectName, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
         "lt.lecturerTitleId, lt.lecturerTitle, " +
-        "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, es.grouping, d.dayId, d.day " +
+        "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, est.grouping, d.dayId, d.day " +
         "FROM STUDENT_ENROLLMENT_SUBJECT ses " +
-        "INNER JOIN ENROLLMENT_SUBJECT es ON ses.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON ses.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
         "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
         "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON es.venueId = v.venueId " +
-        "INNER JOIN DAY d ON es.dayId = d.dayId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "WHERE ses.subjectStatusId = 1 " +
         "AND studentId = ?;",
         [studentId],
@@ -558,15 +560,16 @@ class UserRepository implements IUserRepostory {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT es.*, ses.studentId, ses.subjectStatusId, l.lecturerId, l.firstName AS lecturerFirstName, l.lastName AS lecturerLastName, l.lecturerTitleId, lt.lecturerTitle, l.email, l.phoneNumber, ct.classType, v.venue, d.day, ss.subjectStatus, e.enrollmentStartDateTime, e.enrollmentEndDateTime, s.subjectCode, s.subjectName, s.description, s.creditHours " +
         "FROM ENROLLMENT_SUBJECT es " +
-        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT ses ON es.enrollmentSubjectId = ses.enrollmentSubjectId " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON es.enrollmentSubjectId = est.enrollmentSubjectId " +
+        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT ses ON est.enrollmentSubjectTypeId = ses.enrollmentSubjectTypeId " +
         "INNER JOIN SUBJECT_STATUS ss ON ses.subjectStatusId = ss.subjectStatusId " +
         "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
         "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
         "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON es.venueId = v.venueId " +
-        "INNER JOIN DAY d ON es.dayId = d.dayId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
         "WHERE ses.studentId = ? " +
@@ -597,15 +600,16 @@ class UserRepository implements IUserRepostory {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(DISTINCT(s.subjectId)) AS totalCount " +
         "FROM ENROLLMENT_SUBJECT es " +
-        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT ses ON es.enrollmentSubjectId = ses.enrollmentSubjectId " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON es.enrollmentSubjectId = est.enrollmentSubjectId " +
+        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT ses ON est.enrollmentSubjectTypeId = ses.enrollmentSubjectTypeId " +
         "INNER JOIN SUBJECT_STATUS ss ON ses.subjectStatusId = ss.subjectStatusId " +
         "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
         "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
         "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON es.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON es.venueId = v.venueId " +
-        "INNER JOIN DAY d ON es.dayId = d.dayId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
         "WHERE ses.studentId = ? " +
