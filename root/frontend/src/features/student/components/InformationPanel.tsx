@@ -3,12 +3,11 @@ import type { StudentInformation } from "@datatypes/userType";
 import { useEffect, useState } from 'react';
 import { fetchStudentInformationAPI } from "../api/studentInformation";
 
-
 function LabelAndValue({ label, value }: { label: string, value: string | number }) {
   return (
-    <div className="flex flex-wrap">
-      <p className="min-w-5xs">{label}</p>
-      <p className="text-black min-w-7/10">{value}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-[150px_auto]">
+      <p>{label}</p>
+      <p className="text-black">{value}</p>
     </div>
   );
 }
@@ -62,7 +61,7 @@ export default function InformationPanel({ token, student }: { token: string, st
         <h2 className="font-semibold pb-5">
           {student.lastName + " " + student.firstName} ({student.userId})
         </h2>
-        <div className="flex flex-col font-bold text-gray-charcoal">
+        <div className="flex flex-col font-bold text-gray-charcoal gap-y-2">
           <LabelAndValue label={"Programme:"} value={data.courseName} />
           <LabelAndValue label={"Intake:"} value={data.intake} />
           <LabelAndValue label={"Study Mode:"} value={data.studyMode} />
