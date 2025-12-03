@@ -72,7 +72,7 @@ CREATE TABLE PROGRAMME_INTAKE (
     semester INT NOT NULL,
     semesterStartDate DATE NOT NULL,
     semesterEndDate DATE NOT NULL,
-    enrollmentId INT NOT NULL,
+    enrollmentId INT,
     FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
