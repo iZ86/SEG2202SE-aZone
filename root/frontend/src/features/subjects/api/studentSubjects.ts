@@ -1,6 +1,6 @@
 export async function fetchStudentSubjectsAPI(token: string): Promise<Response | undefined> {
   try {
-    return await fetch("http://localhost:8080/api/v1/users/students/subjects",
+    return await fetch("http://localhost:8080/api/v1/users/students/subjects/active",
       {
         method: 'GET',
         headers: {
