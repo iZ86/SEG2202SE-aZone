@@ -18,6 +18,7 @@ interface IProgrammeRepository {
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeCount(query: string): Promise<number>;
+  getProgrammeIntakeCount(query: string): Promise<number>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -252,6 +253,28 @@ class ProgrammeRepository implements IProgrammeRepository {
         "FROM PROGRAMME " +
         "WHERE programmeId LIKE ? " +
         "OR programmeName LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
+        }
+      );
+    });
+  }
+
+  getProgrammeIntakeCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM PROGRAMME_INTAKE pi " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE p.programmeName LIKE ? " +
+        "OR i.intakeId LIKE ?; ",
         [
           "%" + query + "%",
           "%" + query + "%",
