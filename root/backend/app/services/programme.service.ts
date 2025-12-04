@@ -18,6 +18,7 @@ interface IProgrammeService {
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>>;
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
+  updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
 }
@@ -138,6 +139,17 @@ class ProgrammeService implements IProgrammeService {
     await programmeRepository.deleteProgrammeIntakeById(programmeIntakeId);
 
     return Result.succeed(null, "Programme Intake delete success");
+  }
+
+  async updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<Result<ProgrammeIntakeData>> {
+    await programmeRepository.updateProgrammeIntakeEnrollmentIdById(programmeIntakeId, enrollmentId);
+    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(programmeIntakeId);
+
+    if (!programmeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake updated not found");
+    }
+
+    return Result.succeed(programmeIntake, "Programme intake update success");
   }
 
   async getProgrammeCount(query: string = ""): Promise<Result<number>> {

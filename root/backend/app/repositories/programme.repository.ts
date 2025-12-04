@@ -17,6 +17,7 @@ interface IProgrammeRepository {
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
+  updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<ResultSetHeader>;
   getProgrammeCount(query: string): Promise<number>;
   getProgrammeIntakeCount(query: string): Promise<number>;
 }
@@ -238,6 +239,20 @@ class ProgrammeRepository implements IProgrammeRepository {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM PROGRAMME_INTAKE WHERE programmeIntakeId = ?;",
         [programmIntakeId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE PROGRAMME_INTAKE SET enrollmentId = ? " +
+        "WHERE programmeIntakeId = ?;",
+        [enrollmentId, programmeIntakeId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

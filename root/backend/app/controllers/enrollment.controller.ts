@@ -3,6 +3,7 @@ import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { EnrollmentData, EnrollmentProgrammeIntakeData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
+import programmeService from "../services/programme.service";
 
 export default class EnrollmentController {
   async getAllEnrollments(req: Request, res: Response) {
@@ -67,7 +68,7 @@ export default class EnrollmentController {
     if (programmeIntakeIds && programmeIntakeIds.length > 0) {
       await Promise.all(
         programmeIntakeIds.map((programmeIntakeId) =>
-          enrollmentService.createEnrollmentProgrammeIntake(response.getData().enrollmentId, programmeIntakeId)
+          programmeService.updateProgrammeIntakeEnrollmentIdById(programmeIntakeId, response.getData().enrollmentId)
         )
       );
     }
@@ -105,7 +106,7 @@ export default class EnrollmentController {
     if (programmeIntakeIds && programmeIntakeIds.length > 0) {
       await Promise.all(
         programmeIntakeIds.map((programmeIntakeId) =>
-          enrollmentService.createEnrollmentProgrammeIntake(response.getData().enrollmentId, programmeIntakeId)
+          programmeService.updateProgrammeIntakeEnrollmentIdById(programmeIntakeId, response.getData().enrollmentId)
         )
       );
     }
