@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import type { StudentSubjectData } from "@datatypes/userType";
+import type { StudentSubjectOverviewData } from "@datatypes/userType";
 import { fetchStudentSubjectsAPI } from "@features/subjects/api/studentSubjects";
 
 
@@ -15,7 +15,7 @@ const CREDITTHEME = [
 
 export default function SubjectInformationPanel({ token }: { token: string }) {
 
-  const [data, setData] = useState<StudentSubjectData[]>([]);
+  const [data, setData] = useState<StudentSubjectOverviewData[]>([]);
 
   useEffect(() => {
     fetchStudentSubjects();

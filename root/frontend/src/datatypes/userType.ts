@@ -37,7 +37,7 @@ export type StudentInformation = {
   status: number;
 }
 
-export type StudentSubjectData = {
+export type StudentSubjectOverviewData = {
   subjectId: number;
   subjectCode: string;
   subjectName: string;
