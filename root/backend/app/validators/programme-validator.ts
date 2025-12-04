@@ -16,6 +16,9 @@ export const createAndUpdateProgrammeIntakeValidator: any = [
   body('intakeId')
     .notEmpty().withMessage('Missing intakeId')
     .isNumeric().withMessage('intakeId must be numeric'),
+  body('studyModeId')
+    .notEmpty().withMessage('Missing studyModeId')
+    .isNumeric().withMessage('studyModeId must be numeric'),
   body('semester')
     .notEmpty().withMessage('Missing semester')
     .isNumeric().withMessage('semester must be numeric'),
