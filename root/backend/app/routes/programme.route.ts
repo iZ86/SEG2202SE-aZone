@@ -15,7 +15,7 @@ class ProgrammeRoute {
   initializeRoutes() {
     this.router.get("/:programmeId/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getProgrammeIntakesByProgrammeId));
     this.router.delete("/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteProgrammeIntakeById));
-    this.router.put("/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateProgrammeIntakeValidator, asyncHandler(this.controller.updateProgrammeIntakeById));
+    this.router.patch("/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateProgrammeIntakeValidator, asyncHandler(this.controller.updateProgrammeIntakeById));
     this.router.get("/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getProgrammeIntakeById));
     this.router.get("/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getAllProgrammeIntakes));
     this.router.post("/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateProgrammeIntakeValidator, asyncHandler(this.controller.createProgrammeIntake));
