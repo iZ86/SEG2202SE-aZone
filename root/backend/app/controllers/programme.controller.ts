@@ -206,6 +206,7 @@ export default class ProgrammeController {
   async createProgrammeIntake(req: Request, res: Response) {
     const programmeId: number = req.body.programmeId;
     const intakeId: number = req.body.intakeId;
+    const studyModeId: number = req.body.studyModeId;
     const semester: number = req.body.semester;
     const semesterStartDate: Date = req.body.semesterStartDate;
     const semesterEndDate: Date = req.body.semesterEndDate;
@@ -218,7 +219,7 @@ export default class ProgrammeController {
       return res.sendError.notFound("Invalid programmeId or intakeId");
     }
 
-    const response = await programmeService.createProgrammeIntake(programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
+    const response = await programmeService.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -236,6 +237,7 @@ export default class ProgrammeController {
     const programmeIntakeId: number = parseInt(req.params.programmeIntakeId);
     const programmeId: number = req.body.programmeId;
     const intakeId: number = req.body.intakeId;
+    const studyModeId: number = req.body.studyModeId;
     const semester: number = req.body.semester;
     const semesterStartDate: Date = req.body.semesterStartDate;
     const semesterEndDate: Date = req.body.semesterEndDate;
@@ -254,7 +256,7 @@ export default class ProgrammeController {
       return res.sendError.notFound("Invalid programmeIntakeId, or programmeId, or intakeId");
     }
 
-    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, semester, semesterStartDate, semesterEndDate);
+    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
