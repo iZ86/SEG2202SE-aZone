@@ -63,7 +63,7 @@ export default class EnrollmentController {
 
     const response: Result<EnrollmentData> = await enrollmentService.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
 
-    await enrollmentService.deleteEnrollmentProgrammeIntakeByEnrollmentId(response.getData().enrollmentId);
+    await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(response.getData().enrollmentId);
 
     if (programmeIntakeIds && programmeIntakeIds.length > 0) {
       await Promise.all(
@@ -101,7 +101,7 @@ export default class EnrollmentController {
 
     const response = await enrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
 
-    await enrollmentService.deleteEnrollmentProgrammeIntakeByEnrollmentId(response.getData().enrollmentId);
+    await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(response.getData().enrollmentId);
 
     if (programmeIntakeIds && programmeIntakeIds.length > 0) {
       await Promise.all(
@@ -134,6 +134,7 @@ export default class EnrollmentController {
       return res.sendError.notFound("Invalid enrollmentId");
     }
 
+    await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId);
     const response = await enrollmentService.deleteEnrollmentById(enrollmentId);
 
     if (response.isSuccess()) {

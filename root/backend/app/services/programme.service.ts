@@ -19,6 +19,7 @@ interface IProgrammeService {
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>>;
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
   updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<Result<ProgrammeIntakeData>>;
+  deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
 }
@@ -150,6 +151,12 @@ class ProgrammeService implements IProgrammeService {
     }
 
     return Result.succeed(programmeIntake, "Programme intake update success");
+  }
+
+  async deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>> {
+    await programmeRepository.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId);
+
+    return Result.succeed(null, "Programme intake enrollmentId delete success");
   }
 
   async getProgrammeCount(query: string = ""): Promise<Result<number>> {
