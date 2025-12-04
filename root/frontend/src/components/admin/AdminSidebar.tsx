@@ -60,6 +60,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               key: "programmes",
             },
             {
+              to: "/admin/programme-intakes",
+              label: "Programme Intakes",
+              key: "programme-intakes",
+            },
+            {
               to: "/admin/courses",
               label: "Courses",
               key: "courses",
