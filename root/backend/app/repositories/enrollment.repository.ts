@@ -1,10 +1,10 @@
-import { EnrollmentData, EnrollmentProgrammeIntakeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface IEnrollmentRepository {
-  getAllEnrollments(query: string, pageSize: number, page: number): Promise<EnrollmentData[]>;
+  getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]>;
   getEnrollmentById(enrollmentId: number): Promise<EnrollmentData | undefined>;
   createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
   updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
@@ -15,23 +15,36 @@ interface IEnrollmentRepository {
   getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined>;
   createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
+  getAllEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
+  getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
+  getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined>;
+  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined>;
+  createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
+  updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
+  deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader>;
+  getEnrollmentSubjectCount(query: string): Promise<number>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
-  getAllEnrollments(query: string, pageSize: number, page: number): Promise<EnrollmentData[]> {
-    const offset: number = (page - 1) * pageSize;
+  getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<EnrollmentData[]>(
-        "SELECT * " +
-        "FROM ENROLLMENT " +
-        "WHERE enrollmentId LIKE ? " +
-        "ORDER BY enrollmentStartDateTime ASC " +
-        "LIMIT ? OFFSET ?;",
-        [
-          "%" + query + "%",
-          pageSize,
-          offset,
-        ],
+      let sql: string = `
+      SELECT *
+      FROM ENROLLMENT
+      WHERE enrollmentId LIKE ?
+      ORDER BY enrollmentStartDateTime ASC `;
+
+      const params: any[] = [
+        "%" + query + "%",
+      ];
+
+      if (page != null && pageSize != null) {
+        const offset: number = (page - 1) * pageSize;
+        sql += "LIMIT ? OFFSET ? ";
+        params.push(pageSize, offset);
+      }
+
+      databaseConn.query<EnrollmentData[]>(sql, params,
         (err, res) => {
           if (err) reject(err);
           resolve(res);
@@ -188,6 +201,172 @@ class EnrollmentRepository implements IEnrollmentRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getAllEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]> {
+    return new Promise((resolve, reject) => {
+      let sql: string = `
+      SELECT *
+      FROM ENROLLMENT_SUBJECT es
+      INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId
+      INNER JOIN SUBJECT s ON es.subjectid = s.subjectId
+      INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId
+      INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId
+      WHERE es.enrollmentSubjectId LIKE ?
+      OR s.subjectName LIKE ?
+      OR l.firstName LIKE ?
+      OR l.lastName LIKE ? `;
+
+      const params: any[] = [
+        "%" + query + "%",
+        "%" + query + "%",
+        "%" + query + "%",
+        "%" + query + "%",
+      ];
+
+      if (page != null && pageSize != null) {
+        const offset: number = (page - 1) * pageSize;
+        sql += "LIMIT ? OFFSET ? ";
+        params.push(pageSize, offset);
+      }
+
+      databaseConn.query<EnrollmentSubjectData[]>(sql, params,
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectData[]>(
+        "SELECT * " +
+        "FROM ENROLLMENT_SUBJECT es " +
+        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+        "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "WHERE es.enrollmentSubjectId = ? ",
+        [enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectData[]>(
+        "SELECT * " +
+        "FROM ENROLLMENT_SUBJECT es " +
+        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+        "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "WHERE es.enrollmentId = ? " +
+        "AND es.subjectId = ? " +
+        "AND es.lecturerId = ?;",
+        [enrollmentId, subjectId, lecturerId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectData[]>(
+        "SELECT * " +
+        "FROM ENROLLMENT_SUBJECT es " +
+        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+        "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "WHERE es.enrollmentSubjectId = ? " +
+        "AND es.enrollmentId = ? " +
+        "AND es.subjectId = ? " +
+        "AND es.lecturerId = ?;",
+        [enrollmentSubjectId, enrollmentId, subjectId, lecturerId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "INSERT INTO ENROLLMENT_SUBJECT (enrollmentId, subjectId, lecturerId) " +
+        "VALUES (?, ?, ?);",
+        [enrollmentId, subjectId, lecturerId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE ENROLLMENT_SUBJECT SET enrollmentId = ?, subjectId = ?, lecturerId = ? " +
+        "WHERE enrollmentSubjectId = ?;",
+        [enrollmentId, subjectId, lecturerId, enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM ENROLLMENT_SUBJECT WHERE enrollmentSubjectId = ?;",
+        [enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getEnrollmentSubjectCount(query: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<TotalCount[]>(
+        "SELECT COUNT(*) AS totalCount " +
+        "FROM ENROLLMENT_SUBJECT es " +
+        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+        "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "WHERE es.enrollmentSubjectId LIKE ? " +
+        " OR s.subjectName LIKE ? " +
+        "OR l.firstName LIKE ? " +
+        "OR l.lastName LIKE ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0].totalCount);
         }
       );
     });

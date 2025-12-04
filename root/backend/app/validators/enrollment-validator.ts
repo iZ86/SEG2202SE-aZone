@@ -18,3 +18,19 @@ export const createAndUpdateEnrollmentValidator: any = [
     .isNumeric().withMessage('All items must be numeric'),
   validate,
 ];
+
+export const createAndUpdateEnrollmentSubjectValidator: any = [
+  body('enrollmentId')
+    .trim()
+    .notEmpty().withMessage('enrollmentId cannot be empty')
+    .isNumeric().withMessage('enrollmentId must be numeric'),
+  body('subjectId')
+    .trim()
+    .notEmpty().withMessage('subjectId cannot be empty')
+    .isNumeric().withMessage('subjectId must be numeric'),
+  body('lecturerId')
+    .trim()
+    .notEmpty().withMessage('lecturerId cannot be empty')
+    .isNumeric().withMessage('lecturerId must be numeric'),
+  validate,
+];

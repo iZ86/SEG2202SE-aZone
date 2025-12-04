@@ -1,24 +1,36 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
+import subjectService from "../services/subject.service";
+import { SubjectData } from "../models/subject-model";
+import { LecturerData } from "../models/lecturer-model";
+import lecturerService from "../services/lecturer.service";
 
 export default class EnrollmentController {
   async getAllEnrollments(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number | null = parseInt(req.query.page as string) || null;
+    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
     const response: Result<EnrollmentData[]> = await enrollmentService.getAllEnrollments(query, pageSize, page);
     const enrollmentCount: Result<number> = await enrollmentService.getEnrollmentCount(query);
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok({
+    let apiResponse: object = {
+      enrollments: response.getData(),
+    };
+
+    if (page != null && pageSize != null) {
+      apiResponse = {
         enrollments: response.getData(),
         enrollmentCount: enrollmentCount.isSuccess() ? enrollmentCount.getData() : 0,
-      }, response.getMessage());
+      };
+    }
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(apiResponse, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -136,6 +148,153 @@ export default class EnrollmentController {
 
     await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId);
     const response = await enrollmentService.deleteEnrollmentById(enrollmentId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.delete();
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async getAllEnrollmentSubjects(req: Request, res: Response) {
+    const page: number | null = parseInt(req.query.page as string) || null;
+    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const query: string = req.query.query as string || "";
+
+    const response: Result<EnrollmentSubjectData[]> = await enrollmentService.getAllEnrollmentSubjects(query, pageSize, page);
+    const enrollmentSubjectCount: Result<number> = await enrollmentService.getEnrollmentSubjectCount(query);
+
+    let apiResponse: object = {
+      enrollmentSubjects: response.getData(),
+    };
+
+    if (page != null && pageSize != null) {
+      apiResponse = {
+        enrollmentSubjects: response.getData(),
+        enrollmentSubjectCount: enrollmentSubjectCount.isSuccess() ? enrollmentSubjectCount.getData() : 0,
+      };
+    }
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(apiResponse, response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async getEnrollmentSubjectById(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
+    }
+
+    const response: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async createEnrollmentSubject(req: Request, res: Response) {
+    const enrollmentId: number = req.body.enrollmentId;
+    const subjectId: number = req.body.subjectId;
+    const lecturerId: number = req.body.lecturerId;
+
+    if (!enrollmentId || isNaN(enrollmentId) || !subjectId || isNaN(subjectId) || !lecturerId || isNaN(lecturerId)) {
+      return res.sendError.badRequest("Invalid enrollmentId or subjectId or lecturerId");
+    }
+
+    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
+
+    if (!subjectResponse.isSuccess() || !lecturerResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid subjectId or lecturerId");
+    }
+
+    const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+
+    if (isEnrollmentSujectDuplicated.isSuccess()) {
+      return res.sendError.conflict("enrollmentSubject existed");
+    }
+
+    const response: Result<EnrollmentSubjectData> = await enrollmentService.createEnrollmentSubject(enrollmentId, subjectId, lecturerId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async updateEnrollmentSubjectById(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+    const enrollmentId: number = req.body.enrollmentId;
+    const subjectId: number = req.body.subjectId;
+    const lecturerId: number = req.body.lecturerId;
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId) || !enrollmentId || isNaN(enrollmentId) || !subjectId || isNaN(subjectId) || !lecturerId || isNaN(lecturerId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId or enrollmentId or subjectId or lecturerId");
+    }
+
+    const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
+    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
+
+    if (!enrollmentSubjectResponse.isSuccess() || !subjectResponse.isSuccess() || !lecturerResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid enrollmentSubjectId or subjectId or lecturerId");
+    }
+
+    const isEnrollmentIdAndSubjectIdAndLecturerIdBelongsToEnrollmentSubjectId: Result<SubjectData> = await enrollmentService.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+
+    if (!isEnrollmentIdAndSubjectIdAndLecturerIdBelongsToEnrollmentSubjectId.isSuccess()) {
+      const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+
+      if (isEnrollmentSujectDuplicated.isSuccess()) {
+        return res.sendError.conflict("enrollmentSubject existed");
+      }
+    }
+
+    const response = await enrollmentService.updateEnrollmentSubjectById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async deleteEnrollmentSubjectById(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
+    }
+
+    const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
+
+    if (!enrollmentSubjectResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid enrollmentSubjectId");
+    }
+
+    const response = await enrollmentService.deleteEnrollmentSubjectById(enrollmentSubjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();
