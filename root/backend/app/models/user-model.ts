@@ -41,36 +41,21 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   courseStatus: number;
 }
 
-export interface StudentEnrollmentSubjectData extends RowDataPacket {
-  studentId: number;
-  enrollmentSubjectId: number;
-  enrollmentId: number;
-  enrollmentStartDateTime: Date;
-  enrollmentEndDateTime: Date;
+export interface StudentSubjectData extends RowDataPacket {
   subjectId: number;
   subjectCode: string;
   subjectName: string;
-  description: string;
   creditHours: number;
-  lecturerId: number;
-  firstName: string;
-  lastName: string;
-  lecturerTitleId: number;
-  lecturerTitle: string;
-  email: string;
-  phoneNumber: string;
-  classTypeId: number;
-  classType: string;
-  venueId: number;
-  venue: string;
-  startTime: Date;
-  endTime: Date;
-  dayId: number;
-  day: string;
-  numberOfSeats: number;
-  grouping: number;
   subjectStatusId: number;
   subjectStatus: string;
+  courseId: number;
+  courseCode: string;
+  courseName: string;
+  programmeIntakeId: number;
+  semester: number;
+  intake: number;
+  studyModeId: number;
+  studyMode: string;
 }
 
 export interface StudentSemesterStartAndEndData extends RowDataPacket {
@@ -86,7 +71,7 @@ export interface StudentEnrollmentSchedule extends RowDataPacket {
 }
 
 /** Used when getting the subject data of active subjects for the student. */
-export interface StudentSubjectData extends RowDataPacket {
+export interface StudentSubjectOverviewData extends RowDataPacket {
   subjectId: number;
   subjectCode: string;
   subjectName: string;

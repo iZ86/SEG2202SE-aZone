@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentSubjectData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 
 interface IUserRepostory {
@@ -26,11 +26,11 @@ interface IUserRepostory {
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
-  getStudentActiveSubjectsById(studentId: number): Promise<StudentSubjectData[]>;
+  getStudentActiveSubjectsOverviewById(studentId: number): Promise<StudentSubjectOverviewData[]>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
-  getAllStudentEnrollmentSubjectById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentEnrollmentSubjectData[]>;
-  getStudentEnrollmentSubjectCountById(studentId: number, semester: number, query: string): Promise<number>;
+  getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]>;
+  getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<number>;
   getStudentEnrollmentScheduleById(studentId: number): Promise<StudentEnrollmentSchedule>;
 }
 
@@ -490,9 +490,9 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentActiveSubjectsById(studentId: number): Promise<StudentSubjectData[]> {
+  getStudentActiveSubjectsOverviewById(studentId: number): Promise<StudentSubjectOverviewData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<StudentSubjectData[]>(
+      databaseConn.query<StudentSubjectOverviewData[]>(
         "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
@@ -554,31 +554,30 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getAllStudentEnrollmentSubjectById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentEnrollmentSubjectData[]> {
+  getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      databaseConn.query<StudentEnrollmentSubjectData[]>(
-        "SELECT es.*, sest.studentId, sest.subjectStatusId, l.lecturerId, l.firstName AS lecturerFirstName, l.lastName AS lecturerLastName, l.lecturerTitleId, lt.lecturerTitle, l.email, l.phoneNumber, ct.classType, v.venue, d.day, ss.subjectStatus, e.enrollmentStartDateTime, e.enrollmentEndDateTime, s.subjectCode, s.subjectName, s.description, s.creditHours " +
-        "FROM ENROLLMENT_SUBJECT es " +
-        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON es.enrollmentSubjectId = est.enrollmentSubjectId " +
-        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
+      databaseConn.query<StudentSubjectData[]>(
+        "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus, " +
+        "c.courseId, c.courseCode, c.courseName, pi.programmeIntakeId, pi.semester, pi.intakeId as intake, sm.studyModeId, sm.studyMode " +
+        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
         "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
-        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
-        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-        "INNER JOIN DAY d ON est.dayId = d.dayId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON es.enrollmentId = pi.enrollmentId " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
+        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE sest.studentId = ? " +
+        "AND scpi.studentId = ? " +
         "AND (s.subjectCode LIKE ? " +
         "OR s.subjectName LIKE ?) " +
         "AND (? = 0 OR pi.semester = ?) " +
-        "GROUP BY s.subjectId " +
+        "ORDER BY sest.subjectStatusId, s.subjectId ASC " +
         "LIMIT ? OFFSET ?;",
         [
+          studentId,
           studentId,
           "%" + query + "%",
           "%" + query + "%",
@@ -595,7 +594,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentEnrollmentSubjectCountById(studentId: number, semester: number, query: string): Promise<number> {
+  getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(DISTINCT(s.subjectId)) AS totalCount " +

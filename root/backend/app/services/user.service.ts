@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectData, StudentSubjectOverviewData } from "../models/user-model";
 
 import userRepository from "../repositories/user.repository";
 
@@ -25,11 +25,11 @@ interface IUserService {
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
-  getStudentActiveSubjectsById(studentId: number): Promise<Result<StudentSubjectData[]>>;
+  getStudentActiveSubjectsOverviewById(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
-  getAllStudentEnrollmentSubjectById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentEnrollmentSubjectData[]>>;
-  getStudentEnrollmentSubjectCountById(studentId: number, semester: number, query: string): Promise<Result<number>>;
+  getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
+  getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<Result<number>>;
   getStudentEnrollmentScheduleById(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
 }
 
@@ -246,8 +246,8 @@ class UserService implements IUserService {
     return Result.succeed(studentInformation, "Student information retrieve success");
   }
 
-  async getStudentActiveSubjectsById(studentId: number): Promise<Result<StudentSubjectData[]>> {
-    const studentActiveSubjects: StudentSubjectData[] = await userRepository.getStudentActiveSubjectsById(studentId);
+  async getStudentActiveSubjectsOverviewById(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
+    const studentActiveSubjects: StudentSubjectOverviewData[] = await userRepository.getStudentActiveSubjectsOverviewById(studentId);
     return Result.succeed(studentActiveSubjects, "Student active subjects retrieve success");
   }
 
@@ -262,14 +262,14 @@ class UserService implements IUserService {
     return Result.succeed(studentSemesterStartAndEndData, "Student semester start and end date retrieve success");
   }
 
-  async getAllStudentEnrollmentSubjectById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentEnrollmentSubjectData[]>> {
-    const studentEnrollmentSubject: StudentEnrollmentSubjectData[] = await userRepository.getAllStudentEnrollmentSubjectById(studentId, semester, query, pageSize, page);
+  async getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>> {
+    const studentEnrollmentSubject: StudentSubjectData[] = await userRepository.getAllStudentSubjectsById(studentId, semester, query, pageSize, page);
 
-    return Result.succeed(studentEnrollmentSubject, "Student enrollment subjects retrieve success");
+    return Result.succeed(studentEnrollmentSubject, "Student subjects retrieve success");
   }
 
-  async getStudentEnrollmentSubjectCountById(studentId: number, semester: number, query: string = ""): Promise<Result<number>> {
-    const studentEnrollmentSubjectCount: number = await userRepository.getStudentEnrollmentSubjectCountById(studentId, semester, query);
+  async getStudentSubjectsCountById(studentId: number, semester: number, query: string = ""): Promise<Result<number>> {
+    const studentEnrollmentSubjectCount: number = await userRepository.getStudentSubjectsCountById(studentId, semester, query);
 
     return Result.succeed(studentEnrollmentSubjectCount ? studentEnrollmentSubjectCount : 0, "Student Enrollment Subject count retrieve success");
   }
