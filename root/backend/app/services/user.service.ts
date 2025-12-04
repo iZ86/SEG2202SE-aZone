@@ -2,10 +2,9 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectData } from "../models/user-model";
 
 import userRepository from "../repositories/user.repository";
-import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;

@@ -1,8 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
-import { StudentClassData, StudentSubjectData } from "../models/subject-model";
 
 interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
