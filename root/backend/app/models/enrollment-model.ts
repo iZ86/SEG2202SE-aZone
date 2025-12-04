@@ -20,3 +20,22 @@ export interface EnrollmentProgrammeIntakeData extends RowDataPacket {
   semesterStartDate: Date;
   semesterEndDate: Date;
 };
+
+export interface EnrollmentSubjectData extends RowDataPacket {
+  enrollmentSubjectId: number;
+  enrollmentId: number;
+  enrollmentStartDateTime: Date;
+  enrollmentEndDateTime: Date;
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  description: string;
+  creditHours: number;
+  lecturerId: number;
+  firstName: string;
+  lastName: string;
+  lecturerTitleId: number;
+  lecturerTitle: string;
+  email: string;
+  phoneNumber: string;
+};
