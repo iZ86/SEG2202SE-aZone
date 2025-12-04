@@ -29,7 +29,7 @@ interface IUserRepostory {
   getStudentActiveSubjectsOverviewById(studentId: number): Promise<StudentSubjectOverviewData[]>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
-  getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]>;
+  getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]>;
   getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<number>;
   getStudentEnrollmentScheduleById(studentId: number): Promise<StudentEnrollmentSchedule>;
 }
@@ -554,7 +554,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]> {
+  getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSubjectData[]>(

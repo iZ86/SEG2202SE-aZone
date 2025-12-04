@@ -28,7 +28,7 @@ interface IUserService {
   getStudentActiveSubjectsOverviewById(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
-  getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
+  getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
   getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<Result<number>>;
   getStudentEnrollmentScheduleById(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
 }
@@ -262,8 +262,8 @@ class UserService implements IUserService {
     return Result.succeed(studentSemesterStartAndEndData, "Student semester start and end date retrieve success");
   }
 
-  async getAllStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>> {
-    const studentEnrollmentSubject: StudentSubjectData[] = await userRepository.getAllStudentSubjectsById(studentId, semester, query, pageSize, page);
+  async getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>> {
+    const studentEnrollmentSubject: StudentSubjectData[] = await userRepository.getStudentSubjectsById(studentId, semester, query, pageSize, page);
 
     return Result.succeed(studentEnrollmentSubject, "Student subjects retrieve success");
   }

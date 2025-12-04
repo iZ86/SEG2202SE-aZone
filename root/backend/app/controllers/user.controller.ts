@@ -443,14 +443,14 @@ export default class UserController {
     }
   }
 
-  async getAllStudentSubjectsById(req: Request, res: Response) {
+  async getStudentSubjectsById(req: Request, res: Response) {
     const studentId: number = req.user.userId;
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
     const semester: number = parseInt(req.query.semester as string) || 0;
 
-    const response: Result<StudentSubjectData[]> = await userService.getAllStudentSubjectsById(studentId, semester, query, pageSize, page);
+    const response: Result<StudentSubjectData[]> = await userService.getStudentSubjectsById(studentId, semester, query, pageSize, page);
     const subjectCount: Result<number> = await userService.getStudentSubjectsCountById(studentId, semester, query);
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
