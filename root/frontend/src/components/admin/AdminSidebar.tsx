@@ -85,6 +85,11 @@ export default function AdminSideBar({ page }: { page: string }) {
               key: "enrollments",
             },
             {
+              to: "/admin/enrollment-subjects",
+              label: "Enrollment Subjects",
+              key: "enrollment-subjects",
+            },
+            {
               to: "/admin/lecturers",
               label: "Lecturers",
               key: "lecturers",

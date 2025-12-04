@@ -38,6 +38,9 @@ import AdminEditLecturer from "@routes/admin/AdminEditLecturer";
 import AdminProgrammeIntake from "@routes/admin/AdminProgrammeIntake";
 import AdminCreateProgrammeIntake from "@routes/admin/AdminCreateProgrammeIntake";
 import AdminEditProgrammeIntake from "@routes/admin/AdminEditProgrammeIntake";
+import AdminEnrollmentSubject from "@routes/admin/AdminEnrollmentSubject";
+import AdminCreateEnrollmentSubject from "@routes/admin/AdminCreateEnrollmentSubject";
+import AdminEditEnrollmentSubject from "@routes/admin/AdminEditEnrollmentSubject";
 
 const StudentLayout = () => (
   <StudentProvider>
@@ -210,6 +213,18 @@ const routes = [
       {
         path: "/admin/programme-intakes/:id/edit",
         element: <AdminEditProgrammeIntake />,
+      },
+      {
+        path: "/admin/enrollment-subjects",
+        element: <AdminEnrollmentSubject />,
+      },
+      {
+        path: "/admin/enrollment-subjects/create",
+        element: <AdminCreateEnrollmentSubject />,
+      },
+      {
+        path: "/admin/enrollment-subjects/:id/edit",
+        element: <AdminEditEnrollmentSubject />,
       },
       {
         path: "/admin/profile",
