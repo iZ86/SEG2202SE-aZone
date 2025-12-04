@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchTimeTableAPI } from '../api/timetable';
-import type { StudentClassData } from '@datatypes/subjectType';
+import type { StudentClassData } from '@datatypes/userType';
 
 
 

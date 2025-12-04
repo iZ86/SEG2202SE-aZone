@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import type { StudentSubjectData } from "@datatypes/subjectType";
+import type { StudentSubjectData } from "@datatypes/userType";
 import { fetchStudentSubjectsAPI } from "@features/subjects/api/studentSubjects";
 
 
