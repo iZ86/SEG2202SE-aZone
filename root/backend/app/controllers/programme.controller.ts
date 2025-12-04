@@ -8,18 +8,25 @@ import { IntakeData } from "../models/intake-model";
 
 export default class ProgrammeController {
   async getAllProgrammes(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number | null = parseInt(req.query.page as string) || null;
+    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
     const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammes(query, pageSize, page);
     const programmeCount: Result<number> = await programmeService.getProgrammeCount(query);
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok({
+    let apiResponse: object = {
+      programmes: response.getData(),
+    };
+
+    if (page != null && pageSize != null) {
+      apiResponse = {
         programmes: response.getData(),
         programmeCount: programmeCount.isSuccess() ? programmeCount.getData() : 0,
-      }, response.getMessage());
+      };
+    }
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(apiResponse, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -130,10 +137,26 @@ export default class ProgrammeController {
   }
 
   async getAllProgrammeIntakes(req: Request, res: Response) {
-    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammeIntakes();
+    const page: number | null = parseInt(req.query.page as string) || null;
+    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const query: string = req.query.query as string || "";
+
+    const response: Result<ProgrammeIntakeData[]> = await programmeService.getAllProgrammeIntakes(query, pageSize, page);
+    const programmeIntakeCount: Result<number> = await programmeService.getProgrammeIntakeCount(query);
+
+    let apiResponse: object = {
+      programmeIntakes: response.getData(),
+    };
+
+    if (page != null && pageSize != null) {
+      apiResponse = {
+        programmeIntakes: response.getData(),
+        programmeIntakeCount: programmeIntakeCount.isSuccess() ? programmeIntakeCount.getData() : 0,
+      };
+    }
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(apiResponse, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

@@ -4,7 +4,7 @@ import databaseConn from "../database/db-connection";
 import { TotalCount } from "../models/general-model";
 
 interface IProgrammeRepository {
-  getAllProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
+  getAllProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]>;
   getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined>;
   getProgrammeByName(programmeName: string): Promise<ProgrammeData | undefined>;
   getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<ProgrammeData | undefined>;
@@ -12,7 +12,7 @@ interface IProgrammeRepository {
   updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader>;
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
-  getAllProgrammeIntakes(): Promise<ProgrammeIntakeData[]>;
+  getAllProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
@@ -21,21 +21,25 @@ interface IProgrammeRepository {
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
-  getAllProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]> {
-    const offset: number = (page - 1) * pageSize;
+  getAllProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<ProgrammeData[]>(
-        "SELECT programmeId, programmeName " +
-        "FROM PROGRAMME " +
-        "WHERE programmeId LIKE ? " +
-        "OR programmeName LIKE ? " +
-        "LIMIT ? OFFSET ?;",
-        [
-          "%" + query + "%",
-          "%" + query + "%",
-          pageSize,
-          offset,
-        ],
+      let sql: string = `
+      SELECT programmeId, programmeName
+      FROM PROGRAMME
+      WHERE programmeId LIKE ?
+      OR programmeName LIKE ? `;
+
+      const params: any[] = [
+        "%" + query + "%",
+        "%" + query + "%",
+      ];
+
+      if (page != null && pageSize != null) {
+        const offset: number = (page - 1) * pageSize;
+        sql += "LIMIT ? OFFSET ? ";
+        params.push(pageSize, offset);
+      }
+      databaseConn.query<ProgrammeData[]>(sql, params,
         (err, res) => {
           if (err) reject(err);
           resolve(res);
@@ -131,14 +135,29 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getAllProgrammeIntakes(): Promise<ProgrammeIntakeData[]> {
+  getAllProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, sm.studyMode, pi.semesterStartDate, pi.semesterEndDate " +
-        "FROM PROGRAMME_INTAKE pi " +
-        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
-        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId;",
+      let sql: string = `
+      SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, sm.studyMode, pi.semesterStartDate, pi.semesterEndDate
+      FROM PROGRAMME_INTAKE pi
+      INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId
+      INNER JOIN INTAKE i ON pi.intakeId = i.intakeId
+      INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId
+      WHERE p.programmeName LIKE ?
+      OR i.intakeId LIKE ? `;
+
+      const params: any[] = [
+        "%" + query + "%",
+        "%" + query + "%",
+      ];
+
+      if (page != null && pageSize != null) {
+        const offset: number = (page - 1) * pageSize;
+        sql += "LIMIT ? OFFSET ? ";
+        params.push(pageSize, offset);
+      }
+
+      databaseConn.query<ProgrammeIntakeData[]>(sql, params,
         (err, res) => {
           if (err) reject(err);
           resolve(res);

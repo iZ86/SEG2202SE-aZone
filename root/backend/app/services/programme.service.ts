@@ -5,14 +5,14 @@ import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 
 interface IProgrammeService {
-  getAllProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeData[]>>;
+  getAllProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
   getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>>;
   getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   createProgramme(programmeName: string): Promise<Result<ProgrammeData>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
-  getAllProgrammeIntakes(): Promise<Result<ProgrammeIntakeData[]>>;
+  getAllProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>>;
@@ -22,7 +22,7 @@ interface IProgrammeService {
 }
 
 class ProgrammeService implements IProgrammeService {
-  async getAllProgrammes(query: string = "", pageSize: number, page: number): Promise<Result<ProgrammeData[]>> {
+  async getAllProgrammes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>> {
     const programmes: ProgrammeData[] = await programmeRepository.getAllProgrammes(query, pageSize, page);
 
     return Result.succeed(programmes, "Programmes retrieve success");
@@ -87,8 +87,8 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme delete success");
   }
 
-  async getAllProgrammeIntakes(): Promise<Result<ProgrammeIntakeData[]>> {
-    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getAllProgrammeIntakes();
+  async getAllProgrammeIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>> {
+    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getAllProgrammeIntakes(query, pageSize, page);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
   }

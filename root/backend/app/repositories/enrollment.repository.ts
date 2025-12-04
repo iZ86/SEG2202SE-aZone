@@ -165,7 +165,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-
   createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
