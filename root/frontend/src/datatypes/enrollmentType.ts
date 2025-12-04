@@ -17,7 +17,6 @@ export type EnrollmentProgrammeIntake = {
 };
 
 export type EnrollmentSubject = {
-  studentId: number;
   enrollmentSubjectId: number;
   enrollmentId: number;
   enrollmentStartDateTime: Date;
@@ -26,17 +25,12 @@ export type EnrollmentSubject = {
   subjectCode: string;
   subjectName: string;
   description: string;
-  subjectStatusId: number;
-  subjectStatus: string;
   creditHours: number;
-  classTypeId: number;
-  classType: string;
-  venueId: number;
-  venue: string;
-  startTime: Date;
-  endTime: Date;
-  dayId: number;
-  day: string;
-  numberOfSeats: number;
-  grouping: number;
+  lecturerId: number;
+  firstName: string;
+  lastName: string;
+  lecturerTitleId: number;
+  lecturerTitle: string;
+  email: string;
+  phoneNumber: string;
 };
