@@ -55,6 +55,7 @@ CREATE TABLE COURSE (
     courseId INT AUTO_INCREMENT PRIMARY KEY,
     programmeId INT NOT NULL,
     courseName VARCHAR(255) NOT NULL,
+    courseCode VARCHAR(50) NOT NULL,    
     FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE
 );
@@ -214,16 +215,16 @@ INSERT INTO `PROGRAMME` (`programmeId`, `programmeName`) VALUES
 (2, 'Diploma'),
 (3, 'Foundation');
 
-INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`) VALUES
-(1, 2, 'Diploma in Information Technology'),
-(2, 1, 'Bachelor of Science (Honours) in\r\nComputer Science'),
-(3, 1, 'Bachelor of Science (Honours) in Information Technology'),
-(4, 1, 'Bachelor of \r\nSoftware Engineering (Hons)'),
-(5, 1, 'Bachelor (Honours)  \r\nin Finance'),
-(6, 3, 'Foundation in Art'),
-(7, 3, 'Foundation in Science and Technology'),
-(8, 2, 'Diploma in Finance'),
-(9, 2, 'Diploma in Business Administration');
+INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`, `courseCode`) VALUES
+(1, 2, 'Diploma in Information Technology', 'DIIT'),
+(2, 1, 'Bachelor of Science (Honours) in\r\nComputer Science', 'BCS'),
+(3, 1, 'Bachelor of Science (Honours) in Information Technology', 'BIT'),
+(4, 1, 'Bachelor of \r\nSoftware Engineering (Hons)', 'BSE'),
+(5, 1, 'Bachelor (Honours)  \r\nin Finance', 'BFI'),
+(6, 3, 'Foundation in Art', 'FIA'),
+(7, 3, 'Foundation in Science and Technology', 'FIST'),
+(8, 2, 'Diploma in Finance', 'DIF'),
+(9, 2, 'Diploma in Business Administration', 'DIBA');
 
 INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
 ("Full Time"),
