@@ -5,11 +5,11 @@ import { useStudent } from "../hooks/useStudent";
 import LoadingOverlay from "@components/LoadingOverlay";
 import { getAllStudentEnrollmentSubjectByIdAPI } from "../api/student";
 import { toast } from "react-toastify";
-import type { EnrollmentSubject } from "@datatypes/enrollmentType";
+import type { StudentSubjectData } from "@datatypes/userType";
 
 export default function SubjectListingTable() {
   const { authToken, student, loading } = useStudent();
-  const [subjects, setSubjects] = useState<EnrollmentSubject[]>([]);
+  const [subjects, setSubjects] = useState<StudentSubjectData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [selectedSemester, setSelectedSemester] = useState(0);
