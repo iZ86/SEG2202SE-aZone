@@ -4,7 +4,7 @@ import { LecturerData, LecturerTitleData } from "../models/lecturer-model";
 import lecturerRepository from "../repositories/lecturer.repository";
 
 interface ILecturerService {
-  getAllLecturers(query: string, pageSize: number, page: number): Promise<Result<LecturerData[]>>;
+  getAllLecturers(query: string, pageSize: number | null, page: number | null): Promise<Result<LecturerData[]>>;
   getLecturerById(lecturerId: number): Promise<Result<LecturerData>>;
   getLecturerByEmail(email: string): Promise<Result<LecturerData>>;
   getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<Result<LecturerData>>;
@@ -17,7 +17,7 @@ interface ILecturerService {
 }
 
 class LecturerService implements ILecturerService {
-  async getAllLecturers(query: string = "", pageSize: number, page: number): Promise<Result<LecturerData[]>> {
+  async getAllLecturers(query: string = "", pageSize: number | null, page: number | null): Promise<Result<LecturerData[]>> {
     const lecturers: LecturerData[] = await lecturerRepository.getAllLecturers(query, pageSize, page);
 
     return Result.succeed(lecturers, "Lecturers retrieve success");

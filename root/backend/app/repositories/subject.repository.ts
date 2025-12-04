@@ -4,7 +4,7 @@ import { SubjectData } from "../models/subject-model";
 import { TotalCount } from "../models/general-model";
 
 interface ISubjectRepository {
-  getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
+  getAllSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]>;
   getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
   getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined>;
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined>;
@@ -15,23 +15,28 @@ interface ISubjectRepository {
 }
 
 class SubjectRepository implements ISubjectRepository {
-  getAllSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]> {
-    const offset: number = (page - 1) * pageSize;
+  getAllSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<SubjectData[]>(
-        "SELECT * " +
-        "FROM SUBJECT " +
-        "WHERE subjectId LIKE ? " +
-        "OR subjectName LIKE ? " +
-        "OR subjectCode LIKE ? " +
-        "LIMIT ? OFFSET ?;",
-        [
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          pageSize,
-          offset,
-        ],
+      let sql: string = `
+        SELECT *
+        FROM SUBJECT
+        WHERE subjectId LIKE ?
+        OR subjectName LIKE ?
+        OR subjectCode LIKE ? `;
+
+      const params: any[] = [
+        "%" + query + "%",
+        "%" + query + "%",
+        "%" + query + "%",
+      ];
+
+      if (page != null && pageSize != null) {
+        const offset: number = (page - 1) * pageSize;
+        sql += "LIMIT ? OFFSET ? ";
+        params.push(pageSize, offset);
+      }
+
+      databaseConn.query<SubjectData[]>(sql, params,
         (err, res) => {
           if (err) reject(err);
           resolve(res);

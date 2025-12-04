@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface ILecturerRepository {
-  getAllLecturers(query: string, pageSize: number, page: number): Promise<LecturerData[]>;
+  getAllLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]>;
   getLecturerById(lecturerId: number): Promise<LecturerData | undefined>;
   getLecturerByEmail(email: string): Promise<LecturerData | undefined>;
   getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<LecturerData | undefined>;
@@ -17,26 +17,31 @@ interface ILecturerRepository {
 }
 
 class LecturerRepository implements ILecturerRepository {
-  getAllLecturers(query: string, pageSize: number, page: number): Promise<LecturerData[]> {
-    const offset: number = (page - 1) * pageSize;
+  getAllLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<LecturerData[]>(
-        "SELECT * " +
-        "FROM LECTURER l " +
-        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "WHERE l.lecturerId LIKE ? " +
-        "OR l.firstName LIKE ? " +
-        "OR l.lastName LIKE ? " +
-        "OR lt.lecturerTitle LIKE ? " +
-        "LIMIT ? OFFSET ?;",
-        [
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          pageSize,
-          offset,
-        ],
+      let sql: string = `
+        SELECT *
+        FROM LECTURER l
+        INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId
+        WHERE l.lecturerId LIKE ?
+        OR l.firstName LIKE ?
+        OR l.lastName LIKE ?
+        OR lt.lecturerTitle LIKE ? `;
+
+      const params: any[] = [
+        "%" + query + "%",
+        "%" + query + "%",
+        "%" + query + "%",
+        "%" + query + "%",
+      ];
+
+      if (page != null && pageSize != null) {
+        const offset: number = (page - 1) * pageSize;
+        sql += "LIMIT ? OFFSET ? ";
+        params.push(pageSize, offset);
+      }
+
+      databaseConn.query<LecturerData[]>(sql, params,
         (err, res) => {
           if (err) reject(err);
           resolve(res);

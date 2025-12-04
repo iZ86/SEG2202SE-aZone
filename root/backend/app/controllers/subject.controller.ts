@@ -8,18 +8,26 @@ import { CourseData } from "../models/course-model";
 
 export default class SubjectController {
   async getAllSubjects(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number | null = parseInt(req.query.page as string) || null;
+    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
     const response: Result<SubjectData[]> = await subjectService.getAllSubjects(query, pageSize, page);
     const subjectCount: Result<number> = await subjectService.getSubjectCount(query);
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok({
+    let apiResponse: object = {
+      subjects: response.getData(),
+    };
+
+    if (page != null && pageSize != null) {
+      apiResponse = {
         subjects: response.getData(),
         subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
-      }, response.getMessage());
+      };
+    }
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(apiResponse, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
