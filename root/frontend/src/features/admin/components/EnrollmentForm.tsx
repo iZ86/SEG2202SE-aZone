@@ -10,11 +10,11 @@ import {
 } from "../api/enrollments";
 import DatePicker from "@components/DatePicker";
 import {
+  CalendarDate,
   parseAbsoluteToLocal,
   ZonedDateTime,
   type CalendarDateTime,
 } from "@internationalized/date";
-import CustomDatePicker from "@components/DatePicker";
 import { useAdmin } from "../hooks/useAdmin";
 import { toast } from "react-toastify";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
@@ -192,21 +192,21 @@ export default function EnrollmentForm({
   }
 
   function onChangeEnrollmentStartDateTime(
-    value: CalendarDateTime | ZonedDateTime | null
+    value: CalendarDate | CalendarDateTime | ZonedDateTime | null
   ) {
     if (value !== null) {
       setEmptyEnrollmentStartDateTime(false);
     }
-    setEnrollmentStartDateTime(value);
+    setEnrollmentStartDateTime(value as CalendarDateTime);
   }
 
   function onChangeEnrollmentEndDateTime(
-    value: CalendarDateTime | ZonedDateTime | null
+    value: CalendarDate | CalendarDateTime | ZonedDateTime | null
   ) {
     if (value !== null) {
       setEmptyEnrollmentEndDateTime(false);
     }
-    setEnrollmentEndDateTime(value);
+    setEnrollmentEndDateTime(value as CalendarDateTime);
   }
 
   function onChangeProgrammeIntake(
@@ -283,13 +283,14 @@ export default function EnrollmentForm({
                   isInvalid={invalidEnrollmentDateTimes}
                   invalidMessage="Enrollmet Start Date Time Existed"
                 >
-                  <CustomDatePicker
+                  <DatePicker
                     value={enrollmentStartDateTime}
                     onChange={onChangeEnrollmentStartDateTime}
                     isInvalid={
                       emptyEnrollmentStartDateTime || invalidEnrollmentDateTimes
                     }
                     placeholder="Select Enrollment Start Date & Time"
+                    isMinuteGranularity={true}
                   />
                 </AdminInputFieldWrapper>
               </div>
@@ -306,6 +307,7 @@ export default function EnrollmentForm({
                       emptyEnrollmentEndDateTime || invalidEnrollmentDateTimes
                     }
                     placeholder="Select Enrollment End Date & Time"
+                    isMinuteGranularity={true}
                   />
                 </AdminInputFieldWrapper>
               </div>

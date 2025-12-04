@@ -21,7 +21,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { CalendarDateTime, ZonedDateTime } from "@internationalized/date";
+import {
+  CalendarDate,
+  CalendarDateTime,
+  ZonedDateTime,
+} from "@internationalized/date";
 import { useState } from "react";
 
 export default function DateTimePicker({
@@ -32,11 +36,15 @@ export default function DateTimePicker({
   width = "full",
   minWidth = "48",
   maxWidth = "74",
+  isMinuteGranularity = true,
 }: {
-  value: CalendarDateTime | ZonedDateTime | null;
-  onChange: (value: CalendarDateTime | ZonedDateTime | null) => void;
+  value: CalendarDate | CalendarDateTime | ZonedDateTime | null;
+  onChange: (
+    value: CalendarDate | CalendarDateTime | ZonedDateTime | null
+  ) => void;
   isInvalid: boolean;
   placeholder: string;
+  isMinuteGranularity: boolean;
   width?: string;
   minWidth?: string;
   maxWidth?: string;
@@ -47,7 +55,7 @@ export default function DateTimePicker({
     <DatePicker
       value={value}
       onChange={onChange}
-      granularity="minute"
+      granularity={isMinuteGranularity ? "minute" : "day"}
       className={`relative max-w-${maxWidth} min-w-${minWidth} w-${width}`}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
