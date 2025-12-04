@@ -133,7 +133,7 @@ CREATE TABLE ENROLLMENT_SUBJECT (
         ON DELETE CASCADE,
     FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId)
         ON DELETE CASCADE,
-    UNIQUE (enrollmentId, subjectId)
+    UNIQUE (enrollmentId, subjectId, lecturerId)
 );
 
 CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
