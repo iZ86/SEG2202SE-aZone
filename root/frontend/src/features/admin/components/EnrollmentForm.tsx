@@ -89,15 +89,13 @@ export default function EnrollmentForm({
       setProgrammeIntakes(
         data.programmeIntakes.map((programmeIntake: ProgrammeIntake) => ({
           value: programmeIntake.programmeIntakeId,
-          label:
-            programmeIntake.programmeName +
-            " Programme - " +
-            programmeIntake.intakeId +
-            " - Semester " +
-            programmeIntake.semester +
-            " (" +
-            programmeIntake.studyMode +
-            ")",
+          label: `${programmeIntake.programmeName} (Sem ${
+            programmeIntake.semester
+          }) - Intake: ${programmeIntake.intakeId} - Duration: ${new Date(
+            programmeIntake.semesterStartDate
+          ).toLocaleDateString()} - ${new Date(
+            programmeIntake.semesterEndDate
+          ).toLocaleDateString()} • ${programmeIntake.studyMode}`,
         }))
       );
     };
@@ -237,23 +235,23 @@ export default function EnrollmentForm({
 
     const { data } = await response.json();
 
-    if (!data || data.length === 0) {
+    if (!data.programmeIntakes || data.programmeIntakes.length === 0) {
       setProgrammeIntakeOptions([]);
       return;
     }
 
-    const options = data.map((programmeIntake: ProgrammeIntake) => ({
-      value: programmeIntake.programmeIntakeId,
-      label:
-        programmeIntake.programmeName +
-        " Programme - " +
-        programmeIntake.intakeId +
-        " - Semester " +
-        programmeIntake.semester +
-        " (" +
-        programmeIntake.studyMode +
-        ")",
-    }));
+    const options = data.programmeIntakes.map(
+      (programmeIntake: ProgrammeIntake) => ({
+        value: programmeIntake.programmeIntakeId,
+        label: `${programmeIntake.programmeName} (Sem ${
+          programmeIntake.semester
+        }) - Intake: ${programmeIntake.intakeId} - Duration: ${new Date(
+          programmeIntake.semesterStartDate
+        ).toLocaleDateString()} - ${new Date(
+          programmeIntake.semesterEndDate
+        ).toLocaleDateString()} • ${programmeIntake.studyMode}`,
+      })
+    );
 
     setProgrammeIntakeOptions(options);
   }
