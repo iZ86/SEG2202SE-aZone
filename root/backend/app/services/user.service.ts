@@ -283,7 +283,7 @@ class UserService implements IUserService {
         enrollmentStartDateTime: null,
         enrollmentEndDateTime: null
       },
-      "Student enrollment schedule retrieved"
+      "Student enrollment schedule retrieve success"
     );
 
   }
