@@ -50,9 +50,9 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   lastName: string;
   lectureTitleId: number;
   lectureTitle: number;
+  enrollmentSubjectTypeId: number;
   classTypeId: number;
   classType: string;
-  enrollmentSubjectTypeId: number;
   grouping: number;
   dayId: number;
   day: string;

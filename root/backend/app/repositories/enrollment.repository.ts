@@ -396,7 +396,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
-        "lt.lecturerTitle, est.classTypeId, ct.classType, est.enrollmentSubjectTypeId, est.grouping, d.dayId, d.day, est.startTime, " +
+        "lt.lecturerTitle, est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.grouping, d.dayId, d.day, est.startTime, " +
         "est.endTime " +
         "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
