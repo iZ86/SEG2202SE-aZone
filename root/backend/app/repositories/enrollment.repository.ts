@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData} from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -23,6 +23,8 @@ interface IEnrollmentRepository {
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader>;
   getEnrollmentSubjectCount(query: string): Promise<number>;
+
+  getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -370,6 +372,34 @@ class EnrollmentRepository implements IEnrollmentRepository {
         }
       );
     });
+  }
+
+  getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentEnrollmentSubjectData[]>(
+        "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
+        "lt.lecturerTitle, est.classTypeId, ct.classType, est.enrollmentSubjectTypeId, est.grouping, d.dayId, d.day, est.startTime, " +
+        "est.endTime " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN ENROLLMENT e ON pi.enrollmentId = e.enrollmentId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON e.enrollmentId = es.enrollmentId " +
+        "INNER JOIN SUBJECT s on es.subjectId = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON es.enrollmentSubjectId = est.enrollmentSubjectId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE scpi.studentId = ? " +
+        "AND scpi.status = 1;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      )
+    })
   }
 }
 

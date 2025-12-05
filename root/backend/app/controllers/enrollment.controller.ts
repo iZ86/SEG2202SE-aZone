@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
 import subjectService from "../services/subject.service";
 import { SubjectData } from "../models/subject-model";
 import { LecturerData } from "../models/lecturer-model";
 import lecturerService from "../services/lecturer.service";
+import { StudentEnrollmentSchedule } from "../models/user-model";
 
 export default class EnrollmentController {
   async getAllEnrollments(req: Request, res: Response) {
@@ -160,32 +161,54 @@ export default class EnrollmentController {
   }
 
   async getAllEnrollmentSubjects(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
-    const query: string = req.query.query as string || "";
 
-    const response: Result<EnrollmentSubjectData[]> = await enrollmentService.getAllEnrollmentSubjects(query, pageSize, page);
-    const enrollmentSubjectCount: Result<number> = await enrollmentService.getEnrollmentSubjectCount(query);
+    const userId: number = req.user.userId as number;
+    const isStudent: boolean = req.user.isStudent as boolean;
+    const isAdmin: boolean = req.user.isAdmin as boolean;
 
-    let apiResponse: object = {
-      enrollmentSubjects: response.getData(),
-    };
-
-    if (page != null && pageSize != null) {
-      apiResponse = {
-        enrollmentSubjects: response.getData(),
-        enrollmentSubjectCount: enrollmentSubjectCount.isSuccess() ? enrollmentSubjectCount.getData() : 0,
-      };
-    }
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(apiResponse, response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
+    if (isStudent) {
+      const response: Result<{studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectData[]}> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
+      if (response.isSuccess()) {
+        return res.sendSuccess.ok(response.getData(), response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage());
+        }
       }
+
+    } else if (isAdmin) {
+      const page: number | null = parseInt(req.query.page as string) || null;
+      const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+      const query: string = req.query.query as string || "";
+
+      const response: Result<EnrollmentSubjectData[]> = await enrollmentService.getAllEnrollmentSubjects(query, pageSize, page);
+      const enrollmentSubjectCount: Result<number> = await enrollmentService.getEnrollmentSubjectCount(query);
+
+      let apiResponse: object = {
+        enrollmentSubjects: response.getData(),
+      };
+
+      if (page != null && pageSize != null) {
+        apiResponse = {
+          enrollmentSubjects: response.getData(),
+          enrollmentSubjectCount: enrollmentSubjectCount.isSuccess() ? enrollmentSubjectCount.getData() : 0,
+        };
+      }
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.ok(apiResponse, response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage());
+        }
+      }
+    } else {
+      throw new Error("getAllEnrollmentSubjects in enrollment.controller.ts, user is neither student nor admin");
     }
+
+
   }
 
   async getEnrollmentSubjectById(req: Request, res: Response) {

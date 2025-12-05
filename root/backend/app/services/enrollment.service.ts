@@ -1,7 +1,9 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData } from "../models/enrollment-model";
+import { StudentEnrollmentSchedule } from "../models/user-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
+import userRepository from "../repositories/user.repository";
 
 interface IEnrollmentService {
   getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
@@ -21,6 +23,8 @@ interface IEnrollmentService {
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>>;
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
+  
+ getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectData[]}>>;
 }
 
 class EnrollmentService implements IEnrollmentService {
@@ -184,6 +188,19 @@ class EnrollmentService implements IEnrollmentService {
     const enrollmentSubjectCount: number = await enrollmentRepository.getEnrollmentSubjectCount(query);
 
     return Result.succeed(enrollmentSubjectCount ? enrollmentSubjectCount : 0, "Enrollment subject count retrieve success");
+  }
+
+  async getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectData[]}>> {
+    const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await userRepository.getStudentEnrollmentScheduleById(studentId);
+
+    if (!studentEnrollmentSchedule) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "No enrollment at the moment");
+    }
+    
+    const studentEnrollmentSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjectsByStudentId(studentId);
+
+
+    return Result.succeed({studentEnrollmentSchedule: studentEnrollmentSchedule, studentEnrollmentSubjects: studentEnrollmentSubjects}, "Student enrollment subject retrieve success");
   }
 }
 
