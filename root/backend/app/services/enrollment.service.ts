@@ -1,6 +1,6 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData } from "../models/enrollment-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 
 interface IEnrollmentService {
@@ -22,7 +22,7 @@ interface IEnrollmentService {
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>>;
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>
-  getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectData[] }>>;
+  getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[] }>>;
 }
 
 class EnrollmentService implements IEnrollmentService {
@@ -188,7 +188,9 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectCount ? enrollmentSubjectCount : 0, "Enrollment subject count retrieve success");
   }
 
-  async getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectData[] }>> {
+  async getEnrollmentSubjectsByStudentId(studentId: number):
+    Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[] }>> {
+
     const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await enrollmentRepository.getEnrollmentScheduleByStudentId(studentId);
 
     if (!studentEnrollmentSchedule) {
@@ -198,7 +200,90 @@ class EnrollmentService implements IEnrollmentService {
     const studentEnrollmentSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjectsByStudentId(studentId);
 
 
-    return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule, studentEnrollmentSubjects: studentEnrollmentSubjects }, "Student enrollment subject retrieve success");
+    const studentEnrollmentSubjectsOrganizedMap:
+      {
+        [subjectId: number]: {
+          subjectId: StudentEnrollmentSubjectData["subjectId"],
+          subjectCode: StudentEnrollmentSubjectData["subjectCode"],
+          subjectName: StudentEnrollmentSubjectData["subjectName"],
+          creditHours: StudentEnrollmentSubjectData["creditHours"],
+          lectureId: StudentEnrollmentSubjectData["lectureId"],
+          firstName: StudentEnrollmentSubjectData["firstName"],
+          lastName: StudentEnrollmentSubjectData["lastName"],
+          lectureTitleId: StudentEnrollmentSubjectData["lectureTitleId"],
+          lectureTitle: StudentEnrollmentSubjectData["lectureTitle"],
+          classTypes: {
+            [classTypeId: number]: {
+              classTypeId: StudentEnrollmentSubjectData["classTypeId"],
+              classType: StudentEnrollmentSubjectData["classType"],
+              classTypeDetails: {
+                enrollmentSubjectTypeId: StudentEnrollmentSubjectData["enrollmentSubjectTypeId"],
+                grouping: StudentEnrollmentSubjectData["grouping"],
+                dayId: StudentEnrollmentSubjectData["dayId"],
+                day: StudentEnrollmentSubjectData["day"],
+                startTime: StudentEnrollmentSubjectData["startTime"],
+                endTime: StudentEnrollmentSubjectData["endTime"],
+              }[]
+            }
+          }
+        }
+      } = {};
+
+
+    // Loop through all the enrollment subjects.
+    for (const studentEnrollmentSubject of studentEnrollmentSubjects) {
+
+      // If the subject does not exist in the new map datastructure add it with empty classTypes.
+      if (!studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId]) {
+        studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId] = {
+          subjectId: studentEnrollmentSubject.subjectId,
+          subjectCode: studentEnrollmentSubject.subjectCode,
+          subjectName: studentEnrollmentSubject.subjectName,
+          creditHours: studentEnrollmentSubject.creditHours,
+          lectureId: studentEnrollmentSubject.lectureId,
+          firstName: studentEnrollmentSubject.firstName,
+          lastName: studentEnrollmentSubject.lastName,
+          lectureTitleId: studentEnrollmentSubject.lectureTitleId,
+          lectureTitle: studentEnrollmentSubject.lectureTitle,
+          classTypes: {}
+        }
+      }
+
+      // If the subject does exist. However, the classType does not, add the class type.
+      if (!studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId].classTypes[studentEnrollmentSubject.classTypeId]) {
+        studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId].classTypes[studentEnrollmentSubject.classTypeId] = {
+          classTypeId: studentEnrollmentSubject.classTypeId,
+          classType: studentEnrollmentSubject.classType,
+          classTypeDetails: []
+        }
+      }
+
+      // If the class type exist, add the respective class detail.
+      studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId].classTypes[studentEnrollmentSubject.classTypeId].classTypeDetails.push({
+        enrollmentSubjectTypeId: studentEnrollmentSubject.enrollmentSubjectTypeId,
+        grouping: studentEnrollmentSubject.grouping,
+        dayId: studentEnrollmentSubject.dayId,
+        day: studentEnrollmentSubject.day,
+        startTime: studentEnrollmentSubject.startTime,
+        endTime: studentEnrollmentSubject.endTime
+      })
+    }
+
+    // The response data.
+    const studentEnrollmentSubjectsOrganized: any = []
+
+    // Since everything is in Key-Value datastructure format, this will convert it to array for response.
+    for (let subjectId in studentEnrollmentSubjectsOrganizedMap) {
+      let classTypes = [];
+      for (let classTypeId in studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes) {
+        classTypes.push(studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes[classTypeId]);
+      }
+      studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes = classTypes
+      studentEnrollmentSubjectsOrganized.push(studentEnrollmentSubjectsOrganizedMap[subjectId])
+    }
+
+
+    return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule, studentEnrollmentSubjects: studentEnrollmentSubjectsOrganized }, "Student enrollment subject retrieve success");
   }
 
   async getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {

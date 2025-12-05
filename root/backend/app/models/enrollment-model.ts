@@ -1,5 +1,29 @@
 import { RowDataPacket } from "mysql2";
 
+export interface StudentEnrollmentSubjectOrganizedData {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+  lectureId: number;
+  firstName: string;
+  lastName: string;
+  lectureTitleId: number;
+  lectureTitle: number;
+  classTypes: [{
+    classTypeId: number;
+    classType: string;
+    classTypeDetails: [{
+      enrollmentSubjectTypeId: number;
+      grouping: number;
+      dayId: number;
+      day: string;
+      startTime: Date;
+      endTime: Date;
+    }]
+  }]
+};
+
 export interface EnrollmentData extends RowDataPacket {
   enrollmentId: number;
   enrollmentStartDateTime: Date;
