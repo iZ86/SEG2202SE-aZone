@@ -63,13 +63,6 @@ export interface StudentSemesterStartAndEndData extends RowDataPacket {
   semesterEndDate: Date;
 }
 
-export interface StudentEnrollmentSchedule extends RowDataPacket {
-  programmeIntakeId: number | null;
-  enrollmentId: number | null;
-  enrollmentStartDateTime: Date | null;
-  enrollmentEndDateTime: Date | null;
-}
-
 /** Used when getting the subject data of active subjects for the student. */
 export interface StudentSubjectOverviewData extends RowDataPacket {
   subjectId: number;

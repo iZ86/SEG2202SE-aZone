@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData} from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -23,7 +23,7 @@ interface IEnrollmentRepository {
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader>;
   getEnrollmentSubjectCount(query: string): Promise<number>;
-
+  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
 }
 
@@ -372,6 +372,24 @@ class EnrollmentRepository implements IEnrollmentRepository {
         }
       );
     });
+  }
+
+  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentEnrollmentSchedule[]>(
+        "SELECT scpi.programmeIntakeId, e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN ENROLLMENT e ON pi.enrollmentId = e.enrollmentId " +
+        "WHERE scpi.studentId = ? " +
+        "AND scpi.status = 1;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      )
+    })
   }
 
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {

@@ -2,8 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentEnrollmentSchedule, StudentClassData, StudentSubjectData, StudentSubjectOverviewData } from "../models/user-model";
-
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, StudentSubjectData, StudentSubjectOverviewData } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
 interface IUserService {
@@ -30,7 +29,6 @@ interface IUserService {
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
   getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
   getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<Result<number>>;
-  getStudentEnrollmentScheduleById(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
 }
 
 class UserService implements IUserService {
@@ -272,20 +270,6 @@ class UserService implements IUserService {
     const studentEnrollmentSubjectCount: number = await userRepository.getStudentSubjectsCountById(studentId, semester, query);
 
     return Result.succeed(studentEnrollmentSubjectCount ? studentEnrollmentSubjectCount : 0, "Student Enrollment Subject count retrieve success");
-  }
-
-  async getStudentEnrollmentScheduleById(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {
-    const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await userRepository.getStudentEnrollmentScheduleById(studentId);
-    return Result.succeed(
-      studentEnrollmentSchedule ?? {
-        programmeIntakeId: null,
-        enrollmentId: null,
-        enrollmentStartDateTime: null,
-        enrollmentEndDateTime: null
-      },
-      "Student enrollment schedule retrieve success"
-    );
-
   }
 }
 

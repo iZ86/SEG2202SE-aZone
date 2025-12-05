@@ -29,8 +29,6 @@ class UserRoute {
     this.router.get("/students/subjects", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentSubjectsById));
     this.router.get("/students/subjects/active", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentActiveSubjectsOverviewById));
 
-    this.router.get("/students/enrollment/schedule", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentEnrollmentScheduleById));
-
     this.router.get("/students/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentById));
 
     this.router.get("/students/:studentId/course/programme/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentCourseProgrammeIntakeByStudentId));
