@@ -306,7 +306,10 @@ INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentId`, `subjectId`, `lecturerId`) VAL
 INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
 (1, 1, 1, "04:00:00", "06:00:00", 1, 30, 1),
 (3, 2, 1, "08:00:00", "10:00:00", 1, 30, 1),
-(2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1);
+(2, 1, 1, "08:00:00", "10:00:00", 2, 30, 1),
+(1, 2, 1, "06:00:00", "08:00:00", 3, 30, 1),
+(1, 1, 1, "06:00:00", "08:00:00", 4, 30, 2),
+(1, 2, 1, "06:00:00", "08:00:00", 5, 30, 2);
 
 INSERT INTO `STUDENT_ENROLLMENT_SUBJECT_TYPE` (`studentId`, `enrollmentSubjectTypeId` ,`subjectStatusId`) VALUES
 (23049679, 1, 1),
