@@ -1,3 +1,4 @@
+import type { CreateEnrollmentSubjectType, UpdateEnrollmentSubjectType } from "@datatypes/enrollmentType";
 import {
   type CalendarDateTime,
 } from "@internationalized/date";
@@ -185,6 +186,76 @@ export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSu
 export const deleteEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubjectId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const getEnrollmentSubjectTypeByEnrollmentSubjectIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects-type/${enrollmentSubjectId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const createEnrollmentSubjectTypeAPI = async (token: string, enrollmentSubjects: CreateEnrollmentSubjectType[]): Promise<Response | undefined> => {
+  try {
+    return await fetch("http://localhost:8080/api/v1/enrollments/subjects-type",
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          enrollmentSubjects
+        }),
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const updateEnrollmentSubjectTypeByEnrollmentSubjectIdAPI = async (token: string, enrollmentSubjectId: number, enrollmentSubjects: UpdateEnrollmentSubjectType[]): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects-type/${enrollmentSubjectId}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          enrollmentSubjects
+        }),
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const deleteEnrollmentSubjectTypeByEnrollmentSubjectIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects-type/${enrollmentSubjectId}`,
       {
         method: 'DELETE',
         headers: {
