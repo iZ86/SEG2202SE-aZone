@@ -20,8 +20,8 @@ export interface StudentEnrollmentSubjectOrganizedData {
       day: string;
       startTime: Date;
       endTime: Date;
-    }]
-  }]
+    }];
+  }];
 };
 
 export interface EnrollmentData extends RowDataPacket {
@@ -63,6 +63,21 @@ export interface EnrollmentSubjectData extends RowDataPacket {
   email: string;
   phoneNumber: string;
 };
+
+export interface EnrollmentSubjectTypeData extends RowDataPacket {
+  enrollmentSubjectTypeId: number;
+  enrollmentSubjectId: number;
+  classTypeId: number;
+  classType: string;
+  venueId: number;
+  venue: string;
+  startTime: Date;
+  endTime: Date;
+  dayId: number;
+  day: string;
+  numberOfSeats: number;
+  grouping: number;
+}
 
 export interface StudentEnrollmentSubjectData extends RowDataPacket {
   subjectId: number;
