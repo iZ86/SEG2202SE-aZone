@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
 import subjectService from "../services/subject.service";
@@ -166,7 +166,7 @@ export default class EnrollmentController {
     const isAdmin: boolean = req.user.isAdmin as boolean;
 
     if (isStudent) {
-      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[] }> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
+      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
       if (response.isSuccess()) {
         return res.sendSuccess.ok(response.getData(), response.getMessage());
       } else {
@@ -335,6 +335,122 @@ export default class EnrollmentController {
 
     if (studentEnrollmentScheduleResponse.isSuccess()) {
       return res.sendSuccess.ok(studentEnrollmentScheduleResponse.getData(), studentEnrollmentScheduleResponse.getMessage());
+    }
+  }
+
+  async getEnrollmentSubjectTypeByEnrollmentSubjectId(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
+    }
+
+    const response: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async createEnrollmentSubjectType(req: Request, res: Response) {
+    const enrollmentSubjects: {
+      enrollmentSubjectId: number;
+      classTypeId: number;
+      venueId: number;
+      startTime: Date;
+      endTime: Date;
+      dayId: number;
+      numberOfSeats: number;
+      grouping: number;
+    }[] = req.body.enrollmentSubjects;
+
+    await Promise.all(
+      enrollmentSubjects.map(async (enrollmentSubject) => {
+        await enrollmentService.createEnrollmentSubjectType(enrollmentSubject.enrollmentSubjectId, enrollmentSubject.classTypeId, enrollmentSubject.venueId, enrollmentSubject.startTime, enrollmentSubject.endTime, enrollmentSubject.dayId, enrollmentSubject.numberOfSeats, enrollmentSubject.grouping);
+      })
+    );
+
+    const response: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjects[0].enrollmentSubjectId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async updateEnrollmentSubjectTypeByEnrollmentSubjectId(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+    const enrollmentSubjects: {
+      classTypeId: number;
+      venueId: number;
+      startTime: Date;
+      endTime: Date;
+      dayId: number;
+      numberOfSeats: number;
+      grouping: number;
+    }[] = req.body.enrollmentSubjects;
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
+    }
+
+    const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
+
+    if (!enrollmentSubjectResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid enrollmentSubjectId");
+    }
+
+    await enrollmentService.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    await Promise.all(
+      enrollmentSubjects.map(async (enrollmentSubject) => {
+        await enrollmentService.createEnrollmentSubjectType(enrollmentSubjectId, enrollmentSubject.classTypeId, enrollmentSubject.venueId, enrollmentSubject.startTime, enrollmentSubject.endTime, enrollmentSubject.dayId, enrollmentSubject.numberOfSeats, enrollmentSubject.grouping);
+      })
+    );
+
+    const response: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async deleteEnrollmentSubjectTypeByEnrollmentSubjectId(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
+    }
+
+    const enrollmentSubjectTypeResponse: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    if (!enrollmentSubjectTypeResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid enrollmentSubjectId");
+    }
+
+    const response = await enrollmentService.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.delete();
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
     }
   }
 }

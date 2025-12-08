@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import EnrollmentController from "../controllers/enrollment.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateEnrollmentSubjectValidator, createAndUpdateEnrollmentValidator } from "../validators/enrollment-validator";
+import { createAndUpdateEnrollmentSubjectValidator, createAndUpdateEnrollmentValidator, createEnrollmentSubjectTypeValidator, updateEnrollmentSubjectTypeValidator } from "../validators/enrollment-validator";
 
 class EnrollmentRoute {
   router = Router();
@@ -32,6 +32,11 @@ class EnrollmentRoute {
     this.router.get("/subjects/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getEnrollmentSubjectById));
     this.router.put("/subjects/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateEnrollmentSubjectValidator, asyncHandler(this.controller.updateEnrollmentSubjectById));
     this.router.delete("/subjects/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteEnrollmentSubjectById));
+
+    this.router.get("/subjects-type/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getEnrollmentSubjectTypeByEnrollmentSubjectId));
+    this.router.post("/subjects-type", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createEnrollmentSubjectTypeValidator, asyncHandler(this.controller.createEnrollmentSubjectType));
+    this.router.put("/subjects-type/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, updateEnrollmentSubjectTypeValidator, asyncHandler(this.controller.updateEnrollmentSubjectTypeByEnrollmentSubjectId));
+    this.router.delete("/subjects-type/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteEnrollmentSubjectTypeByEnrollmentSubjectId));
   }
 }
 

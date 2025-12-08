@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -25,6 +25,10 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectCount(query: string): Promise<number>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
+  getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData>;
+  getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
+  createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<ResultSetHeader>;
+  deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -388,8 +392,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res[0]);
         }
-      )
-    })
+      );
+    });
   }
 
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
@@ -416,8 +420,72 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
-    })
+      );
+    });
+  }
+
+  getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectTypeData[]>(
+        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping " +
+        "FROM ENROLLMENT_SUBJECT_TYPE est " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE est.enrollmentSubjectTypeId = ?;",
+        [enrollmentSubjectTypeId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectTypeData[]>(
+        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping " +
+        "FROM ENROLLMENT_SUBJECT_TYPE est " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE est.enrollmentSubjectId = ?;",
+        [enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "INSERT INTO ENROLLMENT_SUBJECT_TYPE (enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+        [enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM ENROLLMENT_SUBJECT_TYPE WHERE enrollmentSubjectId = ?;",
+        [enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        });
+    });
   }
 }
 
