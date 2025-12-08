@@ -666,9 +666,7 @@ export default function EnrollmentSubjectForm({
     const options = data.lecturers.map((lecturer: Lecturer) => ({
       value: lecturer.lecturerId,
       label:
-        (lecturer.lecturerTitle === "None"
-          ? ""
-          : lecturer.lecturerTitle + ".") +
+        (lecturer.lecturerTitle === "None" ? "" : lecturer.lecturerTitle) +
         " " +
         lecturer.lastName +
         " " +

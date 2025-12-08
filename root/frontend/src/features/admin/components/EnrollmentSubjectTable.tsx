@@ -151,7 +151,7 @@ export default function EnrollmentSubjectTable() {
                     <td className="px-6 py-5">
                       {(enrollmentSubject.lecturerTitle === "None"
                         ? ""
-                        : enrollmentSubject.lecturerTitle + ". ") +
+                        : enrollmentSubject.lecturerTitle + " ") +
                         enrollmentSubject.lastName +
                         " " +
                         enrollmentSubject.firstName}
