@@ -15,3 +15,34 @@ export type EnrollmentProgrammeIntake = {
   semesterStartDate: Date;
   semesterEndDate: Date;
 };
+
+export interface StudentEnrollmentSubjectOrganizedData {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+  lectureId: number;
+  firstName: string;
+  lastName: string;
+  lectureTitleId: number;
+  lectureTitle: number;
+  classTypes: [{
+    classTypeId: number;
+    classType: string;
+    classTypeDetails: [{
+      enrollmentSubjectTypeId: number;
+      grouping: number;
+      dayId: number;
+      day: string;
+      startTime: string;
+      endTime: string;
+    }]
+  }]
+};
+
+export interface StudentEnrollmentSchedule {
+  programmeIntakeId: number | null;
+  enrollmentId: number | null;
+  enrollmentStartDateTime: Date | null;
+  enrollmentEndDateTime: Date | null;
+}
