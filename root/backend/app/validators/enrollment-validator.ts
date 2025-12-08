@@ -34,3 +34,77 @@ export const createAndUpdateEnrollmentSubjectValidator: any = [
     .isNumeric().withMessage('lecturerId must be numeric'),
   validate,
 ];
+
+export const createEnrollmentSubjectTypeValidator: any = [
+  body('enrollmentSubjects')
+    .isArray({ min: 1 }).withMessage('enrollmentSubjects must be an array and at least one value')
+    .notEmpty().withMessage('Array cannot be empty'),
+  body('enrollmentSubjects.*.enrollmentSubjectId')
+    .trim()
+    .notEmpty().withMessage('enrollmentSubjectId cannot be empty')
+    .isNumeric().withMessage('enrollmentSubjectId must be numeric'),
+  body('enrollmentSubjects.*.classTypeId')
+    .trim()
+    .notEmpty().withMessage('classTypeId cannot be empty')
+    .isNumeric().withMessage('classTypeId must be numeric'),
+  body('enrollmentSubjects.*.venueId')
+    .trim()
+    .notEmpty().withMessage('venueId cannot be empty')
+    .isNumeric().withMessage('venueId must be numeric'),
+  body('enrollmentSubjects.*.startTime')
+    .trim()
+    .notEmpty().withMessage('startTime cannot be empty')
+    .isTime({}).withMessage('startTime must be time'),
+  body('enrollmentSubjects.*.endTime')
+    .trim()
+    .notEmpty().withMessage('endTime cannot be empty')
+    .isTime({}).withMessage('endTime must be time'),
+  body('enrollmentSubjects.*.dayId')
+    .trim()
+    .notEmpty().withMessage('dayId cannot be empty')
+    .isNumeric().withMessage('dayId must be numeric'),
+  body('enrollmentSubjects.*.numberOfSeats')
+    .trim()
+    .notEmpty().withMessage('numberOfSeats cannot be empty')
+    .isNumeric().withMessage('numberOfSeats must be numeric'),
+  body('enrollmentSubjects.*.grouping')
+    .trim()
+    .notEmpty().withMessage('grouping cannot be empty')
+    .isNumeric().withMessage('grouping must be numeric'),
+  validate,
+];
+
+export const updateEnrollmentSubjectTypeValidator: any = [
+  body('enrollmentSubjects')
+    .isArray({ min: 1 }).withMessage('enrollmentSubjects must be an array and at least one value')
+    .notEmpty().withMessage('Array cannot be empty'),
+  body('enrollmentSubjects.*.classTypeId')
+    .trim()
+    .notEmpty().withMessage('classTypeId cannot be empty')
+    .isNumeric().withMessage('classTypeId must be numeric'),
+  body('enrollmentSubjects.*.venueId')
+    .trim()
+    .notEmpty().withMessage('venueId cannot be empty')
+    .isNumeric().withMessage('venueId must be numeric'),
+  body('enrollmentSubjects.*.startTime')
+    .trim()
+    .notEmpty().withMessage('startTime cannot be empty')
+    .isTime({}).withMessage('startTime must be time'),
+  body('enrollmentSubjects.*.endTime')
+    .trim()
+    .notEmpty().withMessage('endTime cannot be empty')
+    .isTime({}).withMessage('endTime must be time'),
+  body('enrollmentSubjects.*.dayId')
+    .trim()
+    .notEmpty().withMessage('dayId cannot be empty')
+    .isNumeric().withMessage('dayId must be numeric'),
+  body('enrollmentSubjects.*.numberOfSeats')
+    .trim()
+    .notEmpty().withMessage('numberOfSeats cannot be empty')
+    .isNumeric().withMessage('numberOfSeats must be numeric'),
+  body('enrollmentSubjects.*.grouping')
+    .trim()
+    .notEmpty().withMessage('grouping cannot be empty')
+    .isNumeric().withMessage('grouping must be numeric'),
+  validate,
+];
