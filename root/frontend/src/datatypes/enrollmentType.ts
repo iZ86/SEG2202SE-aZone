@@ -18,6 +18,25 @@ export type EnrollmentProgrammeIntake = {
   semesterEndDate: Date;
 };
 
+export type EnrollmentSubject = {
+  enrollmentSubjectId: number;
+  enrollmentId: number;
+  subjectId: number;
+  lecturerId: number;
+  enrollmentStartDateTime: Date;
+  enrollmentEndDateTime: Date;
+  subjectCode: string;
+  subjectName: string;
+  description: number;
+  creditHours: number;
+  firstName: number;
+  lastName: number;
+  lecturerTitleId: number;
+  email: string;
+  phoneNumber: string;
+  lecturerTitle: string;
+};
+
 export type EnrollmentSubjectType = {
   enrollmentSubjectTypeId: number;
   enrollmentSubjectId: number;
@@ -28,7 +47,7 @@ export type EnrollmentSubjectType = {
   dayId: number;
   day: string;
   startTime: Time;
-  endTime: Time,
+  endTime: Time;
   numberOfSeats: number;
   grouping: number;
 };
@@ -39,7 +58,7 @@ export type CreateEnrollmentSubjectType = {
   venueId: number;
   dayId: number;
   startTime: string;
-  endTime: string,
+  endTime: string;
   numberOfSeats: number;
   grouping: number;
 };
@@ -49,7 +68,7 @@ export type UpdateEnrollmentSubjectType = {
   venueId: number;
   dayId: number;
   startTime: string;
-  endTime: string,
+  endTime: string;
   numberOfSeats: number;
   grouping: number;
 };
