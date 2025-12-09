@@ -17,3 +17,21 @@ export enum ENUM_PROGRAMME_STATUS {
   FINISHED = 3,
   DROPPED = 4,
 }
+
+export enum ENUM_DAY {
+  MONDAY = 1,
+  TUESDAY = 2,
+  WEDNESDAY = 3,
+  THURSDAY = 4,
+  FRIDAY = 5,
+  SATURDAY = 6,
+  SUNDAY = 7,
+}
+
+export enum ENUM_CLASS_TYPE {
+  LECTURE = 1,
+  PRACTICAL = 2,
+  TUTORIAL = 3,
+  WORKSHOP = 4,
+}
+
