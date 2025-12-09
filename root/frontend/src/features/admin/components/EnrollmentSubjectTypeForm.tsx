@@ -18,6 +18,7 @@ export default function EnrollmentSubjectTypeForm({
   data,
   isEmpty,
   isInvalid,
+  isInvalidTime,
   onChange,
   onRemove,
 }: {
@@ -48,6 +49,10 @@ export default function EnrollmentSubjectTypeForm({
     endTime: boolean;
     numberOfSeats: boolean;
     grouping: boolean;
+  };
+  isInvalidTime: {
+    startTime: boolean;
+    endTime: boolean;
   };
   onChange: (
     index: number,
@@ -230,15 +235,22 @@ export default function EnrollmentSubjectTypeForm({
         <div className="flex-1">
           <AdminInputFieldWrapper
             isEmpty={emptyStartTime || isEmpty.startTime}
-            isInvalid={isInvalid.startTime}
-            invalidMessage="Class session duplicated!"
+            isInvalid={isInvalid.startTime || isInvalidTime.startTime}
+            invalidMessage={`${
+              isInvalidTime.startTime
+                ? "Time should be before end time"
+                : "Class session duplicated"
+            }`}
           >
             <TimePicker
               placeholder="Select Class Start Time"
               value={data.startTime}
               onChange={onChangeStartTime}
               isInvalid={
-                emptyStartTime || isEmpty.startTime || isInvalid.startTime
+                emptyStartTime ||
+                isEmpty.startTime ||
+                isInvalid.startTime ||
+                isInvalidTime.startTime
               }
             />
           </AdminInputFieldWrapper>
@@ -246,14 +258,23 @@ export default function EnrollmentSubjectTypeForm({
         <div className="flex-1">
           <AdminInputFieldWrapper
             isEmpty={emptyEndTime || isEmpty.endTime}
-            isInvalid={isInvalid.endTime}
-            invalidMessage="Class session duplicated!"
+            isInvalid={isInvalid.endTime || isInvalidTime.endTime}
+            invalidMessage={`${
+              isInvalidTime.endTime
+                ? "Time should be after start time"
+                : "Class session duplicated"
+            }`}
           >
             <TimePicker
               placeholder="Select Class End Time"
               value={data.endTime}
               onChange={onChangeEndTime}
-              isInvalid={emptyEndTime || isEmpty.endTime || isInvalid.endTime}
+              isInvalid={
+                emptyEndTime ||
+                isEmpty.endTime ||
+                isInvalid.endTime ||
+                isInvalidTime.endTime
+              }
             />
           </AdminInputFieldWrapper>
         </div>
