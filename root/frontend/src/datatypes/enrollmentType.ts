@@ -53,7 +53,6 @@ export type EnrollmentSubjectType = {
 };
 
 export type CreateEnrollmentSubjectType = {
-  enrollmentSubjectId: number;
   classTypeId: number;
   venueId: number;
   dayId: number;
@@ -64,6 +63,7 @@ export type CreateEnrollmentSubjectType = {
 };
 
 export type UpdateEnrollmentSubjectType = {
+  enrollmentSubjectTypeId: number;
   classTypeId: number;
   venueId: number;
   dayId: number;
@@ -72,4 +72,3 @@ export type UpdateEnrollmentSubjectType = {
   numberOfSeats: number;
   grouping: number;
 };
-
