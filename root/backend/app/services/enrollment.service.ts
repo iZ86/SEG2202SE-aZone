@@ -304,7 +304,15 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   async getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>> {
-    const enrollmentSubjectType: EnrollmentSubjectTypeData[] | undefined = await enrollmentRepository.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+    const enrollmentSubjectType: EnrollmentSubjectTypeData[] = await enrollmentRepository.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    if (!enrollmentSubjectType) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject type not found");
+    }
+
+    return Result.succeed(enrollmentSubjectType, "Enrollment subject type retrieve success");
+  }
+
   async getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>> {
     const enrollmentSubjectType: EnrollmentSubjectTypeData | undefined = await enrollmentRepository.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime, endTime, venueId, dayId);
 
