@@ -2,6 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentSubjectData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
+import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
 interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -20,9 +21,11 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
-  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>; getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
+  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>; updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader>;
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
@@ -424,13 +427,13 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader> {
+  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET status = ? " +
         "WHERE studentId = ? " +
         "AND status = ?;",
-        [0, studentId, 1],
+        [status, studentId, 1],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

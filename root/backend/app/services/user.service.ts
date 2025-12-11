@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
 import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, StudentSubjectData, StudentSubjectOverviewData } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
@@ -203,7 +203,7 @@ class UserService implements IUserService {
 
   // Enroll the student into a course, and specify a programme intake.
   async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
-    await userRepository.updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId);
+    await userRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
 
     await userRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
