@@ -97,6 +97,8 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   day: string;
   startTime: Date;
   endTime: Date;
+  numberOfStudentsEnrolled: number;
+  numberOfSeats: number;
 };
 
 export interface StudentEnrollmentSchedule extends RowDataPacket {

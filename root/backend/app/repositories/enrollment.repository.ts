@@ -401,7 +401,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
         "lt.lecturerTitle, est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.grouping, d.dayId, d.day, est.startTime, " +
-        "est.endTime " +
+        "est.endTime, COUNT(sest.enrollmentSubjectTypeId) as numberOfStudentsEnrolled, est.numberOfSeats " +
         "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
         "INNER JOIN ENROLLMENT e ON pi.enrollmentId = e.enrollmentId " +
@@ -413,8 +413,10 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON est.venueId = v.venueId " +
         "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "LEFT JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
         "WHERE scpi.studentId = ? " +
-        "AND scpi.status = 1;",
+        "AND scpi.status = 1 " +
+        "GROUP BY est.enrollmentSubjectTypeId;",
         [studentId],
         (err, res) => {
           if (err) reject(err);

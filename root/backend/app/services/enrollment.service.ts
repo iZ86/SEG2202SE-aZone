@@ -226,6 +226,8 @@ class EnrollmentService implements IEnrollmentService {
                 day: StudentEnrollmentSubjectData["day"],
                 startTime: StudentEnrollmentSubjectData["startTime"],
                 endTime: StudentEnrollmentSubjectData["endTime"],
+                numberOfStudentsEnrolled: StudentEnrollmentSubjectData["numberOfStudentsEnrolled"],
+                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"]
               }[];
             };
           };
@@ -268,7 +270,9 @@ class EnrollmentService implements IEnrollmentService {
         dayId: studentEnrollmentSubject.dayId,
         day: studentEnrollmentSubject.day,
         startTime: studentEnrollmentSubject.startTime,
-        endTime: studentEnrollmentSubject.endTime
+        endTime: studentEnrollmentSubject.endTime,
+        numberOfStudentsEnrolled: studentEnrollmentSubject.numberOfStudentsEnrolled,
+        numberOfSeats: studentEnrollmentSubject.numberOfSeats
       });
     }
 
