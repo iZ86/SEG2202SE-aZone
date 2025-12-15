@@ -268,7 +268,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined> {
+  getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectData[]>(
         "SELECT * " +
@@ -278,9 +278,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
         "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
         "WHERE es.enrollmentId = ? " +
-        "AND es.subjectId = ? " +
-        "AND es.lecturerId = ?;",
-        [enrollmentId, subjectId, lecturerId],
+        "AND es.subjectId = ?;",
+        [enrollmentId, subjectId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
@@ -289,7 +288,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined> {
+  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectData[]>(
         "SELECT * " +
@@ -300,9 +299,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
         "WHERE es.enrollmentSubjectId = ? " +
         "AND es.enrollmentId = ? " +
-        "AND es.subjectId = ? " +
-        "AND es.lecturerId = ?;",
-        [enrollmentSubjectId, enrollmentId, subjectId, lecturerId],
+        "AND es.subjectId = ?;",
+        [enrollmentSubjectId, enrollmentId, subjectId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
