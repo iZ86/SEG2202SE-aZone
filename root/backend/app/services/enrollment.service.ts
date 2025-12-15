@@ -1,6 +1,6 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds } from "../models/enrollment-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 
 interface IEnrollmentService {
@@ -203,7 +203,6 @@ class EnrollmentService implements IEnrollmentService {
 
     const studentEnrollmentSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjectsByStudentId(studentId);
 
-
     const studentEnrollmentSubjectsOrganizedMap:
       {
         [subjectId: number]: {
@@ -227,6 +226,8 @@ class EnrollmentService implements IEnrollmentService {
                 day: StudentEnrollmentSubjectData["day"],
                 startTime: StudentEnrollmentSubjectData["startTime"],
                 endTime: StudentEnrollmentSubjectData["endTime"],
+                numberOfStudentsEnrolled: StudentEnrollmentSubjectData["numberOfStudentsEnrolled"],
+                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"];
               }[];
             };
           };
@@ -269,26 +270,40 @@ class EnrollmentService implements IEnrollmentService {
         dayId: studentEnrollmentSubject.dayId,
         day: studentEnrollmentSubject.day,
         startTime: studentEnrollmentSubject.startTime,
-        endTime: studentEnrollmentSubject.endTime
+        endTime: studentEnrollmentSubject.endTime,
+        numberOfStudentsEnrolled: studentEnrollmentSubject.numberOfStudentsEnrolled,
+        numberOfSeats: studentEnrollmentSubject.numberOfSeats
       });
     }
 
     // The response data.
-    const studentEnrollmentSubjectsOrganized: any = [];
+    const studentEnrollmentSubjectsOrganized: StudentEnrollmentSubjectOrganizedData[] = [];
 
     // Since everything is in Key-Value datastructure format, this will convert it to array for response.
     for (let subjectId in studentEnrollmentSubjectsOrganizedMap) {
-      let classTypes = [];
+      let studentEnrollmentSubject = studentEnrollmentSubjectsOrganizedMap[subjectId];
+      let classTypes: StudentEnrollmentSubjectOrganizedData["classTypes"] = [];
       for (let classTypeId in studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes) {
         classTypes.push(studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes[classTypeId]);
       }
       studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes = classTypes;
-      studentEnrollmentSubjectsOrganized.push(studentEnrollmentSubjectsOrganizedMap[subjectId]);
+      studentEnrollmentSubjectsOrganized.push({
+        subjectId: studentEnrollmentSubject.subjectId,
+        subjectCode: studentEnrollmentSubject.subjectCode,
+        subjectName: studentEnrollmentSubject.subjectName,
+        creditHours: studentEnrollmentSubject.creditHours,
+        lecturerId: studentEnrollmentSubject.lecturerId,
+        firstName: studentEnrollmentSubject.firstName,
+        lastName: studentEnrollmentSubject.lastName,
+        lecturerTitleId: studentEnrollmentSubject.lecturerTitleId,
+        lecturerTitle: studentEnrollmentSubject.lecturerTitle,
+        classTypes: classTypes
+      });
     }
-
 
     return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule, studentEnrollmentSubjects: studentEnrollmentSubjectsOrganized }, "Student enrollment subject retrieve success");
   }
+
 
   async getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {
     const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await enrollmentRepository.getEnrollmentScheduleByStudentId(studentId);
