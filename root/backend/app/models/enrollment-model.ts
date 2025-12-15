@@ -104,8 +104,12 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
 };
 
 export interface StudentEnrollmentSchedule extends RowDataPacket {
-  programmeIntakeId: number | null;
-  enrollmentId: number | null;
-  enrollmentStartDateTime: Date | null;
-  enrollmentEndDateTime: Date | null;
+  programmeIntakeId: number;
+  enrollmentId: number;
+  enrollmentStartDateTime: Date;
+  enrollmentEndDateTime: Date;
+}
+
+export interface StudentEnrolledSubjectTypeIds {
+  enrollmentSubjectTypeIds: number[]
 }

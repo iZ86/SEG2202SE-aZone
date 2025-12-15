@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
 import subjectService from "../services/subject.service";
@@ -451,6 +451,29 @@ export default class EnrollmentController {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
       }
+    }
+  }
+
+  async createStudentEnrollmentSubjectTypes(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const isStudent: boolean = req.user.isStudent as boolean;
+    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+
+    if (isStudent) {
+      const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(userId, studentEnrollmentSubjectTypes);
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.create(response.getData(), response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage(), response.getData());
+          case ENUM_ERROR_CODE.CONFLICT:
+            return res.sendError.conflict(response.getMessage(), response.getData());
+        }
+      }
+    } else {
+      return res.sendError.forbidden("trest");
     }
   }
 }

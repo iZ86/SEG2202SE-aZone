@@ -19,6 +19,14 @@ export const createAndUpdateEnrollmentValidator: any = [
   validate,
 ];
 
+export const enrollStudentSubjectsValidator: any = [
+  body('enrollmentSubjectTypeIds')
+  .isArray({min: 1}).withMessage('enrollmentSubjectTypeIds must be an array of numbers with atleast one value')
+  .notEmpty().withMessage('Array cannot be empty'),
+  validate,
+];
+
+
 export const createAndUpdateEnrollmentSubjectValidator: any = [
   body('enrollmentId')
     .trim()
