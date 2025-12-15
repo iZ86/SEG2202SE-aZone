@@ -162,3 +162,19 @@ export const getStudentsCountAPI = async (token: string): Promise<Response | und
     console.error(err);
   }
 };
+
+export const getStudentsTimetableByIdAPI = async (token: string, studentId: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/users/students/${studentId}/timetable`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
