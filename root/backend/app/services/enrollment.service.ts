@@ -211,11 +211,11 @@ class EnrollmentService implements IEnrollmentService {
           subjectCode: StudentEnrollmentSubjectData["subjectCode"],
           subjectName: StudentEnrollmentSubjectData["subjectName"],
           creditHours: StudentEnrollmentSubjectData["creditHours"],
-          lectureId: StudentEnrollmentSubjectData["lectureId"],
+          lecturerId: StudentEnrollmentSubjectData["lecturerId"],
           firstName: StudentEnrollmentSubjectData["firstName"],
           lastName: StudentEnrollmentSubjectData["lastName"],
-          lectureTitleId: StudentEnrollmentSubjectData["lectureTitleId"],
-          lectureTitle: StudentEnrollmentSubjectData["lectureTitle"],
+          lecturerTitleId: StudentEnrollmentSubjectData["lecturerTitleId"],
+          lecturerTitle: StudentEnrollmentSubjectData["lecturerTitle"],
           classTypes: {
             [classTypeId: number]: {
               classTypeId: StudentEnrollmentSubjectData["classTypeId"],
@@ -244,11 +244,11 @@ class EnrollmentService implements IEnrollmentService {
           subjectCode: studentEnrollmentSubject.subjectCode,
           subjectName: studentEnrollmentSubject.subjectName,
           creditHours: studentEnrollmentSubject.creditHours,
-          lectureId: studentEnrollmentSubject.lectureId,
+          lecturerId: studentEnrollmentSubject.lecturerId,
           firstName: studentEnrollmentSubject.firstName,
           lastName: studentEnrollmentSubject.lastName,
-          lectureTitleId: studentEnrollmentSubject.lectureTitleId,
-          lectureTitle: studentEnrollmentSubject.lectureTitle,
+          lecturerTitleId: studentEnrollmentSubject.lecturerTitleId,
+          lecturerTitle: studentEnrollmentSubject.lecturerTitle,
           classTypes: {}
         };
       }
