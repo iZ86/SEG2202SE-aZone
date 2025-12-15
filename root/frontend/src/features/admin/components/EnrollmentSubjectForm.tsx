@@ -25,6 +25,8 @@ import type { Subject } from "@datatypes/subjectType";
 import { getAllLecturersAPI } from "../api/lecturers";
 import type { Lecturer } from "@datatypes/lecturerType";
 import EnrollmentSubjectTypeForm from "./EnrollmentSubjectTypeForm";
+import { getAllVenuesAPI } from "../api/venues";
+import type { Venue } from "@datatypes/venueType";
 
 export default function EnrollmentSubjectForm({
   type,
@@ -57,6 +59,8 @@ export default function EnrollmentSubjectForm({
       grouping: number;
     }[]
   >([]);
+
+  const [venueOptions, setVenueOptions] = useState<reactSelectOptionType[]>([]);
 
   const [emptyEnrollment, setEmptyEnrollment] = useState(false);
   const [emptySubject, setEmptySubject] = useState(false);
@@ -133,6 +137,29 @@ export default function EnrollmentSubjectForm({
   const { authToken, admin, loading } = useAdmin();
 
   useEffect(() => {
+    const getAllVenues = async (token: string) => {
+      const response: Response | undefined = await getAllVenuesAPI(token);
+
+      if (!response || !response.ok) {
+        setVenueOptions([]);
+        return;
+      }
+
+      const { data } = await response.json();
+
+      if (!data.venues || data.venues.length === 0) {
+        setVenueOptions([]);
+        return;
+      }
+
+      const options = data.venues.map((venue: Venue) => ({
+        value: venue.venueId,
+        label: venue.venue,
+      }));
+
+      setVenueOptions(options);
+    };
+
     const setupEditEnrollmentSubjectForm = async (
       token: string,
       enrollmentSubjectId: number
@@ -227,6 +254,7 @@ export default function EnrollmentSubjectForm({
     getAllEnrollments(authToken);
     getAllSubjects(authToken);
     getAllLecturers(authToken);
+    getAllVenues(authToken);
     if (type === "Edit" && id > 0) {
       setupEditEnrollmentSubjectForm(authToken, id);
       setupEditEnrollmentSubjectTypeForm(authToken, id);
@@ -433,7 +461,7 @@ export default function EnrollmentSubjectForm({
         setIsLoading(false);
         setInvalidEnrollmentSubject(true);
         toast.error(
-          "Enrollment Subject Existed. Please select a different value"
+          "Enrollment Subject Existed. Please select a different subject"
         );
         return;
       } else if (message.startsWith("enrollmentSubjectType")) {
@@ -861,6 +889,7 @@ export default function EnrollmentSubjectForm({
                 isInvalidTime={invalidTime[idx] || {}}
                 onChange={updateClass}
                 onRemove={removeClass}
+                venueOptions={venueOptions}
               />
             ))}
 

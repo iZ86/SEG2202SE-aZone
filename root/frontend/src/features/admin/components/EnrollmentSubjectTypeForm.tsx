@@ -5,13 +5,11 @@ import SmallButton from "@components/SmallButton";
 import TimePicker from "@components/TimePicker";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import { Time } from "@internationalized/date";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { SingleValue } from "react-select";
-import { getAllVenuesAPI } from "../api/venues";
 import { useAdmin } from "../hooks/useAdmin";
 import LoadingOverlay from "@components/LoadingOverlay";
 import { useNavigate } from "react-router-dom";
-import type { Venue } from "@datatypes/venueType";
 
 export default function EnrollmentSubjectTypeForm({
   index,
@@ -21,6 +19,7 @@ export default function EnrollmentSubjectTypeForm({
   isInvalidTime,
   onChange,
   onRemove,
+  venueOptions,
 }: {
   index: number;
   data: {
@@ -60,16 +59,16 @@ export default function EnrollmentSubjectTypeForm({
     value: string | SingleValue<reactSelectOptionType> | Time | null
   ) => void;
   onRemove: (index: number) => void;
+  venueOptions: reactSelectOptionType[];
 }) {
-  const { authToken, admin, loading } = useAdmin();
-  const navigate = useNavigate();
+  const { admin, loading } = useAdmin();
+
   const classTypeOptions: reactSelectOptionType[] = [
     { value: 1, label: "Lecture" },
     { value: 2, label: "Practical" },
     { value: 3, label: "Tutorial" },
     { value: 4, label: "Workshop" },
   ];
-  const [venueOptions, setVenueOptions] = useState<reactSelectOptionType[]>([]);
   const dayOptions: reactSelectOptionType[] = [
     { value: 1, label: "Monday" },
     { value: 2, label: "Tuesday" },
@@ -87,14 +86,6 @@ export default function EnrollmentSubjectTypeForm({
   const [emptyGrouping, setEmptyGrouping] = useState<boolean>(false);
   const [emptyStartTime, setEmptyStartTime] = useState<boolean>(false);
   const [emptyEndTime, setEmptyEndTime] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!authToken) {
-      return;
-    }
-
-    getAllVenues(authToken);
-  }, [authToken, navigate]);
 
   if (loading || !admin) {
     return <LoadingOverlay />;
@@ -168,29 +159,6 @@ export default function EnrollmentSubjectTypeForm({
       setEmptyEndTime(false);
     }
     onChange(index, "endTime", value);
-  }
-
-  async function getAllVenues(token: string) {
-    const response: Response | undefined = await getAllVenuesAPI(token);
-
-    if (!response || !response.ok) {
-      setVenueOptions([]);
-      return;
-    }
-
-    const { data } = await response.json();
-
-    if (!data.venues || data.venues.length === 0) {
-      setVenueOptions([]);
-      return;
-    }
-
-    const options = data.venues.map((venue: Venue) => ({
-      value: venue.venueId,
-      label: venue.venue,
-    }));
-
-    setVenueOptions(options);
   }
 
   return (
