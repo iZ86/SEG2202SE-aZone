@@ -125,6 +125,22 @@ export const getAllEnrollmentSubjectsAPI = async (token: string, pageSize?: numb
   }
 };
 
+export const getEnrollmentSubjectByStudentIdAPI = async (token: string, studentId: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${studentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export const getEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubjectId}`,
