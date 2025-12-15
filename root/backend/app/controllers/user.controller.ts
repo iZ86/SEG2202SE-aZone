@@ -341,36 +341,6 @@ export default class UserController {
     }
   }
 
-  async updateStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
-    const courseId: number = req.body.courseId;
-    const programmeIntakeId: number = req.body.programmeIntakeId;
-    const status: number = req.body.status;
-
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.badRequest("Invalid studentId");
-    }
-
-    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
-    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
-
-    if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid studentId, or courseId, or programmeIntakeId");
-    }
-
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.create(response.getData(), response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
-
   async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
     const courseId: number = parseInt(req.params.courseId);

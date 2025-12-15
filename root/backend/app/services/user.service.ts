@@ -21,7 +21,6 @@ interface IUserService {
   getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
-  updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentActiveSubjectsOverviewById(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
@@ -214,18 +213,6 @@ class UserService implements IUserService {
     }
 
     return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake create success");
-  }
-
-  async updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
-    await userRepository.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
-
-    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData[] | undefined = await userRepository.getStudentCourseProgrammeIntakeByStudentId(studentId);
-
-    if (!studentCrouseProgrammeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake updated not found");
-    }
-
-    return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake update success");
   }
 
   async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
