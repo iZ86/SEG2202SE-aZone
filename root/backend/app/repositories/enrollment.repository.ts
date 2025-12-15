@@ -30,6 +30,8 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined>;
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader>;
+  deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
+  createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -506,6 +508,37 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         });
+    });
+  }
+
+  deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE sest " +
+        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "WHERE es.enrollmentId = ? " +
+        "AND sest.studentId = ?; ",
+        [enrollmentId, studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "INSERT INTO STUDENT_ENROLLMENT_SUBJECT_TYPE (studentId, enrollmentSubjectTypeId, subjectStatusId) VALUES ?;",
+        [studentEnrollmentSubjectTypes],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
     });
   }
 }
