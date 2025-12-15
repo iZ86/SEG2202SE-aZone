@@ -219,6 +219,12 @@ export default class ProgrammeController {
       return res.sendError.notFound("Invalid programmeId or intakeId");
     }
 
+    const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
+
+    if (isProgrammeIntakeDuplicated.isSuccess()) {
+      return res.sendError.conflict("programmeIntake duplciated");
+    }
+
     const response = await programmeService.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate);
 
     if (response.isSuccess()) {
@@ -254,6 +260,16 @@ export default class ProgrammeController {
 
     if (!programmeIntakeResponse.isSuccess() || !programmeIdResponse.isSuccess() || !intakeIdResponse.isSuccess()) {
       return res.sendError.notFound("Invalid programmeIntakeId, or programmeId, or intakeId");
+    }
+
+    const isProgrammeIntakeBelongsToProgrammeIntakeId: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId, programmeId, intakeId, semester);
+
+    if (!isProgrammeIntakeBelongsToProgrammeIntakeId.isSuccess()) {
+      const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
+
+      if (isProgrammeIntakeDuplicated.isSuccess()) {
+        return res.sendError.conflict("programmeIntake duplciated");
+      }
     }
 
     const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate);
