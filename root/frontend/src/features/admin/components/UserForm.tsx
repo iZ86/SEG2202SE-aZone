@@ -1,13 +1,14 @@
 import LoadingOverlay from "@components/LoadingOverlay";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import type { SingleValue } from "react-select";
+import type { MultiValue, SingleValue } from "react-select";
 import {
   createStudentAPI,
   createStudentCourseProgrammeIntakeAPI,
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeIdAPI,
   getStudentByIdAPI,
   getStudentCourseProgrammeIntakeByStudentIdAPI,
+  getStudentsTimetableByIdAPI,
   updateStudentByIdAPI,
 } from "../api/students";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
@@ -19,7 +20,10 @@ import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import { getAdminByIdAPI, updateAdminByIdAPI } from "../api/admins";
 import type { Programme, ProgrammeIntake } from "@datatypes/programmeType";
 import type { Course } from "@datatypes/courseType";
-import type { StudentCourseProgrammeIntake } from "@datatypes/userType";
+import type {
+  StudentClassData,
+  StudentCourseProgrammeIntake,
+} from "@datatypes/userType";
 import { Trash2 } from "lucide-react";
 import {
   getAllProgrammesAPI,
@@ -28,6 +32,13 @@ import {
 import { getCoursesByProgrammeIdAPI } from "../api/courses";
 import { toast } from "react-toastify";
 import { useAdmin } from "../hooks/useAdmin";
+import {
+  createStudentEnrollmentSubjectTypesByStudentIdAPI,
+  getEnrollmentSubjectByStudentIdAPI,
+} from "../api/enrollments";
+import type { EnrollmentSubjectResponse } from "@datatypes/enrollmentType";
+import { MultiFilter } from "@components/MultiFilter";
+import type { ClassType, ClassTypeDetail } from "@datatypes/classTypeType";
 
 export default function UserForm({
   type,
@@ -67,6 +78,9 @@ export default function UserForm({
       label: "",
     }
   );
+  const [enrollmentSubjectTypes, setEnrollmentSubjectTypes] = useState<
+    reactSelectOptionType[]
+  >([]);
 
   const [studentCoursesHistory, setStudentCoursesHistory] = useState<
     StudentCourseProgrammeIntake[]
@@ -85,6 +99,8 @@ export default function UserForm({
     { value: 0, label: "Inactive" },
     { value: 1, label: "Active" },
   ];
+  const [enrollmentSubjectTypesOptions, setEnrollmentSubjectTypesOptions] =
+    useState<reactSelectOptionType[]>([]);
 
   const [emptyStatus, setEmptyStatus] = useState(false);
   const [emptyFirstName, setEmptyFirstName] = useState(false);
@@ -96,10 +112,17 @@ export default function UserForm({
   const [emptyProgramme, setEmptyProgramme] = useState(false);
   const [emptyCourse, setEmptyCourse] = useState(false);
   const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
+  const [emptyEnrollmentSubjectTypes, setEmptyEnrollmentSubjectTypes] =
+    useState(false);
+
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [
     isStudentCourseProgrammeIntakeExist,
     setIsStudentCourseProgrammeIntakeExist,
+  ] = useState(false);
+  const [
+    isEnrollmentSubjectTypeTimeClashed,
+    setIsEnrollmentSubjectTypeTimeClashed,
   ] = useState(false);
 
   const [isPasswordMatched, setIsPasswordMatched] = useState(true);
@@ -186,6 +209,100 @@ export default function UserForm({
         setProgrammeIntake(
           activeProgrammeIntakes[0] || { value: -1, label: "" }
         );
+      } else if (activeTab === "Enroll in Subjects") {
+        const enrollmentSubjectTypesResponse: Response | undefined =
+          await getEnrollmentSubjectByStudentIdAPI(token, studentId);
+
+        const enrolledSubjectsResponse: Response | undefined =
+          await getStudentsTimetableByIdAPI(token, studentId);
+        if (
+          !enrollmentSubjectTypesResponse ||
+          !enrollmentSubjectTypesResponse.ok ||
+          !enrolledSubjectsResponse ||
+          !enrolledSubjectsResponse.ok
+        ) {
+          navigate("/admin/users");
+          toast.error("Failed to fetch student enrollment subjects");
+          return;
+        }
+        const { data } = await enrollmentSubjectTypesResponse.json();
+        const enrolledSubjectsResponseJson =
+          await enrolledSubjectsResponse.json();
+        const enrolledSubjectsResponseData = enrolledSubjectsResponseJson.data;
+
+        const enrollmentSubjectTypesOptions =
+          data.studentEnrollmentSubjects.flatMap(
+            (enrollmentSubjectType: EnrollmentSubjectResponse) =>
+              enrollmentSubjectType.classTypes.flatMap((classType: ClassType) =>
+                classType.classTypeDetails.map(
+                  (classTypeDetail: ClassTypeDetail) => ({
+                    value: classTypeDetail.enrollmentSubjectTypeId,
+                    label:
+                      enrollmentSubjectType.subjectCode +
+                      " " +
+                      enrollmentSubjectType.subjectName +
+                      " (CH: " +
+                      enrollmentSubjectType.creditHours +
+                      ")" +
+                      " - " +
+                      classType.classType +
+                      " • " +
+                      (enrollmentSubjectType.lecturerTitle === "None"
+                        ? ""
+                        : enrollmentSubjectType.lecturerTitle + " ") +
+                      enrollmentSubjectType.lastName +
+                      " " +
+                      enrollmentSubjectType.firstName +
+                      " - " +
+                      classTypeDetail.day +
+                      " " +
+                      classTypeDetail.startTime +
+                      "-" +
+                      classTypeDetail.endTime +
+                      " • Group " +
+                      classTypeDetail.grouping +
+                      "",
+                  })
+                )
+              )
+          );
+
+        setEnrollmentSubjectTypesOptions(enrollmentSubjectTypesOptions);
+
+        const enrolledSubjects = enrolledSubjectsResponseData.timetable.map(
+          (timetable: StudentClassData) => {
+            return {
+              value: timetable.enrollmentSubjectTypeId,
+              label:
+                timetable.subjectCode +
+                " " +
+                timetable.subjectName +
+                " (CH: " +
+                timetable.creditHours +
+                ")" +
+                " - " +
+                timetable.classType +
+                " • " +
+                (timetable.lecturerTitle === "None"
+                  ? ""
+                  : timetable.lecturerTitle + " ") +
+                timetable.lecturerLastName +
+                " " +
+                timetable.lecturerFirstName +
+                " - " +
+                timetable.day +
+                " " +
+                timetable.startTime +
+                "-" +
+                timetable.endTime +
+                " • Group " +
+                timetable.grouping +
+                "",
+            };
+          }
+        );
+
+        setEnrollmentSubjectTypes(enrolledSubjects);
       }
 
       skipReset.current = true;
@@ -430,6 +547,67 @@ export default function UserForm({
     return;
   }
 
+  async function handleSubmitEnrollmentSubjectTypes(
+    e: FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
+
+    if (isLoading) {
+      return;
+    }
+
+    if (emptyEnrollmentSubjectTypes) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (setEnrollmentSubjectTypesEmptyInputs()) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    if (type !== "Edit") {
+      navigate("/admin/users");
+      return;
+    }
+
+    const response: Response | undefined =
+      await createStudentEnrollmentSubjectTypesByStudentIdAPI(
+        authToken as string,
+        id,
+        enrollmentSubjectTypes.map((est) => est.value)
+      );
+
+    if (response && response.status === 409) {
+      const { data } = await response.json();
+
+      const clashedId = data.enrollmentSubjectTypeIds[0];
+
+      const clashedOption = enrollmentSubjectTypesOptions.find(
+        (est) => est.value === clashedId
+      );
+
+      setIsEnrollmentSubjectTypeTimeClashed(true);
+      setIsLoading(false);
+      toast.error(`Time clash detected: ${clashedOption?.label}`);
+      return;
+    } else {
+      setIsEnrollmentSubjectTypeTimeClashed(false);
+    }
+
+    if (!response || !response.ok) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
+    navigate("/admin/users");
+    toast.success("Updated student's subject");
+    return;
+  }
+
   const handleDeleteStudentCourseProgrammeIntake = async (
     courseId: number,
     programmeIntakeId: number
@@ -517,6 +695,17 @@ export default function UserForm({
     return emptyInput;
   }
 
+  function setEnrollmentSubjectTypesEmptyInputs() {
+    let emptyInput: boolean = false;
+
+    if (!enrollmentSubjectTypes.values || enrollmentSubjectTypes.length === 0) {
+      setEmptyEnrollmentSubjectTypes(true);
+      emptyInput = true;
+    }
+
+    return emptyInput;
+  }
+
   function onChangeStatus(onChangeStatus: SingleValue<reactSelectOptionType>) {
     if (!onChangeStatus) {
       return;
@@ -595,6 +784,21 @@ export default function UserForm({
     }
     setProgrammeIntake(onChangeProgrammeIntake);
     setEmptyProgrammeIntake(false);
+  }
+
+  function onChangeEnrollmentSubjectTypes(
+    onChangeEnrollmentSubjectTypes: MultiValue<reactSelectOptionType>
+  ) {
+    const onChangeEnrollmentSubjectTypesValues: reactSelectOptionType[] = [];
+    if (onChangeEnrollmentSubjectTypes.length !== 0) {
+      setEmptyEnrollmentSubjectTypes(false);
+    }
+    for (let i = 0; i < onChangeEnrollmentSubjectTypes.length; i++) {
+      onChangeEnrollmentSubjectTypesValues.push(
+        onChangeEnrollmentSubjectTypes[i]
+      );
+    }
+    setEnrollmentSubjectTypes(onChangeEnrollmentSubjectTypesValues);
   }
 
   async function getAllProgrammes(token: string) {
@@ -1025,16 +1229,31 @@ export default function UserForm({
 
           {!isAdmin && activeTab === "Enroll in Subjects" && (
             <form
-              onSubmit={handleSubmitUser}
+              onSubmit={handleSubmitEnrollmentSubjectTypes}
               className="gap-y-8 flex flex-col justify-center items-center"
             >
               <h1 className="font-bold text-slate-900 self-start">
                 Edit Student's Subjects
               </h1>
-              <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-                <div className="flex-1"></div>
-
-                <div className="flex-1"></div>
+              <div className="flex flex-col xl:flex-row w-xs sm:w-xl md:w-2xl lg:w-4xl xl:w-6xl gap-x-10 gap-y-8 xl:gap-y-0">
+                <div className="flex-1">
+                  <AdminInputFieldWrapper
+                    isEmpty={emptyEnrollmentSubjectTypes}
+                    isInvalid={isEnrollmentSubjectTypeTimeClashed}
+                    invalidMessage="Time clash detected with selected subjects."
+                  >
+                    <MultiFilter
+                      placeholder="Select a Subject to Enroll"
+                      options={enrollmentSubjectTypesOptions}
+                      value={enrollmentSubjectTypes}
+                      isInvalid={
+                        emptyEnrollmentSubjectTypes ||
+                        isEnrollmentSubjectTypeTimeClashed
+                      }
+                      onChange={onChangeEnrollmentSubjectTypes}
+                    />
+                  </AdminInputFieldWrapper>
+                </div>
               </div>
 
               <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
