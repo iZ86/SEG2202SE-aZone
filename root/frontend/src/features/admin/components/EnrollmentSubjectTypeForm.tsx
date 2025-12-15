@@ -9,7 +9,6 @@ import { useState } from "react";
 import type { SingleValue } from "react-select";
 import { useAdmin } from "../hooks/useAdmin";
 import LoadingOverlay from "@components/LoadingOverlay";
-import { useNavigate } from "react-router-dom";
 
 export default function EnrollmentSubjectTypeForm({
   index,
