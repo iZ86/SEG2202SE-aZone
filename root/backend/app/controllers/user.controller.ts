@@ -267,12 +267,13 @@ export default class UserController {
 
   async getStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
+    const status: number = parseInt(req.query.status as string) || 0;
 
     if (!studentId || isNaN(studentId)) {
       return res.sendError.badRequest("Invalid studentId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(
@@ -350,7 +351,7 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId or courseId or programmeIntakeId");
     }
 
-    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId, 0);
 
     if (!studentCourseProgrammeIntake.isSuccess()) {
       return res.sendError.notFound("Student course programme intake not found");
