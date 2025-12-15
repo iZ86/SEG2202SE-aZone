@@ -5,11 +5,9 @@ export interface StudentEnrollmentSubjectOrganizedData {
   subjectCode: string;
   subjectName: string;
   creditHours: number;
-  lectureId: number;
+  lecturerId: number;
   firstName: string;
   lastName: string;
-  lectureTitleId: number;
-  lectureTitle: number;
   classTypes: [{
     classTypeId: number;
     classType: string;
@@ -84,12 +82,14 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   subjectCode: string;
   subjectName: string;
   creditHours: number;
-  lectureId: number;
+  lecturerId: number;
   firstName: string;
   lastName: string;
-  lectureTitleId: number;
-  lectureTitle: number;
+  lecturerTitleId: number;
+  lecturerTitle: number;
   enrollmentSubjectTypeId: number;
+  venueId: number;
+  venue: string;
   classTypeId: number;
   classType: string;
   grouping: number;
