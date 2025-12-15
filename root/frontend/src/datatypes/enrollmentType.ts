@@ -1,4 +1,5 @@
 import type { Time } from "@internationalized/date";
+import type { ClassType } from "./classTypeType";
 
 export type Enrollment = {
   enrollmentId: number;
@@ -72,3 +73,14 @@ export type UpdateEnrollmentSubjectType = {
   numberOfSeats: number;
   grouping: number;
 };
+
+export interface EnrollmentSubjectResponse {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+  lecturerTitle: string;
+  firstName: string;
+  lastName: string;
+  classTypes: ClassType[];
+}
