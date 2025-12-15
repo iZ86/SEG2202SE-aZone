@@ -232,3 +232,22 @@ export const getEnrollmentSubjectTypeByEnrollmentSubjectIdAPI = async (token: st
     console.error(err);
   }
 };
+
+export const createStudentEnrollmentSubjectTypesByStudentIdAPI = async (token: string, studentId: number, enrollmentSubjectTypeIds: number[]): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${studentId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          enrollmentSubjectTypeIds
+        }),
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
