@@ -14,7 +14,19 @@ export class Result<T> {
     return new Result(true, data, null, message) as Success<T>;
   }
 
-  static fail(errorCode: string, message: string): Failure {
+
+  // ---- FAIL OVERLOADS ----
+  static fail(errorCode: string, message: string): Failure;
+  static fail<T>(errorCode: string, message: string, data: T): Result<T>;
+
+  static fail<T>(
+    errorCode: string,
+    message: string,
+    data?: T,
+  ): Result<T | never> {
+    if (data) {
+      return new Result(false, data, errorCode, message);
+    }
     return new Result(false, null, errorCode, message) as Failure;
   }
 
