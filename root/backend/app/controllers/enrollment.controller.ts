@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
 import subjectService from "../services/subject.service";
@@ -470,6 +470,26 @@ export default class EnrollmentController {
             return res.sendError.notFound(response.getMessage(), response.getData());
           case ENUM_ERROR_CODE.CONFLICT:
             return res.sendError.conflict(response.getMessage(), response.getData());
+        }
+      }
+    } else {
+      return res.sendError.forbidden("trest");
+    }
+  }
+
+  async getEnrolledSubjectsByStudentId(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const isStudent: boolean = req.user.isStudent as boolean;
+
+    if (isStudent) {
+      const response: Result<{studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[]}> = await enrollmentService.getEnrolledSubjectsByStudentId(userId);
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.create(response.getData(), response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage(), response.getData());
         }
       }
     } else {

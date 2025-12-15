@@ -103,6 +103,26 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   numberOfSeats: number;
 };
 
+export interface StudentEnrolledSubject extends RowDataPacket {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+  lecturerId: number;
+  firstName: string;
+  lastName: string;
+  lecturerTitleId: number;
+  lecturerTitle: string;
+  enrollmentSubjectTypeId: number;
+  classTypeId: number;
+  classType: string;
+  grouping: number;
+  dayId: number;
+  day: string;
+  startTime: Date;
+  endTime: Date;
+}
+
 export interface StudentEnrollmentSchedule extends RowDataPacket {
   programmeIntakeId: number;
   enrollmentId: number;
