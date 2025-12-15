@@ -143,7 +143,7 @@ export const getEnrollmentSubjectByStudentIdAPI = async (token: string, studentI
 
 export const getEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubjectId}`,
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subject/${enrollmentSubjectId}`,
       {
         method: 'GET',
         headers: {
@@ -159,7 +159,7 @@ export const getEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubje
 
 export const createEnrollmentSubjectAPI = async (token: string, enrollmentId: number, subjectId: number, lecturerId: number, enrollmentSubjects: CreateEnrollmentSubjectType[]): Promise<Response | undefined> => {
   try {
-    return await fetch("http://localhost:8080/api/v1/enrollments/subjects",
+    return await fetch("http://localhost:8080/api/v1/enrollments/subject",
       {
         method: 'POST',
         headers: {
@@ -179,9 +179,9 @@ export const createEnrollmentSubjectAPI = async (token: string, enrollmentId: nu
   }
 };
 
-export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubejctId: number, enrollmentId: number, subjectId: number, lecturerId: number, enrollmentSubjects: UpdateEnrollmentSubjectType[]): Promise<Response | undefined> => {
+export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, enrollmentSubjects: UpdateEnrollmentSubjectType[]): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubejctId}`,
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subject/${enrollmentSubjectId}`,
       {
         method: 'PUT',
         headers: {
@@ -203,7 +203,7 @@ export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSu
 
 export const deleteEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubjectId}`,
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subject/${enrollmentSubjectId}`,
       {
         method: 'DELETE',
         headers: {
