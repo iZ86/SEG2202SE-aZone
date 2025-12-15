@@ -9,6 +9,7 @@ interface ICourseService {
   getCourseById(courseId: number): Promise<Result<CourseProgrammeData>>;
   getCourseByName(courseName: string): Promise<Result<CourseData>>;
   getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
+  getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<Result<CourseProgrammeData>>;
   createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   getCourseCount(query: string): Promise<Result<number>>;
@@ -52,6 +53,16 @@ class CourseService implements ICourseService {
     }
 
     return Result.succeed(courses, "Courses retrieve success");
+  }
+
+  async getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<Result<CourseProgrammeData>> {
+    const course: CourseProgrammeData | undefined = await courseRepository.getCourseByIdAndCourseName(courseId, courseName);
+
+    if (!course) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
+    }
+
+    return Result.succeed(course, "Course retrieve success");
   }
 
   async createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
