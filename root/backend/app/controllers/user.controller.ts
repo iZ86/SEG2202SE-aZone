@@ -375,7 +375,7 @@ export default class UserController {
     const response: Result<StudentInformation> = await userService.getStudentInformationById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage())
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -385,7 +385,7 @@ export default class UserController {
   }
 
   async getStudentActiveSubjectsOverviewById(req: Request, res: Response) {
-    const userId: number = req.user.userId
+    const userId: number = req.user.userId;
 
     const response: Result<StudentSubjectOverviewData[]> = await userService.getStudentActiveSubjectsOverviewById(userId);
 
@@ -397,10 +397,28 @@ export default class UserController {
   }
 
   async getStudentTimetableById(req: Request, res: Response) {
-    const userId: number = req.user.userId
+    const userId: number = req.user.userId;
 
     const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(userId);
     const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(userId);
+
+
+    if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {
+      return res.sendSuccess.ok({
+        semesterStartDate: studentSemesterStartAndEndDate.getData()?.semesterStartDate,
+        semesterEndDate: studentSemesterStartAndEndDate.getData()?.semesterEndDate,
+        timetable: response.getData()
+      }, response.getMessage());
+    } else {
+      throw new Error("user.controller.ts, getStudentTimetableById failed");
+    }
+  }
+
+  async getStudentTimetableByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId as string);
+
+    const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(studentId);
+    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(studentId);
 
 
     if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {
