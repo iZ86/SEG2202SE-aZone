@@ -200,7 +200,7 @@ INSERT INTO `CLASS_TYPE` (`classTypeId`, `classType`) VALUES
 (4, 'Workshop');
 
 INSERT INTO `ENROLLMENT` (`enrollmentId`, `enrollmentStartDateTime`, `enrollmentEndDateTime`) VALUES
-(1, '2025-10-01 08:30:00', '2025-10-03 23:59:59');
+(1, '2025-10-01 08:30:00', '2026-10-03 23:59:59');
 
 
 INSERT INTO `INTAKE` (`intakeId`) VALUES
@@ -323,6 +323,7 @@ INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentSubjectId`, `enrollmentId`, `subjec
 
 INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectTypeId`, `enrollmentSubjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
 (44, 18, 1, 9, '10:00:00', '12:00:00', 2, 100, 1),
+(55, 18, 1, 9, '10:00:00', '12:00:00', 2, 100, 2),
 (45, 18, 2, 7, '08:30:00', '10:30:00', 3, 35, 2),
 (48, 20, 1, 10, '08:00:00', '09:00:00', 4, 100, 2),
 (49, 20, 4, 11, '10:00:00', '12:00:00', 5, 100, 4),
