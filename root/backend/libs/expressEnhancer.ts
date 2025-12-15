@@ -27,8 +27,8 @@ declare module 'express-serve-static-core' {
       badRequest(message?: string): void;
       unauthorized(message?: string): void;
       forbidden(message?: string): void;
-      notFound(message?: string): void;
-      conflict(message?: string): void;
+      notFound(message?: string, data?: any): void;
+      conflict(message?: string, data?: any): void;
       invalidContentType(message?: string): void;
       tooManyRequests(message?: string): void;
       internal(message?: string): void;
@@ -87,14 +87,28 @@ export function enhanceResponse(req: Request, res: Response, next: NextFunction)
       });
     },
 
-    notFound(message = "Not Found") {
+    notFound(message = "Not Found", data = undefined) {
+      if (data) {
+        return r.status(404).json({
+          success: false,
+          message,
+          data
+        });
+      }
       return r.status(404).json({
         success: false,
         message
       });
     },
 
-    conflict(message = "Conflict") {
+    conflict(message = "Conflict", data = undefined) {
+      if (data) {
+        return r.status(409).json({
+          success: false,
+          message,
+          data
+        });
+      }
       return r.status(409).json({
         success: false,
         message
