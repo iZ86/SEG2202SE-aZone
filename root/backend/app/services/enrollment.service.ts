@@ -15,8 +15,8 @@ interface IEnrollmentService {
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getAllEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentSubjectData[]>>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
-  getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
-  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
+  getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
+  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>>;
@@ -136,8 +136,8 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
-  async getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>> {
-    const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+  async getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
+    const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
     if (!enrollmentSubject) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject not found");
@@ -146,8 +146,8 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
-  async getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>> {
-    const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+  async getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
+    const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId, enrollmentId, subjectId);
 
     if (!enrollmentSubject) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject not found");

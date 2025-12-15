@@ -17,8 +17,8 @@ interface IEnrollmentRepository {
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
   getAllEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
-  getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined>;
-  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<EnrollmentSubjectData | undefined>;
+  getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
+  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
   createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader>;

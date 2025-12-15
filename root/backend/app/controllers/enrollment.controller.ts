@@ -253,7 +253,7 @@ export default class EnrollmentController {
       return res.sendError.notFound("Invalid subjectId, or lecturerId, or enrollmentId");
     }
 
-    const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+    const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
     if (isEnrollmentSujectDuplicated.isSuccess()) {
       return res.sendError.conflict("enrollmentSubject existed");
@@ -351,10 +351,10 @@ export default class EnrollmentController {
       return res.sendError.notFound("Invalid enrollmentSubjectId or enrollmentId or subjectId or lecturerId");
     }
 
-    const isEnrollmentIdAndSubjectIdAndLecturerIdBelongsToEnrollmentSubjectId: Result<SubjectData> = await enrollmentService.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+    const isEnrollmentIdAndSubjectIdBelongsToEnrollmentSubjectId: Result<SubjectData> = await enrollmentService.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId, enrollmentId, subjectId);
 
-    if (!isEnrollmentIdAndSubjectIdAndLecturerIdBelongsToEnrollmentSubjectId.isSuccess()) {
-      const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+    if (!isEnrollmentIdAndSubjectIdBelongsToEnrollmentSubjectId.isSuccess()) {
+      const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
       if (isEnrollmentSujectDuplicated.isSuccess()) {
         return res.sendError.conflict("enrollmentSubject existed");
