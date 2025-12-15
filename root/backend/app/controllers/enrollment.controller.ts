@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
 import subjectService from "../services/subject.service";
@@ -492,6 +492,60 @@ export default class EnrollmentController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async createStudentEnrollmentSubjectTypes(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const isAdmin: boolean = req.user.isAdmin;
+    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+
+    const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(userId, studentEnrollmentSubjectTypes, isAdmin);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage(), response.getData());
+        case ENUM_ERROR_CODE.FORBIDDEN:
+          return res.sendError.forbidden(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage(), response.getData());
+      }
+    }
+  }
+
+  async createStudentEnrollmentSubjectTypesByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId as string);
+    const isAdmin: boolean = req.user.isAdmin;
+    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+
+    if (!studentId || isNaN(studentId)) {
+      return res.sendError.notFound("Invalid studentId");
+    }
+
+    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
+
+    if (!studentResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid studentId");
+    }
+
+    const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(studentId, studentEnrollmentSubjectTypes, isAdmin);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage(), response.getData());
+        case ENUM_ERROR_CODE.FORBIDDEN:
+          return res.sendError.forbidden(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage(), response.getData());
+        case ENUM_ERROR_CODE.BAD_REQUEST:
+          return res.sendError.badRequest(response.getMessage());
       }
     }
   }

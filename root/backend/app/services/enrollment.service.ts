@@ -2,6 +2,7 @@ import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds } from "../models/enrollment-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
+import { isTimeRangeColliding } from "../utils/utils";
 
 interface IEnrollmentService {
   getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
@@ -27,6 +28,7 @@ interface IEnrollmentService {
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>>;
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<Result<EnrollmentSubjectTypeData>>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<null>>;
+  enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>>;
 }
 
 class EnrollmentService implements IEnrollmentService {
@@ -354,6 +356,157 @@ class EnrollmentService implements IEnrollmentService {
     await enrollmentRepository.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
 
     return Result.succeed(null, "Enrollment subject type delete success");
+  }
+
+  async enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>> {
+    const currDate: Date = new Date();
+
+    const enrollmentSubjectsResult: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await this.getEnrollmentSubjectsByStudentId(studentId);
+
+    // Check if the student enroll or not.
+    if (!isAdmin) {
+      if (!enrollmentSubjectsResult.isSuccess() || currDate < new Date(enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentStartDateTime) || currDate > new Date(enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentEndDateTime)) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment not found" + currDate + " " + new Date(enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentStartDateTime) + " " + new Date(enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentEndDateTime));
+      }
+    }
+
+    const studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[] = enrollmentSubjectsResult.getData().studentEnrollmentSubjects;
+
+    const studentEnrollmentSubjectsMap: {
+      [enrollmentSubjectTypeId: number]: {
+        dayId: number,
+        startTime: Date,
+        endTime: Date,
+        classTypeId: number,
+        subjectId: number,
+        numberOfStudentsEnrolled: number,
+        numberOfSeats: number,
+      };
+    } = {};
+
+    // Place all the enrollmentSubjectTypeIds connected to studentId into a dictionary for easier lookup.
+    for (const studentEnrollmentSubject of studentEnrollmentSubjects) {
+      for (const classType of studentEnrollmentSubject.classTypes) {
+        for (const classTypeDetail of classType.classTypeDetails) {
+          studentEnrollmentSubjectsMap[classTypeDetail.enrollmentSubjectTypeId] = {
+            dayId: classTypeDetail.dayId,
+            startTime: classTypeDetail.startTime,
+            endTime: classTypeDetail.endTime,
+            classTypeId: classType.classTypeId,
+            subjectId: studentEnrollmentSubject.subjectId,
+            numberOfStudentsEnrolled: classTypeDetail.numberOfStudentsEnrolled,
+            numberOfSeats: classTypeDetail.numberOfSeats
+          };
+        }
+      }
+    }
+
+    const subjectIdAndClassTypeId: { [subjectId: number]: { [classTypeId: number]: boolean; }; } = {};
+    const dayIdAndTime: { [dayId: number]: { startTime: Date; endTime: Date; }[]; } = {};
+    const errorEnrollmentSubjectTypeIds: number[] = [];
+
+    // Checks if the enrollmentSubjectTypeId provided is valid or not.
+    for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
+
+      if (!studentEnrollmentSubjectsMap[enrollmentSubjectTypeId]) {
+
+        errorEnrollmentSubjectTypeIds.push(enrollmentSubjectTypeId);
+
+      }
+    }
+
+    if (errorEnrollmentSubjectTypeIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject type does not exist", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
+    }
+
+    // Checks if the enrollmentSubjectTypeId has multiple of the same classTypes for the subject.
+    for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
+
+      const studentEnrollmentSubject = studentEnrollmentSubjectsMap[enrollmentSubjectTypeId];
+
+      if (subjectIdAndClassTypeId[studentEnrollmentSubject.subjectId]) {
+        if ((subjectIdAndClassTypeId[studentEnrollmentSubject.subjectId][studentEnrollmentSubject.classTypeId])) {
+          errorEnrollmentSubjectTypeIds.push(enrollmentSubjectTypeId);
+        } else {
+          subjectIdAndClassTypeId[studentEnrollmentSubject.subjectId][studentEnrollmentSubject.classTypeId] = true;
+        }
+
+      } else {
+        subjectIdAndClassTypeId[studentEnrollmentSubject.subjectId] = {};
+        subjectIdAndClassTypeId[studentEnrollmentSubject.subjectId][studentEnrollmentSubject.classTypeId] = true;
+      }
+
+    }
+
+    if (errorEnrollmentSubjectTypeIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Can only enroll to one enrollment subject type of one class type for one subject", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
+    }
+
+    // Checks if the enrollmentSubjectTypeId has day and time schedule has collided with other enrollmentSubjectTypeIds
+    for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
+      const studentEnrollmentSubject = studentEnrollmentSubjectsMap[enrollmentSubjectTypeId];
+      const { dayId, startTime, endTime } = studentEnrollmentSubject;
+
+      if (!dayIdAndTime[dayId]) {
+        dayIdAndTime[dayId] = [];
+      }
+
+      const hasClash = dayIdAndTime[dayId].some(existingTime =>
+        isTimeRangeColliding(
+          existingTime.startTime,
+          existingTime.endTime,
+          startTime,
+          endTime
+        )
+      );
+
+      if (hasClash) {
+        errorEnrollmentSubjectTypeIds.push(enrollmentSubjectTypeId);
+      } else {
+        dayIdAndTime[dayId].push({ startTime, endTime });
+      }
+    }
+
+
+    if (errorEnrollmentSubjectTypeIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentSubjectId time clash", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
+    }
+
+    // Checks if any of the enrollmentSubjectTypeId has reached full capacity of students.
+    for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
+
+      const studentEnrollmentSubject = studentEnrollmentSubjectsMap[enrollmentSubjectTypeId];
+
+      if (studentEnrollmentSubject.numberOfStudentsEnrolled === studentEnrollmentSubject.numberOfSeats) {
+
+        errorEnrollmentSubjectTypeIds.push(enrollmentSubjectTypeId);
+
+      }
+    }
+
+    if (errorEnrollmentSubjectTypeIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "One of multiple enrollmentSubjectId has reached full capacity", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
+    }
+
+    // Delete existing studentEnrollmentSubjectType
+    const deleteStudentEnrollmentSubjectType = await enrollmentRepository.deleteStudentEnrollmentSubjectTypeByStudentId(studentId, enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentId);
+
+    const studentEnrolledSubjects: number[][] = [];
+
+    for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
+      studentEnrolledSubjects.push([
+        studentId,
+        enrollmentSubjectTypeId,
+        1
+      ]);
+    }
+
+    const createStudentEnrollmentSubjectTypes = await enrollmentRepository.createStudentEnrollmentSubjectType(studentEnrolledSubjects);
+    if (createStudentEnrollmentSubjectTypes.affectedRows === 0) {
+      throw new Error("createStudentEnrollmentSubjectType failed to insert");
+    }
+
+    return Result.succeed(studentEnrolledSubjectTypeIds, "Student enrolled successfully.");
   }
 }
 
