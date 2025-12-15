@@ -9,6 +9,8 @@ import { SubjectData } from "../models/subject-model";
 import { LecturerData } from "../models/lecturer-model";
 import lecturerService from "../services/lecturer.service";
 import venueService from "../services/venue.service";
+import userService from "../services/user.service";
+import { StudentClassData, UserData } from "../models/user-model";
 
 export default class EnrollmentController {
   async getAllEnrollments(req: Request, res: Response) {
@@ -207,8 +209,20 @@ export default class EnrollmentController {
     } else {
       throw new Error("getAllEnrollmentSubjects in enrollment.controller.ts, user is neither student nor admin");
     }
+  }
 
+  async getAllEnrollmentSubjectsByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId as string);
 
+    const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await enrollmentService.getEnrollmentSubjectsByStudentId(studentId);
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
   }
 
   async getEnrollmentSubjectById(req: Request, res: Response) {
