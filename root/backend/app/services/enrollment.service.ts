@@ -277,16 +277,28 @@ class EnrollmentService implements IEnrollmentService {
     }
 
     // The response data.
-    const studentEnrollmentSubjectsOrganized: any = [];
+    const studentEnrollmentSubjectsOrganized: StudentEnrollmentSubjectOrganizedData[] = [];
 
     // Since everything is in Key-Value datastructure format, this will convert it to array for response.
     for (let subjectId in studentEnrollmentSubjectsOrganizedMap) {
-      let classTypes = [];
+      let studentEnrollmentSubject = studentEnrollmentSubjectsOrganizedMap[subjectId];
+      let classTypes: StudentEnrollmentSubjectOrganizedData["classTypes"] = [];
       for (let classTypeId in studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes) {
         classTypes.push(studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes[classTypeId]);
       }
       studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes = classTypes;
-      studentEnrollmentSubjectsOrganized.push(studentEnrollmentSubjectsOrganizedMap[subjectId]);
+      studentEnrollmentSubjectsOrganized.push({
+        subjectId: studentEnrollmentSubject.subjectId,
+        subjectCode: studentEnrollmentSubject.subjectCode,
+        subjectName: studentEnrollmentSubject.subjectName,
+        creditHours: studentEnrollmentSubject.creditHours,
+        lecturerId: studentEnrollmentSubject.lecturerId,
+        firstName: studentEnrollmentSubject.firstName,
+        lastName: studentEnrollmentSubject.lastName,
+        lecturerTitleId: studentEnrollmentSubject.lecturerTitleId,
+        lecturerTitle: studentEnrollmentSubject.lecturerTitle,
+        classTypes: classTypes
+      });
     }
 
 

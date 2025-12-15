@@ -5,23 +5,25 @@ export interface StudentEnrollmentSubjectOrganizedData {
   subjectCode: string;
   subjectName: string;
   creditHours: number;
-  lectureId: number;
+  lecturerId: number;
   firstName: string;
   lastName: string;
-  lectureTitleId: number;
-  lectureTitle: number;
-  classTypes: [{
+  lecturerTitleId: number;
+  lecturerTitle: string;
+  classTypes: {
     classTypeId: number;
     classType: string;
-    classTypeDetails: [{
+    classTypeDetails: {
       enrollmentSubjectTypeId: number;
       grouping: number;
       dayId: number;
       day: string;
       startTime: Date;
       endTime: Date;
-    }];
-  }];
+      numberOfStudentsEnrolled: number;
+      numberOfSeats: number;
+    }[];
+  }[];
 };
 
 export interface EnrollmentData extends RowDataPacket {
