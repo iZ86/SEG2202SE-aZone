@@ -63,7 +63,11 @@ export function MultiFilter({
                 state.isFocused ? "bg-neutral-200" : "bg-white"
               } py-2 px-4 rounded-xl border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority`,
             multiValue: () =>
-              "flex gap-x-1 bg-neutral-200 text-blue-air-superiority py-1 px-4 rounded-xl",
+              `${
+                isInvalid
+                  ? "bg-red-100 text-red-tomato"
+                  : "bg-neutral-200 text-blue-air-superiority"
+              } flex gap-x-1 py-1 px-4 rounded-xl`,
             valueContainer: () => "flex gap-x-2 gap-y-2",
           }}
           unstyled
