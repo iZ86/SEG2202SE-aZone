@@ -267,12 +267,13 @@ export default class UserController {
 
   async getStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
+    const status: number = parseInt(req.query.status as string) || 0;
 
     if (!studentId || isNaN(studentId)) {
       return res.sendError.badRequest("Invalid studentId");
     }
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(
@@ -341,36 +342,6 @@ export default class UserController {
     }
   }
 
-  async updateStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
-    const courseId: number = req.body.courseId;
-    const programmeIntakeId: number = req.body.programmeIntakeId;
-    const status: number = req.body.status;
-
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.badRequest("Invalid studentId");
-    }
-
-    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
-    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
-
-    if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid studentId, or courseId, or programmeIntakeId");
-    }
-
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.updateStudentCourseProgrammeIntakeByStudentId(studentId, courseId, programmeIntakeId, status);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.create(response.getData(), response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
-
   async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
     const courseId: number = parseInt(req.params.courseId);
@@ -380,7 +351,7 @@ export default class UserController {
       return res.sendError.badRequest("Invalid studentId or courseId or programmeIntakeId");
     }
 
-    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId);
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId, 0);
 
     if (!studentCourseProgrammeIntake.isSuccess()) {
       return res.sendError.notFound("Student course programme intake not found");
@@ -404,7 +375,7 @@ export default class UserController {
     const response: Result<StudentInformation> = await userService.getStudentInformationById(userId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage())
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -414,7 +385,7 @@ export default class UserController {
   }
 
   async getStudentActiveSubjectsOverviewById(req: Request, res: Response) {
-    const userId: number = req.user.userId
+    const userId: number = req.user.userId;
 
     const response: Result<StudentSubjectOverviewData[]> = await userService.getStudentActiveSubjectsOverviewById(userId);
 
@@ -426,10 +397,28 @@ export default class UserController {
   }
 
   async getStudentTimetableById(req: Request, res: Response) {
-    const userId: number = req.user.userId
+    const userId: number = req.user.userId;
 
     const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(userId);
     const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(userId);
+
+
+    if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {
+      return res.sendSuccess.ok({
+        semesterStartDate: studentSemesterStartAndEndDate.getData()?.semesterStartDate,
+        semesterEndDate: studentSemesterStartAndEndDate.getData()?.semesterEndDate,
+        timetable: response.getData()
+      }, response.getMessage());
+    } else {
+      throw new Error("user.controller.ts, getStudentTimetableById failed");
+    }
+  }
+
+  async getStudentTimetableByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId as string);
+
+    const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(studentId);
+    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(studentId);
 
 
     if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {

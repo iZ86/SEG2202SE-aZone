@@ -52,12 +52,14 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
           if (!detail) return;
 
           selectedClasses.push({
+            enrollmentSubjectTypeId: detail.enrollmentSubjectTypeId,
             enrollmentSubjectId: detail.enrollmentSubjectTypeId,
             startTime: detail.startTime,
             endTime: detail.endTime,
             subjectId: subject.subjectId,
             subjectCode: subject.subjectCode,
             subjectName: subject.subjectName,
+            creditHours: subject.creditHours,
             lecturerId: subject.lecturerId,
             lecturerFirstName: subject.firstName,
             lecturerLastName: subject.lastName,
@@ -110,21 +112,8 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
     return `${day}-${month}-${year}`;
   }
 
-  function convert24UTCTimeTo12LocalTime(timeString: string): string {
-    const [hours, minutes, seconds] = timeString.split(":").map(Number);
 
-    const utcDate = new Date();
-    utcDate.setUTCHours(hours, minutes, seconds, 0);
 
-    return utcDate
-      .toLocaleTimeString(undefined, {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })
-      .toUpperCase()
-      .replace(" ", "");
-  }
 
   return (
 
@@ -166,7 +155,7 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
                   >
                     <div className="flex flex-col flex-wrap font-bold gap-y-2">
 
-                      <p className="font-bold">{convert24UTCTimeTo12LocalTime(classData.startTime)} - {convert24UTCTimeTo12LocalTime(classData.endTime)}</p>
+                      <p className="font-bold">{classData.startTime} - {classData.endTime}</p>
                       <div className="flex flex-col flex-wrap text-black">
                         <p className="text-black">
                           {classData.subjectCode} - {classData.subjectName}
@@ -204,7 +193,7 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
           ))) :
           <div className="col-span-7 flex justify-center items-center">
             <h3 className="text-black font-bold text-gray-charcoal">
-              No subjects chosen.
+              {studentEnrollmentSubjects ? "No subjects chosen." : "No subjects for this week."}
             </h3>
           </div>
         }

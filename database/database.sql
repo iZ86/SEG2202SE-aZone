@@ -134,7 +134,7 @@ CREATE TABLE ENROLLMENT_SUBJECT (
         ON DELETE CASCADE,
     FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId)
         ON DELETE CASCADE,
-    UNIQUE (enrollmentId, subjectId, lecturerId)
+    UNIQUE (enrollmentId, subjectId)
 );
 
 CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
@@ -232,8 +232,8 @@ INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
 
 INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`) VALUES
 (1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1),
-(2, 2, 202508, 1, 1, '2025-08-16', '2025-12-12', 1),
-(3, 1, 202504, 1, 5, '2025-04-09', '2025-08-06', 1);
+(2, 2, 202508, 1, 1, '2025-08-16', '2026-12-12', 1),
+(3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1);
 
 
 INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
@@ -318,26 +318,28 @@ INSERT INTO `LECTURER` (`lecturerId`, `firstName`, `lastName`, `lecturerTitleId`
 INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentSubjectId`, `enrollmentId`, `subjectId`, `lecturerId`) VALUES
 (17, 1, 1, 3),
 (18, 1, 2, 4),
+(20, 1, 7, 6),
 (21, 1, 4, 7),
-(20, 1, 7, 6);
+(22, 1, 3, 3);
 
 INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectTypeId`, `enrollmentSubjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
 (44, 18, 1, 9, '10:00:00', '12:00:00', 2, 100, 1),
 (55, 18, 1, 6, '10:00:00', '12:00:00', 2, 100, 2),
 (45, 18, 2, 7, '08:30:00', '10:30:00', 3, 35, 2),
+(46, 18, 1, 9, '12:00:00', '14:00:00', 5, 100, 1),
+(47, 18, 2, 5, '16:00:00', '18:00:00', 5, 30, 1),
 (48, 20, 1, 10, '08:00:00', '09:00:00', 4, 100, 2),
 (49, 20, 4, 11, '10:00:00', '12:00:00', 5, 100, 4),
 (50, 21, 1, 6, '11:00:00', '13:00:00', 1, 100, 2),
-(51, 21, 3, 3, '13:00:00', '14:00:00', 3, 30, 3),
-(52, 17, 1, 8, '08:00:00', '10:00:00', 1, 100, 1),
-(53, 17, 2, 3, '10:00:00', '12:00:00', 2, 30, 1),
-(54, 17, 4, 5, '10:00:00', '11:00:00', 2, 25, 1);
+(51, 21, 3, 3, '13:00:00', '14:00:00', 3, 30, 2),
+(76, 17, 1, 3, '12:00:00', '14:00:00', 1, 30, 1),
+(77, 17, 2, 8, '08:00:00', '10:00:00', 1, 100, 1),
+(78, 17, 4, 5, '15:00:00', '16:00:00', 2, 25, 2),
+(79, 17, 2, 3, '14:00:00', '16:00:00', 2, 20, 3);
 
 INSERT INTO `STUDENT_ENROLLMENT_SUBJECT_TYPE` (`studentId`, `enrollmentSubjectTypeId`, `subjectStatusId`) VALUES
 (23049679, 44, 1),
 (23049679, 49, 1),
 (23055155, 44, 1),
 (23055155, 51, 1),
-(23056138, 44, 1),
-(23056138, 53, 1),
-(23056138, 54, 1);
+(23056138, 44, 1);

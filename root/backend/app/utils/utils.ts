@@ -17,21 +17,20 @@ export function isTimeRangeColliding(
   endTimeTwo: Date
 ): boolean {
   // Helper function to get time in minutes, treating 00:00 as 1440 if it's an end time
-  const getTimeValue = (date: Date, isEndTime: boolean): number => {
-    const totalMinutes = date.getUTCHours() * 60 + date.getUTCMinutes();
-    
-    // If it's an end time and shows as 00:00, treat it as 1440 (end of day)
-    if (isEndTime && totalMinutes === 0) {
-      return 1440;
-    }
-    return totalMinutes;
-  };
+  // const getTimeValue = (date: Date, isEndTime: boolean): number => {
+  //   const totalMinutes = date.getUTCHours() * 60 + date.getUTCMinutes();
+  //   // If it's an end time and shows as 00:00, treat it as 1440 (end of day)
+  //   if (isEndTime && totalMinutes === 0) {
+  //     return 1440;
+  //   }
+  //   return totalMinutes;
+  // };
 
-  const start1 = getTimeValue(startTime, false);
-  const end1 = getTimeValue(endTime, true);
-  const start2 = getTimeValue(startTimeTwo, false);
-  const end2 = getTimeValue(endTimeTwo, true);
+  // const start1 = getTimeValue(startTime, false);
+  // const end1 = getTimeValue(endTime, true);
+  // const start2 = getTimeValue(startTimeTwo, false);
+  // const end2 = getTimeValue(endTimeTwo, true);
 
   // Check for collision
-  return !(end1 <= start2 || end2 <= start1);
+  return !(endTime <= startTimeTwo || endTimeTwo <= startTime);
 }

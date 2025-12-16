@@ -40,17 +40,9 @@ export const createAndUpdateEnrollmentSubjectValidator: any = [
     .trim()
     .notEmpty().withMessage('lecturerId cannot be empty')
     .isNumeric().withMessage('lecturerId must be numeric'),
-  validate,
-];
-
-export const createEnrollmentSubjectTypeValidator: any = [
   body('enrollmentSubjects')
-    .isArray({ min: 1 }).withMessage('enrollmentSubjects must be an array and at least one value')
+    .isArray().withMessage('enrollmentSubjects must be an array')
     .notEmpty().withMessage('Array cannot be empty'),
-  body('enrollmentSubjects.*.enrollmentSubjectId')
-    .trim()
-    .notEmpty().withMessage('enrollmentSubjectId cannot be empty')
-    .isNumeric().withMessage('enrollmentSubjectId must be numeric'),
   body('enrollmentSubjects.*.classTypeId')
     .trim()
     .notEmpty().withMessage('classTypeId cannot be empty')
@@ -82,10 +74,26 @@ export const createEnrollmentSubjectTypeValidator: any = [
   validate,
 ];
 
-export const updateEnrollmentSubjectTypeValidator: any = [
+export const updateEnrollmentSubjectValidator: any = [
+  body('enrollmentId')
+    .trim()
+    .notEmpty().withMessage('enrollmentId cannot be empty')
+    .isNumeric().withMessage('enrollmentId must be numeric'),
+  body('subjectId')
+    .trim()
+    .notEmpty().withMessage('subjectId cannot be empty')
+    .isNumeric().withMessage('subjectId must be numeric'),
+  body('lecturerId')
+    .trim()
+    .notEmpty().withMessage('lecturerId cannot be empty')
+    .isNumeric().withMessage('lecturerId must be numeric'),
   body('enrollmentSubjects')
-    .isArray({ min: 1 }).withMessage('enrollmentSubjects must be an array and at least one value')
+    .isArray().withMessage('enrollmentSubjects must be an array')
     .notEmpty().withMessage('Array cannot be empty'),
+  body('enrollmentSubjects.*.enrollmentSubjectTypeId')
+    .trim()
+    .notEmpty().withMessage('enrollmentSubjectTypeId cannot be empty')
+    .isNumeric().withMessage('enrollmentSubjectTypeId must be numeric'),
   body('enrollmentSubjects.*.classTypeId')
     .trim()
     .notEmpty().withMessage('classTypeId cannot be empty')

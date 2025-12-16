@@ -4,13 +4,10 @@ import { useNavigate } from "react-router-dom";
 import MediumButton from "@components/MediumButton";
 import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import {
-  createEnrollmentSubjectTypeAPI,
   createEnrollmentSubjectAPI,
   getEnrollmentSubjectByIdAPI,
   getEnrollmentSubjectTypeByEnrollmentSubjectIdAPI,
   updateEnrollmentSubjectByIdAPI,
-  updateEnrollmentSubjectTypeByEnrollmentSubjectIdAPI,
-  deleteEnrollmentSubjectTypeByEnrollmentSubjectIdAPI,
 } from "../api/enrollments";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import type { SingleValue } from "react-select";
@@ -20,16 +17,16 @@ import { toast } from "react-toastify";
 import { getAllEnrollmentsAPI } from "../api/enrollments";
 import { Time } from "@internationalized/date";
 import type {
-  CreateEnrollmentSubjectType,
   Enrollment,
   EnrollmentSubjectType,
-  UpdateEnrollmentSubjectType,
 } from "@datatypes/enrollmentType";
 import { getAllSubjectsAPI } from "../api/subjects";
 import type { Subject } from "@datatypes/subjectType";
 import { getAllLecturersAPI } from "../api/lecturers";
 import type { Lecturer } from "@datatypes/lecturerType";
 import EnrollmentSubjectTypeForm from "./EnrollmentSubjectTypeForm";
+import { getAllVenuesAPI } from "../api/venues";
+import type { Venue } from "@datatypes/venueType";
 
 export default function EnrollmentSubjectForm({
   type,
@@ -52,6 +49,7 @@ export default function EnrollmentSubjectForm({
   });
   const [classes, setClasses] = useState<
     {
+      enrollmentSubjectTypeId?: number;
       classType: reactSelectOptionType;
       venue: reactSelectOptionType;
       day: reactSelectOptionType;
@@ -60,26 +58,9 @@ export default function EnrollmentSubjectForm({
       numberOfSeats: number;
       grouping: number;
     }[]
-  >([
-    {
-      classType: {
-        value: -1,
-        label: "",
-      },
-      venue: {
-        value: -1,
-        label: "",
-      },
-      day: {
-        value: -1,
-        label: "",
-      },
-      startTime: null,
-      endTime: null,
-      numberOfSeats: 0,
-      grouping: 0,
-    },
-  ]);
+  >([]);
+
+  const [venueOptions, setVenueOptions] = useState<reactSelectOptionType[]>([]);
 
   const [emptyEnrollment, setEmptyEnrollment] = useState(false);
   const [emptySubject, setEmptySubject] = useState(false);
@@ -129,6 +110,17 @@ export default function EnrollmentSubjectForm({
       grouping: false,
     },
   ]);
+  const [invalidTime, setInvalidTime] = useState<
+    {
+      startTime: boolean;
+      endTime: boolean;
+    }[]
+  >([
+    {
+      startTime: false,
+      endTime: false,
+    },
+  ]);
 
   const [enrollmentOptions, setEnrollmentOptions] = useState<
     reactSelectOptionType[]
@@ -145,6 +137,29 @@ export default function EnrollmentSubjectForm({
   const { authToken, admin, loading } = useAdmin();
 
   useEffect(() => {
+    const getAllVenues = async (token: string) => {
+      const response: Response | undefined = await getAllVenuesAPI(token);
+
+      if (!response || !response.ok) {
+        setVenueOptions([]);
+        return;
+      }
+
+      const { data } = await response.json();
+
+      if (!data.venues || data.venues.length === 0) {
+        setVenueOptions([]);
+        return;
+      }
+
+      const options = data.venues.map((venue: Venue) => ({
+        value: venue.venueId,
+        label: venue.venue,
+      }));
+
+      setVenueOptions(options);
+    };
+
     const setupEditEnrollmentSubjectForm = async (
       token: string,
       enrollmentSubjectId: number
@@ -155,7 +170,7 @@ export default function EnrollmentSubjectForm({
       );
 
       if (!response?.ok) {
-        navigate("/admin/enrollment-subject");
+        navigate("/admin/enrollment-subjects");
         toast.error("Failed to fetch enrollment subject data");
         return;
       }
@@ -175,7 +190,7 @@ export default function EnrollmentSubjectForm({
       });
       setLecturer({
         label:
-          (data.lecturerTitle === "None" ? "" : data.lecturerTitle + ".") +
+          (data.lecturerTitle === "None" ? "" : data.lecturerTitle) +
           " " +
           data.lastName +
           " " +
@@ -195,7 +210,7 @@ export default function EnrollmentSubjectForm({
         );
 
       if (!response?.ok) {
-        navigate("/admin/enrollment-subject");
+        navigate("/admin/enrollment-subjects");
         toast.error("Failed to fetch enrollment subject data");
         return;
       }
@@ -204,6 +219,8 @@ export default function EnrollmentSubjectForm({
 
       setClasses(
         data.map((enrollmentSubjectType: EnrollmentSubjectType) => ({
+          enrollmentSubjectTypeId:
+            enrollmentSubjectType.enrollmentSubjectTypeId,
           classType: {
             value: enrollmentSubjectType.classTypeId,
             label: enrollmentSubjectType.classType,
@@ -237,6 +254,7 @@ export default function EnrollmentSubjectForm({
     getAllEnrollments(authToken);
     getAllSubjects(authToken);
     getAllLecturers(authToken);
+    getAllVenues(authToken);
     if (type === "Edit" && id > 0) {
       setupEditEnrollmentSubjectForm(authToken, id);
       setupEditEnrollmentSubjectTypeForm(authToken, id);
@@ -278,53 +296,113 @@ export default function EnrollmentSubjectForm({
 
     // Check for duplicate class sessions
     if (classes.length > 1) {
-      const sessionKeys: Map<string, number> = new Map<string, number>();
-      let isDuplicateFound: boolean = false;
+      let isOverlapFound: boolean = false;
 
+      // Outer loop iterates through each class
       for (let i = 0; i < classes.length; i++) {
-        const cls = classes[i];
+        const classA = classes[i];
 
-        // Unique key for the class session based on relevant fields
-        const key = [
-          id,
-          cls.classType.value,
-          cls.venue.value,
-          formatTime(cls.startTime),
-          formatTime(cls.endTime),
-          cls.day.value,
-        ].join("|");
+        // Skip if essential data is missing (prevents crashes)
+        if (
+          !classA.startTime ||
+          !classA.endTime ||
+          classA.day.value === -1 ||
+          classA.venue.value === -1
+        ) {
+          continue;
+        }
 
-        if (sessionKeys.has(key)) {
-          // Duplicate found
-          isDuplicateFound = true;
-          const originalIndex = sessionKeys.get(key) as number;
+        // Inner loop compares classA with all subsequent classes (classB)
+        // We start from i + 1 to avoid checking a class against itself or checking pairs twice.
+        for (let j = i + 1; j < classes.length; j++) {
+          const classB = classes[j];
 
-          // Set error state and provide feedback
-          setInvalidClassSession((prev) => {
-            const newState = [...prev];
-            newState[i] = {
-              ...newState[i],
-              classType: true,
-              venue: true,
-              day: true,
-              startTime: true,
-              endTime: true,
-            };
-            return newState;
-          });
-          toast.error(
-            `Class Session #${i + 1} is a duplicate of Class Session #${
-              originalIndex + 1
-            }`
-          );
+          // Skip if essential data is missing for classB
+          if (
+            !classB.startTime ||
+            !classB.endTime ||
+            classB.day.value === -1 ||
+            classB.venue.value === -1
+          ) {
+            continue;
+          }
+
+          // 1. Check for Shared Context: Same Day and Same Venue
+          if (
+            classA.day.value === classB.day.value &&
+            classA.venue.value === classB.venue.value
+          ) {
+            // 2. Check for Time Overlap
+            // Condition for OVERLAP: (A.start < B.end) AND (A.end > B.start)
+
+            const isOverlapping =
+              classA.startTime.compare(classB.endTime) < 0 &&
+              classA.endTime.compare(classB.startTime) > 0;
+
+            if (isOverlapping) {
+              isOverlapFound = true;
+
+              // Set error state for BOTH conflicting classes (i and j)
+              setInvalidClassSession((prev) => {
+                const newState = [...prev];
+
+                // Mark class A (index i)
+                newState[i] = {
+                  ...newState[i],
+                  venue: true,
+                  day: true,
+                  startTime: true,
+                  endTime: true,
+                };
+
+                // Mark class B (index j)
+                newState[j] = {
+                  ...newState[j],
+                  venue: true,
+                  day: true,
+                  startTime: true,
+                  endTime: true,
+                };
+                return newState;
+              });
+
+              toast.error(
+                `Class Session #${i + 1} conflicts with Class Session #${
+                  j + 1
+                }: They share the same venue and day at an overlapping time.`
+              );
+              break;
+            }
+          }
+        }
+
+        if (isOverlapFound) {
           break;
         }
-        // Store the key and the current index
-        sessionKeys.set(key, i);
       }
 
-      if (isDuplicateFound) {
+      if (isOverlapFound) {
         setIsLoading(false);
+        return;
+      }
+    }
+
+    for (let i = 0; i < classes.length; i++) {
+      if (
+        (classes[i].endTime?.compare(classes[i].startTime as Time) as number) <=
+        0
+      ) {
+        toast.error("Start time must be before end time");
+        setIsLoading(false);
+        setInvalidTime((prev) => {
+          const newState = [...prev];
+          newState[i] = {
+            ...newState[i],
+            startTime: true,
+            endTime: true,
+          };
+          return newState;
+        });
         return;
       }
     }
@@ -333,28 +411,79 @@ export default function EnrollmentSubjectForm({
     let response: Response | undefined;
 
     if (type === "Add") {
+      const formattedClasses = classes.map((cls) => {
+        return {
+          classTypeId: cls.classType.value,
+          venueId: cls.venue.value,
+          dayId: cls.day.value,
+          startTime: formatTime(cls.startTime),
+          endTime: formatTime(cls.endTime),
+          numberOfSeats: cls.numberOfSeats,
+          grouping: cls.grouping,
+        };
+      });
+
       response = await createEnrollmentSubjectAPI(
         authToken as string,
         enrollment.value,
         subject.value,
-        lecturer.value
+        lecturer.value,
+        formattedClasses
       );
     } else if (type === "Edit") {
+      const formattedClasses = classes.map((cls) => {
+        return {
+          enrollmentSubjectTypeId: cls.enrollmentSubjectTypeId || 0,
+          classTypeId: cls.classType.value,
+          venueId: cls.venue.value,
+          dayId: cls.day.value,
+          startTime: formatTime(cls.startTime),
+          endTime: formatTime(cls.endTime),
+          numberOfSeats: cls.numberOfSeats,
+          grouping: cls.grouping,
+        };
+      });
+
       response = await updateEnrollmentSubjectByIdAPI(
         authToken as string,
         id,
         enrollment.value,
         subject.value,
-        lecturer.value
+        lecturer.value,
+        formattedClasses
       );
     }
 
     if (response && response.status === 409) {
-      setIsLoading(false);
-      setInvalidEnrollmentSubject(true);
-      toast.error(
-        "Enrollment Subject Existed. Please select a different value"
-      );
+      const { message }: { message: string } = await response.json();
+
+      if (message === "enrollmentSubject existed") {
+        setIsLoading(false);
+        setInvalidEnrollmentSubject(true);
+        toast.error(
+          "Enrollment Subject Existed. Please select a different subject"
+        );
+        return;
+      } else if (message.startsWith("enrollmentSubjectType")) {
+        const invalidEnrollmentSubjectTypeIndex = parseInt(
+          message.split(":")[1].trim()
+        );
+        setIsLoading(false);
+        setInvalidClassSession((prev) => {
+          const newState = [...prev];
+          newState[invalidEnrollmentSubjectTypeIndex] = {
+            ...newState[invalidEnrollmentSubjectTypeIndex],
+            classType: true,
+            venue: true,
+            day: true,
+            startTime: true,
+            endTime: true,
+          };
+          return newState;
+        });
+        toast.error("Venue used by other subjects. Please modify the details.");
+      }
+
       return;
     }
 
@@ -364,91 +493,11 @@ export default function EnrollmentSubjectForm({
       return;
     }
 
-    if (classes.length === 0) {
-      // If no class sessions, or removed. Delete existing class sessions
-      const deleteResponse: Response | undefined =
-        await deleteEnrollmentSubjectTypeByEnrollmentSubjectIdAPI(
-          authToken,
-          id
-        );
-
-      if (!deleteResponse || !deleteResponse.ok) {
-        setIsLoading(false);
-        navigate("/admin/enrollment-subjects");
-        toast.error("Failed to delete existing class sessions");
-        return;
-      }
-
-      toast.success(
-        `Enrollment subject ${type === "Edit" ? "updated" : "created"}`
-      );
-      navigate("/admin/enrollment-subjects");
-      return;
-    }
-
-    if (setEmptySubjectSessionsInputs()) {
-      setIsLoading(false);
-      return;
-    }
-
-    const { data } = await response.json();
-    const enrollmentSubjectId: number = data.enrollmentSubjectId
-      ? data.enrollmentSubjectId
-      : id;
-
-    const formattedClasses = classes.map((cls) => {
-      if (type === "Add") {
-        return {
-          enrollmentSubjectId,
-          classTypeId: cls.classType.value,
-          venueId: cls.venue.value,
-          dayId: cls.day.value,
-          startTime: formatTime(cls.startTime),
-          endTime: formatTime(cls.endTime),
-          numberOfSeats: cls.numberOfSeats,
-          grouping: cls.grouping,
-        };
-      } else if (type === "Edit") {
-        return {
-          classTypeId: cls.classType.value,
-          venueId: cls.venue.value,
-          dayId: cls.day.value,
-          startTime: formatTime(cls.startTime),
-          endTime: formatTime(cls.endTime),
-          numberOfSeats: cls.numberOfSeats,
-          grouping: cls.grouping,
-        };
-      }
-    });
-
-    let enrollmentSubjectTypeResponse: Response | undefined;
-
-    if (type === "Add") {
-      enrollmentSubjectTypeResponse = await createEnrollmentSubjectTypeAPI(
-        authToken as string,
-        formattedClasses as CreateEnrollmentSubjectType[]
-      );
-    } else if (type === "Edit") {
-      enrollmentSubjectTypeResponse =
-        await updateEnrollmentSubjectTypeByEnrollmentSubjectIdAPI(
-          authToken as string,
-          enrollmentSubjectId,
-          formattedClasses as UpdateEnrollmentSubjectType[]
-        );
-    }
-
-    if (!enrollmentSubjectTypeResponse || !enrollmentSubjectTypeResponse.ok) {
-      setIsLoading(false);
-      toast.error("Failed to create class sessions");
-      return;
-    }
-
-    toast.success(
-      `Enrollment subject and class sessions ${
-        type === "Edit" ? "updated" : "created"
-      }`
-    );
+    setIsLoading(false);
     navigate("/admin/enrollment-subjects");
+    toast.success(
+      `${type === "Add" ? "Created" : "Updated"} enrollment subject`
+    );
     return;
   }
 
@@ -732,6 +781,18 @@ export default function EnrollmentSubjectForm({
       };
       return newState;
     });
+
+    if (field === "startTime" || field === "endTime") {
+      setInvalidTime((prev) => {
+        const newState = [...prev];
+        newState[index] = {
+          ...newState[index],
+          startTime: false,
+          endTime: false,
+        };
+        return newState;
+      });
+    }
   }
 
   function removeClass(index: number) {
@@ -825,8 +886,10 @@ export default function EnrollmentSubjectForm({
                 data={cls}
                 isEmpty={emptyClassSession[idx] || {}}
                 isInvalid={invalidClassSession[idx] || {}}
+                isInvalidTime={invalidTime[idx] || {}}
                 onChange={updateClass}
                 onRemove={removeClass}
+                venueOptions={venueOptions}
               />
             ))}
 

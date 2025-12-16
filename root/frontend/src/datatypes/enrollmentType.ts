@@ -1,3 +1,6 @@
+import type { Time } from "@internationalized/date";
+import type { ClassType } from "./classTypeType";
+
 export type Enrollment = {
   enrollmentId: number;
   enrollmentStartDateTime: Date;
@@ -65,6 +68,39 @@ export interface StudentEnrolledSubject {
   grouping: number;
   dayId: number;
   day: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: Time;
+  endTime: Time;
+  numberOfSeats: number;
+};
+
+export type CreateEnrollmentSubjectType = {
+  classTypeId: number;
+  venueId: number;
+  dayId: number;
+  startTime: string;
+  endTime: string;
+  numberOfSeats: number;
+  grouping: number;
+};
+
+export type UpdateEnrollmentSubjectType = {
+  enrollmentSubjectTypeId: number;
+  classTypeId: number;
+  venueId: number;
+  dayId: number;
+  startTime: string;
+  endTime: string;
+  numberOfSeats: number;
+  grouping: number;
+};
+
+export interface EnrollmentSubjectResponse {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+  lecturerTitle: string;
+  firstName: string;
+  lastName: string;
+  classTypes: ClassType[];
 }

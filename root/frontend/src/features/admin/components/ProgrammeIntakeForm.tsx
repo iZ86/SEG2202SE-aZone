@@ -63,6 +63,8 @@ export default function ProgrammeIntakeForm({
   const [emptySemesterStartDate, setEmptySemesterStartDate] = useState(false);
   const [emptySemesterEndDate, setEmptySemesterEndDate] = useState(false);
 
+  const [invalidProgrammeIntake, setInvalidProgrammeIntake] = useState(false);
+
   const [programmeOptions, setProgrammeOptions] = useState<
     reactSelectOptionType[]
   >([]);
@@ -205,6 +207,7 @@ export default function ProgrammeIntakeForm({
     }
 
     if (response && response.status === 409) {
+      setInvalidProgrammeIntake(true);
       setIsLoading(false);
       toast.error("ProgrammeIntake name existed");
       return;
@@ -379,23 +382,31 @@ export default function ProgrammeIntakeForm({
           <form onSubmit={handleSubmit} className="mt-6 gap-y-8 flex flex-col">
             <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyProgramme}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyProgramme}
+                  isInvalid={invalidProgrammeIntake}
+                  invalidMessage="Programme Intake Existed."
+                >
                   <SingleFilter
                     placeholder="Select Programme"
                     options={programmeOptions}
                     value={programme}
-                    isInvalid={emptyProgramme}
+                    isInvalid={emptyProgramme || invalidProgrammeIntake}
                     onChange={onChangeProgramme}
                   />
                 </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyIntake}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyIntake}
+                  isInvalid={invalidProgrammeIntake}
+                  invalidMessage="Programme Intake Existed."
+                >
                   <SingleFilter
                     placeholder="Select Intake"
                     options={intakeOptions}
                     value={intake}
-                    isInvalid={emptyIntake}
+                    isInvalid={emptyIntake || invalidProgrammeIntake}
                     onChange={onChangeIntake}
                   />
                 </AdminInputFieldWrapper>
@@ -415,12 +426,16 @@ export default function ProgrammeIntakeForm({
                 </AdminInputFieldWrapper>
               </div>
               <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptySemester}>
+                <AdminInputFieldWrapper
+                  isEmpty={emptySemester}
+                  isInvalid={invalidProgrammeIntake}
+                  invalidMessage="Programme Intake Existed."
+                >
                   <SingleFilter
                     placeholder="Select Semester"
                     options={semesterOptions}
                     value={semester}
-                    isInvalid={emptySemester}
+                    isInvalid={emptySemester || invalidProgrammeIntake}
                     onChange={onChangeSemester}
                   />
                 </AdminInputFieldWrapper>

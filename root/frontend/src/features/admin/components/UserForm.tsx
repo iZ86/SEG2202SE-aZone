@@ -1,13 +1,14 @@
 import LoadingOverlay from "@components/LoadingOverlay";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import type { SingleValue } from "react-select";
+import type { MultiValue, SingleValue } from "react-select";
 import {
   createStudentAPI,
   createStudentCourseProgrammeIntakeAPI,
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeIdAPI,
   getStudentByIdAPI,
   getStudentCourseProgrammeIntakeByStudentIdAPI,
+  getStudentsTimetableByIdAPI,
   updateStudentByIdAPI,
 } from "../api/students";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
@@ -19,7 +20,10 @@ import AdminInputFieldWrapper from "@components/admin/AdminInputFieldWrapper";
 import { getAdminByIdAPI, updateAdminByIdAPI } from "../api/admins";
 import type { Programme, ProgrammeIntake } from "@datatypes/programmeType";
 import type { Course } from "@datatypes/courseType";
-import type { StudentCourseProgrammeIntake } from "@datatypes/userType";
+import type {
+  StudentClassData,
+  StudentCourseProgrammeIntake,
+} from "@datatypes/userType";
 import { Trash2 } from "lucide-react";
 import {
   getAllProgrammesAPI,
@@ -28,6 +32,13 @@ import {
 import { getCoursesByProgrammeIdAPI } from "../api/courses";
 import { toast } from "react-toastify";
 import { useAdmin } from "../hooks/useAdmin";
+import {
+  createStudentEnrollmentSubjectTypesByStudentIdAPI,
+  getEnrollmentSubjectByStudentIdAPI,
+} from "../api/enrollments";
+import type { EnrollmentSubjectResponse } from "@datatypes/enrollmentType";
+import { MultiFilter } from "@components/MultiFilter";
+import type { ClassType, ClassTypeDetail } from "@datatypes/classTypeType";
 
 export default function UserForm({
   type,
@@ -36,6 +47,13 @@ export default function UserForm({
   type: "Add" | "Edit";
   id?: number;
 }) {
+  type Tab = "Student Information" | "Course History" | "Enroll in Subjects";
+  const tabs: Tab[] = [
+    "Student Information",
+    "Course History",
+    "Enroll in Subjects",
+  ];
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -60,6 +78,9 @@ export default function UserForm({
       label: "",
     }
   );
+  const [enrollmentSubjectTypes, setEnrollmentSubjectTypes] = useState<
+    reactSelectOptionType[]
+  >([]);
 
   const [studentCoursesHistory, setStudentCoursesHistory] = useState<
     StudentCourseProgrammeIntake[]
@@ -78,6 +99,8 @@ export default function UserForm({
     { value: 0, label: "Inactive" },
     { value: 1, label: "Active" },
   ];
+  const [enrollmentSubjectTypesOptions, setEnrollmentSubjectTypesOptions] =
+    useState<reactSelectOptionType[]>([]);
 
   const [emptyStatus, setEmptyStatus] = useState(false);
   const [emptyFirstName, setEmptyFirstName] = useState(false);
@@ -89,81 +112,200 @@ export default function UserForm({
   const [emptyProgramme, setEmptyProgramme] = useState(false);
   const [emptyCourse, setEmptyCourse] = useState(false);
   const [emptyProgrammeIntake, setEmptyProgrammeIntake] = useState(false);
+  const [emptyEnrollmentSubjectTypes, setEmptyEnrollmentSubjectTypes] =
+    useState(false);
+
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [
     isStudentCourseProgrammeIntakeExist,
     setIsStudentCourseProgrammeIntakeExist,
   ] = useState(false);
+  const [
+    isEnrollmentSubjectTypeTimeClashed,
+    setIsEnrollmentSubjectTypeTimeClashed,
+  ] = useState(false);
 
   const [isPasswordMatched, setIsPasswordMatched] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [activeTab, setActiveTab] = useState<Tab>("Student Information");
+
   const navigate = useNavigate();
   const skipReset = useRef(false);
   const [searchParams] = useSearchParams();
   const isAdmin: boolean = searchParams.get("admin") === "true";
+
   const { authToken, admin, loading } = useAdmin();
 
   useEffect(() => {
     const setupEditStudentForm = async (token: string, studentId: number) => {
-      const studentCourseProgrammeIntakeResponse: Response | undefined =
-        await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
-      const studentResponse: Response | undefined = await getStudentByIdAPI(
-        token,
-        studentId
-      );
+      if (activeTab === "Student Information") {
+        const studentResponse: Response | undefined = await getStudentByIdAPI(
+          token,
+          studentId
+        );
 
-      if (!studentCourseProgrammeIntakeResponse?.ok || !studentResponse?.ok) {
-        navigate("/admin/users");
-        return;
+        if (!studentResponse || !studentResponse.ok) {
+          navigate("/admin/users");
+          toast.error("Failed to fetch student data");
+          return;
+        }
+
+        const { data } = await studentResponse.json();
+
+        setFirstName(data.firstName);
+        setLastName(data.lastName);
+        setEmail(data.email);
+        setPhoneNumber(data.phoneNumber);
+        setStatus({
+          value: data.userStatus ? 1 : 0,
+          label: data.userStatus ? "Active" : "Inactive",
+        });
+      } else if (activeTab === "Course History") {
+        const studentCourseProgrammeIntakeResponse: Response | undefined =
+          await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
+
+        if (
+          !studentCourseProgrammeIntakeResponse ||
+          !studentCourseProgrammeIntakeResponse.ok
+        ) {
+          navigate("/admin/users");
+          toast.error("Failed to fetch student course history");
+          return;
+        }
+
+        const { data } = await studentCourseProgrammeIntakeResponse.json();
+
+        // Filter active and history programmes
+        const studentCoursesHistory = (data || []).filter(
+          (p: StudentCourseProgrammeIntake) => p.courseStatus !== 1
+        );
+        setStudentCoursesHistory(studentCoursesHistory);
+
+        const activeProgrammes = (data || [])
+          .filter((p: StudentCourseProgrammeIntake) => p.courseStatus === 1)
+          .map((programme: Programme) => ({
+            value: programme.programmeId,
+            label: programme.programmeName,
+          }));
+        setProgramme(activeProgrammes[0] || { value: -1, label: "" });
+
+        // Filter active and history courses
+        const activeCourses = (data || [])
+          .filter((c: StudentCourseProgrammeIntake) => c.courseStatus === 1)
+          .map((course: Course) => ({
+            value: course.courseId,
+            label: course.courseName,
+          }));
+        setCourse(activeCourses[0] || { value: -1, label: "" });
+
+        // Filter active and history programme intakes
+        const activeProgrammeIntakes = (data || [])
+          .filter((i: StudentCourseProgrammeIntake) => i.courseStatus === 1)
+          .map((intake: ProgrammeIntake) => ({
+            value: intake.programmeIntakeId,
+            label: intake.intakeId + " - Semester " + intake.semester,
+          }));
+        setProgrammeIntake(
+          activeProgrammeIntakes[0] || { value: -1, label: "" }
+        );
+      } else if (activeTab === "Enroll in Subjects") {
+        const enrollmentSubjectTypesResponse: Response | undefined =
+          await getEnrollmentSubjectByStudentIdAPI(token, studentId);
+
+        const enrolledSubjectsResponse: Response | undefined =
+          await getStudentsTimetableByIdAPI(token, studentId);
+        if (
+          !enrollmentSubjectTypesResponse ||
+          !enrollmentSubjectTypesResponse.ok ||
+          !enrolledSubjectsResponse ||
+          !enrolledSubjectsResponse.ok
+        ) {
+          navigate("/admin/users");
+          toast.error("Failed to fetch student enrollment subjects");
+          return;
+        }
+        const { data } = await enrollmentSubjectTypesResponse.json();
+        const enrolledSubjectsResponseJson =
+          await enrolledSubjectsResponse.json();
+        const enrolledSubjectsResponseData = enrolledSubjectsResponseJson.data;
+
+        const enrollmentSubjectTypesOptions =
+          data.studentEnrollmentSubjects.flatMap(
+            (enrollmentSubjectType: EnrollmentSubjectResponse) =>
+              enrollmentSubjectType.classTypes.flatMap((classType: ClassType) =>
+                classType.classTypeDetails.map(
+                  (classTypeDetail: ClassTypeDetail) => ({
+                    value: classTypeDetail.enrollmentSubjectTypeId,
+                    label:
+                      enrollmentSubjectType.subjectCode +
+                      " " +
+                      enrollmentSubjectType.subjectName +
+                      " (CH: " +
+                      enrollmentSubjectType.creditHours +
+                      ")" +
+                      " - " +
+                      classType.classType +
+                      " • " +
+                      (enrollmentSubjectType.lecturerTitle === "None"
+                        ? ""
+                        : enrollmentSubjectType.lecturerTitle + " ") +
+                      enrollmentSubjectType.lastName +
+                      " " +
+                      enrollmentSubjectType.firstName +
+                      " - " +
+                      classTypeDetail.day +
+                      " " +
+                      classTypeDetail.startTime +
+                      "-" +
+                      classTypeDetail.endTime +
+                      " • Group " +
+                      classTypeDetail.grouping +
+                      "",
+                  })
+                )
+              )
+          );
+
+        setEnrollmentSubjectTypesOptions(enrollmentSubjectTypesOptions);
+
+        const enrolledSubjects = enrolledSubjectsResponseData.timetable.map(
+          (timetable: StudentClassData) => {
+            return {
+              value: timetable.enrollmentSubjectTypeId,
+              label:
+                timetable.subjectCode +
+                " " +
+                timetable.subjectName +
+                " (CH: " +
+                timetable.creditHours +
+                ")" +
+                " - " +
+                timetable.classType +
+                " • " +
+                (timetable.lecturerTitle === "None"
+                  ? ""
+                  : timetable.lecturerTitle + " ") +
+                timetable.lecturerLastName +
+                " " +
+                timetable.lecturerFirstName +
+                " - " +
+                timetable.day +
+                " " +
+                timetable.startTime +
+                "-" +
+                timetable.endTime +
+                " • Group " +
+                timetable.grouping +
+                "",
+            };
+          }
+        );
+
+        setEnrollmentSubjectTypes(enrolledSubjects);
       }
 
-      const studentDataJson = await studentResponse.json();
-      const studentData = studentDataJson.data;
-      const { data } = await studentCourseProgrammeIntakeResponse.json();
-
       skipReset.current = true;
-
-      setFirstName(studentData.firstName);
-      setLastName(studentData.lastName);
-      setEmail(studentData.email);
-      setPhoneNumber(studentData.phoneNumber);
-      setStatus({
-        value: studentData.userStatus ? 1 : 0,
-        label: studentData.userStatus ? "Active" : "Inactive",
-      });
-
-      // Filter active and history programmes
-      const studentCoursesHistory = (data || []).filter(
-        (p: StudentCourseProgrammeIntake) =>
-          p.courseStatus === 2 || p.courseStatus === 3
-      );
-      setStudentCoursesHistory(studentCoursesHistory);
-
-      const activeProgrammes = (data || [])
-        .filter((p: StudentCourseProgrammeIntake) => p.courseStatus === 1)
-        .map((programme: Programme) => ({
-          value: programme.programmeId,
-          label: programme.programmeName,
-        }));
-      setProgramme(activeProgrammes[0] || { value: -1, label: "" });
-
-      // Filter active and history courses
-      const activeCourses = (data || [])
-        .filter((c: StudentCourseProgrammeIntake) => c.courseStatus === 1)
-        .map((course: Course) => ({
-          value: course.courseId,
-          label: course.courseName,
-        }));
-      setCourse(activeCourses[0] || { value: -1, label: "" });
-
-      // Filter active and history programme intakes
-      const activeProgrammeIntakes = (data || [])
-        .filter((i: StudentCourseProgrammeIntake) => i.courseStatus === 1)
-        .map((intake: ProgrammeIntake) => ({
-          value: intake.programmeIntakeId,
-          label: intake.intakeId + " - Semester " + intake.semester,
-        }));
-      setProgrammeIntake(activeProgrammeIntakes[0] || { value: -1, label: "" });
     };
 
     const setupEditAdminForm = async (token: string, adminId: number) => {
@@ -201,13 +343,15 @@ export default function UserForm({
         setupEditStudentForm(authToken, id);
       }
     }
-  }, [type, id, isAdmin, authToken, navigate]);
+  }, [type, id, isAdmin, authToken, navigate, activeTab]);
 
   useEffect(() => {
     if (programme.value <= 0 || !authToken) {
       setCourseOptions([]);
       return;
     }
+
+    if (activeTab !== "Course History") return;
 
     getCoursesByProgrammeId(authToken, programme.value);
     getProgrammeIntakesByProgrammeId(authToken, programme.value);
@@ -224,7 +368,7 @@ export default function UserForm({
         label: "",
       });
     }
-  }, [authToken, programme]);
+  }, [authToken, programme, activeTab]);
 
   if (loading || !admin) {
     return <LoadingOverlay />;
@@ -403,6 +547,67 @@ export default function UserForm({
     return;
   }
 
+  async function handleSubmitEnrollmentSubjectTypes(
+    e: FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
+
+    if (isLoading) {
+      return;
+    }
+
+    if (emptyEnrollmentSubjectTypes) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (setEnrollmentSubjectTypesEmptyInputs()) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    if (type !== "Edit") {
+      navigate("/admin/users");
+      return;
+    }
+
+    const response: Response | undefined =
+      await createStudentEnrollmentSubjectTypesByStudentIdAPI(
+        authToken as string,
+        id,
+        enrollmentSubjectTypes.map((est) => est.value)
+      );
+
+    if (response && response.status === 409) {
+      const { data } = await response.json();
+
+      const clashedId = data.enrollmentSubjectTypeIds[0];
+
+      const clashedOption = enrollmentSubjectTypesOptions.find(
+        (est) => est.value === clashedId
+      );
+
+      setIsEnrollmentSubjectTypeTimeClashed(true);
+      setIsLoading(false);
+      toast.error(`Time clash detected: ${clashedOption?.label}`);
+      return;
+    } else {
+      setIsEnrollmentSubjectTypeTimeClashed(false);
+    }
+
+    if (!response || !response.ok) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
+    navigate("/admin/users");
+    toast.success("Updated student's subject");
+    return;
+  }
+
   const handleDeleteStudentCourseProgrammeIntake = async (
     courseId: number,
     programmeIntakeId: number
@@ -490,6 +695,17 @@ export default function UserForm({
     return emptyInput;
   }
 
+  function setEnrollmentSubjectTypesEmptyInputs() {
+    let emptyInput: boolean = false;
+
+    if (!enrollmentSubjectTypes.values || enrollmentSubjectTypes.length === 0) {
+      setEmptyEnrollmentSubjectTypes(true);
+      emptyInput = true;
+    }
+
+    return emptyInput;
+  }
+
   function onChangeStatus(onChangeStatus: SingleValue<reactSelectOptionType>) {
     if (!onChangeStatus) {
       return;
@@ -568,6 +784,21 @@ export default function UserForm({
     }
     setProgrammeIntake(onChangeProgrammeIntake);
     setEmptyProgrammeIntake(false);
+  }
+
+  function onChangeEnrollmentSubjectTypes(
+    onChangeEnrollmentSubjectTypes: MultiValue<reactSelectOptionType>
+  ) {
+    const onChangeEnrollmentSubjectTypesValues: reactSelectOptionType[] = [];
+    if (onChangeEnrollmentSubjectTypes.length !== 0) {
+      setEmptyEnrollmentSubjectTypes(false);
+    }
+    for (let i = 0; i < onChangeEnrollmentSubjectTypes.length; i++) {
+      onChangeEnrollmentSubjectTypesValues.push(
+        onChangeEnrollmentSubjectTypes[i]
+      );
+    }
+    setEnrollmentSubjectTypes(onChangeEnrollmentSubjectTypesValues);
   }
 
   async function getAllProgrammes(token: string) {
@@ -665,132 +896,167 @@ export default function UserForm({
               type === "Edit" &&
               "Make changes to the admin information below."}
           </p>
+
+          {type == "Edit" && !isAdmin && (
+            <div className="flex space-x-8 border-b border-gray-300 mt-8">
+              {tabs.map(
+                (
+                  role:
+                    | "Student Information"
+                    | "Course History"
+                    | "Enroll in Subjects"
+                ) => (
+                  <button
+                    key={role}
+                    className={`pb-2 font-semibold cursor-pointer ${
+                      activeTab === role
+                        ? "border-b-2 border-blue-600 text-blue-600"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab(role)}
+                    type="button"
+                  >
+                    {role}
+                  </button>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         <hr className="border-slate-200 w-full border" />
 
         <div className="flex flex-col px-10 py-6 justify-center items-center gap-y-14">
-          <form
-            onSubmit={handleSubmitUser}
-            className="mt-6 gap-y-8 flex flex-col justify-center items-center"
-          >
-            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-              <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyFirstName}>
-                  <NormalTextField
-                    text={firstName}
-                    onChange={onChangeFirstName}
-                    isInvalid={emptyFirstName}
-                    placeholder="First Name"
-                  />
-                </AdminInputFieldWrapper>
-              </div>
-
-              <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyLastName}>
-                  <NormalTextField
-                    text={lastName}
-                    onChange={onChangeLastName}
-                    isInvalid={emptyLastName}
-                    placeholder="Last Name"
-                  />
-                </AdminInputFieldWrapper>
-              </div>
-            </div>
-
-            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-              <div className="flex-1">
-                <AdminInputFieldWrapper
-                  isEmpty={emptyEmail}
-                  isInvalid={invalidEmail}
-                  invalidMessage="Email already exists."
-                >
-                  <NormalTextField
-                    text={email}
-                    onChange={onChangeEmail}
-                    isInvalid={emptyEmail || invalidEmail}
-                    placeholder="Email (e.g., john@example.com)"
-                  />
-                </AdminInputFieldWrapper>
-              </div>
-              <div className="flex-1">
-                <AdminInputFieldWrapper isEmpty={emptyPhoneNumber}>
-                  <NormalTextField
-                    text={phoneNumber}
-                    onChange={onChangePhoneNumber}
-                    isInvalid={emptyPhoneNumber}
-                    placeholder="Phone Number (e.g., 0123456789)"
-                  />
-                </AdminInputFieldWrapper>
-              </div>
-            </div>
-
-            {type === "Add" && (
+          {activeTab === "Student Information" && (
+            <form
+              onSubmit={handleSubmitUser}
+              className="gap-y-8 flex flex-col justify-center items-center"
+            >
+              {type === "Edit" && !isAdmin && (
+                <h1 className="font-bold text-slate-900 self-start">
+                  Edit Student's Information
+                </h1>
+              )}
               <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                 <div className="flex-1">
-                  <AdminInputFieldWrapper isEmpty={emptyPassword}>
-                    <PasswordTextField
-                      password={password}
-                      onChange={onChangePassword}
-                      invalidPassword={emptyPassword}
-                      placeholder="Password"
+                  <AdminInputFieldWrapper isEmpty={emptyFirstName}>
+                    <NormalTextField
+                      text={firstName}
+                      onChange={onChangeFirstName}
+                      isInvalid={emptyFirstName}
+                      placeholder="First Name"
                     />
                   </AdminInputFieldWrapper>
-                  {!isPasswordMatched && (
-                    <p className="text-red-500 mt-1">Passwords do not match</p>
-                  )}
                 </div>
+
                 <div className="flex-1">
-                  <AdminInputFieldWrapper isEmpty={emptyConfirmPassword}>
-                    <PasswordTextField
-                      password={confirmPassword}
-                      onChange={onChangeConfirmPassword}
-                      invalidPassword={emptyConfirmPassword}
-                      placeholder="Confirm Password"
+                  <AdminInputFieldWrapper isEmpty={emptyLastName}>
+                    <NormalTextField
+                      text={lastName}
+                      onChange={onChangeLastName}
+                      isInvalid={emptyLastName}
+                      placeholder="Last Name"
                     />
                   </AdminInputFieldWrapper>
                 </div>
               </div>
-            )}
 
-            {!isAdmin && (
-              <>
+              <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
+                <div className="flex-1">
+                  <AdminInputFieldWrapper
+                    isEmpty={emptyEmail}
+                    isInvalid={invalidEmail}
+                    invalidMessage="Email already exists."
+                  >
+                    <NormalTextField
+                      text={email}
+                      onChange={onChangeEmail}
+                      isInvalid={emptyEmail || invalidEmail}
+                      placeholder="Email (e.g., john@example.com)"
+                    />
+                  </AdminInputFieldWrapper>
+                </div>
+                <div className="flex-1">
+                  <AdminInputFieldWrapper isEmpty={emptyPhoneNumber}>
+                    <NormalTextField
+                      text={phoneNumber}
+                      onChange={onChangePhoneNumber}
+                      isInvalid={emptyPhoneNumber}
+                      placeholder="Phone Number (e.g., 0123456789)"
+                    />
+                  </AdminInputFieldWrapper>
+                </div>
+              </div>
+
+              {type === "Add" && (
                 <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                   <div className="flex-1">
-                    <SingleFilter
-                      placeholder="Select Student Status"
-                      options={statusOptions}
-                      value={status}
-                      isInvalid={emptyStatus}
-                      onChange={onChangeStatus}
-                    />
+                    <AdminInputFieldWrapper isEmpty={emptyPassword}>
+                      <PasswordTextField
+                        password={password}
+                        onChange={onChangePassword}
+                        invalidPassword={emptyPassword}
+                        placeholder="Password"
+                      />
+                    </AdminInputFieldWrapper>
+                    {!isPasswordMatched && (
+                      <p className="text-red-500 mt-1">
+                        Passwords do not match
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <AdminInputFieldWrapper isEmpty={emptyConfirmPassword}>
+                      <PasswordTextField
+                        password={confirmPassword}
+                        onChange={onChangeConfirmPassword}
+                        invalidPassword={emptyConfirmPassword}
+                        placeholder="Confirm Password"
+                      />
+                    </AdminInputFieldWrapper>
                   </div>
                 </div>
-              </>
-            )}
+              )}
 
-            <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
-              <MediumButton
-                buttonText={
-                  type === "Edit" ? "Save Changes" : "Create New Student"
-                }
-                submit={true}
-                backgroundColor="bg-blue-500"
-                hoverBgColor="hover:bg-blue-600"
-                textColor="text-white"
-              />
-              <MediumButton
-                buttonText="Cancel"
-                submit={false}
-                backgroundColor="bg-slate-400"
-                hoverBgColor="hover:bg-slate-600"
-                textColor="text-white"
-                link="/admin/users"
-              />
-            </div>
-          </form>
+              {!isAdmin && (
+                <>
+                  <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
+                    <div className="flex-1">
+                      <SingleFilter
+                        placeholder="Select Student Status"
+                        options={statusOptions}
+                        value={status}
+                        isInvalid={emptyStatus}
+                        onChange={onChangeStatus}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
-          {!isAdmin && type === "Edit" && (
+              <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
+                <MediumButton
+                  buttonText={
+                    type === "Edit" ? "Save Changes" : "Create New Student"
+                  }
+                  submit={true}
+                  backgroundColor="bg-blue-500"
+                  hoverBgColor="hover:bg-blue-600"
+                  textColor="text-white"
+                />
+                <MediumButton
+                  buttonText="Cancel"
+                  submit={false}
+                  backgroundColor="bg-slate-400"
+                  hoverBgColor="hover:bg-slate-600"
+                  textColor="text-white"
+                  link="/admin/users"
+                />
+              </div>
+            </form>
+          )}
+
+          {!isAdmin && type === "Edit" && activeTab === "Course History" && (
             <>
               <form
                 onSubmit={handleSubmitCourse}
@@ -961,6 +1227,55 @@ export default function UserForm({
                 </div>
               </div>
             </>
+          )}
+
+          {!isAdmin && activeTab === "Enroll in Subjects" && (
+            <form
+              onSubmit={handleSubmitEnrollmentSubjectTypes}
+              className="gap-y-8 flex flex-col justify-center items-center"
+            >
+              <h1 className="font-bold text-slate-900 self-start">
+                Edit Student's Subjects
+              </h1>
+              <div className="flex flex-col xl:flex-row w-xs sm:w-xl md:w-2xl lg:w-4xl xl:w-6xl gap-x-10 gap-y-8 xl:gap-y-0">
+                <div className="flex-1">
+                  <AdminInputFieldWrapper
+                    isEmpty={emptyEnrollmentSubjectTypes}
+                    isInvalid={isEnrollmentSubjectTypeTimeClashed}
+                    invalidMessage="Time clash detected with selected subjects."
+                  >
+                    <MultiFilter
+                      placeholder="Select a Subject to Enroll"
+                      options={enrollmentSubjectTypesOptions}
+                      value={enrollmentSubjectTypes}
+                      isInvalid={
+                        emptyEnrollmentSubjectTypes ||
+                        isEnrollmentSubjectTypeTimeClashed
+                      }
+                      onChange={onChangeEnrollmentSubjectTypes}
+                    />
+                  </AdminInputFieldWrapper>
+                </div>
+              </div>
+
+              <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
+                <MediumButton
+                  buttonText="Save Changes"
+                  submit={true}
+                  backgroundColor="bg-blue-500"
+                  hoverBgColor="hover:bg-blue-600"
+                  textColor="text-white"
+                />
+                <MediumButton
+                  buttonText="Cancel"
+                  submit={false}
+                  backgroundColor="bg-slate-400"
+                  hoverBgColor="hover:bg-slate-600"
+                  textColor="text-white"
+                  link="/admin/users"
+                />
+              </div>
+            </form>
           )}
         </div>
       </div>

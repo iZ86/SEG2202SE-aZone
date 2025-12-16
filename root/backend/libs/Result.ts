@@ -14,7 +14,6 @@ export class Result<T> {
     return new Result(true, data, null, message) as Success<T>;
   }
 
-
   // ---- FAIL OVERLOADS ----
   static fail(errorCode: string, message: string): Failure;
   static fail<T>(errorCode: string, message: string, data: T): Result<T>;
@@ -29,6 +28,10 @@ export class Result<T> {
     }
     return new Result(false, null, errorCode, message) as Failure;
   }
+
+  // static fail(errorCode: string, message: string): Failure {
+  //   return new Result(false, null, errorCode, message) as Failure;
+  // }
 
   isSuccess(): boolean {
     return this.success;
