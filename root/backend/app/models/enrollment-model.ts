@@ -9,11 +9,7 @@ export interface StudentEnrollmentSubjectOrganizedData {
   firstName: string;
   lastName: string;
   lecturerTitleId: number;
-<<<<<<< HEAD
   lecturerTitle: string;
-=======
-  lecturerTitle: number;
->>>>>>> 6b05bd082ba2b635b1db8fbdf61860e4905ce8bd
   classTypes: {
     classTypeId: number;
     classType: string;
