@@ -565,26 +565,20 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSubjectData[]>(
-        "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus, " +
-        "c.courseId, c.courseCode, c.courseName, pi.programmeIntakeId, pi.semester, pi.intakeId as intake, sm.studyModeId, sm.studyMode " +
+        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
         "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON es.enrollmentId = pi.enrollmentId " +
-        "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
-        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE sest.studentId = ? " +
-        "AND scpi.studentId = ? " +
         "AND (s.subjectCode LIKE ? " +
         "OR s.subjectName LIKE ?) " +
         "AND (? = 0 OR pi.semester = ?) " +
         "ORDER BY sest.subjectStatusId, s.subjectId ASC " +
         "LIMIT ? OFFSET ?;",
         [
-          studentId,
           studentId,
           "%" + query + "%",
           "%" + query + "%",
