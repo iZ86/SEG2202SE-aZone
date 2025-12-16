@@ -475,7 +475,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrolledSubjectsData: StudentEnrolledSubject[] = enrolledSubjects.getData().studentEnrolledSubjects;
 
-    const enrolledSubjectDataMap: {[enrolmentSubjectTypeId: number]: StudentEnrolledSubject} = {};
+    const enrolledSubjectDataMap: { [enrolmentSubjectTypeId: number]: StudentEnrolledSubject } = {};
 
     for (const enrolledSubjectData of enrolledSubjectsData) {
       enrolledSubjectDataMap[enrolledSubjectData.enrollmentSubjectTypeId] = enrolledSubjectData;
@@ -499,6 +499,10 @@ class EnrollmentService implements IEnrollmentService {
 
     // Delete existing studentEnrollmentSubjectType
     const deleteStudentEnrollmentSubjectType = await enrollmentRepository.deleteStudentEnrollmentSubjectTypeByStudentId(studentId, enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentId);
+
+    if (studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds.length === 0) {
+      return Result.succeed(studentEnrolledSubjectTypeIds, "Student enrolled successfully.");
+    }
 
     const studentEnrolledSubjects: number[][] = [];
 
