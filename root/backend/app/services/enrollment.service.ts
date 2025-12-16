@@ -1,6 +1,6 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject } from "../models/enrollment-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeRangeColliding } from "../utils/utils";
 
@@ -31,6 +31,7 @@ interface IEnrollmentService {
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<Result<EnrollmentSubjectTypeData>>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<null>>;
   enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>>;
+  getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[] }>>
 }
 
 class EnrollmentService implements IEnrollmentService {
@@ -241,7 +242,7 @@ class EnrollmentService implements IEnrollmentService {
                 startTime: StudentEnrollmentSubjectData["startTime"],
                 endTime: StudentEnrollmentSubjectData["endTime"],
                 numberOfStudentsEnrolled: StudentEnrollmentSubjectData["numberOfStudentsEnrolled"],
-                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"];
+                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"]
               }[];
             };
           };
@@ -393,7 +394,7 @@ class EnrollmentService implements IEnrollmentService {
         subjectId: number,
         numberOfStudentsEnrolled: number,
         numberOfSeats: number,
-      };
+      }
     } = {};
 
     // Place all the enrollmentSubjectTypeIds connected to studentId into a dictionary for easier lookup.
@@ -484,12 +485,29 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentSubjectId time clash", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
     }
 
+    const enrolledSubjects: Result<{
+      studentEnrollmentSchedule: StudentEnrollmentSchedule;
+      studentEnrolledSubjects: StudentEnrolledSubject[];
+    }> = await this.getEnrolledSubjectsByStudentId(studentId);
+
+    if (!enrolledSubjects.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrolledSubjects.getMessage());
+    }
+
+    const enrolledSubjectsData: StudentEnrolledSubject[] = enrolledSubjects.getData().studentEnrolledSubjects;
+
+    const enrolledSubjectDataMap: { [enrolmentSubjectTypeId: number]: StudentEnrolledSubject } = {};
+
+    for (const enrolledSubjectData of enrolledSubjectsData) {
+      enrolledSubjectDataMap[enrolledSubjectData.enrollmentSubjectTypeId] = enrolledSubjectData;
+    }
+
     // Checks if any of the enrollmentSubjectTypeId has reached full capacity of students.
     for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
 
       const studentEnrollmentSubject = studentEnrollmentSubjectsMap[enrollmentSubjectTypeId];
 
-      if (studentEnrollmentSubject.numberOfStudentsEnrolled === studentEnrollmentSubject.numberOfSeats) {
+      if (studentEnrollmentSubject.numberOfStudentsEnrolled === studentEnrollmentSubject.numberOfSeats && !enrolledSubjectDataMap[enrollmentSubjectTypeId]) {
 
         errorEnrollmentSubjectTypeIds.push(enrollmentSubjectTypeId);
 
@@ -503,6 +521,10 @@ class EnrollmentService implements IEnrollmentService {
     // Delete existing studentEnrollmentSubjectType
     const deleteStudentEnrollmentSubjectType = await enrollmentRepository.deleteStudentEnrollmentSubjectTypeByStudentId(studentId, enrollmentSubjectsResult.getData().studentEnrollmentSchedule.enrollmentId);
 
+    if (studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds.length === 0) {
+      return Result.succeed(studentEnrolledSubjectTypeIds, "Student enrolled successfully.");
+    }
+
     const studentEnrolledSubjects: number[][] = [];
 
     for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
@@ -510,7 +532,7 @@ class EnrollmentService implements IEnrollmentService {
         studentId,
         enrollmentSubjectTypeId,
         1
-      ]);
+      ])
     }
 
     const createStudentEnrollmentSubjectTypes = await enrollmentRepository.createStudentEnrollmentSubjectType(studentEnrolledSubjects);
@@ -519,6 +541,22 @@ class EnrollmentService implements IEnrollmentService {
     }
 
     return Result.succeed(studentEnrolledSubjectTypeIds, "Student enrolled successfully.");
+  }
+
+  async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[] }>> {
+
+    const studentEnrollmentSchedule: Result<StudentEnrollmentSchedule> = await this.getEnrollmentScheduleByStudentId(studentId);
+
+    const currDate = new Date();
+    if (!studentEnrollmentSchedule.isSuccess() || !studentEnrollmentSchedule.getData().enrollmentId
+      || currDate < new Date(studentEnrollmentSchedule.getData().enrollmentStartDateTime)
+      || currDate > new Date(studentEnrollmentSchedule.getData().enrollmentEndDateTime)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "No enrollment at this time.");
+    }
+
+    const enrolledSubjects: StudentEnrolledSubject[] = await enrollmentRepository.getEnrolledSubjectsByStudentId(studentId, studentEnrollmentSchedule.getData().enrollmentId);
+
+    return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule.getData(), studentEnrolledSubjects: enrolledSubjects }, "enrolled subjects retrieve success");
   }
 }
 

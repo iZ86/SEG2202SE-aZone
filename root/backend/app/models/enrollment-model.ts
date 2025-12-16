@@ -9,7 +9,11 @@ export interface StudentEnrollmentSubjectOrganizedData {
   firstName: string;
   lastName: string;
   lecturerTitleId: number;
+<<<<<<< HEAD
+  lecturerTitle: string;
+=======
   lecturerTitle: number;
+>>>>>>> 6b05bd082ba2b635b1db8fbdf61860e4905ce8bd
   classTypes: {
     classTypeId: number;
     classType: string;
@@ -90,7 +94,7 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   firstName: string;
   lastName: string;
   lecturerTitleId: number;
-  lecturerTitle: number;
+  lecturerTitle: string;
   enrollmentSubjectTypeId: number;
   venueId: number;
   venue: string;
@@ -104,6 +108,26 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   numberOfStudentsEnrolled: number;
   numberOfSeats: number;
 };
+
+export interface StudentEnrolledSubject extends RowDataPacket {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+  lecturerId: number;
+  firstName: string;
+  lastName: string;
+  lecturerTitleId: number;
+  lecturerTitle: string;
+  enrollmentSubjectTypeId: number;
+  classTypeId: number;
+  classType: string;
+  grouping: number;
+  dayId: number;
+  day: string;
+  startTime: Date;
+  endTime: Date;
+}
 
 export interface StudentEnrollmentSchedule extends RowDataPacket {
   programmeIntakeId: number;

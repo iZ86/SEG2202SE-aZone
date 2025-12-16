@@ -200,7 +200,7 @@ INSERT INTO `CLASS_TYPE` (`classTypeId`, `classType`) VALUES
 (4, 'Workshop');
 
 INSERT INTO `ENROLLMENT` (`enrollmentId`, `enrollmentStartDateTime`, `enrollmentEndDateTime`) VALUES
-(1, '2025-10-01 08:30:00', '2025-10-03 23:59:59');
+(1, '2025-10-01 08:30:00', '2026-10-03 23:59:59');
 
 
 INSERT INTO `INTAKE` (`intakeId`) VALUES
@@ -232,8 +232,8 @@ INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
 
 INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`) VALUES
 (1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1),
-(2, 2, 202508, 1, 1, '2025-08-16', '2025-12-12', 1),
-(3, 1, 202504, 1, 5, '2025-04-09', '2025-08-06', 1);
+(2, 2, 202508, 1, 1, '2025-08-16', '2026-12-12', 1),
+(3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1);
 
 
 INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
@@ -324,6 +324,7 @@ INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentSubjectId`, `enrollmentId`, `subjec
 
 INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectTypeId`, `enrollmentSubjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`) VALUES
 (44, 18, 1, 9, '10:00:00', '12:00:00', 2, 100, 1),
+(55, 18, 1, 6, '10:00:00', '12:00:00', 2, 100, 2),
 (45, 18, 2, 7, '08:30:00', '10:30:00', 3, 35, 2),
 (46, 18, 1, 9, '12:00:00', '14:00:00', 5, 100, 1),
 (47, 18, 2, 5, '16:00:00', '18:00:00', 5, 30, 1),
@@ -338,9 +339,7 @@ INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectTypeId`, `enrollmentSub
 
 INSERT INTO `STUDENT_ENROLLMENT_SUBJECT_TYPE` (`studentId`, `enrollmentSubjectTypeId`, `subjectStatusId`) VALUES
 (23049679, 44, 1),
-(23049679, 46, 1),
 (23049679, 49, 1),
 (23055155, 44, 1),
-(23055155, 47, 1),
 (23055155, 51, 1),
 (23056138, 44, 1);

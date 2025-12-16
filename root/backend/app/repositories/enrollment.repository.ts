@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, StudentEnrolledSubject } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -33,6 +33,7 @@ interface IEnrollmentRepository {
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader>;
   deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
+  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -415,6 +416,32 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
+  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentEnrolledSubject[]>(
+        "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
+        "lt.lecturerTitle, est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.grouping, d.dayId, d.day, est.startTime, " +
+        "est.endTime " +
+        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN SUBJECT s on es.subjectId = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE es.enrollmentId = ? " +
+        "AND sest.studentId = ?; ",
+        [enrollmentId, studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      )
+    })
+  }
+
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
@@ -545,8 +572,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         }
-      );
-    });
+      )
+    })
   }
 
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader> {
@@ -558,8 +585,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         }
-      );
-    });
+      )
+    })
   }
 }
 
