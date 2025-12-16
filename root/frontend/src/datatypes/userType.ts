@@ -61,7 +61,7 @@ export type StudentClassData = {
   classType: string;
   venueId: number;
   venue: string;
-  grouping: string;
+  grouping: number;
   dayId: number;
   day: string;
 };
