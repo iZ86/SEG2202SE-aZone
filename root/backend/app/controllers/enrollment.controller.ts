@@ -114,6 +114,16 @@ export default class EnrollmentController {
       return res.sendError.notFound("Invalid enrollmentId");
     }
 
+    const isEnrollmentBelongsToEnrollmentId: Result<EnrollmentData> = await enrollmentService.getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+
+    if (!isEnrollmentBelongsToEnrollmentId.isSuccess()) {
+      const isDateTimeDuplicated: Result<EnrollmentData> = await enrollmentService.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
+
+      if (isDateTimeDuplicated.isSuccess()) {
+        return res.sendError.conflict("enrollmentStartDateTime and enrollmentEndDateTime existed");
+      }
+    }
+
     const response = await enrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
 
     await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(response.getData().enrollmentId);
