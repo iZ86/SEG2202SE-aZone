@@ -112,6 +112,25 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
     return `${day}-${month}-${year}`;
   }
 
+  function convert24UTCTimeTo12LocalTime(timeString: string): string {
+    // Split time into components
+    const [h, m, s] = timeString.split(":").map(Number);
+
+    // Create a Date today using UTC time
+    const date = new Date();
+    date.setUTCHours(h, m, s);
+
+    // Convert to local time using JS
+    const localHours = date.getHours();
+    const localMinutes = date.getMinutes();
+
+    // Format to 12-hour format
+    const period = localHours >= 12 ? "PM" : "AM";
+    const hour12 = (localHours % 12) || 12; // 0 → 12
+    const minuteStr = localMinutes.toString().padStart(2, "0");
+
+    return `${hour12}:${minuteStr}${period}`;
+  }
 
 
 
@@ -155,10 +174,10 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
                   >
                     <div className="flex flex-col flex-wrap font-bold gap-y-2">
 
-                      <p className="font-bold">{classData.startTime} - {classData.endTime}</p>
+                      <p className="font-bold">{convert24UTCTimeTo12LocalTime(classData.startTime)} - {convert24UTCTimeTo12LocalTime(classData.endTime)}</p>
                       <div className="flex flex-col flex-wrap text-black">
                         <p className="text-black">
-                          {classData.subjectCode} - {classData.subjectName}
+                          {(classData.subjectCode)} - {classData.subjectName}
                         </p>
 
                         <p>{classData.classType}</p>
