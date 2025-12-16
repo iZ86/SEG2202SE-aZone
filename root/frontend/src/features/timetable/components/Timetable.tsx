@@ -31,7 +31,8 @@ export default function Timetable({ token, headerBgColor = "bg-white", currentDa
     } else {
       flattenSelectedEnrollmentSubjects(studentEnrollmentSubjects, selectedEnrollmentSubjectIndex);
     }
-  }, []);
+  }, [selectedEnrollmentSubjectIndex]);
+
 
   async function flattenSelectedEnrollmentSubjects(studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[], selectedEnrollmentSubjectIndex: SelectedEnrollmentSubjectIds) {
 
