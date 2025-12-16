@@ -462,7 +462,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "LEFT JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
         "WHERE scpi.studentId = ? " +
         "AND scpi.status = 1 " +
-        "GROUP BY est.enrollmentSubjectTypeId;",
+        "GROUP BY est.enrollmentSubjectTypeId " + 
+        "ORDER BY est.grouping ASC;",
         [studentId],
         (err, res) => {
           if (err) reject(err);
