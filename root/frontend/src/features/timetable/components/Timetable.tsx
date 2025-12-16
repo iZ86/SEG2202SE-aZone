@@ -31,7 +31,7 @@ export default function Timetable({
 
   useEffect(() => {
     fetchTimeTable();
-  });
+  }, []);
 
   async function fetchTimeTable() {
     const response: Response | undefined = await fetchTimeTableAPI(token);
