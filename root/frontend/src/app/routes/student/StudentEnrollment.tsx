@@ -570,8 +570,9 @@ export default function StudentEnrollment() {
             {studentEnrollmentSubjects.map((subj, index) => (
               <div
                 // onClick={() => setSelectedSubjectIndex(index)}
-                className={`flex flex-wrap gap-y-4 items-center p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white
-                            ${viewEnrollmentSubjectIndex === index ? "border-2 border-blue-500" : "hover:shadow-md border border-transparent"}`}
+                // className={`flex flex-wrap gap-y-4 items-center p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white
+                //             ${viewEnrollmentSubjectIndex === index ? "border-2 border-blue-500" : "hover:shadow-md border border-transparent"}`}
+                className={`flex flex-wrap gap-y-4 items-center p-6 rounded-xl shadow-sm cursor-pointer transition-all duration-200 bg-white`}
               >
                 <div className="flex items-start gap-4 mr-auto w-sm">
                   <div className="p-3 bg-gray-100 rounded-lg">
