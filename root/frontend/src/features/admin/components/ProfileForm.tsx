@@ -31,6 +31,7 @@ export default function ProfileForm() {
   const [emptyFile, setEmptyFile] = useState(false);
 
   const [invalidFile, setInvalidFile] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
 
   const [isPictureUploading, setIsPictureUploading] = useState(false);
   const [isUserInformationUpadting, setIsUserInformationUpdating] =
@@ -130,6 +131,13 @@ export default function ProfileForm() {
     setIsUserInformationUpdating(true);
 
     const response = await updateMeAPI(authToken, emailInput, phoneNumberInput);
+
+    if (response && response.status === 409) {
+      setIsUserInformationUpdating(false);
+      setInvalidEmail(true);
+      toast.error("Email already exist!");
+      return;
+    }
 
     if (response && response.ok) {
       const { data } = await response.json();
@@ -280,11 +288,11 @@ export default function ProfileForm() {
             </h3>
 
             <div className="space-y-6">
-              <AdminInputFieldWrapper isEmpty={emptyEmailInput}>
+              <AdminInputFieldWrapper isEmpty={emptyEmailInput} isInvalid={invalidEmail} invalidMessage="Email already exists">
                 <NormalTextField
                   text={emailInput}
                   placeholder="Email (e.g., john@example.com)"
-                  isInvalid={emptyEmailInput}
+                  isInvalid={emptyEmailInput || invalidEmail}
                   onChange={onChangeEmail}
                 />
               </AdminInputFieldWrapper>

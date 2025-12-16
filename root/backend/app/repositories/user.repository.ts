@@ -8,6 +8,8 @@ interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getAllStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
+  getUserByEmail(email: string): Promise<UserData | undefined>;
+  getUserByIdAndEmail(userId: number, email: string): Promise<UserData | undefined>;
   getStudentById(studentId: number): Promise<UserData | undefined>;
   getStudentByEmail(email: string): Promise<UserData | undefined>;
   getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined>;
@@ -100,6 +102,37 @@ class UserRepository implements IUserRepostory {
         "FROM REGISTERED_USER " +
         "WHERE userId = ?;",
         [userId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getUserByEmail(email: string): Promise<UserData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserData[]>(
+        "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
+        "FROM REGISTERED_USER " +
+        "WHERE email = ?;",
+        [email],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getUserByIdAndEmail(userId: number, email: string): Promise<UserData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserData[]>(
+        "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
+        "FROM REGISTERED_USER " +
+        "WHERE email = ? " +
+        "AND userId = ?;",
+        [email, userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);

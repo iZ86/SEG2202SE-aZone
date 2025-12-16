@@ -8,6 +8,8 @@ import userRepository from "../repositories/user.repository";
 interface IUserService {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getAllStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
+  getUserByEmail(email: string): Promise<Result<UserData>>;
+  getUserByIdAndEmail(userId: number, email: string): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   getStudentByEmail(email: string): Promise<Result<UserData>>;
@@ -40,6 +42,26 @@ class UserService implements IUserService {
   async getAllStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
     const students: UserData[] = await userRepository.getAllStudents(query, pageSize, page);
     return Result.succeed(students, "Students retrieve success");
+  }
+
+  async getUserByEmail(email: string): Promise<Result<UserData>> {
+    const student: UserData | undefined = await userRepository.getUserByEmail(email);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
+    }
+
+    return Result.succeed(student, "Student retrieve success");
+  }
+
+  async getUserByIdAndEmail(userId: number, email: string): Promise<Result<UserData>> {
+    const student: UserData | undefined = await userRepository.getUserByIdAndEmail(userId, email);
+
+    if (!student) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
+    }
+
+    return Result.succeed(student, "Student retrieve success");
   }
 
   async getStudentById(studentId: number): Promise<Result<UserData>> {
