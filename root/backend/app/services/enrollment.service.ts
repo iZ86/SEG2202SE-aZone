@@ -464,12 +464,29 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentSubjectId time clash", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
     }
 
+    const enrolledSubjects: Result<{
+      studentEnrollmentSchedule: StudentEnrollmentSchedule;
+      studentEnrolledSubjects: StudentEnrolledSubject[];
+    }> = await this.getEnrolledSubjectsByStudentId(studentId);
+
+    if (!enrolledSubjects.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrolledSubjects.getMessage());
+    }
+
+    const enrolledSubjectsData: StudentEnrolledSubject[] = enrolledSubjects.getData().studentEnrolledSubjects;
+
+    const enrolledSubjectDataMap: {[enrolmentSubjectTypeId: number]: StudentEnrolledSubject} = {};
+
+    for (const enrolledSubjectData of enrolledSubjectsData) {
+      enrolledSubjectDataMap[enrolledSubjectData.enrollmentSubjectTypeId] = enrolledSubjectData;
+    }
+
     // Checks if any of the enrollmentSubjectTypeId has reached full capacity of students.
     for (const enrollmentSubjectTypeId of studentEnrolledSubjectTypeIds.enrollmentSubjectTypeIds) {
 
       const studentEnrollmentSubject = studentEnrollmentSubjectsMap[enrollmentSubjectTypeId];
 
-      if (studentEnrollmentSubject.numberOfStudentsEnrolled === studentEnrollmentSubject.numberOfSeats) {
+      if (studentEnrollmentSubject.numberOfStudentsEnrolled === studentEnrollmentSubject.numberOfSeats && !enrolledSubjectDataMap[enrollmentSubjectTypeId]) {
 
         errorEnrollmentSubjectTypeIds.push(enrollmentSubjectTypeId);
 
