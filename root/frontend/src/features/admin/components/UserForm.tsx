@@ -932,9 +932,11 @@ export default function UserForm({
               onSubmit={handleSubmitUser}
               className="gap-y-8 flex flex-col justify-center items-center"
             >
-              <h1 className="font-bold text-slate-900 self-start">
-                Edit Student's Information
-              </h1>
+              {type === "Edit" && !isAdmin && (
+                <h1 className="font-bold text-slate-900 self-start">
+                  Edit Student's Information
+                </h1>
+              )}
               <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
                 <div className="flex-1">
                   <AdminInputFieldWrapper isEmpty={emptyFirstName}>
