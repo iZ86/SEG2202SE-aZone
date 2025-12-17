@@ -303,7 +303,7 @@ export default function StudentEnrollment() {
       return;
     }
 
-    if (!response.ok && response.status === 400) {
+    if (!response.ok && response.status === 404) {
       setError404(true);
       return;
     }
