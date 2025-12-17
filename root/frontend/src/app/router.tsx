@@ -86,10 +86,10 @@ const routes = [
         path: "/subject-listing",
         element: <StudentSubjectListing />,
       },
-      {
-        path: "/fees-summary",
-        element: <StudentFeeSummary />,
-      },
+      // {
+      //   path: "/fees-summary",
+      //   element: <StudentFeeSummary />,
+      // },
       {
         path: "/profile",
         element: <StudentProfile />,
