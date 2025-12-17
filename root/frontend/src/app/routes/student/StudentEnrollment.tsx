@@ -281,6 +281,9 @@ export default function StudentEnrollment() {
 
   useEffect(() => {
 
+    if (!authToken) {
+      return;
+    }
     fetchEnrollmentSubjects();
     fetchEnrolledSubjects();
 
