@@ -112,6 +112,16 @@ export default class CourseController {
       return res.sendError.notFound("Invalid programmeId, or courseId");
     }
 
+    const isCourseNameBelongsToCourseId: Result<CourseData> = await courseService.getCourseByIdAndCourseName(courseId, courseName);
+
+    if (!isCourseNameBelongsToCourseId.isSuccess()) {
+      const isCourseNameDuplicated: Result<CourseData> = await courseService.getCourseByName(courseName);
+
+      if (isCourseNameDuplicated.isSuccess()) {
+        return res.sendError.conflict("Course name duplciated");
+      }
+    }
+    
     const response = await courseService.updateCourseById(courseId, courseName, programmeId);
 
     if (response.isSuccess()) {

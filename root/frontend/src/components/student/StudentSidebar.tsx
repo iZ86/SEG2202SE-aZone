@@ -45,11 +45,11 @@ export default function StudentSideBar({ page }: { page: string }) {
         <nav className="flex flex-col mt-2">
           {[
             { to: "/", label: "Dashboard", key: "dashboard" },
-            {
-              to: "/enrollment",
-              label: "Enrollment",
-              key: "enrollment",
-            },
+            // {
+            //   to: "/enrollment",
+            //   label: "Enrollment",
+            //   key: "enrollment",
+            // },
             {
               to: "/programme-history",
               label: "Programme History",
@@ -60,11 +60,11 @@ export default function StudentSideBar({ page }: { page: string }) {
               label: "Subject Listing",
               key: "subject-listing",
             },
-            {
-              to: "/fees-summary",
-              label: "Fees Summary",
-              key: "fees-summary",
-            },
+            // {
+            //   to: "/fees-summary",
+            //   label: "Fees Summary",
+            //   key: "fees-summary",
+            // },
           ].map((item) => (
             <Link
               key={item.key}

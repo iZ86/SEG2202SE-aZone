@@ -22,7 +22,7 @@ export type StudentCourseProgrammeIntake = {
   semesterEndDate: string;
   courseStatus: number;
   status: string;
-}
+};
 
 export type StudentInformation = {
   courseId: number;
@@ -35,22 +35,24 @@ export type StudentInformation = {
   studyModeId: number;
   studyMode: string;
   status: number;
-}
+};
 
 export type StudentSubjectOverviewData = {
   subjectId: number;
   subjectCode: string;
   subjectName: string;
   creditHours: number;
-}
+};
 
 export type StudentClassData = {
+  enrollmentSubjectTypeId: number;
   enrollmentSubjectId: number;
   startTime: string;
   endTime: string;
   subjectId: number;
   subjectCode: string;
   subjectName: string;
+  creditHours: number;
   lecturerId: number;
   lecturerFirstName: string;
   lecturerLastName: string;
@@ -61,7 +63,7 @@ export type StudentClassData = {
   classType: string;
   venueId: number;
   venue: string;
-  grouping: string;
+  grouping: number;
   dayId: number;
   day: string;
 };

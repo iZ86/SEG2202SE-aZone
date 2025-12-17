@@ -2,11 +2,14 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentSubjectData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
+import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
 interface IUserRepostory {
   getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getAllStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
+  getUserByEmail(email: string): Promise<UserData | undefined>;
+  getUserByIdAndEmail(userId: number, email: string): Promise<UserData | undefined>;
   getStudentById(studentId: number): Promise<UserData | undefined>;
   getStudentByEmail(email: string): Promise<UserData | undefined>;
   getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined>;
@@ -20,9 +23,11 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
-  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>; getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>; updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader>;
+  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
+  getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader>;
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
@@ -97,6 +102,37 @@ class UserRepository implements IUserRepostory {
         "FROM REGISTERED_USER " +
         "WHERE userId = ?;",
         [userId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getUserByEmail(email: string): Promise<UserData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserData[]>(
+        "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
+        "FROM REGISTERED_USER " +
+        "WHERE email = ?;",
+        [email],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  }
+
+  getUserByIdAndEmail(userId: number, email: string): Promise<UserData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<UserData[]>(
+        "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
+        "FROM REGISTERED_USER " +
+        "WHERE email = ? " +
+        "AND userId = ?;",
+        [email, userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
@@ -389,19 +425,25 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number): Promise<StudentCourseProgrammeIntakeData[] | undefined> {
+  getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
-        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
-        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
-        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
-        "INNER JOIN INTAKE i ON i.intakeId = pi.intakeId " +
-        "WHERE scpi.studentId = ?;",
-        [
-          studentId
-        ],
+      let sql: string = `
+        SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus
+        FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi
+        INNER JOIN COURSE c ON scpi.courseId = c.courseId
+        INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId
+        INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId
+        INNER JOIN INTAKE i ON i.intakeId = pi.intakeId
+        WHERE scpi.studentId = ? `;
+
+      const params: any[] = [studentId];
+
+      if (status && status != 0) {
+        sql += "AND scpi.status = ?;";
+        params.push(status);
+      }
+
+      databaseConn.query<StudentCourseProgrammeIntakeData[]>(sql, params,
         (err, res) => {
           if (err) reject(err);
           resolve(res);
@@ -424,13 +466,13 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  updateStudentCourseProgrammeIntakeInactiveByStudentId(studentId: number): Promise<ResultSetHeader> {
+  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET status = ? " +
         "WHERE studentId = ? " +
         "AND status = ?;",
-        [0, studentId, 1],
+        [status, studentId, 1],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
@@ -512,8 +554,7 @@ class UserRepository implements IUserRepostory {
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentClassData[]>(
-        "SELECT es.enrollmentSubjectId, est.startTime, est.endTime, s.subjectId, s.subjectCode, " +
-        "s.subjectName, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
+        "SELECT est.enrollmentSubjectTypeId, es.enrollmentSubjectId, est.startTime, est.endTime, s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
         "lt.lecturerTitleId, lt.lecturerTitle, " +
         "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, est.grouping, d.dayId, d.day " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
@@ -557,26 +598,20 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSubjectData[]>(
-        "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus, " +
-        "c.courseId, c.courseCode, c.courseName, pi.programmeIntakeId, pi.semester, pi.intakeId as intake, sm.studyModeId, sm.studyMode " +
+        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
         "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON es.enrollmentId = pi.enrollmentId " +
-        "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
-        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE sest.studentId = ? " +
-        "AND scpi.studentId = ? " +
         "AND (s.subjectCode LIKE ? " +
         "OR s.subjectName LIKE ?) " +
         "AND (? = 0 OR pi.semester = ?) " +
         "ORDER BY sest.subjectStatusId, s.subjectId ASC " +
         "LIMIT ? OFFSET ?;",
         [
-          studentId,
           studentId,
           "%" + query + "%",
           "%" + query + "%",

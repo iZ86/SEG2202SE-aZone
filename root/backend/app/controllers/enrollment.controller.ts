@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE } from "../enums/enums";
+import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import programmeService from "../services/programme.service";
 import subjectService from "../services/subject.service";
 import { SubjectData } from "../models/subject-model";
 import { LecturerData } from "../models/lecturer-model";
 import lecturerService from "../services/lecturer.service";
+import venueService from "../services/venue.service";
+import userService from "../services/user.service";
+import { StudentClassData, UserData } from "../models/user-model";
 
 export default class EnrollmentController {
   async getAllEnrollments(req: Request, res: Response) {
@@ -111,6 +114,16 @@ export default class EnrollmentController {
       return res.sendError.notFound("Invalid enrollmentId");
     }
 
+    const isEnrollmentBelongsToEnrollmentId: Result<EnrollmentData> = await enrollmentService.getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+
+    if (!isEnrollmentBelongsToEnrollmentId.isSuccess()) {
+      const isDateTimeDuplicated: Result<EnrollmentData> = await enrollmentService.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
+
+      if (isDateTimeDuplicated.isSuccess()) {
+        return res.sendError.conflict("enrollmentStartDateTime and enrollmentEndDateTime existed");
+      }
+    }
+
     const response = await enrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
 
     await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(response.getData().enrollmentId);
@@ -166,7 +179,7 @@ export default class EnrollmentController {
     const isAdmin: boolean = req.user.isAdmin as boolean;
 
     if (isStudent) {
-      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[] }> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
+      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
       if (response.isSuccess()) {
         return res.sendSuccess.ok(response.getData(), response.getMessage());
       } else {
@@ -206,8 +219,20 @@ export default class EnrollmentController {
     } else {
       throw new Error("getAllEnrollmentSubjects in enrollment.controller.ts, user is neither student nor admin");
     }
+  }
 
+  async getAllEnrollmentSubjectsByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId as string);
 
+    const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await enrollmentService.getEnrollmentSubjectsByStudentId(studentId);
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
   }
 
   async getEnrollmentSubjectById(req: Request, res: Response) {
@@ -234,31 +259,88 @@ export default class EnrollmentController {
     const subjectId: number = req.body.subjectId;
     const lecturerId: number = req.body.lecturerId;
 
-    if (!enrollmentId || isNaN(enrollmentId) || !subjectId || isNaN(subjectId) || !lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid enrollmentId or subjectId or lecturerId");
-    }
+    const enrollmentSubjects: {
+      classTypeId: number;
+      venueId: number;
+      startTime: Date;
+      endTime: Date;
+      dayId: number;
+      numberOfSeats: number;
+      grouping: number;
+    }[] = req.body.enrollmentSubjects || [];
 
+    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
     const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
     const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
-    if (!subjectResponse.isSuccess() || !lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid subjectId or lecturerId");
+    if (!subjectResponse.isSuccess() || !lecturerResponse.isSuccess() || !enrollmentResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid subjectId, or lecturerId, or enrollmentId");
     }
 
-    const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+    const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
     if (isEnrollmentSujectDuplicated.isSuccess()) {
       return res.sendError.conflict("enrollmentSubject existed");
     }
 
-    const response: Result<EnrollmentSubjectData> = await enrollmentService.createEnrollmentSubject(enrollmentId, subjectId, lecturerId);
+    // Check if all the class session data is valid. When the array is not empty
+    if (enrollmentSubjects.length > 0) {
+      for (const [index, enrollmentSubject] of enrollmentSubjects.entries()) {
+        const isClassSessionDuplicated: Result<EnrollmentSubjectTypeData> = await enrollmentService.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(
+          enrollmentSubject.startTime,
+          enrollmentSubject.endTime,
+          enrollmentSubject.venueId,
+          enrollmentSubject.dayId
+        );
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.create(response.getData(), response.getMessage());
+        if (isClassSessionDuplicated.isSuccess()) {
+          return res.sendError.conflict(`enrollmentSubjectType duplicated at index:${index}`);
+        }
+
+        const isDayIdValid: boolean =
+          enrollmentSubject.dayId >= ENUM_DAY.MONDAY &&
+          enrollmentSubject.dayId <= ENUM_DAY.SUNDAY;
+
+        const isClassTypeIdValid: boolean =
+          enrollmentSubject.classTypeId >= ENUM_CLASS_TYPE.LECTURE &&
+          enrollmentSubject.classTypeId <= ENUM_CLASS_TYPE.WORKSHOP;
+
+        const isVenueIdValid = await venueService.getVenueById(enrollmentSubject.venueId);
+
+        if (!isVenueIdValid.isSuccess() || !isDayIdValid || !isClassTypeIdValid) {
+          return res.sendError.badRequest("Invalid venueId, or dayId, or classTypeId");
+        }
+      }
+    }
+
+    const createEnrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.createEnrollmentSubject(enrollmentId, subjectId, lecturerId);
+
+    if (enrollmentSubjects.length === 0) {
+      await enrollmentService.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(createEnrollmentSubjectResponse.getData().enrollmentSubjectId);
+      if (createEnrollmentSubjectResponse.isSuccess()) {
+        return res.sendSuccess.create(createEnrollmentSubjectResponse.getData(), createEnrollmentSubjectResponse.getMessage());
+      } else {
+        switch (createEnrollmentSubjectResponse.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(createEnrollmentSubjectResponse.getMessage());
+        }
+      }
+    }
+
+    await Promise.all(
+      enrollmentSubjects.map(async (enrollmentSubject) => {
+        await enrollmentService.createEnrollmentSubjectType(createEnrollmentSubjectResponse.getData().enrollmentSubjectId, enrollmentSubject.classTypeId, enrollmentSubject.venueId, enrollmentSubject.startTime, enrollmentSubject.endTime, enrollmentSubject.dayId, enrollmentSubject.numberOfSeats, enrollmentSubject.grouping);
+      })
+    );
+
+    const createEnrollmentSubjectTypeResponse: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(createEnrollmentSubjectResponse.getData().enrollmentSubjectId);
+
+    if (createEnrollmentSubjectTypeResponse.isSuccess()) {
+      return res.sendSuccess.create(createEnrollmentSubjectTypeResponse.getData(), createEnrollmentSubjectTypeResponse.getMessage());
     } else {
-      switch (response.getErrorCode()) {
+      switch (createEnrollmentSubjectTypeResponse.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
+          return res.sendError.notFound(createEnrollmentSubjectTypeResponse.getMessage());
       }
     }
   }
@@ -269,36 +351,103 @@ export default class EnrollmentController {
     const subjectId: number = req.body.subjectId;
     const lecturerId: number = req.body.lecturerId;
 
-    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId) || !enrollmentId || isNaN(enrollmentId) || !subjectId || isNaN(subjectId) || !lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid enrollmentSubjectId or enrollmentId or subjectId or lecturerId");
+    const enrollmentSubjects: {
+      enrollmentSubjectTypeId: number;
+      classTypeId: number;
+      venueId: number;
+      startTime: Date;
+      endTime: Date;
+      dayId: number;
+      numberOfSeats: number;
+      grouping: number;
+    }[] = req.body.enrollmentSubjects || [];
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
     }
 
     const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
+    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
     const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
     const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
-    if (!enrollmentSubjectResponse.isSuccess() || !subjectResponse.isSuccess() || !lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid enrollmentSubjectId or subjectId or lecturerId");
+    if (!enrollmentSubjectResponse.isSuccess() || !enrollmentResponse.isSuccess() || !subjectResponse.isSuccess() || !lecturerResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid enrollmentSubjectId or enrollmentId or subjectId or lecturerId");
     }
 
-    const isEnrollmentIdAndSubjectIdAndLecturerIdBelongsToEnrollmentSubjectId: Result<SubjectData> = await enrollmentService.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectIdAndLecturerId(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+    const isEnrollmentIdAndSubjectIdBelongsToEnrollmentSubjectId: Result<SubjectData> = await enrollmentService.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId, enrollmentId, subjectId);
 
-    if (!isEnrollmentIdAndSubjectIdAndLecturerIdBelongsToEnrollmentSubjectId.isSuccess()) {
-      const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectIdAndLecturerId(enrollmentId, subjectId, lecturerId);
+    if (!isEnrollmentIdAndSubjectIdBelongsToEnrollmentSubjectId.isSuccess()) {
+      const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
       if (isEnrollmentSujectDuplicated.isSuccess()) {
         return res.sendError.conflict("enrollmentSubject existed");
       }
     }
 
-    const response = await enrollmentService.updateEnrollmentSubjectById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+    if (enrollmentSubjects.length > 0) {
+      for (const [index, enrollmentSubject] of enrollmentSubjects.entries()) {
+        // Find duplicate venue, time and day.
+        const isClassSessionDuplicated: Result<EnrollmentSubjectTypeData> = await enrollmentService.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(
+          enrollmentSubject.startTime,
+          enrollmentSubject.endTime,
+          enrollmentSubject.venueId,
+          enrollmentSubject.dayId
+        );
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
+        if (isClassSessionDuplicated.isSuccess()) {
+          // If updating the same data, ignore it.
+          if (isClassSessionDuplicated.getData().enrollmentSubjectTypeId === parseInt(enrollmentSubject.enrollmentSubjectTypeId.toString())) {
+            continue;
+          }
+          return res.sendError.conflict(`enrollmentSubjectType duplicated at index:${index}`);
+        }
+
+        const isDayIdValid: boolean =
+          enrollmentSubject.dayId >= ENUM_DAY.MONDAY &&
+          enrollmentSubject.dayId <= ENUM_DAY.SUNDAY;
+
+        const isClassTypeIdValid: boolean =
+          enrollmentSubject.classTypeId >= ENUM_CLASS_TYPE.LECTURE &&
+          enrollmentSubject.classTypeId <= ENUM_CLASS_TYPE.WORKSHOP;
+
+        const isVenueIdValid = await venueService.getVenueById(enrollmentSubject.venueId);
+
+        if (!isVenueIdValid.isSuccess() || !isDayIdValid || !isClassTypeIdValid) {
+          return res.sendError.badRequest("Invalid venueId, or dayId, or classTypeId");
+        }
+      }
+    }
+
+    const updateEnrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.updateEnrollmentSubjectById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+
+    await enrollmentService.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId);
+
+    if (enrollmentSubjects.length === 0) {
+      if (updateEnrollmentSubjectResponse.isSuccess()) {
+        return res.sendSuccess.create(updateEnrollmentSubjectResponse.getData(), updateEnrollmentSubjectResponse.getMessage());
+      } else {
+        switch (updateEnrollmentSubjectResponse.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(updateEnrollmentSubjectResponse.getMessage());
+        }
+      }
+    }
+
+    await Promise.all(
+      enrollmentSubjects.map(async (enrollmentSubject) => {
+        await enrollmentService.createEnrollmentSubjectType(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId, enrollmentSubject.classTypeId, enrollmentSubject.venueId, enrollmentSubject.startTime, enrollmentSubject.endTime, enrollmentSubject.dayId, enrollmentSubject.numberOfSeats, enrollmentSubject.grouping);
+      })
+    );
+
+    const createEnrollmentSubjectTypeResponse: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId);
+
+    if (createEnrollmentSubjectTypeResponse.isSuccess()) {
+      return res.sendSuccess.ok(createEnrollmentSubjectTypeResponse.getData(), createEnrollmentSubjectTypeResponse.getMessage());
     } else {
-      switch (response.getErrorCode()) {
+      switch (createEnrollmentSubjectTypeResponse.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
+          return res.sendError.notFound(createEnrollmentSubjectTypeResponse.getMessage());
       }
     }
   }
@@ -335,6 +484,99 @@ export default class EnrollmentController {
 
     if (studentEnrollmentScheduleResponse.isSuccess()) {
       return res.sendSuccess.ok(studentEnrollmentScheduleResponse.getData(), studentEnrollmentScheduleResponse.getMessage());
+    }
+  }
+
+  async getEnrollmentSubjectTypeByEnrollmentSubjectId(req: Request, res: Response) {
+    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+
+    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
+      return res.sendError.badRequest("Invalid enrollmentSubjectId");
+    }
+
+    const response: Result<EnrollmentSubjectTypeData[]> = await enrollmentService.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
+  async createStudentEnrollmentSubjectTypes(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const isAdmin: boolean = req.user.isAdmin;
+    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+
+    const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(userId, studentEnrollmentSubjectTypes, isAdmin);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage(), response.getData());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage(), response.getData());
+      }
+    }
+  }
+
+  async createStudentEnrollmentSubjectTypesByStudentId(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId as string);
+    const isAdmin: boolean = req.user.isAdmin;
+    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+
+    if (!studentId || isNaN(studentId)) {
+      return res.sendError.notFound("Invalid studentId");
+    }
+
+    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
+
+    if (!studentResponse.isSuccess()) {
+      return res.sendError.notFound("Invalid studentId");
+    }
+
+    const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(studentId, studentEnrollmentSubjectTypes, isAdmin);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage(), response.getData());
+        case ENUM_ERROR_CODE.FORBIDDEN:
+          return res.sendError.forbidden(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage(), response.getData());
+        case ENUM_ERROR_CODE.BAD_REQUEST:
+          return res.sendError.badRequest(response.getMessage());
+      }
+    }
+  }
+
+
+
+  async getEnrolledSubjectsByStudentId(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const isStudent: boolean = req.user.isStudent as boolean;
+
+    if (isStudent) {
+      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[] }> = await enrollmentService.getEnrolledSubjectsByStudentId(userId);
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.create(response.getData(), response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage(), response.getData());
+        }
+      }
+    } else {
+      return res.sendError.forbidden("trest");
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Error500Panel, Error404Panel } from "@components/ErrorComponent";
 
-const HOMEPAGELINK = "/dashboard";
+const HOMEPAGELINK = "/";
 
 /** To be rendered instead of the original content if there is a 500 error code from the API call. */
 export function StudentError500Panel() {

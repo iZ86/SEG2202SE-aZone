@@ -13,7 +13,8 @@ interface ISubjectService {
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>>;
   createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
-  deleteSubjectById(subjectId: number): Promise<Result<null>>; getSubjectCount(query: string): Promise<Result<number>>;
+  deleteSubjectById(subjectId: number): Promise<Result<null>>;
+  getSubjectCount(query: string): Promise<Result<number>>;
 }
 
 class SubjectService implements ISubjectService {

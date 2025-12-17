@@ -1,3 +1,4 @@
+import type { CreateEnrollmentSubjectType, UpdateEnrollmentSubjectType } from "@datatypes/enrollmentType";
 import {
   type CalendarDateTime,
 } from "@internationalized/date";
@@ -124,9 +125,9 @@ export const getAllEnrollmentSubjectsAPI = async (token: string, pageSize?: numb
   }
 };
 
-export const getEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
+export const getEnrollmentSubjectByStudentIdAPI = async (token: string, studentId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubjectId}`,
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${studentId}`,
       {
         method: 'GET',
         headers: {
@@ -140,9 +141,25 @@ export const getEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubje
   }
 };
 
-export const createEnrollmentSubjectAPI = async (token: string, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Response | undefined> => {
+export const getEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
   try {
-    return await fetch("http://localhost:8080/api/v1/enrollments/subjects",
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subject/${enrollmentSubjectId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const createEnrollmentSubjectAPI = async (token: string, enrollmentId: number, subjectId: number, lecturerId: number, enrollmentSubjects: CreateEnrollmentSubjectType[]): Promise<Response | undefined> => {
+  try {
+    return await fetch("http://localhost:8080/api/v1/enrollments/subject",
       {
         method: 'POST',
         headers: {
@@ -153,6 +170,7 @@ export const createEnrollmentSubjectAPI = async (token: string, enrollmentId: nu
           enrollmentId,
           subjectId,
           lecturerId,
+          enrollmentSubjects: enrollmentSubjects,
         }),
         mode: "cors"
       });
@@ -161,9 +179,9 @@ export const createEnrollmentSubjectAPI = async (token: string, enrollmentId: nu
   }
 };
 
-export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubejctId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Response | undefined> => {
+export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, enrollmentSubjects: UpdateEnrollmentSubjectType[]): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubejctId}`,
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subject/${enrollmentSubjectId}`,
       {
         method: 'PUT',
         headers: {
@@ -174,6 +192,7 @@ export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSu
           enrollmentId,
           subjectId,
           lecturerId,
+          enrollmentSubjects,
         }),
         mode: "cors"
       });
@@ -184,13 +203,48 @@ export const updateEnrollmentSubjectByIdAPI = async (token: string, enrollmentSu
 
 export const deleteEnrollmentSubjectByIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${enrollmentSubjectId}`,
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subject/${enrollmentSubjectId}`,
       {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const getEnrollmentSubjectTypeByEnrollmentSubjectIdAPI = async (token: string, enrollmentSubjectId: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects-type/${enrollmentSubjectId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const createStudentEnrollmentSubjectTypesByStudentIdAPI = async (token: string, studentId: number, enrollmentSubjectTypeIds: number[]): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/subjects/${studentId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          enrollmentSubjectTypeIds
+        }),
         mode: "cors"
       });
   } catch (err) {

@@ -5,6 +5,7 @@ import SmallButton from "@components/SmallButton";
 import InformationPanel from "@features/student/components/InformationPanel";
 import { useStudent } from "@features/student/hooks/useStudent";
 import { useEffect, useState } from "react";
+import SubjectEnrollmentPanel from "@features/enrollment/components/SubjectEnrollmentPanel";
 
 
 function TimetablePanel({ token }: { token: string }) {
@@ -83,23 +84,12 @@ function TimetablePanel({ token }: { token: string }) {
 export default function Dashboard() {
 
   const { authToken, student } = useStudent();
+  const [error500, setError500] = useState(false);
   return (
     <div className="flex flex-col min-h-screen bg-white-antiflash">
       <StudentNavbar page="dashboard" />
       <main className="flex-1 p-5 sm:p-10">
-        <div className="shadow-lg rounded-lg bg-white">
-          <div className="flex justify-between items-center p-4">
-            <div>
-              <h2 className="text-black font-bold">
-                SUBJECT ENROLLMENT OPEN NOW
-              </h2>
-              <p className="text-gray-500">
-                Start Date: 15-OCT-2025 - 25-OCT 2025
-              </p>
-            </div>
-            <SmallButton buttonText="Enroll" link="/enrollment" />
-          </div>
-        </div>
+        <SubjectEnrollmentPanel authToken={authToken} setError500={setError500} />
         <div className="flex flex-wrap gap-x-5 gap-y-4 mt-4">
           <div className="flex-1">
             {authToken && <SubjectInformationPanel token={authToken} />}

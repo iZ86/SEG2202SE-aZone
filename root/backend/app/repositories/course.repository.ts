@@ -8,6 +8,7 @@ interface ICourseRepository {
   getCourseById(courseId: number): Promise<CourseProgrammeData | undefined>;
   getCourseByName(courseName: string): Promise<CourseData | undefined>;
   getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined>;
+  getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<CourseProgrammeData | undefined>;
   createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
@@ -91,6 +92,23 @@ class CourseRepository implements ICourseRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<CourseProgrammeData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<CourseProgrammeData[]>(
+        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
+        "FROM COURSE c " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "WHERE c.courseId = ? " +
+        "AND c.courseName COLLATE utf8mb4_general_ci = ?;",
+        [courseId, courseName],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res?.[0]);
         }
       );
     });
