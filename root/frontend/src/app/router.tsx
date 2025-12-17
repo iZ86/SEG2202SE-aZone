@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 import GuestLogin from "@routes/GuestLogin";
 import AdminDashboard from "@routes/admin/AdminDashboard";
 import AdminLogin from "@routes/admin/AdminLogin";
@@ -41,6 +41,7 @@ import AdminEditProgrammeIntake from "@routes/admin/AdminEditProgrammeIntake";
 import AdminEnrollmentSubject from "@routes/admin/AdminEnrollmentSubject";
 import AdminCreateEnrollmentSubject from "@routes/admin/AdminCreateEnrollmentSubject";
 import AdminEditEnrollmentSubject from "@routes/admin/AdminEditEnrollmentSubject";
+import { Error404Panel } from "@components/ErrorComponent";
 
 const StudentLayout = () => (
   <StudentProvider>
@@ -232,6 +233,17 @@ const routes = [
       },
     ],
   },
+
+  {
+    path: "/admin/*",
+    element: <Navigate to="/admin" replace />
+  },
+  
+  
+  {
+    path: "/*",
+    element: <Navigate to="/" replace />
+  }
 ];
 
 export const Router = () => {
