@@ -219,7 +219,8 @@ function EnrollmentSelection({
             htmlFor={name + classType.grouping}>
             <div className="flex items-center gap-x-8">
               <input className={`border-2 rounded-2xl align-middle min-w-4 min-h-4 appearance-none outline-hidden ${((clashingEnrollmentSubjects.length > 0) || (classType.numberOfStudentsEnrolled === classType.numberOfSeats && !enrolledSubjectsMap[studentEnrollmentSubjects[enrollmentSubjectIndex].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].enrollmentSubjectTypeId])) ? "border-gray-charcoal-gray-charcoal" : "border-gray-battleship"} checked:bg-blue-air-superiority checked:border-blue-air-superiority cursor-pointer`}
-                id={name + classType.grouping} type="radio" name={name} onChange={(e) => { test(e) }} disabled={((clashingEnrollmentSubjects.length > 0) || (classType.numberOfStudentsEnrolled === classType.numberOfSeats && !enrolledSubjectsMap[studentEnrollmentSubjects[enrollmentSubjectIndex].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].enrollmentSubjectTypeId]))} value={enrollmentSubjectTypeIndex} defaultChecked={selectedEnrollmentSubjectIndexModal[enrollmentSubjectIndex] && selectedEnrollmentSubjectIndexModal[enrollmentSubjectIndex][classTypeIndex] ? selectedEnrollmentSubjectIndexModal[enrollmentSubjectIndex][classTypeIndex][enrollmentSubjectTypeIndex] : false} />
+                id={name + classType.grouping} type="radio" name={name} onChange={(e) => { test(e) }} disabled={((clashingEnrollmentSubjects.length > 0) || (classType.numberOfStudentsEnrolled === classType.numberOfSeats && !enrolledSubjectsMap[studentEnrollmentSubjects[enrollmentSubjectIndex].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].enrollmentSubjectTypeId]))} value={enrollmentSubjectTypeIndex}
+                defaultChecked={!((classType.numberOfStudentsEnrolled === classType.numberOfSeats) && !enrolledSubjectsMap[studentEnrollmentSubjects[enrollmentSubjectIndex].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].enrollmentSubjectTypeId]) && selectedEnrollmentSubjectIndexModal[enrollmentSubjectIndex] && selectedEnrollmentSubjectIndexModal[enrollmentSubjectIndex][classTypeIndex] ? selectedEnrollmentSubjectIndexModal[enrollmentSubjectIndex][classTypeIndex][enrollmentSubjectTypeIndex] : false} />
               <div className="flex justify-between w-full items-center flex-wrap gap-y-2">
                 <div className="flex flex-col min-w-6/9">
                   <h3 className="font-medium">Group {classType.grouping}</h3>
@@ -463,7 +464,7 @@ export default function StudentEnrollment() {
 
       const errorMessage = responseData.message;
       toast.error(`${errorMessage}: ${clashingEnrollmentSubjectsString}`);
-
+      fetchEnrollmentSubjects();
 
       return;
     }
