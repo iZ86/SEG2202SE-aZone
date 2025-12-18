@@ -224,6 +224,7 @@ function EnrollmentSelection({
                 <div className="flex flex-col min-w-6/9">
                   <h3 className="font-medium">Group {classType.grouping}</h3>
                   <span>
+                    {((classType.numberOfStudentsEnrolled === classType.numberOfSeats) && !enrolledSubjectsMap[studentEnrollmentSubjects[enrollmentSubjectIndex].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].enrollmentSubjectTypeId]) ? (<p className="text-red-tomato">Full Capacity</p>) : undefined}
                     {classType.day} {convert24UTCTimeTo12LocalTime(classType.startTime)} - {convert24UTCTimeTo12LocalTime(classType.endTime)}
                   </span>
                   {clashingEnrollmentSubjects.length > 0 ?
