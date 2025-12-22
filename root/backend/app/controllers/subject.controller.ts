@@ -7,12 +7,12 @@ import courseService from "../services/course.service";
 import { CourseData } from "../models/course-model";
 
 export default class SubjectController {
-  async getAllSubjects(req: Request, res: Response) {
+  async getSubjects(req: Request, res: Response) {
     const page: number | null = parseInt(req.query.page as string) || null;
     const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<SubjectData[]> = await subjectService.getAllSubjects(query, pageSize, page);
+    const response: Result<SubjectData[]> = await subjectService.getSubjects(query, pageSize, page);
     const subjectCount: Result<number> = await subjectService.getSubjectCount(query);
 
     let apiResponse: object = {

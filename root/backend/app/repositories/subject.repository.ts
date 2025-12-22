@@ -4,7 +4,7 @@ import { SubjectData } from "../models/subject-model";
 import { TotalCount } from "../models/general-model";
 
 interface ISubjectRepository {
-  getAllSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]>;
+  getSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]>;
   getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
   getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined>;
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined>;
@@ -15,7 +15,7 @@ interface ISubjectRepository {
 }
 
 class SubjectRepository implements ISubjectRepository {
-  getAllSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]> {
+  getSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
         SELECT *
