@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface ILecturerRepository {
-  getAllLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]>;
+  getLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]>;
   getLecturerById(lecturerId: number): Promise<LecturerData | undefined>;
   getLecturerByEmail(email: string): Promise<LecturerData | undefined>;
   getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<LecturerData | undefined>;
@@ -17,7 +17,7 @@ interface ILecturerRepository {
 }
 
 class LecturerRepository implements ILecturerRepository {
-  getAllLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]> {
+  getLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
         SELECT *

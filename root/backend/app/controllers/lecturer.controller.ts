@@ -5,12 +5,12 @@ import { LecturerData, LecturerTitleData } from "../models/lecturer-model";
 import lecturerService from "../services/lecturer.service";
 
 export default class LecturerController {
-  async getAllLecturers(req: Request, res: Response) {
+  async getLecturers(req: Request, res: Response) {
     const page: number | null = parseInt(req.query.page as string) || null;
     const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<LecturerData[]> = await lecturerService.getAllLecturers(query, pageSize, page);
+    const response: Result<LecturerData[]> = await lecturerService.getLecturers(query, pageSize, page);
     const lecturerCount: Result<number> = await lecturerService.getLecturerCount(query);
 
     let apiResponse: object = {
