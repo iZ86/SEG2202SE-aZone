@@ -5,7 +5,7 @@ import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeRangeColliding } from "../utils/utils";
 
 interface IEnrollmentService {
-  getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
+  getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
   getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>>;
   createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
   updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
@@ -35,8 +35,8 @@ interface IEnrollmentService {
 }
 
 class EnrollmentService implements IEnrollmentService {
-  async getAllEnrollments(query: string = "", pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>> {
-    const enrollments: EnrollmentData[] = await enrollmentRepository.getAllEnrollments(query, pageSize, page);
+  async getEnrollments(query: string = "", pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>> {
+    const enrollments: EnrollmentData[] = await enrollmentRepository.getEnrollments(query, pageSize, page);
 
     return Result.succeed(enrollments, "Enrollments retrieve success");
   }

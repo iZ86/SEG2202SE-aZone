@@ -13,12 +13,12 @@ import userService from "../services/user.service";
 import { StudentClassData, UserData } from "../models/user-model";
 
 export default class EnrollmentController {
-  async getAllEnrollments(req: Request, res: Response) {
+  async getEnrollments(req: Request, res: Response) {
     const page: number | null = parseInt(req.query.page as string) || null;
     const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<EnrollmentData[]> = await enrollmentService.getAllEnrollments(query, pageSize, page);
+    const response: Result<EnrollmentData[]> = await enrollmentService.getEnrollments(query, pageSize, page);
     const enrollmentCount: Result<number> = await enrollmentService.getEnrollmentCount(query);
 
     let apiResponse: object = {

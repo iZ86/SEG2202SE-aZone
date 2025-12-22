@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface IEnrollmentRepository {
-  getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]>;
+  getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]>;
   getEnrollmentById(enrollmentId: number): Promise<EnrollmentData | undefined>;
   createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
   updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
@@ -37,7 +37,7 @@ interface IEnrollmentRepository {
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
-  getAllEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]> {
+  getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
       SELECT *
