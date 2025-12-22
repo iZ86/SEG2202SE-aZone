@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface IIntakeRepository {
-  getAllIntakes(query: string, pageSize: number | null, page: number | null): Promise<IntakeData[]>;
+  getIntakes(query: string, pageSize: number | null, page: number | null): Promise<IntakeData[]>;
   getIntakeById(intakeId: number): Promise<IntakeData | undefined>;
   createIntake(intakeId: number): Promise<ResultSetHeader>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader>;
@@ -13,7 +13,7 @@ interface IIntakeRepository {
 }
 
 class IntakeRepository implements IIntakeRepository {
-  getAllIntakes(query: string, pageSize: number | null, page: number | null): Promise<IntakeData[]> {
+  getIntakes(query: string, pageSize: number | null, page: number | null): Promise<IntakeData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
       SELECT intakeId

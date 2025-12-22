@@ -4,7 +4,7 @@ import { IntakeData } from "../models/intake-model";
 import intakeRepository from "../repositories/intake.repository";
 
 interface IIntakeService {
-  getAllIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<IntakeData[]>>;
+  getIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<IntakeData[]>>;
   getIntakeById(intakeId: number): Promise<Result<IntakeData>>;
   createIntake(intakeId: number): Promise<Result<IntakeData>>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>>;
@@ -13,8 +13,8 @@ interface IIntakeService {
 }
 
 class IntakeService implements IIntakeService {
-  async getAllIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<IntakeData[]>> {
-    const intakes: IntakeData[] = await intakeRepository.getAllIntakes(query, pageSize, page);
+  async getIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<IntakeData[]>> {
+    const intakes: IntakeData[] = await intakeRepository.getIntakes(query, pageSize, page);
 
     return Result.succeed(intakes, "Intakes retrieve success");
   }

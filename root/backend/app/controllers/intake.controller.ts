@@ -5,12 +5,12 @@ import { IntakeData } from "../models/intake-model";
 import intakeService from "../services/intake.service";
 
 export default class IntakeController {
-  async getAllIntakes(req: Request, res: Response) {
+  async getIntakes(req: Request, res: Response) {
     const page: number | null = parseInt(req.query.page as string) || null;
     const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<IntakeData[]> = await intakeService.getAllIntakes(query, pageSize, page);
+    const response: Result<IntakeData[]> = await intakeService.getIntakes(query, pageSize, page);
     const intakeCount: Result<number> = await intakeService.getIntakeCount(query);
 
     let apiResponse: object = {
