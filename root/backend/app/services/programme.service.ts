@@ -12,7 +12,7 @@ interface IProgrammeService {
   createProgramme(programmeName: string): Promise<Result<ProgrammeData>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
-  getAllProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>>;
+  getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
@@ -92,8 +92,8 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme delete success");
   }
 
-  async getAllProgrammeIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>> {
-    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getAllProgrammeIntakes(query, pageSize, page);
+  async getProgrammeIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>> {
+    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakes(query, pageSize, page);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
   }
