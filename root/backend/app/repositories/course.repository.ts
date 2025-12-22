@@ -4,7 +4,7 @@ import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/co
 import { TotalCount } from "../models/general-model";
 
 interface ICourseRepository {
-  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]>;
+  getCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]>;
   getCourseById(courseId: number): Promise<CourseProgrammeData | undefined>;
   getCourseByName(courseName: string): Promise<CourseData | undefined>;
   getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined>;
@@ -22,7 +22,7 @@ interface ICourseRepository {
 }
 
 class CourseRepository implements ICourseRepository {
-  getAllCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]> {
+  getCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(

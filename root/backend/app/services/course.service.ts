@@ -5,7 +5,7 @@ import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/co
 import courseRepository from "../repositories/course.repository";
 
 interface ICourseService {
-  getAllCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>>;
+  getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>>;
   getCourseById(courseId: number): Promise<Result<CourseProgrammeData>>;
   getCourseByName(courseName: string): Promise<Result<CourseData>>;
   getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
@@ -19,8 +19,8 @@ interface ICourseService {
 }
 
 class CourseService implements ICourseService {
-  async getAllCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
-    const courses: CourseProgrammeData[] = await courseRepository.getAllCourses(query, pageSize, page);
+  async getCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
+    const courses: CourseProgrammeData[] = await courseRepository.getCourses(query, pageSize, page);
 
     return Result.succeed(courses, "Courses retrieve success");
   }

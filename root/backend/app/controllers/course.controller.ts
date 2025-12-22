@@ -9,12 +9,12 @@ import { SubjectData } from "../models/subject-model";
 import subjectService from "../services/subject.service";
 
 export default class CourseController {
-  async getAllCourses(req: Request, res: Response) {
+  async getCourses(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<CourseData[]> = await courseService.getAllCourses(query, pageSize, page);
+    const response: Result<CourseData[]> = await courseService.getCourses(query, pageSize, page);
     const courseCount: Result<number> = await courseService.getCourseCount(query);
 
     if (response.isSuccess()) {
