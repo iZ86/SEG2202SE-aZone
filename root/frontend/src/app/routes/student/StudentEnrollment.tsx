@@ -1,5 +1,5 @@
 import StudentNavbar from "@components/student/StudentNavbar";
-import { Search, ClipboardList, Trash2, SquarePen, Book, ChevronLeft } from "lucide-react";
+import { ClipboardList, Trash2, Book, ChevronLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogTrigger, Modal, ModalOverlay, Button } from "react-aria-components";
