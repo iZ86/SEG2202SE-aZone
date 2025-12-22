@@ -5,12 +5,12 @@ import { VenueData } from "../models/venue-model";
 import venueService from "../services/venue.service";
 
 export default class VenueController {
-  async getAllVenues(req: Request, res: Response) {
+  async getVenues(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<VenueData[]> = await venueService.getAllVenues(query, pageSize, page);
+    const response: Result<VenueData[]> = await venueService.getVenues(query, pageSize, page);
     const venueCount: Result<number> = await venueService.getVenueCount(query);
 
     if (response.isSuccess()) {

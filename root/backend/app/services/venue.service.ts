@@ -5,7 +5,7 @@ import { VenueData } from "../models/venue-model";
 import venueRepository from "../repositories/venue.repository";
 
 interface IVenueService {
-  getAllVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
+  getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
   getVenueById(venueId: number): Promise<Result<VenueData>>;
   getVenueByVenue(venue: string): Promise<Result<VenueData>>;
   getVenueByIdAndVenue(venueId: number, venue: string): Promise<Result<VenueData>>;
@@ -16,8 +16,8 @@ interface IVenueService {
 }
 
 class VenueService implements IVenueService {
-  async getAllVenues(query: string = "", pageSize: number, page: number): Promise<Result<VenueData[]>> {
-    const venues: VenueData[] = await venueRepository.getAllVenues(query, pageSize, page);
+  async getVenues(query: string = "", pageSize: number, page: number): Promise<Result<VenueData[]>> {
+    const venues: VenueData[] = await venueRepository.getVenues(query, pageSize, page);
 
     return Result.succeed(venues, "Venues retrieve success");
   }

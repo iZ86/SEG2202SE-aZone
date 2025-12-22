@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface IVenueRepository {
-  getAllVenues(query: string, pageSize: number, page: number): Promise<VenueData[]>;
+  getVenues(query: string, pageSize: number, page: number): Promise<VenueData[]>;
   getVenueById(venueId: number): Promise<VenueData | undefined>;
   getVenueByVenue(venue: string): Promise<VenueData | undefined>;
   getVenueByIdAndVenue(venueId: number, venue: string): Promise<VenueData | undefined>;
@@ -15,7 +15,7 @@ interface IVenueRepository {
 }
 
 class VenueRepository implements IVenueRepository {
-  getAllVenues(query: string, pageSize: number, page: number): Promise<VenueData[]> {
+  getVenues(query: string, pageSize: number, page: number): Promise<VenueData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<VenueData[]>(
