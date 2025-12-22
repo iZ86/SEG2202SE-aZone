@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import storageService from "../services/storage.service";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE } from "../enums/enums";
 import authService from "../services/auth.service";
 
 export default class StorageController {

@@ -10,7 +10,7 @@ import { LecturerData } from "../models/lecturer-model";
 import lecturerService from "../services/lecturer.service";
 import venueService from "../services/venue.service";
 import userService from "../services/user.service";
-import { StudentClassData, UserData } from "../models/user-model";
+import { UserData } from "../models/user-model";
 
 export default class EnrollmentController {
   async getEnrollments(req: Request, res: Response) {
