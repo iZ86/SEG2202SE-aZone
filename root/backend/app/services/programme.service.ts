@@ -5,7 +5,7 @@ import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 
 interface IProgrammeService {
-  getAllProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
+  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
   getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>>;
   getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
@@ -27,8 +27,8 @@ interface IProgrammeService {
 }
 
 class ProgrammeService implements IProgrammeService {
-  async getAllProgrammes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>> {
-    const programmes: ProgrammeData[] = await programmeRepository.getAllProgrammes(query, pageSize, page);
+  async getProgrammes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>> {
+    const programmes: ProgrammeData[] = await programmeRepository.getProgrammes(query, pageSize, page);
 
     return Result.succeed(programmes, "Programmes retrieve success");
   }

@@ -4,7 +4,7 @@ import databaseConn from "../database/db-connection";
 import { TotalCount } from "../models/general-model";
 
 interface IProgrammeRepository {
-  getAllProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]>;
+  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]>;
   getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined>;
   getProgrammeByName(programmeName: string): Promise<ProgrammeData | undefined>;
   getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<ProgrammeData | undefined>;
@@ -26,7 +26,7 @@ interface IProgrammeRepository {
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
-  getAllProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]> {
+  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
       SELECT programmeId, programmeName

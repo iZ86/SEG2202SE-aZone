@@ -7,12 +7,12 @@ import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
 import { IntakeData } from "../models/intake-model";
 
 export default class ProgrammeController {
-  async getAllProgrammes(req: Request, res: Response) {
+  async getProgrammes(req: Request, res: Response) {
     const page: number | null = parseInt(req.query.page as string) || null;
     const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<ProgrammeData[]> = await programmeService.getAllProgrammes(query, pageSize, page);
+    const response: Result<ProgrammeData[]> = await programmeService.getProgrammes(query, pageSize, page);
     const programmeCount: Result<number> = await programmeService.getProgrammeCount(query);
 
     let apiResponse: object = {
