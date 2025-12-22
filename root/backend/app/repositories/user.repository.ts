@@ -5,7 +5,7 @@ import { TotalCount } from "../models/general-model";
 import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
 interface IUserRepostory {
-  getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
+  getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
   getUserByEmail(email: string): Promise<UserData | undefined>;
@@ -39,7 +39,7 @@ interface IUserRepostory {
 }
 
 class UserRepository implements IUserRepostory {
-  getAllAdmins(query: string, pageSize: number, page: number): Promise<UserData[]> {
+  getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(

@@ -6,7 +6,7 @@ import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, Student
 import userRepository from "../repositories/user.repository";
 
 interface IUserService {
-  getAllAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
+  getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getUserByEmail(email: string): Promise<Result<UserData>>;
   getUserByIdAndEmail(userId: number, email: string): Promise<Result<UserData>>;
@@ -33,8 +33,8 @@ interface IUserService {
 }
 
 class UserService implements IUserService {
-  async getAllAdmins(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
-    const admins: UserData[] = await userRepository.getAllAdmins(query, pageSize, page);
+  async getAdmins(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
+    const admins: UserData[] = await userRepository.getAdmins(query, pageSize, page);
 
     return Result.succeed(admins, "Admins retrieve success");
   }

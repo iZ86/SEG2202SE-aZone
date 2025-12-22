@@ -10,12 +10,12 @@ import { ProgrammeIntakeData } from "../models/programme-model";
 import { ResultSetHeader } from "mysql2";
 
 export default class UserController {
-  async getAllAdmins(req: Request, res: Response) {
+  async getAdmins(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<UserData[]> = await userService.getAllAdmins(query, pageSize, page);
+    const response: Result<UserData[]> = await userService.getAdmins(query, pageSize, page);
     const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.ADMIN);
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
