@@ -217,7 +217,7 @@ export default class EnrollmentController {
         }
       }
     } else {
-      throw new Error("getAllEnrollmentSubjects in enrollment.controller.ts, user is neither student nor admin");
+      throw new Error("getEnrollmentSubjects in enrollment.controller.ts, user is neither student nor admin");
     }
   }
 
