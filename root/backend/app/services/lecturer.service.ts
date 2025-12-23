@@ -12,7 +12,7 @@ interface ILecturerService {
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   deleteLecturerById(lecturerId: number): Promise<Result<null>>;
   getLecturerCount(query: string): Promise<Result<number>>;
-  getAllLecturerTitles(): Promise<Result<LecturerTitleData[]>>;
+  getLecturerTitles(): Promise<Result<LecturerTitleData[]>>;
   getLecturerTitleById(lecturerTitleId: number): Promise<Result<LecturerTitleData>>;
 }
 
@@ -97,8 +97,8 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturerCount ? lecturerCount : 0, "Lecturer count retrieve success");
   }
 
-  async getAllLecturerTitles(): Promise<Result<LecturerTitleData[]>> {
-    const lecturerTitle: LecturerTitleData[] = await lecturerRepository.getAllLecturerTitles();
+  async getLecturerTitles(): Promise<Result<LecturerTitleData[]>> {
+    const lecturerTitle: LecturerTitleData[] = await lecturerRepository.getLecturerTitles();
 
     return Result.succeed(lecturerTitle, "Lecturer title retrieve success");
   }

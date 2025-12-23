@@ -143,8 +143,8 @@ export default class LecturerController {
     }
   }
 
-  async getAllLecturerTitles(req: Request, res: Response) {
-    const response: Result<LecturerTitleData[]> = await lecturerService.getAllLecturerTitles();
+  async getLecturerTitles(req: Request, res: Response) {
+    const response: Result<LecturerTitleData[]> = await lecturerService.getLecturerTitles();
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({

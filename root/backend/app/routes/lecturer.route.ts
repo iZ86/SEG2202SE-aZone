@@ -14,7 +14,7 @@ class LecturerRoute {
 
   initializeRoutes() {
     this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getLecturers));
-    this.router.get("/titles", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getAllLecturerTitles));
+    this.router.get("/titles", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getLecturerTitles));
     this.router.get("/titles/:lecturerTitleId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getLecturerTitleById));
     this.router.get("/:lecturerId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getLecturerById));
 

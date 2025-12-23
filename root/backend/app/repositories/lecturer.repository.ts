@@ -12,7 +12,7 @@ interface ILecturerRepository {
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader>;
   deleteLecturerById(lecturerId: number): Promise<ResultSetHeader>;
   getLecturerCount(query: string): Promise<number>;
-  getAllLecturerTitles(): Promise<LecturerTitleData[]>;
+  getLecturerTitles(): Promise<LecturerTitleData[]>;
   getLecturerTitleById(lecturerTitleId: number): Promise<LecturerTitleData | undefined>;
 }
 
@@ -162,7 +162,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  getAllLecturerTitles(): Promise<LecturerTitleData[]> {
+  getLecturerTitles(): Promise<LecturerTitleData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<LecturerTitleData[]>(
         "SELECT * " +
