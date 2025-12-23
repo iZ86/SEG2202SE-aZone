@@ -244,12 +244,12 @@ export default class UserController {
     }
   }
 
-  async getAllStudentCourseProgrammeIntakes(req: Request, res: Response) {
+  async getStudentCourseProgrammeIntakes(req: Request, res: Response) {
     const page: number = parseInt(req.query.page as string) || 1;
     const pageSize: number = parseInt(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getAllStudentCourseProgrammeIntakes(query, pageSize, page);
+    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakes(query, pageSize, page);
     const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
     if (response.isSuccess()) {

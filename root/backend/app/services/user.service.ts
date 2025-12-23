@@ -20,7 +20,7 @@ interface IUserService {
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>>;
-  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
+  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
@@ -192,8 +192,8 @@ class UserService implements IUserService {
     return Result.succeed(userResponse, "User update success");
   }
 
-  async getAllStudentCourseProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
-    const studentCourseProgrammeIntakes: StudentCourseProgrammeIntakeData[] = await userRepository.getAllStudentCourseProgrammeIntakes(query, pageSize, page);
+  async getStudentCourseProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
+    const studentCourseProgrammeIntakes: StudentCourseProgrammeIntakeData[] = await userRepository.getStudentCourseProgrammeIntakes(query, pageSize, page);
 
     if (!studentCourseProgrammeIntakes.length) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");

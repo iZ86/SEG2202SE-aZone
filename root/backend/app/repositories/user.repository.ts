@@ -23,7 +23,7 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
-  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
   getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
@@ -367,7 +367,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  getAllStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number): Promise<StudentCourseProgrammeIntakeData[]> {
+  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number): Promise<StudentCourseProgrammeIntakeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
