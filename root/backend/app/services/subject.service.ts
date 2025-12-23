@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { SubjectData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData } from "../models/subject-model";
 import subjectRepository from "../repositories/subject.repository";
 import courseRepository from "../repositories/course.repository";
 import { CourseSubjectData } from "../models/course-model";
@@ -15,6 +15,8 @@ interface ISubjectService {
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<CourseSubjectData[]>>;
   deleteSubjectById(subjectId: number): Promise<Result<null>>;
   getSubjectCount(query: string): Promise<Result<number>>;
+  getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
+  getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<Result<number>>;
 }
 
 class SubjectService implements ISubjectService {
@@ -105,6 +107,18 @@ class SubjectService implements ISubjectService {
     const subjectCount: number = await subjectRepository.getSubjectCount(query);
 
     return Result.succeed(subjectCount ? subjectCount : 0, "Subject count retrieve success");
+  }
+
+  async getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>> {
+    const studentEnrollmentSubject: StudentSubjectData[] = await subjectRepository.getSubjectsByStudentId(studentId, semester, query, pageSize, page);
+
+    return Result.succeed(studentEnrollmentSubject, "Student subjects retrieve success");
+  }
+
+  async getSubjectsCountByStudentId(studentId: number, semester: number, query: string = ""): Promise<Result<number>> {
+    const studentEnrollmentSubjectCount: number = await subjectRepository.getSubjectsCountByStudentId(studentId, semester, query);
+
+    return Result.succeed(studentEnrollmentSubjectCount ? studentEnrollmentSubjectCount : 0, "Student Enrollment Subject count retrieve success");
   }
 }
 

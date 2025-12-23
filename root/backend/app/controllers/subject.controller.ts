@@ -2,38 +2,70 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
-import { SubjectData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData } from "../models/subject-model";
 import courseService from "../services/course.service";
 import { CourseData } from "../models/course-model";
 
 export default class SubjectController {
   async getSubjects(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
-    const query: string = req.query.query as string || "";
 
-    const response: Result<SubjectData[]> = await subjectService.getSubjects(query, pageSize, page);
-    const subjectCount: Result<number> = await subjectService.getSubjectCount(query);
+    const userId: number = req.user.userId as number;
+    const isStudent: boolean = req.user.isStudent as boolean;
+    const isAdmin: boolean = req.user.isAdmin as boolean;
 
-    let apiResponse: object = {
-      subjects: response.getData(),
-    };
+    if (isStudent) {
 
-    if (page != null && pageSize != null) {
-      apiResponse = {
-        subjects: response.getData(),
-        subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
-      };
-    }
+      const page: number = parseInt(req.query.page as string) || 1;
+      const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+      const query: string = req.query.query as string || "";
+      const semester: number = parseInt(req.query.semester as string) || 0;
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(apiResponse, response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
+      const response: Result<StudentSubjectData[]> = await subjectService.getSubjectsByStudentId(userId, semester, query, pageSize, page);
+      const subjectCount: Result<number> = await subjectService.getSubjectsCountByStudentId(userId, semester, query);
+      if (response.isSuccess()) {
+        return res.sendSuccess.ok({
+          subjects: response.getData(),
+          subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
+        }, response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage());
+        }
       }
+    } else if (isAdmin) {
+
+      const page: number | null = parseInt(req.query.page as string) || null;
+      const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+      const query: string = req.query.query as string || "";
+
+      const response: Result<SubjectData[]> = await subjectService.getSubjects(query, pageSize, page);
+      const subjectCount: Result<number> = await subjectService.getSubjectCount(query);
+
+      let apiResponse: object = {
+        subjects: response.getData(),
+      };
+
+      if (page != null && pageSize != null) {
+        apiResponse = {
+          subjects: response.getData(),
+          subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
+        };
+      }
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.ok(apiResponse, response.getMessage());
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage());
+        }
+      }
+
+    } else {
+      throw new Error("getSubjects in subjects.controller.ts, user is neither student nor admin");
     }
+
   }
 
   async getSubjectById(req: Request, res: Response) {

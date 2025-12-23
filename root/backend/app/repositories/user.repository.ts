@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentSubjectData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
@@ -34,8 +34,6 @@ interface IUserRepostory {
   getStudentActiveSubjectsOverviewById(studentId: number): Promise<StudentSubjectOverviewData[]>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
-  getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]>;
-  getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<number>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -589,76 +587,6 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getStudentSubjectsById(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]> {
-    const offset: number = (page - 1) * pageSize;
-    return new Promise((resolve, reject) => {
-      databaseConn.query<StudentSubjectData[]>(
-        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus " +
-        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
-        "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
-        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
-        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
-        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON es.enrollmentId = pi.enrollmentId " +
-        "WHERE sest.studentId = ? " +
-        "AND (s.subjectCode LIKE ? " +
-        "OR s.subjectName LIKE ?) " +
-        "AND (? = 0 OR pi.semester = ?) " +
-        "ORDER BY sest.subjectStatusId, s.subjectId ASC " +
-        "LIMIT ? OFFSET ?;",
-        [
-          studentId,
-          "%" + query + "%",
-          "%" + query + "%",
-          semester,
-          semester,
-          pageSize,
-          offset,
-        ],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        }
-      );
-    });
-  }
-
-  getStudentSubjectsCountById(studentId: number, semester: number, query: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<TotalCount[]>(
-        "SELECT COUNT(DISTINCT(s.subjectId)) AS totalCount " +
-        "FROM ENROLLMENT_SUBJECT es " +
-        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON es.enrollmentSubjectId = est.enrollmentSubjectId " +
-        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
-        "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
-        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
-        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
-        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-        "INNER JOIN DAY d ON est.dayId = d.dayId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
-        "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
-        "WHERE sest.studentId = ? " +
-        "AND (s.subjectCode LIKE ? " +
-        "OR s.subjectName LIKE ?) " +
-        "AND (? = 0 OR pi.semester = ?) ",
-        [
-          studentId,
-          "%" + query + "%",
-          "%" + query + "%",
-          semester,
-          semester,
-        ],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0].totalCount);
         }
       );
     });

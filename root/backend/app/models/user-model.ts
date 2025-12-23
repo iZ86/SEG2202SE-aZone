@@ -41,23 +41,6 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   courseStatus: number;
 }
 
-export interface StudentSubjectData extends RowDataPacket {
-  subjectId: number;
-  subjectCode: string;
-  subjectName: string;
-  creditHours: number;
-  subjectStatusId: number;
-  subjectStatus: string;
-  courseId: number;
-  courseCode: string;
-  courseName: string;
-  programmeIntakeId: number;
-  semester: number;
-  intake: number;
-  studyModeId: number;
-  studyMode: string;
-}
-
 export interface StudentSemesterStartAndEndData extends RowDataPacket {
   semesterStartDate: Date;
   semesterEndDate: Date;
