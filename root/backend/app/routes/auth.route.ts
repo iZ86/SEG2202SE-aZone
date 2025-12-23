@@ -13,8 +13,11 @@ class AuthRoute {
   }
 
   initializeRoutes() {
-    this.router.post("/login", loginValidator, asyncHandler(this.controller.login));
+
     this.router.get("/me", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getMe));
+
+    this.router.post("/login", loginValidator, asyncHandler(this.controller.login));
+
     this.router.patch("/me", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, updateMeValidator, asyncHandler(this.controller.updateMe));
   }
 }
