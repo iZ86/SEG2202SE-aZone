@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { SubjectData, StudentSubjectData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData } from "../models/subject-model";
 import { TotalCount } from "../models/general-model";
 
 interface ISubjectRepository {
@@ -14,6 +14,7 @@ interface ISubjectRepository {
   getSubjectCount(query: string): Promise<number>;
   getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]>;
   getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<number>;
+  getActiveSubjectsOverviewByStudentId(studentId: number): Promise<StudentSubjectOverviewData[]>;
 }
 
 class SubjectRepository implements ISubjectRepository {
@@ -226,6 +227,27 @@ class SubjectRepository implements ISubjectRepository {
       );
     });
   }
+
+  getActiveSubjectsOverviewByStudentId(studentId: number): Promise<StudentSubjectOverviewData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentSubjectOverviewData[]>(
+        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours " +
+        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
+        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
+        "WHERE sest.subjectStatusId = 1 " +
+        "AND sest.studentId = ? " +
+        "ORDER BY s.subjectId;",
+        [studentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
 }
 
 export default new SubjectRepository();

@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
@@ -31,7 +31,6 @@ interface IUserRepostory {
   updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
-  getStudentActiveSubjectsOverviewById(studentId: number): Promise<StudentSubjectOverviewData[]>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
 }
@@ -524,26 +523,6 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getStudentActiveSubjectsOverviewById(studentId: number): Promise<StudentSubjectOverviewData[]> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<StudentSubjectOverviewData[]>(
-        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours " +
-        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
-        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
-        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
-        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "WHERE sest.subjectStatusId = 1 " +
-        "AND sest.studentId = ? " +
-        "ORDER BY s.subjectId;",
-        [studentId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
         }
       );
     });

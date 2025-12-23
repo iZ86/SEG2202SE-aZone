@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
 interface IUserService {
@@ -25,7 +25,6 @@ interface IUserService {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
-  getStudentActiveSubjectsOverviewById(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
 }
@@ -249,11 +248,6 @@ class UserService implements IUserService {
     }
 
     return Result.succeed(studentInformation, "Student information retrieve success");
-  }
-
-  async getStudentActiveSubjectsOverviewById(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
-    const studentActiveSubjects: StudentSubjectOverviewData[] = await userRepository.getStudentActiveSubjectsOverviewById(studentId);
-    return Result.succeed(studentActiveSubjects, "Student active subjects retrieve success");
   }
 
   async getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>> {

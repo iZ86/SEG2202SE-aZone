@@ -24,3 +24,11 @@ export interface StudentSubjectData extends RowDataPacket {
   studyModeId: number;
   studyMode: string;
 }
+
+/** Used when getting the subject data of active subjects for the student. */
+export interface StudentSubjectOverviewData extends RowDataPacket {
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  creditHours: number;
+}

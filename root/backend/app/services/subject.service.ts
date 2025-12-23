@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { SubjectData, StudentSubjectData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData } from "../models/subject-model";
 import subjectRepository from "../repositories/subject.repository";
 import courseRepository from "../repositories/course.repository";
 import { CourseSubjectData } from "../models/course-model";
@@ -17,6 +17,7 @@ interface ISubjectService {
   getSubjectCount(query: string): Promise<Result<number>>;
   getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
   getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<Result<number>>;
+  getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
 }
 
 class SubjectService implements ISubjectService {
@@ -119,6 +120,11 @@ class SubjectService implements ISubjectService {
     const studentEnrollmentSubjectCount: number = await subjectRepository.getSubjectsCountByStudentId(studentId, semester, query);
 
     return Result.succeed(studentEnrollmentSubjectCount ? studentEnrollmentSubjectCount : 0, "Student Enrollment Subject count retrieve success");
+  }
+
+  async getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
+    const studentActiveSubjects: StudentSubjectOverviewData[] = await subjectRepository.getActiveSubjectsOverviewByStudentId(studentId);
+    return Result.succeed(studentActiveSubjects, "Student active subjects retrieve success");
   }
 }
 

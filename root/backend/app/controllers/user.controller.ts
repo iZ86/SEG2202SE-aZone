@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, StudentSubjectOverviewData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
 import userService from "../services/user.service";
 import courseService from "../services/course.service";
 import programmeService from "../services/programme.service";
@@ -381,18 +381,6 @@ export default class UserController {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
       }
-    }
-  }
-
-  async getStudentActiveSubjectsOverviewById(req: Request, res: Response) {
-    const userId: number = req.user.userId;
-
-    const response: Result<StudentSubjectOverviewData[]> = await userService.getStudentActiveSubjectsOverviewById(userId);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
-    } else {
-      throw new Error("user.controller.ts, getStudentActiveSubjectsById failed");
     }
   }
 
