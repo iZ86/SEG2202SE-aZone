@@ -16,7 +16,7 @@ interface IEnrollmentRepository {
   getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined>;
   createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
-  getAllEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
+  getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
@@ -234,7 +234,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getAllEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]> {
+  getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
       SELECT *

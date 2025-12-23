@@ -172,7 +172,7 @@ export default class EnrollmentController {
     }
   }
 
-  async getAllEnrollmentSubjects(req: Request, res: Response) {
+  async getEnrollmentSubjects(req: Request, res: Response) {
 
     const userId: number = req.user.userId as number;
     const isStudent: boolean = req.user.isStudent as boolean;
@@ -194,7 +194,7 @@ export default class EnrollmentController {
       const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
       const query: string = req.query.query as string || "";
 
-      const response: Result<EnrollmentSubjectData[]> = await enrollmentService.getAllEnrollmentSubjects(query, pageSize, page);
+      const response: Result<EnrollmentSubjectData[]> = await enrollmentService.getEnrollmentSubjects(query, pageSize, page);
       const enrollmentSubjectCount: Result<number> = await enrollmentService.getEnrollmentSubjectCount(query);
 
       let apiResponse: object = {
