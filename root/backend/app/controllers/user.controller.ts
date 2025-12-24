@@ -244,72 +244,28 @@ export default class UserController {
     }
   }
 
-  async getStudentCourseProgrammeIntakes(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
-    const query: string = req.query.query as string;
+  // TODO: Checkup with skyfoojs whether or not this is unused API.
+  // async getStudentCourseProgrammeIntakes(req: Request, res: Response) {
+  //   const page: number = parseInt(req.query.page as string) || 1;
+  //   const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+  //   const query: string = req.query.query as string;
 
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakes(query, pageSize, page);
-    const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
+  //   const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakes(query, pageSize, page);
+  //   const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok({
-        users: response.getData(),
-        userCount: userCount.isSuccess() ? userCount.getData() : 0,
-      }, response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
+  //   if (response.isSuccess()) {
+  //     return res.sendSuccess.ok({
+  //       users: response.getData(),
+  //       userCount: userCount.isSuccess() ? userCount.getData() : 0,
+  //     }, response.getMessage());
+  //   } else {
+  //     switch (response.getErrorCode()) {
+  //       case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+  //         return res.sendError.notFound(response.getMessage());
+  //     }
+  //   }
+  // }
 
-  async getStudentCourseProgrammeIntakeByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
-    const status: number = parseInt(req.query.status as string) || 0;
-
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.badRequest("Invalid studentId");
-    }
-
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakeByStudentId(studentId, status);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(
-        response.getData().map((data) => {
-          let statusLabel: string;
-          switch (data.courseStatus) {
-            case ENUM_PROGRAMME_STATUS.ACTIVE:
-              statusLabel = "Active";
-              break;
-            case ENUM_PROGRAMME_STATUS.COMPLETED:
-              statusLabel = "Completed";
-              break;
-            case ENUM_PROGRAMME_STATUS.FINISHED:
-              statusLabel = "Finished";
-              break;
-            case ENUM_PROGRAMME_STATUS.DROPPED:
-              statusLabel = "Dropped";
-              break;
-            default:
-              statusLabel = "Unknown";
-          }
-
-          return {
-            ...data,
-            status: statusLabel,
-          };
-        }),
-        response.getMessage()
-      );
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
 
   async createStudentCourseProgrammeIntake(req: Request, res: Response) {
     const studentId: number = req.body.studentId;

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
 import intakeService from "../services/intake.service";
-import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData } from "../models/programme-model";
 import { IntakeData } from "../models/intake-model";
 
 export default class ProgrammeController {
@@ -308,6 +308,109 @@ export default class ProgrammeController {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
       }
+    }
+  }
+
+  async getProgrammeHistory(req: Request, res: Response) {
+    const userId: number = req.user.userId as number;
+    const isStudent: boolean = req.user.isStudent as boolean;
+    const isAdmin: boolean = req.user.isAdmin as boolean;
+    const status: number = parseInt(req.query.status as string) || 0;
+
+    if (isStudent) {
+
+      const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(userId, status);
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.ok(
+          response.getData().map((data) => {
+            let statusLabel: string;
+            switch (data.courseStatus) {
+              case ENUM_PROGRAMME_STATUS.ACTIVE:
+                statusLabel = "Active";
+                break;
+              case ENUM_PROGRAMME_STATUS.COMPLETED:
+                statusLabel = "Completed";
+                break;
+              case ENUM_PROGRAMME_STATUS.FINISHED:
+                statusLabel = "Finished";
+                break;
+              case ENUM_PROGRAMME_STATUS.DROPPED:
+                statusLabel = "Dropped";
+                break;
+              default:
+                statusLabel = "Unknown";
+            }
+
+            return {
+              ...data,
+              status: statusLabel,
+            };
+          }),
+          response.getMessage()
+        );
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage());
+        }
+      }
+
+
+    } else if (isAdmin) {
+
+      const studentIdStr: string = req.query.studentId as string || "";
+
+      if (studentIdStr.length === 0) {
+        return res.sendError.badRequest("Invalid studentId");
+      }
+
+      const studentId: number = parseInt(studentIdStr);
+
+      if (!studentId || isNaN(studentId)) {
+        return res.sendError.badRequest("Invalid studentId");
+      }
+
+      const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(studentId, status);
+
+      if (response.isSuccess()) {
+        return res.sendSuccess.ok(
+          response.getData().map((data) => {
+            let statusLabel: string;
+            switch (data.courseStatus) {
+              case ENUM_PROGRAMME_STATUS.ACTIVE:
+                statusLabel = "Active";
+                break;
+              case ENUM_PROGRAMME_STATUS.COMPLETED:
+                statusLabel = "Completed";
+                break;
+              case ENUM_PROGRAMME_STATUS.FINISHED:
+                statusLabel = "Finished";
+                break;
+              case ENUM_PROGRAMME_STATUS.DROPPED:
+                statusLabel = "Dropped";
+                break;
+              default:
+                statusLabel = "Unknown";
+            }
+
+            return {
+              ...data,
+              status: statusLabel,
+            };
+          }),
+          response.getMessage()
+        );
+      } else {
+        switch (response.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return res.sendError.notFound(response.getMessage());
+        }
+      }
+
+    } else {
+      throw new Error("getProgrammeHistory in programme.controller.ts, user is neither student nor admin");
+
     }
   }
 }

@@ -20,8 +20,8 @@ interface IUserService {
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>>;
-  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
+  // getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
@@ -189,16 +189,6 @@ class UserService implements IUserService {
     return Result.succeed(userResponse, "User update success");
   }
 
-  async getStudentCourseProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
-    const studentCourseProgrammeIntakes: StudentCourseProgrammeIntakeData[] = await userRepository.getStudentCourseProgrammeIntakes(query, pageSize, page);
-
-    if (!studentCourseProgrammeIntakes.length) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
-    }
-
-    return Result.succeed(studentCourseProgrammeIntakes, "Students course programme intakes retrieve success");
-  }
-
   async getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
     const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData[] | undefined = await userRepository.getStudentCourseProgrammeIntakeByStudentId(studentId, status);
 
@@ -208,6 +198,17 @@ class UserService implements IUserService {
 
     return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
   }
+
+  // TODO: Checkup with skyfoojs whether or not this is unused API.
+  // async getStudentCourseProgrammeIntakes(query: string = "", pageSize: number, page: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
+  //   const studentCourseProgrammeIntakes: StudentCourseProgrammeIntakeData[] = await userRepository.getStudentCourseProgrammeIntakes(query, pageSize, page);
+
+  //   if (!studentCourseProgrammeIntakes.length) {
+  //     return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
+  //   }
+
+  //   return Result.succeed(studentCourseProgrammeIntakes, "Students course programme intakes retrieve success");
+  // }  
 
   async getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
     const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await userRepository.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId, courseId, programmeIntakeId);

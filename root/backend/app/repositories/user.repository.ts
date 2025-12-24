@@ -23,7 +23,7 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
-  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
+  // getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number, status: number): Promise<StudentCourseProgrammeIntakeData[]>;
   getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
@@ -364,40 +364,41 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number): Promise<StudentCourseProgrammeIntakeData[]> {
-    const offset: number = (page - 1) * pageSize;
-    return new Promise((resolve, reject) => {
-      databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
-        "FROM REGISTERED_USER ru " +
-        "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
-        "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
-        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
-        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
-        "INNER JOIN INTAKE i ON i.intakeId = pi.intakeId " +
-        "WHERE (ru.userId LIKE ? " +
-        "OR ru.firstName LIKE ? " +
-        "OR ru.lastName LIKE ? " +
-        "OR ru.email LIKE ? " +
-        "OR c.courseName LIKE ?) " +
-        "LIMIT ? OFFSET ?;",
-        [
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          "%" + query + "%",
-          pageSize,
-          offset,
-        ],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        }
-      );
-    });
-  };
+  // TODO: Checkup with skyfoojs whether or not this is unused API.
+  // getStudentCourseProgrammeIntakes(query: string, pageSize: number, page: number): Promise<StudentCourseProgrammeIntakeData[]> {
+  //   const offset: number = (page - 1) * pageSize;
+  //   return new Promise((resolve, reject) => {
+  //     databaseConn.query<StudentCourseProgrammeIntakeData[]>(
+  //       "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
+  //       "FROM REGISTERED_USER ru " +
+  //       "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
+  //       "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
+  //       "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
+  //       "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
+  //       "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+  //       "INNER JOIN INTAKE i ON i.intakeId = pi.intakeId " +
+  //       "WHERE (ru.userId LIKE ? " +
+  //       "OR ru.firstName LIKE ? " +
+  //       "OR ru.lastName LIKE ? " +
+  //       "OR ru.email LIKE ? " +
+  //       "OR c.courseName LIKE ?) " +
+  //       "LIMIT ? OFFSET ?;",
+  //       [
+  //         "%" + query + "%",
+  //         "%" + query + "%",
+  //         "%" + query + "%",
+  //         "%" + query + "%",
+  //         "%" + query + "%",
+  //         pageSize,
+  //         offset,
+  //       ],
+  //       (err, res) => {
+  //         if (err) reject(err);
+  //         resolve(res);
+  //       }
+  //     );
+  //   });
+  // };
 
   getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {

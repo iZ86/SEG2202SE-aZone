@@ -14,3 +14,21 @@ export interface ProgrammeIntakeData extends RowDataPacket {
   semesterStartDate: Date;
   semesterEndDate: Date;
 }
+
+export interface ProgrammeHistoryData extends RowDataPacket {
+  studentId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  courseId: number;
+  courseName: string;
+  programmeIntakeId: number;
+  programmeId: number;
+  programmeName: string;
+  intakeId: number;
+  semester: number;
+  semesterStartDate: Date;
+  semesterEndDate: Date;
+  courseStatus: number;
+}

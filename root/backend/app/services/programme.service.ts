@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 
 interface IProgrammeService {
@@ -24,6 +24,7 @@ interface IProgrammeService {
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
+  getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -191,6 +192,16 @@ class ProgrammeService implements IProgrammeService {
     const programmeIntakeCount: number = await programmeRepository.getProgrammeIntakeCount(query);
 
     return Result.succeed(programmeIntakeCount ? programmeIntakeCount : 0, "Programme intake count retrieve success");
+  }
+
+  async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
+    const studentCourseProgrammeIntake: ProgrammeHistoryData[] | undefined = await programmeRepository.getProgrammeHistoryByStudentId(studentId, status);
+
+    if (!studentCourseProgrammeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
+    }
+
+    return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
   }
 }
 
