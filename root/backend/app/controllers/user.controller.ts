@@ -280,7 +280,7 @@ export default class UserController {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId, or courseId, or programmeIntakeId");
     }
 
-    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await userService.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await userService.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (studentCourseProgrammeIntakeResponse.getData()) {
       return res.sendError.conflict("Active course exist");

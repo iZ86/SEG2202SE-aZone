@@ -210,8 +210,8 @@ class UserService implements IUserService {
   //   return Result.succeed(studentCourseProgrammeIntakes, "Students course programme intakes retrieve success");
   // }  
 
-  async getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
-    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await userRepository.getStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrameIntakeId(studentId, courseId, programmeIntakeId);
+  async getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await userRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (!studentCourseProgrammeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
