@@ -244,29 +244,6 @@ export default class UserController {
     }
   }
 
-  // TODO: Checkup with skyfoojs whether or not this is unused API.
-  // async getStudentCourseProgrammeIntakes(req: Request, res: Response) {
-  //   const page: number = parseInt(req.query.page as string) || 1;
-  //   const pageSize: number = parseInt(req.query.pageSize as string) || 15;
-  //   const query: string = req.query.query as string;
-
-  //   const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.getStudentCourseProgrammeIntakes(query, pageSize, page);
-  //   const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
-
-  //   if (response.isSuccess()) {
-  //     return res.sendSuccess.ok({
-  //       users: response.getData(),
-  //       userCount: userCount.isSuccess() ? userCount.getData() : 0,
-  //     }, response.getMessage());
-  //   } else {
-  //     switch (response.getErrorCode()) {
-  //       case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-  //         return res.sendError.notFound(response.getMessage());
-  //     }
-  //   }
-  // }
-
-
   async createStudentCourseProgrammeIntake(req: Request, res: Response) {
     const studentId: number = req.body.studentId;
     const courseId: number = req.body.courseId;
