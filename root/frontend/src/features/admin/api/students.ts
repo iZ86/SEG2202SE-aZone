@@ -96,7 +96,7 @@ export const getAllStudentCourseProgrammeIntakesAPI = async (token: string, page
 
 export const getStudentCourseProgrammeIntakeByStudentIdAPI = async (token: string, studentId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/users/students/${studentId}/course/programme/intake`,
+    return await fetch(`http://localhost:8080/api/v1/programmes/history`,
       {
         method: 'GET',
         headers: {
