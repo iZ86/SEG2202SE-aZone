@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import aZoneLogoWhite from "@images/aZone-logo-white.png";
 import StudentAvatar from "@features/student/components/Avatar";
 import AdminAvatar from "@features/admin/components/Avatar";
 
@@ -34,7 +33,9 @@ export default function UserNavbar({
       />
       <div className="flex items-center gap-x-8">
         {children}
-        <img src={aZoneLogoWhite} alt="aZone White Logo" />
+        <Link to={`${userRole === 2 ? "/admin" : "/"}`}>
+          <h1 className="font-semibold">aZone</h1>
+        </Link>
       </div>
 
       <div className="relative">
