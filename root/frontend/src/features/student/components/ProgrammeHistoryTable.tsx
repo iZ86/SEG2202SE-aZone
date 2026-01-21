@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStudentCourseProgrammeIntakeByStudentIdAPI } from "@features/admin/api/students";
+import { getStudentProgrammeHistoryAPI } from "@features/admin/api/students";
 import { useStudent } from "../hooks/useStudent";
 import { toast } from "react-toastify";
 import LoadingOverlay from "@components/LoadingOverlay";
@@ -77,7 +77,7 @@ export default function StudentProgrammeHistoryTable() {
     studentId: number
   ) {
     const studentCourseProgrammeIntakeResponse: Response | undefined =
-      await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
+      await getStudentProgrammeHistoryAPI(token, studentId);
 
     if (
       !studentCourseProgrammeIntakeResponse ||

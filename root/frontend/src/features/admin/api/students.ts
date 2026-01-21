@@ -94,9 +94,9 @@ export const getAllStudentCourseProgrammeIntakesAPI = async (token: string, page
   }
 };
 
-export const getStudentCourseProgrammeIntakeByStudentIdAPI = async (token: string, studentId: number): Promise<Response | undefined> => {
+export const getStudentProgrammeHistoryAPI = async (token: string, studentId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/programmes/history`,
+    return await fetch(`http://localhost:8080/api/v1/programmes/history${studentId ? `?studentId=${studentId}` : ""}`,
       {
         method: 'GET',
         headers: {
