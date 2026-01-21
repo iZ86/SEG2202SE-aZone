@@ -242,7 +242,7 @@ class EnrollmentService implements IEnrollmentService {
                 startTime: StudentEnrollmentSubjectData["startTime"],
                 endTime: StudentEnrollmentSubjectData["endTime"],
                 numberOfStudentsEnrolled: StudentEnrollmentSubjectData["numberOfStudentsEnrolled"],
-                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"]
+                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"];
               }[];
             };
           };
@@ -394,7 +394,7 @@ class EnrollmentService implements IEnrollmentService {
         subjectId: number,
         numberOfStudentsEnrolled: number,
         numberOfSeats: number,
-      }
+      };
     } = {};
 
     // Place all the enrollmentSubjectTypeIds connected to studentId into a dictionary for easier lookup.
@@ -532,7 +532,7 @@ class EnrollmentService implements IEnrollmentService {
         studentId,
         enrollmentSubjectTypeId,
         1
-      ])
+      ]);
     }
 
     const createStudentEnrollmentSubjectTypes = await enrollmentRepository.createStudentEnrollmentSubjectType(studentEnrolledSubjects);

@@ -438,8 +438,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
-    })
+      );
+    });
   }
 
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
@@ -462,7 +462,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "LEFT JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
         "WHERE scpi.studentId = ? " +
         "AND scpi.status = 1 " +
-        "GROUP BY est.enrollmentSubjectTypeId " + 
+        "GROUP BY est.enrollmentSubjectTypeId " +
         "ORDER BY est.grouping ASC;",
         [studentId],
         (err, res) => {
@@ -573,8 +573,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
-    })
+      );
+    });
   }
 
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader> {
