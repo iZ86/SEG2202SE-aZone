@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, ProgrammeDistribution } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 
 interface IProgrammeService {
@@ -25,6 +25,7 @@ interface IProgrammeService {
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
+  getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -202,6 +203,12 @@ class ProgrammeService implements IProgrammeService {
     }
 
     return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
+  }
+
+  async getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>> {
+    const ProgrammeDistribution: ProgrammeDistribution[] = await programmeRepository.getProgrammeDistribution();
+
+    return Result.succeed(ProgrammeDistribution, "Programme retrieve success");
   }
 }
 

@@ -1,5 +1,5 @@
 import { ResultSetHeader } from "mysql2";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, ProgrammeDistribution } from "../models/programme-model";
 import databaseConn from "../database/db-connection";
 import { TotalCount } from "../models/general-model";
 
@@ -24,6 +24,7 @@ interface IProgrammeRepository {
   getProgrammeCount(query: string): Promise<number>;
   getProgrammeIntakeCount(query: string): Promise<number>;
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]>;
+  getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -387,6 +388,23 @@ class ProgrammeRepository implements IProgrammeRepository {
       );
     });
   };
+
+  getProgrammeDistribution(): Promise<ProgrammeDistribution[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ProgrammeDistribution[]>(
+        "SELECT p.programmeName, COUNT(*) AS count, ROUND(COUNT(*) * 100 / SUM(COUNT(*)) OVER (), 0) AS percentage " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "WHERE scpi.status = 1 " +
+        "GROUP BY p.programmeName;",
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
 }
 
 export default new ProgrammeRepository();

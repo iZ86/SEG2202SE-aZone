@@ -8,12 +8,25 @@ import { getCoursesCountAPI } from "../api/courses";
 import { getSubjectsCountAPI } from "../api/subjects";
 import { getAllEnrollmentsAPI } from "../api/enrollments";
 import type { Enrollment } from "@datatypes/enrollmentType";
+import {
+  BarChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Bar,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
+import { getProgrammeDistributionAPI } from "../api/programmes";
 
 export default function InformationPanel() {
   const { authToken, admin, loading } = useAdmin();
   const [studentsCount, setStudentsCount] = useState(0);
   const [coursesCount, setCoursesCount] = useState(0);
   const [subjectsCount, setSubjectsCount] = useState(0);
+  const [programmeDistribution, setProgrammeDistribution] = useState<
+    { programmeName: string; count: number; percentage: number }[]
+  >([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
 
   const navigate = useNavigate();
@@ -79,6 +92,34 @@ export default function InformationPanel() {
       setEnrollments(data.enrollments);
     };
 
+    const getProgrammeDistribution = async (token: string) => {
+      const response: Response | undefined = await getProgrammeDistributionAPI(
+        token
+      );
+
+      if (!response?.ok) {
+        navigate("/admin/");
+        toast.error("Failed to fetch programme distribution");
+        return;
+      }
+
+      const { data } = await response.json();
+
+      const programmeDistribution: {
+        programmeName: string;
+        count: number;
+        percentage: number;
+      }[] = data.map(
+        (p: { programmeName: string; count: number; percentage: number }) => ({
+          programmeName: p.programmeName,
+          count: p.count,
+          percentage: p.percentage,
+        })
+      );
+
+      setProgrammeDistribution(programmeDistribution);
+    };
+
     if (!authToken) {
       return;
     }
@@ -87,6 +128,7 @@ export default function InformationPanel() {
     getSubjectsCount(authToken);
     getCoursesCount(authToken);
     getRecentEnrollments(authToken);
+    getProgrammeDistribution(authToken);
   }, [authToken, navigate]);
 
   if (loading || !admin) {
@@ -111,6 +153,44 @@ export default function InformationPanel() {
         <StatCard label="Total Students" value={studentsCount} />
         <StatCard label="Total Courses" value={coursesCount} />
         <StatCard label="Total Subjects" value={subjectsCount} />
+      </div>
+
+      <div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 flex-3 flex flex-col">
+            <h3 className="text-black mb-4 font-semibold">
+              Student's Programme Distribution
+            </h3>
+
+            <div>
+              {programmeDistribution.map((item) => (
+                <div key={item.programmeName} className="mb-4 space-y-1">
+                  <div className="flex justify-between text-sm font-medium text-slate-700">
+                    <span className="font-semibold">{item.programmeName}</span>
+                    <span>{item.percentage}%</span>
+                  </div>
+
+                  <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-2 rounded-full transition-all duration-700"
+                      style={{
+                        width: `${item.percentage}%`,
+                        backgroundColor:
+                          programmeColors[item.programmeName] ?? "#64748B", // fallback
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-center mt-auto">
+              <Link
+                className="text-blue-500 hover:text-blue-600 font-semibold"
+                to={"/admin/programmes"}
+              >
+                View All Programmes
+              </Link>
+            </div>
       </div>
 
       <section className="mt-8">
