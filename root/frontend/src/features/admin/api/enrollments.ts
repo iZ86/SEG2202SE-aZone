@@ -251,3 +251,19 @@ export const createStudentEnrollmentSubjectTypesByStudentIdAPI = async (token: s
     console.error(err);
   }
 };
+
+export const getMonthlyEnrollmentCountAPI = async (token: string, duration: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/enrollments/monthly-count?duration=${duration ? duration : 6}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};

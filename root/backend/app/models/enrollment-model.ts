@@ -135,3 +135,8 @@ export interface StudentEnrollmentSchedule extends RowDataPacket {
 export interface StudentEnrolledSubjectTypeIds {
   enrollmentSubjectTypeIds: number[];
 }
+
+export interface MonthlyEnrollmentData extends RowDataPacket {
+  month: string;
+  enrollmentCount: number;
+}

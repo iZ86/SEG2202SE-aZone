@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, StudentEnrolledSubject } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, StudentEnrolledSubject, MonthlyEnrollmentData } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -34,6 +34,7 @@ interface IEnrollmentRepository {
   deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
   getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]>;
+  getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -586,8 +587,25 @@ class EnrollmentRepository implements IEnrollmentRepository {
           if (err) reject(err);
           resolve(res);
         }
-      )
-    })
+      );
+    });
+  }
+
+  getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<MonthlyEnrollmentData[]>(
+        "SELECT DATE_FORMAT(enrollmentStartDateTime, '%Y-%m') AS month, COUNT(*) AS enrollmentCount " +
+        "FROM ENROLLMENT " +
+        "WHERE enrollmentStartDateTime >= DATE_SUB(CURDATE(), INTERVAL ? MONTH) " +
+        "GROUP BY month " +
+        "ORDER BY month ASC;",
+        [duration],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
   }
 }
 
