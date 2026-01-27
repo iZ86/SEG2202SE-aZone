@@ -244,37 +244,6 @@ export default class UserController {
     }
   }
 
-  async createStudentCourseProgrammeIntake(req: Request, res: Response) {
-    const studentId: number = req.body.studentId;
-    const courseId: number = req.body.courseId;
-    const programmeIntakeId: number = req.body.programmeIntakeId;
-
-    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
-    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
-
-    if (!studentResponse.isSuccess() || !courseResponse.isSuccess() || !programmeIntakeResponse.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId, or courseId, or programmeIntakeId");
-    }
-
-    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await userService.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
-
-    if (studentCourseProgrammeIntakeResponse.getData()) {
-      return res.sendError.conflict("Active course exist");
-    }
-
-    const response: Result<StudentCourseProgrammeIntakeData[]> = await userService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.create(response.getData(), response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
-
   async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId);
     const courseId: number = parseInt(req.params.courseId);

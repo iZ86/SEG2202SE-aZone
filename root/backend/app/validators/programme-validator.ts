@@ -30,3 +30,19 @@ export const createAndUpdateProgrammeIntakeValidator: any = [
     .isDate().withMessage('semesterEndDate must be (YYYY-MM-DD) format'),
   validate,
 ];
+
+export const createStudentCourseProgrammeIntakeValidator: any = [
+  body('studentId')
+    .trim()
+    .notEmpty().withMessage('Missing studentId')
+    .isNumeric().withMessage('studentId must be numeric'),
+  body('programmeIntakeId')
+    .trim()
+    .notEmpty().withMessage('Missing programmeIntakeId')
+    .isNumeric().withMessage('programmeIntakeId must be numeric'),
+  body('courseId')
+    .trim()
+    .notEmpty().withMessage('Missing courseId')
+    .isNumeric().withMessage('courseId must be numeric'),
+  validate,
+];

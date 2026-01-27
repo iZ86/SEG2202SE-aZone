@@ -1,8 +1,10 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData } from "../models/programme-model";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
+import courseService from "./course.service";
+import { CourseData } from "../models/course-model";
 
 interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
@@ -25,6 +27,8 @@ interface IProgrammeService {
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
+  getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -202,6 +206,58 @@ class ProgrammeService implements IProgrammeService {
     }
 
     return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
+  }
+
+  async getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+
+    if (!studentCourseProgrammeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
+    }
+
+    return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
+  }
+
+  // Enroll the student into a course, and specify a programme intake.
+  async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    if (studentCourseProgrammeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Student already enrolled into this course programme intake");
+    }
+
+
+    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
+    if (!courseResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResponse.getMessage());
+    }
+
+
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+    if (!programmeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResponse.getMessage());
+    }
+
+
+    const updateResult = await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
+    if (updateResult.affectedRows === 0) {
+      throw new Error("createStudentCourseProgrammeIntake failed to update old programme intake");
+    }
+
+
+    const createResult = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    if (createResult.affectedRows === 0) {
+      throw new Error("createStudentCourseProgrammeIntake failed to insert");
+    }
+
+    
+    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+
+    if (!studentCrouseProgrammeIntake) {
+      throw new Error("createStudentCourseProgrammeIntake student course programme intake created not found");
+    }
+
+    return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake create success");
   }
 }
 

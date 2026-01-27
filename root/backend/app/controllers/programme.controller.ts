@@ -3,7 +3,7 @@ import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
 import intakeService from "../services/intake.service";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData } from "../models/programme-model";
 import { IntakeData } from "../models/intake-model";
 
 export default class ProgrammeController {
@@ -411,6 +411,26 @@ export default class ProgrammeController {
     } else {
       throw new Error("getProgrammeHistory in programme.controller.ts, user is neither student nor admin");
 
+    }
+  }
+
+  async createStudentCourseProgrammeIntake(req: Request, res: Response) {
+    const studentId: number = req.body.studentId;
+    const courseId: number = req.body.courseId;
+    const programmeIntakeId: number = req.body.programmeIntakeId;
+
+
+    const response: Result<StudentCourseProgrammeIntakeData> = await programmeService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
+      }
     }
   }
 }

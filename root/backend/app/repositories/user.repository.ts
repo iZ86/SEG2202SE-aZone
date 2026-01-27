@@ -2,7 +2,6 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
-import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
 interface IUserRepostory {
   getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -23,11 +22,7 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   deleteUserById(userId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
-  getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
-  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader>;
-  updateStudentCourseProgrammeIntakeByStudentId(studentId: number, courseId: number, programmeIntakeId: number, status: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
@@ -363,29 +358,6 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<StudentCourseProgrammeIntakeData[]>(
-        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
-        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
-        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
-        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
-        "INNER JOIN INTAKE i ON i.intakeId = pi.intakeId " +
-        "WHERE scpi.studentId = ? " +
-        "AND scpi.courseId = ? " +
-        "AND scpi.programmeIntakeId = ?;",
-        [
-          studentId, courseId, programmeIntakeId
-        ],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  };
-
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined> {
     return new Promise((resolve, reject) => {
       let sql: string = `
@@ -405,35 +377,6 @@ class UserRepository implements IUserRepostory {
       }
 
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(sql, params,
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        }
-      );
-    });
-  };
-
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "INSERT INTO STUDENT_COURSE_PROGRAMME_INTAKE (studentId, courseId, programmeIntakeId, status) " +
-        "VALUES (?, ?, ?, ?);",
-        [studentId, courseId, programmeIntakeId, 1],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        }
-      );
-    });
-  };
-
-  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET status = ? " +
-        "WHERE studentId = ? " +
-        "AND status = ?;",
-        [status, studentId, 1],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

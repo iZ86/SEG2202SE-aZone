@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import UserController from "../controllers/user.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createStudentCourseProgrammeIntakeValidator, createStudentValidator, updateAdminValidator, updateStudentValidator, updateUserProfilePictureValidator } from "../validators/user-validator";
+import { createStudentValidator, updateAdminValidator, updateStudentValidator, updateUserProfilePictureValidator } from "../validators/user-validator";
 
 class UserRoute {
   router = Router();
@@ -27,7 +27,6 @@ class UserRoute {
 
 
     this.router.post("/students", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createStudentValidator, asyncHandler(this.controller.createStudent));
-    this.router.post("/students/course/programme/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createStudentCourseProgrammeIntakeValidator, asyncHandler(this.controller.createStudentCourseProgrammeIntake));
     
     this.router.put("/students/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, updateStudentValidator, asyncHandler(this.controller.updateStudentById));
 

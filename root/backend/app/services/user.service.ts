@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
@@ -21,7 +21,6 @@ interface IUserService {
   deleteUserById(userId: number): Promise<Result<null>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
@@ -196,31 +195,6 @@ class UserService implements IUserService {
     }
 
     return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
-  }
-
-  async getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
-    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await userRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
-
-    if (!studentCourseProgrammeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
-    }
-
-    return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
-  }
-
-  // Enroll the student into a course, and specify a programme intake.
-  async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
-    await userRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
-
-    await userRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
-
-    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData[] | undefined = await userRepository.getStudentCourseProgrammeIntakeByStudentId(studentId, 0);
-
-    if (!studentCrouseProgrammeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake created not found");
-    }
-
-    return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake create success");
   }
 
   async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
