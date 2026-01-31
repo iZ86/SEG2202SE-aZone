@@ -131,9 +131,9 @@ export const createStudentCourseProgrammeIntakeAPI = async (token: string, stude
   }
 };
 
-export const deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeIdAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number): Promise<Response | undefined> => {
+export const deleteStudentCourseProgrammeIntakeAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/users/students/${studentId}/course/${courseId}/programme/intake/${programmeIntakeId}`,
+    return await fetch(`http://localhost:8080/api/v1/programme/history/student/${studentId}/course/${courseId}/programme/intake/${programmeIntakeId}`,
       {
         method: 'DELETE',
         headers: {

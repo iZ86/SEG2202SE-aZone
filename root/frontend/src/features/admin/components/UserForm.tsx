@@ -5,7 +5,7 @@ import type { MultiValue, SingleValue } from "react-select";
 import {
   createStudentAPI,
   createStudentCourseProgrammeIntakeAPI,
-  deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeIdAPI,
+  deleteStudentCourseProgrammeIntakeAPI,
   getStudentByIdAPI,
   getStudentProgrammeHistoryAPI,
   getStudentsTimetableByIdAPI,
@@ -627,7 +627,7 @@ export default function UserForm({
     if (!confirmDelete) return;
 
     const response =
-      await deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeIdAPI(
+      await deleteStudentCourseProgrammeIntakeAPI(
         authToken,
         id,
         courseId,
