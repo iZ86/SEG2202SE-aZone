@@ -250,10 +250,7 @@ class ProgrammeService implements IProgrammeService {
 
 
     // Update old student course programme intake.
-    const updateResult = await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
-    if (updateResult.affectedRows === 0) {
-      throw new Error("createStudentCourseProgrammeIntake failed to update old programme intake");
-    }
+    await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
 
     // Create new student course programme intake.
     const createResult = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
