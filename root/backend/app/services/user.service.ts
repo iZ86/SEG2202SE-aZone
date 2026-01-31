@@ -20,8 +20,6 @@ interface IUserService {
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   deleteUserById(userId: number): Promise<Result<null>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>>;
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>>;
-  deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
@@ -185,22 +183,6 @@ class UserService implements IUserService {
     const userResponse: UserData | undefined = await userRepository.getUserById(userId);
 
     return Result.succeed(userResponse, "User update success");
-  }
-
-  async getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<Result<StudentCourseProgrammeIntakeData[]>> {
-    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData[] | undefined = await userRepository.getStudentCourseProgrammeIntakeByStudentId(studentId, status);
-
-    if (!studentCourseProgrammeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
-    }
-
-    return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
-  }
-
-  async deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
-    await userRepository.deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeId(studentId, courseId, programmeIntakeId);
-
-    return Result.succeed(null, "Student course programme intake delete success");
   }
 
   async getStudentInformationById(studentId: number): Promise<Result<StudentInformation>> {

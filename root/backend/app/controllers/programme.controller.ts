@@ -433,4 +433,23 @@ export default class ProgrammeController {
       }
     }
   }
+
+  async deleteStudentCourseProgrammeIntake(req: Request, res: Response) {
+    const studentId: number = parseInt(req.params.studentId);
+    const courseId: number = parseInt(req.params.courseId);
+    const programmeIntakeId: number = parseInt(req.params.programmeIntakeId);
+
+
+    const response: Result<null> = await programmeService.deleteStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
+
 }

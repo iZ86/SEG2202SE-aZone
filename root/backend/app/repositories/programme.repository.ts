@@ -30,6 +30,7 @@ interface IProgrammeRepository {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
+  deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -473,6 +474,22 @@ class ProgrammeRepository implements IProgrammeRepository {
       );
     });
   };
+
+  deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM STUDENT_COURSE_PROGRAMME_INTAKE " +
+        "WHERE studentId = ? " +
+        "AND courseId = ? " +
+        "AND programmeIntakeId = ?;",
+        [studentId, courseId, programmeIntakeId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
 }
 
 export default new ProgrammeRepository();

@@ -5,6 +5,8 @@ import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourse
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
 import { CourseData } from "../models/course-model";
+import userService from "./user.service";
+import { UserData } from "../models/user-model";
 
 interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
@@ -29,6 +31,7 @@ interface IProgrammeService {
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
   getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -258,6 +261,46 @@ class ProgrammeService implements IProgrammeService {
     }
 
     return Result.succeed(studentCrouseProgrammeIntake, "Student course programme intake create success");
+  }
+
+  // Delete enrolled/history of programme intake.
+  async deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
+
+    // Check if the parameters exist or not
+    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResponse.getMessage());
+    }
+
+    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
+    if (!courseResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResponse.getMessage());
+    }
+
+
+    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+    if (!programmeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResponse.getMessage());
+    }
+
+
+
+    // Check if student course programe intake exist or not
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    if (!studentCourseProgrammeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found.");
+    }
+
+
+    // Delete
+    const deleteCourseProgrammeIntake = await programmeRepository.deleteStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+
+    if (deleteCourseProgrammeIntake.affectedRows === 0) {
+      throw new Error("deleteStudentCourseProgrammeIntake failed to delete StudentCourseProgrammeIntake")
+    }
+
+
+    return Result.succeed(null, "Student course programme intake delete success");
   }
 }
 
