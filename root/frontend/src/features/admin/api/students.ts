@@ -112,7 +112,7 @@ export const getStudentProgrammeHistoryAPI = async (token: string, studentId: nu
 
 export const createStudentCourseProgrammeIntakeAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/users/students/course/programme/intake`,
+    return await fetch(`http://localhost:8080/api/v1/programme/enroll`,
       {
         method: 'POST',
         headers: {
