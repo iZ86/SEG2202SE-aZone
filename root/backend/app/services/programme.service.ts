@@ -224,9 +224,10 @@ class ProgrammeService implements IProgrammeService {
   // Enroll the student into a course, and specify a programme intake.
   async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
 
-    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
-    if (studentCourseProgrammeIntakeResponse.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Student already enrolled into this course programme intake");
+    // Check if parameters exist.
+    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResponse.getMessage());
     }
 
 
@@ -241,19 +242,26 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResponse.getMessage());
     }
 
+    // Check if student course programme intake exists.
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    if (studentCourseProgrammeIntakeResponse.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Student already enrolled into this course programme intake");
+    }
 
+
+    // Update old student course programme intake.
     const updateResult = await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
     if (updateResult.affectedRows === 0) {
       throw new Error("createStudentCourseProgrammeIntake failed to update old programme intake");
     }
 
-
+    // Create new student course programme intake.
     const createResult = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
     if (createResult.affectedRows === 0) {
       throw new Error("createStudentCourseProgrammeIntake failed to insert");
     }
 
-    
+
     const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (!studentCrouseProgrammeIntake) {
@@ -266,7 +274,7 @@ class ProgrammeService implements IProgrammeService {
   // Delete enrolled/history of programme intake.
   async deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
 
-    // Check if the parameters exist or not
+    // Check if the parameters exist or not.
     const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
     if (!studentResponse.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResponse.getMessage());
@@ -285,14 +293,14 @@ class ProgrammeService implements IProgrammeService {
 
 
 
-    // Check if student course programe intake exist or not
+    // Check if student course programe intake exist or not.
     const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
     if (!studentCourseProgrammeIntakeResponse.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found.");
     }
 
 
-    // Delete
+    // Delete.
     const deleteCourseProgrammeIntake = await programmeRepository.deleteStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (deleteCourseProgrammeIntake.affectedRows === 0) {
