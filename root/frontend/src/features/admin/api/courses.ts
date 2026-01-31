@@ -32,7 +32,7 @@ export const getCourseByIdAPI = async (token: string, courseId: number): Promise
 
 export const getCoursesByProgrammeIdAPI = async (token: string, programmeId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/courses/programme/${programmeId}`,
+    return await fetch(`http://localhost:8080/api/v1/courses?programmeId=${programmeId}`,
       {
         method: 'GET',
         headers: {

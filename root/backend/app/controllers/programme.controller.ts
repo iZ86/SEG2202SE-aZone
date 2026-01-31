@@ -3,7 +3,7 @@ import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
 import intakeService from "../services/intake.service";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import { IntakeData } from "../models/intake-model";
 
 export default class ProgrammeController {
@@ -452,4 +452,16 @@ export default class ProgrammeController {
     }
   }
 
+  async getProgrammeDistribution(req: Request, res: Response) {
+    const response: Result<ProgrammeDistribution[]> = await programmeService.getProgrammeDistribution();
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
+    }
+  }
 }

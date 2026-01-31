@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution} from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
 import { CourseData } from "../models/course-model";
@@ -32,6 +32,7 @@ interface IProgrammeService {
   getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
+  getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -306,6 +307,12 @@ class ProgrammeService implements IProgrammeService {
 
 
     return Result.succeed(null, "Student course programme intake delete success");
+  }
+
+  async getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>> {
+    const ProgrammeDistribution: ProgrammeDistribution[] = await programmeRepository.getProgrammeDistribution();
+
+    return Result.succeed(ProgrammeDistribution, "Programme retrieve success");
   }
 }
 

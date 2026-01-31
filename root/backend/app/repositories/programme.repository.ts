@@ -1,5 +1,5 @@
 import { ResultSetHeader } from "mysql2";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import databaseConn from "../database/db-connection";
 import { TotalCount } from "../models/general-model";
 import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
@@ -31,6 +31,7 @@ interface IProgrammeRepository {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
+  getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -483,6 +484,23 @@ class ProgrammeRepository implements IProgrammeRepository {
         "AND courseId = ? " +
         "AND programmeIntakeId = ?;",
         [studentId, courseId, programmeIntakeId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getProgrammeDistribution(): Promise<ProgrammeDistribution[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ProgrammeDistribution[]>(
+        "SELECT p.programmeName, COUNT(*) AS count, ROUND(COUNT(*) * 100 / SUM(COUNT(*)) OVER (), 0) AS percentage " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
+        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
+        "WHERE scpi.status = 1 " +
+        "GROUP BY p.programmeName;",
         (err, res) => {
           if (err) reject(err);
           resolve(res);

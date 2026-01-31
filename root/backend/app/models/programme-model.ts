@@ -50,3 +50,9 @@ export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   semesterEndDate: Date;
   courseStatus: number;
 }
+
+export interface ProgrammeDistribution extends RowDataPacket {
+  programmeName: string;
+  count: number;
+  percentage: number;
+}

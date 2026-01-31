@@ -199,3 +199,19 @@ export const deleteProgrammeIntakeByIdAPI = async (token: string, programmeIntak
     console.error(err);
   }
 };
+
+export const getProgrammeDistributionAPI = async (token: string): Promise<Response | undefined> => {
+  try {
+    return await fetch("http://localhost:8080/api/v1/programmes/distribution",
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};

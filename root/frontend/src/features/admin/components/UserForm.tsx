@@ -7,7 +7,7 @@ import {
   createStudentCourseProgrammeIntakeAPI,
   deleteStudentCourseProgrammeIntakeByStudentIdAndCourseIdAndProgrammeIntakeIdAPI,
   getStudentByIdAPI,
-  getStudentCourseProgrammeIntakeByStudentIdAPI,
+  getStudentProgrammeHistoryAPI,
   getStudentsTimetableByIdAPI,
   updateStudentByIdAPI,
 } from "../api/students";
@@ -163,7 +163,7 @@ export default function UserForm({
         });
       } else if (activeTab === "Course History") {
         const studentCourseProgrammeIntakeResponse: Response | undefined =
-          await getStudentCourseProgrammeIntakeByStudentIdAPI(token, studentId);
+          await getStudentProgrammeHistoryAPI(token, studentId);
 
         if (
           !studentCourseProgrammeIntakeResponse ||
@@ -215,6 +215,7 @@ export default function UserForm({
 
         const enrolledSubjectsResponse: Response | undefined =
           await getStudentsTimetableByIdAPI(token, studentId);
+
         if (
           !enrollmentSubjectTypesResponse ||
           !enrollmentSubjectTypesResponse.ok ||
@@ -222,9 +223,16 @@ export default function UserForm({
           !enrolledSubjectsResponse.ok
         ) {
           navigate("/admin/users");
-          toast.error("Failed to fetch student enrollment subjects");
-          return;
+
+          if (enrollmentSubjectTypesResponse?.status === 404) {
+            toast.error("No enrollment at the moment");
+            return;
+          } else {
+            toast.error("Failed to fetch student enrollment subjects");
+            return;
+          }
         }
+
         const { data } = await enrollmentSubjectTypesResponse.json();
         const enrolledSubjectsResponseJson =
           await enrolledSubjectsResponse.json();

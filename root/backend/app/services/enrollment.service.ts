@@ -1,6 +1,6 @@
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData } from "../models/enrollment-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeRangeColliding } from "../utils/utils";
 
@@ -31,7 +31,8 @@ interface IEnrollmentService {
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<Result<EnrollmentSubjectTypeData>>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<null>>;
   enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>>;
-  getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[] }>>
+  getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[]; }>>;
+  getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>>;
 }
 
 class EnrollmentService implements IEnrollmentService {
@@ -242,7 +243,7 @@ class EnrollmentService implements IEnrollmentService {
                 startTime: StudentEnrollmentSubjectData["startTime"],
                 endTime: StudentEnrollmentSubjectData["endTime"],
                 numberOfStudentsEnrolled: StudentEnrollmentSubjectData["numberOfStudentsEnrolled"],
-                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"]
+                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"];
               }[];
             };
           };
@@ -394,7 +395,7 @@ class EnrollmentService implements IEnrollmentService {
         subjectId: number,
         numberOfStudentsEnrolled: number,
         numberOfSeats: number,
-      }
+      };
     } = {};
 
     // Place all the enrollmentSubjectTypeIds connected to studentId into a dictionary for easier lookup.
@@ -496,7 +497,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrolledSubjectsData: StudentEnrolledSubject[] = enrolledSubjects.getData().studentEnrolledSubjects;
 
-    const enrolledSubjectDataMap: { [enrolmentSubjectTypeId: number]: StudentEnrolledSubject } = {};
+    const enrolledSubjectDataMap: { [enrolmentSubjectTypeId: number]: StudentEnrolledSubject; } = {};
 
     for (const enrolledSubjectData of enrolledSubjectsData) {
       enrolledSubjectDataMap[enrolledSubjectData.enrollmentSubjectTypeId] = enrolledSubjectData;
@@ -532,7 +533,7 @@ class EnrollmentService implements IEnrollmentService {
         studentId,
         enrollmentSubjectTypeId,
         1
-      ])
+      ]);
     }
 
     const createStudentEnrollmentSubjectTypes = await enrollmentRepository.createStudentEnrollmentSubjectType(studentEnrolledSubjects);
@@ -543,7 +544,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(studentEnrolledSubjectTypeIds, "Student enrolled successfully.");
   }
 
-  async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[] }>> {
+  async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[]; }>> {
 
     const studentEnrollmentSchedule: Result<StudentEnrollmentSchedule> = await this.getEnrollmentScheduleByStudentId(studentId);
 
@@ -557,6 +558,12 @@ class EnrollmentService implements IEnrollmentService {
     const enrolledSubjects: StudentEnrolledSubject[] = await enrollmentRepository.getEnrolledSubjectsByStudentId(studentId, studentEnrollmentSchedule.getData().enrollmentId);
 
     return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule.getData(), studentEnrolledSubjects: enrolledSubjects }, "enrolled subjects retrieve success");
+  }
+
+  async getMonthlyEnrollmentCount(duration: number = 6): Promise<Result<MonthlyEnrollmentData[]>> {
+    const enrollments: MonthlyEnrollmentData[] = await enrollmentRepository.getMonthlyEnrollmentCount(duration);
+
+    return Result.succeed(enrollments, "Enrollments retrieve success");
   }
 }
 
