@@ -3,6 +3,8 @@ import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/course-model";
 import courseRepository from "../repositories/course.repository";
+import programmeService from "./programme.service";
+import { ProgrammeData } from "../models/programme-model";
 
 interface ICourseService {
   getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>>;
@@ -66,12 +68,32 @@ class CourseService implements ICourseService {
   }
 
   async createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
-    const response: ResultSetHeader = await courseRepository.createCourse(courseName, programmeId);
 
-    const course: CourseProgrammeData | undefined = await courseRepository.getCourseById(response.insertId);
+    // Check parameters exist.
+    const courseResult: Result<CourseData> = await this.getCourseByName(courseName);
+
+    if (courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course name duplciated");
+    }
+
+    const programmeResult: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
+
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
+    }
+
+
+    // Create new course.
+    const createResult: ResultSetHeader = await courseRepository.createCourse(courseName, programmeId);
+    if (createResult.affectedRows === 0) {
+      throw new Error("createCourse failed to insert");
+    }
+
+    
+    const course: CourseProgrammeData | undefined = await courseRepository.getCourseById(createResult.insertId);
 
     if (!course) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course created not found");
+      throw new Error("createCourse course created not found");
     }
 
     return Result.succeed(course, "Course create success");
