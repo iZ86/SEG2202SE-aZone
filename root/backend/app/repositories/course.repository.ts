@@ -67,7 +67,7 @@ class CourseRepository implements ICourseRepository {
   getCourseByName(courseName: string): Promise<CourseData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseData[]>(
-        "SELECT courseId, courseName " +
+        "SELECT courseId, courseCode, courseName " +
         "FROM COURSE " +
         "WHERE courseName COLLATE utf8mb4_general_ci = ?;",
         [courseName],

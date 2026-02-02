@@ -2,6 +2,7 @@ import { RowDataPacket } from "mysql2";
 
 export interface CourseData extends RowDataPacket {
   courseId: number;
+  courseCode: string;
   courseName: string;
 }
 
