@@ -5,8 +5,6 @@ import courseService from "../services/course.service";
 import { CourseData } from "../models/course-model";
 import { ProgrammeData } from "../models/programme-model";
 import programmeService from "../services/programme.service";
-import { SubjectData } from "../models/subject-model";
-import subjectService from "../services/subject.service";
 
 export default class CourseController {
 
@@ -159,19 +157,6 @@ export default class CourseController {
     const courseId: number = req.body.courseId;
     const subjectId: number = req.body.subjectId;
 
-    const courseIdResponse: Result<CourseData> = await courseService.getCourseById(courseId);
-
-    const subjectIdResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-
-    if (!courseIdResponse.isSuccess() || !subjectIdResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid courseId or subjectId");
-    }
-
-    const isCourseSubjectExist: boolean = await courseService.isCourseSubjectExist(courseId, subjectId);
-
-    if (isCourseSubjectExist) {
-      return res.sendError.notFound("Course subject already exist");
-    }
 
     const response = await courseService.createCourseSubject(courseId, subjectId);
 
@@ -181,8 +166,8 @@ export default class CourseController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
-        case ENUM_ERROR_CODE.BAD_REQUEST:
-          return res.sendError.badRequest(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }

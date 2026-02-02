@@ -5,6 +5,8 @@ import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/co
 import courseRepository from "../repositories/course.repository";
 import programmeService from "./programme.service";
 import { ProgrammeData } from "../models/programme-model";
+import subjectService from "./subject.service";
+import { SubjectData } from "../models/subject-model";
 
 interface ICourseService {
   getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>>;
@@ -15,9 +17,9 @@ interface ICourseService {
   createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   getCourseCount(query: string): Promise<Result<number>>;
-  getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>>;
+  getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
-  isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
+  getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>>;
 }
 
 class CourseService implements ICourseService {
@@ -121,6 +123,16 @@ class CourseService implements ICourseService {
     return Result.succeed(courseCount ? courseCount : 0, "Course count retrieve success");
   }
 
+  async getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
+    const courseSubject: CourseSubjectData | undefined = await courseRepository.getCourseSubjectById(courseId, subjectId);
+
+    if (!courseSubject) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course subject not found");
+    }
+
+    return Result.succeed(courseSubject, "Course subject retrieve success");
+  }
+
   async getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>> {
     const courseSubject: CourseSubjectData[] = await courseRepository.getCourseSubjectBySubjectId(subjectId);
 
@@ -131,22 +143,44 @@ class CourseService implements ICourseService {
     return Result.succeed(courseSubject, "Course subject retrieve success");
   }
 
-  async isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean> {
-    const isCourseSubjectExist: boolean = await courseRepository.isCourseSubjectExist(courseId, subjectId);
-
-    return isCourseSubjectExist;
-  }
 
   async createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
-    await courseRepository.createCourseSubject(courseId, subjectId);
 
-    const courseSubject: CourseSubjectData | undefined = await courseRepository.getCourseSubjectByCourseIdAndSubjectId(courseId, subjectId);
-
-    if (!courseSubject) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course subject created not found");
+    // Check parameters exist
+    const courseResult: Result<CourseData> = await this.getCourseById(courseId);
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
     }
 
-    return Result.succeed(courseSubject, "Course subject create success");
+    const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+
+
+    // Check if course subject exists.
+    const courseSubjectResult: Result<CourseSubjectData> = await this.getCourseSubjectById(courseId, subjectId);
+
+    if (!courseSubjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course subject already exists");
+    }
+
+    // Create new course subject.
+    const createCourseSubjectResult = await courseRepository.createCourseSubject(courseId, subjectId);
+
+    if (createCourseSubjectResult.affectedRows === 0) {
+      throw new Error("createCourseSubject failed to insert");
+    }
+
+
+    const courseSubject: Result<CourseSubjectData> = await this.getCourseSubjectById(courseId, subjectId);
+
+    if (!courseSubjectResult.isSuccess()) {
+      throw new Error("createCourseSubject course subject created not found");
+    }
+
+    return Result.succeed(courseSubject.getData(), "Course subject create success");
   }
 }
 

@@ -14,7 +14,7 @@ interface ICourseRepository {
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
   getCourseCount(query: string): Promise<number>;
   getCourseSubjectBySubjectId(subjectId: number): Promise<CourseSubjectData[]>;
-  getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined>;
+  getCourseSubjectById(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined>;
   getCourseSubjectCount(query: string): Promise<number>;
   isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean>;
   createCourseSubject(courseId: number, subjectId: number): Promise<ResultSetHeader>;
@@ -194,7 +194,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseSubjectByCourseIdAndSubjectId(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined> {
+  getCourseSubjectById(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseSubjectData[]>(
         "SELECT c.courseId, c.courseName, s.* " +
