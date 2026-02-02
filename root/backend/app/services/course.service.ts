@@ -13,9 +13,8 @@ interface ICourseService {
   getCourseById(courseId: number): Promise<Result<CourseProgrammeData>>;
   getCourseByName(courseName: string): Promise<Result<CourseData>>;
   getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
-  getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<Result<CourseProgrammeData>>;
   createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
-  updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
+  updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   getCourseCount(query: string): Promise<Result<number>>;
   getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
@@ -69,16 +68,6 @@ class CourseService implements ICourseService {
     return Result.succeed(courses, "Courses retrieve success");
   }
 
-  async getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<Result<CourseProgrammeData>> {
-    const course: CourseProgrammeData | undefined = await courseRepository.getCourseByIdAndCourseName(courseId, courseName);
-
-    if (!course) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
-    }
-
-    return Result.succeed(course, "Course retrieve success");
-  }
-
   async createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
 
     // Check parameters exist.
@@ -115,16 +104,62 @@ class CourseService implements ICourseService {
     return Result.succeed(course.getData(), "Course create success");
   }
 
-  async updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
-    await courseRepository.updateCourseById(courseId, programmeId, courseName);
+  async updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
 
-    const course: CourseProgrammeData | undefined = await courseRepository.getCourseById(courseId);
+    // Check parameters exist.
+    const courseResult: Result<CourseProgrammeData> = await this.getCourseById(courseId);
 
-    if (!course) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course updated not found");
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
     }
 
-    return Result.succeed(course, "Course update success");
+    const programmeResult: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
+    }
+
+
+    const currentCourseData: CourseProgrammeData = courseResult.getData();
+
+    // Check if course code already exists or not.
+    // First check if course code has changed.
+    if (currentCourseData.courseCode !== courseCode) {
+
+      // Check if the course code exists or not.
+      const isCourseCodeExistResult: Result<CourseData> = await this.getCourseByCourseCode(courseCode);
+
+      if (isCourseCodeExistResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course code already exists");
+      }
+    }
+
+
+    // Check if course name already exists or not.
+    // First check if the courseName has changed.
+    if (currentCourseData.courseName !== courseName) {
+
+      // Check if the new name exists or not.
+      const isCourseNameExistResult: Result<CourseData> = await this.getCourseByName(courseName);
+
+      if (isCourseNameExistResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course name already exists");
+      }
+    }
+
+
+
+    const updateCourseResult: ResultSetHeader = await courseRepository.updateCourseById(courseId, courseCode, courseName, programmeId);
+    if (updateCourseResult.affectedRows === 0) {
+      throw new Error("updateCourseById failed to update");
+    }
+
+    const course: Result<CourseProgrammeData> = await this.getCourseById(courseId);
+
+    if (!course.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
+    }
+
+    return Result.succeed(course.getData(), "Course update success");
   }
 
   async deleteCourseById(courseId: number): Promise<Result<null>> {

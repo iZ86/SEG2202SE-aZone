@@ -93,37 +93,19 @@ export default class CourseController {
 
   async updateCourseById(req: Request, res: Response) {
     const courseId: number = parseInt(req.params.courseId as string);
+    const courseCode: string = req.body.courseCode;
     const courseName: string = req.body.courseName;
     const programmeId: number = req.body.programmeId;
 
-    if (!courseId || isNaN(courseId)) {
-      return res.sendError.badRequest("Invalid courseId");
-    }
-
-    const programmeResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
-    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
-
-    if (!programmeResponse.isSuccess() || !courseResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeId, or courseId");
-    }
-
-    const isCourseNameBelongsToCourseId: Result<CourseData> = await courseService.getCourseByIdAndCourseName(courseId, courseName);
-
-    if (!isCourseNameBelongsToCourseId.isSuccess()) {
-      const isCourseNameDuplicated: Result<CourseData> = await courseService.getCourseByName(courseName);
-
-      if (isCourseNameDuplicated.isSuccess()) {
-        return res.sendError.conflict("Course name duplciated");
-      }
-    }
-
-    const response = await courseService.updateCourseById(courseId, courseName, programmeId);
+    const response = await courseService.updateCourseById(courseId, courseCode, courseName, programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
           return res.sendError.notFound(response.getMessage());
       }
     }

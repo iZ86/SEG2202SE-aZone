@@ -9,9 +9,8 @@ interface ICourseRepository {
   getCourseByCourseCode(courseCode: string): Promise<CourseData | undefined>;
   getCourseByName(courseName: string): Promise<CourseData | undefined>;
   getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined>;
-  getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<CourseProgrammeData | undefined>;
   createCourse(courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader>;
-  updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
+  updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
   getCourseCount(query: string): Promise<number>;
   getCourseSubjectBySubjectId(subjectId: number): Promise<CourseSubjectData[]>;
@@ -113,23 +112,6 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<CourseProgrammeData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<CourseProgrammeData[]>(
-        "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
-        "FROM COURSE c " +
-        "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
-        "WHERE c.courseId = ? " +
-        "AND c.courseName COLLATE utf8mb4_general_ci = ?;",
-        [courseId, courseName],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res?.[0]);
-        }
-      );
-    });
-  }
-
   createCourse(courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
@@ -144,12 +126,12 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader> {
+  updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "UPDATE COURSE SET programmeId = ?, courseName = ? " +
+        "UPDATE COURSE SET courseCode = ?, courseName = ?, programmeId = ? " +
         "WHERE courseId = ?;",
-        [programmeId, courseName, courseId],
+        [courseCode, courseName, programmeId, courseId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
