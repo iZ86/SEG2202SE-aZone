@@ -218,7 +218,7 @@ class CourseService implements ICourseService {
     }
 
     // Create new course subject.
-    const createCourseSubjectResult = await courseRepository.createCourseSubject(courseId, subjectId);
+    const createCourseSubjectResult: ResultSetHeader = await courseRepository.createCourseSubject(courseId, subjectId);
 
     if (createCourseSubjectResult.affectedRows === 0) {
       throw new Error("createCourseSubject failed to insert");
