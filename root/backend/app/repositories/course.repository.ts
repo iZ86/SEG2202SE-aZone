@@ -6,10 +6,11 @@ import { TotalCount } from "../models/general-model";
 interface ICourseRepository {
   getCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]>;
   getCourseById(courseId: number): Promise<CourseProgrammeData | undefined>;
+  getCourseByCourseCode(courseCode: string): Promise<CourseData | undefined>;
   getCourseByName(courseName: string): Promise<CourseData | undefined>;
   getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined>;
   getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<CourseProgrammeData | undefined>;
-  createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader>;
+  createCourse(courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader>;
   updateCourseById(courseId: number, programmeId: number, courseName: string): Promise<ResultSetHeader>;
   deleteCourseById(courseId: number): Promise<ResultSetHeader>;
   getCourseCount(query: string): Promise<number>;
@@ -59,6 +60,21 @@ class CourseRepository implements ICourseRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res?.[0]);
+        }
+      );
+    });
+  }
+
+  getCourseByCourseCode(courseCode: string): Promise<CourseData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<CourseData[]>(
+        "SELECT courseId, courseCode, courseName " +
+        "FROM COURSE " +
+        "WHERE courseCode COLLATE utf8mb4_general_ci = ?;",
+        [courseCode],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
         }
       );
     });
@@ -114,12 +130,12 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  createCourse(courseName: string, programmeId: number): Promise<ResultSetHeader> {
+  createCourse(courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "INSERT INTO COURSE (programmeId, courseName) " +
-        "VALUES (?, ?);",
-        [programmeId, courseName],
+        "INSERT INTO COURSE (courseCode, courseName, programmeId) " +
+        "VALUES (?, ?, ?);",
+        [courseCode, courseName, programmeId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

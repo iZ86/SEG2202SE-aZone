@@ -72,11 +72,12 @@ export default class CourseController {
   }
 
   async createCourse(req: Request, res: Response) {
+    const courseCode: string = req.body.courseCode;
     const courseName: string = req.body.courseName;
     const programmeId: number = req.body.programmeId;
 
 
-    const response = await courseService.createCourse(courseName, programmeId);
+    const response = await courseService.createCourse(courseCode, courseName, programmeId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());

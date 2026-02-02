@@ -1,10 +1,14 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
 
-export const createAndUpdateCourseValidator: any = [
+export const createCourseValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
     .isNumeric().withMessage('programmeId must be number'),
+  body('courseCode')
+    .trim()
+    .notEmpty().withMessage('Missing courseCode')
+    .isString().withMessage('courseCode must be string'),
   body('courseName')
     .trim()
     .notEmpty().withMessage('Missing courseName')

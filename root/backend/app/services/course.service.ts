@@ -14,7 +14,7 @@ interface ICourseService {
   getCourseByName(courseName: string): Promise<Result<CourseData>>;
   getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
   getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<Result<CourseProgrammeData>>;
-  createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
+  createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   getCourseCount(query: string): Promise<Result<number>>;
   getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
@@ -31,6 +31,16 @@ class CourseService implements ICourseService {
 
   async getCourseById(courseId: number): Promise<Result<CourseProgrammeData>> {
     const course: CourseProgrammeData | undefined = await courseRepository.getCourseById(courseId);
+
+    if (!course) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
+    }
+
+    return Result.succeed(course, "Course retrieve success");
+  }
+
+  async getCourseByCourseCode(courseCode: string): Promise<Result<CourseData>> {
+    const course: CourseData | undefined = await courseRepository.getCourseByCourseCode(courseCode);
 
     if (!course) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course not found");
@@ -69,13 +79,19 @@ class CourseService implements ICourseService {
     return Result.succeed(course, "Course retrieve success");
   }
 
-  async createCourse(courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
+  async createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
 
     // Check parameters exist.
-    const courseResult: Result<CourseData> = await this.getCourseByName(courseName);
+    const courseCodeResult: Result<CourseData> = await this.getCourseByCourseCode(courseCode);
 
-    if (courseResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course name duplicated");
+    if (!courseCodeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course code already exists");
+    }
+
+    const courseNameResult: Result<CourseData> = await this.getCourseByName(courseName);
+
+    if (courseNameResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course name already exists");
     }
 
     const programmeResult: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
@@ -86,7 +102,7 @@ class CourseService implements ICourseService {
 
 
     // Create new course.
-    const createCourseResult: ResultSetHeader = await courseRepository.createCourse(courseName, programmeId);
+    const createCourseResult: ResultSetHeader = await courseRepository.createCourse(courseCode, courseName, programmeId);
     if (createCourseResult.affectedRows === 0) {
       throw new Error("createCourse failed to insert");
     }
