@@ -26,7 +26,7 @@ class CourseRepository implements ICourseRepository {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
-        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
+        "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "WHERE c.courseId LIKE ? " +
@@ -49,7 +49,7 @@ class CourseRepository implements ICourseRepository {
   getCourseById(courseId: number): Promise<CourseProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
-        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
+        "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "WHERE c.courseId = ?;",
@@ -82,7 +82,7 @@ class CourseRepository implements ICourseRepository {
   getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
-        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
+        "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "WHERE p.programmeId = ?;",
@@ -100,7 +100,7 @@ class CourseRepository implements ICourseRepository {
   getCourseByIdAndCourseName(courseId: number, courseName: string): Promise<CourseProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
-        "SELECT c.courseId, c.courseName, p.programmeId, p.programmeName " +
+        "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
         "FROM COURSE c " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "WHERE c.courseId = ? " +

@@ -8,6 +8,7 @@ export interface CourseData extends RowDataPacket {
 
 export interface CourseProgrammeData extends RowDataPacket {
   courseId: number;
+  courseCode: string;
   courseName: string;
   programmeId: number;
   programmeName: string;
