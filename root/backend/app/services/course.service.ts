@@ -73,7 +73,7 @@ class CourseService implements ICourseService {
     const courseResult: Result<CourseData> = await this.getCourseByName(courseName);
 
     if (courseResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course name duplciated");
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course name duplicated");
     }
 
     const programmeResult: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
@@ -84,19 +84,17 @@ class CourseService implements ICourseService {
 
 
     // Create new course.
-    const createResult: ResultSetHeader = await courseRepository.createCourse(courseName, programmeId);
-    if (createResult.affectedRows === 0) {
+    const createCourseResult: ResultSetHeader = await courseRepository.createCourse(courseName, programmeId);
+    if (createCourseResult.affectedRows === 0) {
       throw new Error("createCourse failed to insert");
     }
 
-    
-    const course: CourseProgrammeData | undefined = await courseRepository.getCourseById(createResult.insertId);
-
-    if (!course) {
+    const course: Result<CourseProgrammeData> = await this.getCourseById(createCourseResult.insertId);
+    if (!course.isSuccess()) {
       throw new Error("createCourse course created not found");
     }
 
-    return Result.succeed(course, "Course create success");
+    return Result.succeed(course.getData(), "Course create success");
   }
 
   async updateCourseById(courseId: number, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
