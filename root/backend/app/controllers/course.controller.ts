@@ -90,7 +90,7 @@ export default class CourseController {
   }
 
   async updateCourseById(req: Request, res: Response) {
-    const courseId: number = parseInt(req.params.courseId as string);
+    const courseId: number = Number(req.params.courseId);
     const courseCode: string = req.body.courseCode;
     const courseName: string = req.body.courseName;
     const programmeId: number = req.body.programmeId;
