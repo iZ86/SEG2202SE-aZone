@@ -163,7 +163,18 @@ class CourseService implements ICourseService {
   }
 
   async deleteCourseById(courseId: number): Promise<Result<null>> {
-    await courseRepository.deleteCourseById(courseId);
+
+    // Check if course exist.
+    const courseResult: Result<CourseData> = await this.getCourseById(courseId);
+
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
+    }
+    
+    const deleteCourseResult: ResultSetHeader = await courseRepository.deleteCourseById(courseId);
+    if (deleteCourseResult.affectedRows === 0) {
+      throw new Error("deleteCourseById failed to delete");
+    }
 
     return Result.succeed(null, "Course delete success");
   }

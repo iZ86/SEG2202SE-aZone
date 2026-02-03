@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import CourseController from "../controllers/course.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
-import { createCourseSubjectValidator, createCourseValidator, updateCourseValidator } from "../validators/course-validator";
+import { createCourseSubjectValidator, createCourseValidator, updateCourseValidator, deleteCourseValidator} from "../validators/course-validator";
 
 class CourseRoute {
   router = Router();
@@ -23,7 +23,7 @@ class CourseRoute {
 
     this.router.put("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, updateCourseValidator, asyncHandler(this.controller.updateCourseById));
 
-    this.router.delete("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteCourseById));
+    this.router.delete("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, deleteCourseValidator, asyncHandler(this.controller.deleteCourseById));
   }
 }
 

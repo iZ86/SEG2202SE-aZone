@@ -35,6 +35,14 @@ export const updateCourseValidator: any = [
   validate,
 ];
 
+export const deleteCourseValidator: any = [
+  param('courseId')
+    .exists().withMessage("Invalid courseId")
+    .isInt().withMessage("Invalid courseId")
+    .toInt(),
+  validate,
+]
+
 export const createCourseSubjectValidator: any = [
   body('courseId')
     .notEmpty().withMessage('Missing courseId')

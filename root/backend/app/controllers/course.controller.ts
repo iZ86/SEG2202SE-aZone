@@ -110,17 +110,7 @@ export default class CourseController {
   }
 
   async deleteCourseById(req: Request, res: Response) {
-    const courseId: number = parseInt(req.params.courseId as string);
-
-    if (!courseId || isNaN(courseId)) {
-      return res.sendError.badRequest("Invalid courseId");
-    }
-
-    const courseResponse: Result<CourseData> = await courseService.getCourseById(courseId);
-
-    if (!courseResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid courseId");
-    }
+    const courseId: number = Number(req.params.courseId);
 
     const response = await courseService.deleteCourseById(courseId);
 
