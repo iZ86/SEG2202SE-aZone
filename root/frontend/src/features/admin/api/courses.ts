@@ -46,7 +46,7 @@ export const getCoursesByProgrammeIdAPI = async (token: string, programmeId: num
   }
 };
 
-export const createCourseAPI = async (token: string, courseName: string, programmeId: number): Promise<Response | undefined> => {
+export const createCourseAPI = async (token: string, courseName: string, courseCode: string, programmeId: number): Promise<Response | undefined> => {
   try {
     return await fetch("http://localhost:8080/api/v1/courses",
       {
@@ -57,6 +57,7 @@ export const createCourseAPI = async (token: string, courseName: string, program
         },
         body: JSON.stringify({
           courseName,
+          courseCode,
           programmeId,
         }),
         mode: "cors"
@@ -66,7 +67,7 @@ export const createCourseAPI = async (token: string, courseName: string, program
   }
 };
 
-export const updateCourseByIdAPI = async (token: string, courseId: number, courseName: string, programmeId: number): Promise<Response | undefined> => {
+export const updateCourseByIdAPI = async (token: string, courseId: number, courseName: string, courseCode: string, programmeId: number): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/courses/${courseId}`,
       {
@@ -77,6 +78,7 @@ export const updateCourseByIdAPI = async (token: string, courseId: number, cours
         },
         body: JSON.stringify({
           courseName,
+          courseCode,
           programmeId,
         }),
         mode: "cors"
