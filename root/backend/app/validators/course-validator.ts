@@ -1,6 +1,14 @@
 import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
 
+export const courseParamValidator: any = [
+  param('courseId')
+    .exists().withMessage("Invalid courseId")
+    .isInt().withMessage("Invalid courseId")
+    .toInt(),
+  validate,
+]
+
 export const createCourseValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
@@ -17,13 +25,6 @@ export const createCourseValidator: any = [
 ];
 
 export const updateCourseValidator: any = [
-  param('courseId')
-    .exists().withMessage("Invalid courseId")
-    .isInt().withMessage("Invalid courseId")
-    .toInt(),
-  body('programmeId')
-    .notEmpty().withMessage('Missing programmeId')
-    .isNumeric().withMessage('programmeId must be number'),
   body('courseCode')
     .trim()
     .notEmpty().withMessage('Missing courseCode')
@@ -34,14 +35,6 @@ export const updateCourseValidator: any = [
     .isString().withMessage('courseName must be string'),
   validate,
 ];
-
-export const deleteCourseValidator: any = [
-  param('courseId')
-    .exists().withMessage("Invalid courseId")
-    .isInt().withMessage("Invalid courseId")
-    .toInt(),
-  validate,
-]
 
 export const createCourseSubjectValidator: any = [
   body('courseId')
