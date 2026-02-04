@@ -11,8 +11,8 @@ import { ResultSetHeader } from "mysql2";
 
 export default class UserController {
   async getAdmins(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number = Number(req.query.page as string) || 1;
+    const pageSize: number = Number(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<UserData[]> = await userService.getAdmins(query, pageSize, page);
@@ -31,8 +31,8 @@ export default class UserController {
   }
 
   async getStudents(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number = Number(req.query.page as string) || 1;
+    const pageSize: number = Number(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
 
     const response: Result<UserData[]> = await userService.getStudents(query, pageSize, page);
@@ -52,7 +52,7 @@ export default class UserController {
   }
 
   async getAdminById(req: Request, res: Response) {
-    const adminId: number = parseInt(req.params.adminId);
+    const adminId: number = Number(req.params.adminId);
 
     if (!adminId || isNaN(adminId)) {
       return res.sendError.badRequest("Invalid adminId");
@@ -71,7 +71,7 @@ export default class UserController {
   }
 
   async getStudentById(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
+    const studentId: number = Number(req.params.studentId);
 
     if (!studentId || isNaN(studentId)) {
       return res.sendError.badRequest("Invalid studentId");
@@ -116,7 +116,7 @@ export default class UserController {
   }
 
   async updateStudentById(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
+    const studentId: number = Number(req.params.studentId);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
@@ -160,7 +160,7 @@ export default class UserController {
   }
 
   async updateAdminById(req: Request, res: Response) {
-    const adminId: number = parseInt(req.params.adminId);
+    const adminId: number = Number(req.params.adminId);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
@@ -253,7 +253,7 @@ export default class UserController {
   }
 
   async getStudentTimetableByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId as string);
+    const studentId: number = Number(req.params.studentId as string);
 
     const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(studentId);
     const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(studentId);
