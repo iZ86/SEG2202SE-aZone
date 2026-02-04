@@ -18,7 +18,6 @@ interface IUserService {
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<ResultSetHeader>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData | undefined>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
-  deleteUserById(userId: number): Promise<Result<null>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
@@ -171,10 +170,7 @@ class UserService implements IUserService {
     return Result.succeed(admin, "Admin update success");
   }
 
-  async deleteUserById(userId: number): Promise<Result<null>> {
-    await userRepository.deleteUserById(userId);
 
-    return Result.succeed(null, "User delete success");
   }
 
   async updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData | undefined>> {

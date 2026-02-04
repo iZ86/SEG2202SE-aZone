@@ -188,31 +188,6 @@ export default class UserController {
     }
   }
 
-  async deleteUserById(req: Request, res: Response) {
-    const userId: number = parseInt(req.params.userId);
-
-    if (!userId || isNaN(userId)) {
-      return res.sendError.badRequest("Invalid userId");
-    }
-
-    const userResponse: boolean = await userService.isUserExist(userId);
-
-    if (!userResponse) {
-      return res.sendError.notFound("Invalid userId");
-    }
-
-    const response: Result<null> = await userService.deleteUserById(userId);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.delete();
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
-
   async updateUserProfilePictureById(req: Request, res: Response) {
     const profilePictureUrl: string = req.body.profilePictureUrl;
     const userId: number = req.user.userId;
