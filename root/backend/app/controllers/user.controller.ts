@@ -1,13 +1,8 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
+import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
 import userService from "../services/user.service";
-import courseService from "../services/course.service";
-import programmeService from "../services/programme.service";
-import { CourseData } from "../models/course-model";
-import { ProgrammeIntakeData } from "../models/programme-model";
-import { ResultSetHeader } from "mysql2";
 
 export default class UserController {
   async getAdmins(req: Request, res: Response) {
@@ -97,13 +92,7 @@ export default class UserController {
     const password: string = req.body.password;
     const userStatus: number = req.body.userStatus;
 
-    const isEmailDuplicated: Result<UserData> = await userService.getStudentByEmail(email);
-
-    if (isEmailDuplicated.isSuccess()) {
-      return res.sendError.conflict("Email already exist");
-    }
-
-    const response: Result<ResultSetHeader> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
+    const response: Result<UserData> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -111,6 +100,8 @@ export default class UserController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
@@ -123,30 +114,6 @@ export default class UserController {
     const email: string = req.body.email;
     const userStatus: number = req.body.userStatus;
 
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.badRequest("Invalid studentId");
-    }
-
-    /**
-     * Check if the user is using the email before updating
-     * If user is using the old email, doesn't needs to check if the email is duplicated
-     */
-    const isEmailBelongsToUser: Result<UserData> = await userService.getStudentByIdAndEmail(studentId, email);
-
-    if (!isEmailBelongsToUser.isSuccess()) {
-      const isEmailDuplicated: Result<UserData> = await userService.getStudentByEmail(email);
-
-      if (isEmailDuplicated.isSuccess()) {
-        return res.sendError.conflict("Email already exist");
-      }
-    }
-
-    const userResponse: boolean = await userService.isUserExist(studentId);
-
-    if (!userResponse) {
-      return res.sendError.notFound("Invalid userId");
-    }
-
     const response: Result<UserData | undefined> = await userService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
 
     if (response.isSuccess()) {
@@ -155,6 +122,8 @@ export default class UserController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
@@ -165,16 +134,6 @@ export default class UserController {
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
-
-    if (!adminId || isNaN(adminId)) {
-      return res.sendError.badRequest("Invalid adminId");
-    }
-
-    const userResponse: boolean = await userService.isUserExist(adminId);
-
-    if (!userResponse) {
-      return res.sendError.notFound("Invalid userId");
-    }
 
     const response: Result<UserData> = await userService.updateAdminById(adminId, firstName, lastName, email, phoneNumber);
 
