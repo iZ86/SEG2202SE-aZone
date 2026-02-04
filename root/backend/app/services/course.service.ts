@@ -73,8 +73,8 @@ class CourseService implements ICourseService {
     // Check parameters exist.
     const courseCodeResult: Result<CourseData> = await this.getCourseByCourseCode(courseCode);
 
-    if (!courseCodeResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Course code already exists");
+    if (courseCodeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Course code already exists");
     }
 
     const courseNameResult: Result<CourseData> = await this.getCourseByName(courseName);
@@ -170,7 +170,7 @@ class CourseService implements ICourseService {
     if (!courseResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
     }
-    
+
     const deleteCourseResult: ResultSetHeader = await courseRepository.deleteCourseById(courseId);
     if (deleteCourseResult.affectedRows === 0) {
       throw new Error("deleteCourseById failed to delete");
