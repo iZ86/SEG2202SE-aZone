@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution} from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
 import { CourseData } from "../models/course-model";
@@ -29,7 +29,7 @@ interface IProgrammeService {
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
-  getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
@@ -212,8 +212,8 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
   }
 
-  async getStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
-    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+  async getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
 
     if (!studentCourseProgrammeIntake) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
@@ -244,7 +244,7 @@ class ProgrammeService implements IProgrammeService {
     }
 
     // Check if student course programme intake exists.
-    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
     if (studentCourseProgrammeIntakeResponse.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Student already enrolled into this course programme intake");
     }
@@ -259,8 +259,7 @@ class ProgrammeService implements IProgrammeService {
       throw new Error("createStudentCourseProgrammeIntake failed to insert");
     }
 
-
-    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    const studentCrouseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
 
     if (!studentCrouseProgrammeIntake) {
       throw new Error("createStudentCourseProgrammeIntake student course programme intake created not found");
@@ -290,9 +289,8 @@ class ProgrammeService implements IProgrammeService {
     }
 
 
-
     // Check if student course programe intake exist or not.
-    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
     if (!studentCourseProgrammeIntakeResponse.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found.");
     }
