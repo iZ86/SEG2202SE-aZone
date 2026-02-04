@@ -239,7 +239,7 @@ class CourseService implements ICourseService {
     const courseSubject: Result<CourseSubjectData> = await this.getCourseSubjectById(courseId, subjectId);
 
     if (!courseSubjectResult.isSuccess()) {
-      throw new Error("createCourseSubject course subject created not found");
+      throw new Error("createCourseSubject created course subject created not found");
     }
 
     return Result.succeed(courseSubject.getData(), "Course subject create success");
