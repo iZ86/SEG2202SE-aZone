@@ -439,6 +439,7 @@ export default class ProgrammeController {
     const courseId: number = parseInt(req.params.courseId);
     const programmeIntakeId: number = parseInt(req.params.programmeIntakeId);
 
+    // TODO: IT TAKES FROM THE PARAMS THEREFORE NEED TO CHECK
 
     const response: Result<null> = await programmeService.deleteStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 

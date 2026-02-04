@@ -7,6 +7,8 @@ import courseService from "./course.service";
 import { CourseData } from "../models/course-model";
 import userService from "./user.service";
 import { UserData } from "../models/user-model";
+import enrollmentService from "./enrollment.service";
+import { EnrollmentData } from "../models/enrollment-model";
 
 interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
@@ -19,12 +21,13 @@ interface IProgrammeService {
   getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
+  getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<Result<ProgrammeIntakeData>>;
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
-  updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<Result<ProgrammeIntakeData>>;
+  updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getProgrammeCount(query: string): Promise<Result<number>>;
   getProgrammeIntakeCount(query: string): Promise<Result<number>>;
@@ -123,6 +126,29 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake, "Programme retrieve success");
   }
 
+  async getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>> {
+    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByIds(programmeIntakeIds);
+
+    if (programmeIntakes.length === 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `programmeIntakeIds not found: [${programmeIntakeIds.join(", ")}]`);
+    }
+
+    const foundIds = new Set(
+      programmeIntakes.map(p => p.programmeIntakeId)
+    );
+
+    const missingIds = programmeIntakeIds.filter(
+      id => !foundIds.has(id)
+    );
+
+    if (missingIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Programme intake not found for IDs: [${missingIds.join(", ")}]`);
+    }
+
+    return Result.succeed(programmeIntakes, "Programme retrieve success");
+  }
+
+
   async getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>> {
     const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
 
@@ -173,15 +199,31 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme Intake delete success");
   }
 
-  async updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<Result<ProgrammeIntakeData>> {
-    await programmeRepository.updateProgrammeIntakeEnrollmentIdById(programmeIntakeId, enrollmentId);
-    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(programmeIntakeId);
+  async updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
 
-    if (!programmeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake updated not found");
+    // Check programmeIntakeIds exist.
+    const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await this.getProgrammeIntakesByIds(programmeIntakeIds);
+    if (!programmeIntakesResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
     }
 
-    return Result.succeed(programmeIntake, "Programme intake update success");
+    // Check if enrollmentId exist.
+    const enrollmentResult: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
+    }
+    
+    const updateProgrammeIntakeEnrollmentIdByIdsResult: ResultSetHeader = await programmeRepository.updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds, enrollmentId);
+    if (updateProgrammeIntakeEnrollmentIdByIdsResult.affectedRows === 0) {
+      throw new Error ("updateProgrammeIntakeEnrollmentIdByIds failed to update");
+    }
+
+    const programmeIntakes: Result<ProgrammeIntakeData[]> = await this.getProgrammeIntakesByIds(programmeIntakeIds);
+    if (!programmeIntakes.isSuccess()) {
+      throw new Error("updateProgrammeIntakeEnrollmentIdByIds updated programme intakes not found");
+    }
+
+    return Result.succeed(programmeIntakes.getData(), "Programme intake update success");
   }
 
   async deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>> {

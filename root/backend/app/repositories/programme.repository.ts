@@ -21,7 +21,7 @@ interface IProgrammeRepository {
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
-  updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<ResultSetHeader>;
+  updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<ResultSetHeader>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
   getProgrammeCount(query: string): Promise<number>;
   getProgrammeIntakeCount(query: string): Promise<number>;
@@ -218,6 +218,24 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
+  getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<ProgrammeIntakeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ProgrammeIntakeData[]>(
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId " +
+        "FROM PROGRAMME_INTAKE pi " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE pi.programmeIntakeId IN (?);",
+        [programmeIntakeIds],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
@@ -300,12 +318,12 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  updateProgrammeIntakeEnrollmentIdById(programmeIntakeId: number, enrollmentId: number): Promise<ResultSetHeader> {
+  updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE PROGRAMME_INTAKE SET enrollmentId = ? " +
-        "WHERE programmeIntakeId = ?;",
-        [enrollmentId, programmeIntakeId],
+        "WHERE programmeIntakeId IN (?);",
+        [enrollmentId, programmeIntakeIds],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

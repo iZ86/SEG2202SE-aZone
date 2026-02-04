@@ -1,13 +1,16 @@
+import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData } from "../models/enrollment-model";
+import { ProgrammeIntakeData } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeRangeColliding } from "../utils/utils";
+import programmeService from "./programme.service";
 
 interface IEnrollmentService {
   getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
   getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>>;
-  createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
+  createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>>;
   updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
   deleteEnrollmentById(enrollmentId: number): Promise<Result<null>>;
   getEnrollmentCount(query: string): Promise<Result<number>>;
@@ -52,16 +55,63 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment, "Enrollment retrieve success");
   }
 
-  async createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
-    const response = await enrollmentRepository.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
+  async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>> {
 
-    const enrollmentResponse: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentById(response.insertId);
+    // Check parameters duplicated.
+    const isDateTimeDuplicated: Result<EnrollmentData> = await this.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
 
-    if (!enrollmentResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment created not found");
+    if (isDateTimeDuplicated.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentStartDateTime and enrollmentEndDateTime existed");
     }
 
-    return Result.succeed(enrollmentResponse, "Enrollment create success");
+
+    if (programmeIntakeIds.length > 0) {
+
+      // Check programIntakeIds exist.
+      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByIds(programmeIntakeIds);
+      if (!programmeIntakesResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+      }
+
+      // Check if they already have an enrollmentId.
+      const programmeIntakeIdsWithEnrollmentId: number[] = [];
+      const enrollmentIds: number[] = [];
+
+      programmeIntakesResult.getData().map(p => {
+        if (p.enrollmentId) {
+          programmeIntakeIdsWithEnrollmentId.push(p.programmeIntakeId);
+          enrollmentIds.push(p.enrollmentId);
+        }
+      })
+
+      if (programmeIntakeIdsWithEnrollmentId.length > 0) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, `programmeIntakeIds: [${programmeIntakeIdsWithEnrollmentId.join(", ")}] already belongs to enrollmentIds: [${enrollmentIds.join(", ")}]`);
+      }
+    }
+
+
+    // Create enrollment.
+    const createEnrollmentResult: ResultSetHeader = await enrollmentRepository.createEnrollment(enrollmentStartDateTime, enrollmentEndDateTime);
+    if (createEnrollmentResult.affectedRows === 0) {
+      throw new Error("createEnrollmentWithProgrammeIntakes failed to insert");
+    }
+
+    const enrollment: Result<EnrollmentData> = await this.getEnrollmentById(createEnrollmentResult.insertId);
+    if (!enrollment.isSuccess()) {
+      throw new Error("createEnrollmentWithProgrammeIntakes created enrollment not found");
+    }
+
+
+    if (programmeIntakeIds.length > 0) {
+
+      // Enroll programmeIntakeIds provided to the newly created enrollmentId.
+      const updateProgrammeIntakeEnrollmentIdByIdsResult: Result<ProgrammeIntakeData[]> = await programmeService.updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds, createEnrollmentResult.insertId);
+      if (!updateProgrammeIntakeEnrollmentIdByIdsResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, updateProgrammeIntakeEnrollmentIdByIdsResult.getMessage());
+      }
+    }
+
+    return Result.succeed(enrollment.getData(), "Enrollment create success");
   }
 
   async updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
