@@ -9,7 +9,7 @@ export default class AuthController {
   async login(req: Request, res: Response) {
     const userId: number = req.body.userId;
     const password: string = req.body.password;
-    const role: ENUM_USER_ROLE = parseInt(req.body.role);
+    const role: ENUM_USER_ROLE = Number(req.body.role);
     let response: Result<{ token: string; }>;
 
     switch (role) {
