@@ -242,20 +242,6 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  isUserExist(userId: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query(
-        "SELECT EXISTS(SELECT 1 FROM REGISTERED_USER " +
-        "WHERE userId = ?) AS userExists;",
-        [userId],
-        (err, res: any[]) => {
-          if (err) reject(err);
-          resolve(Boolean(res[0].userExists));
-        }
-      );
-    });
-  };
-
   isAdminExist(adminId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       databaseConn.query(

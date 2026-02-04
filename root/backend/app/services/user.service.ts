@@ -14,7 +14,6 @@ interface IUserService {
   getStudentById(studentId: number): Promise<Result<UserData>>;
   getStudentByEmail(email: string): Promise<Result<UserData>>;
   getStudentByIdAndEmail(studentId: number, email: string): Promise<Result<UserData>>;
-  isUserExist(userId: number): Promise<boolean>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<ResultSetHeader>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData | undefined>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
@@ -113,15 +112,13 @@ class UserService implements IUserService {
     return Result.succeed(userCount ? userCount : 0, "User count retrieve success");
   }
 
-  async isUserExist(userId: number): Promise<boolean> {
-    const isUserExist: boolean = await userRepository.isUserExist(userId);
+  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<ResultSetHeader>> {
+    const studentEmailResult: Result<UserData> = await this.getStudentByEmail(email);
 
-    if (!isUserExist) {
-      return false;
+    if (studentEmailResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Email already exist");
     }
 
-    return true;
-  }
 
   async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<ResultSetHeader>> {
     const hashedPassword: string = await argon2.hash(password, {
