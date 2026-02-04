@@ -6,6 +6,7 @@ export type Course = {
 export type CourseProgramme = {
   courseId: number,
   courseName: string,
+  courseCode: string,
   programmeId: number;
   programmeName: string;
 };

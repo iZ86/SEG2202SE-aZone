@@ -31,8 +31,10 @@ class CourseRepository implements ICourseRepository {
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "WHERE c.courseId LIKE ? " +
         "OR c.courseName LIKE ? " +
+        "OR c.courseCode LIKE ? " +
         "LIMIT ? OFFSET ?;",
         [
+          "%" + query + "%",
           "%" + query + "%",
           "%" + query + "%",
           pageSize,

@@ -4,7 +4,7 @@ import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
 import { SubjectData, StudentSubjectData, StudentSubjectOverviewData } from "../models/subject-model";
 import courseService from "../services/course.service";
-import { CourseData } from "../models/course-model";
+import { CourseData, CourseSubjectData } from "../models/course-model";
 
 export default class SubjectController {
   async getSubjects(req: Request, res: Response) {
@@ -76,7 +76,7 @@ export default class SubjectController {
     }
 
     const response: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-    const courseSubjectResponse: Result<CourseData[]> = await courseService.getCourseSubjectBySubjectId(subjectId);
+    const courseSubjectResponse: Result<CourseSubjectData[]> = await courseService.getCourseSubjectBySubjectId(subjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({

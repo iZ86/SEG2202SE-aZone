@@ -25,15 +25,18 @@ export default function CourseForm({
   id?: number;
 }) {
   const [courseName, setCourseName] = useState("");
+  const [courseCode, setCourseCode] = useState("");
   const [programme, setProgramme] = useState<reactSelectOptionType>({
     value: -1,
     label: "",
   });
 
   const [emptyCourseName, setEmptyCourseName] = useState(false);
+  const [emptyCourseCode, setEmptyCourseCode] = useState(false);
   const [emptyProgramme, setEmptyProgramme] = useState(false);
 
   const [invalidCourseName, setInvalidCourseName] = useState(false);
+  const [invalidCourseCode, setInvalidCourseCode] = useState(false);
 
   const [programmeOptions, setProgrammeOptions] = useState<
     reactSelectOptionType[]
@@ -47,7 +50,7 @@ export default function CourseForm({
     const setupEditCourseForm = async (token: string, courseId: number) => {
       const response: Response | undefined = await getCourseByIdAPI(
         token,
-        courseId
+        courseId,
       );
 
       if (!response?.ok) {
@@ -59,6 +62,7 @@ export default function CourseForm({
       const { data } = await response.json();
 
       setCourseName(data.courseName);
+      setCourseCode(data.courseCode);
       setProgramme({
         label: data.programmeName,
         value: data.programmeId,
@@ -86,7 +90,7 @@ export default function CourseForm({
       return;
     }
 
-    if (emptyProgramme || emptyCourseName) {
+    if (emptyProgramme || emptyCourseName || emptyCourseCode) {
       setIsLoading(false);
       return;
     }
@@ -103,21 +107,31 @@ export default function CourseForm({
       response = await createCourseAPI(
         authToken as string,
         courseName,
-        programme.value
+        courseCode,
+        programme.value,
       );
     } else if (type === "Edit") {
       response = await updateCourseByIdAPI(
         authToken as string,
         id,
         courseName,
-        programme.value
+        courseCode,
+        programme.value,
       );
     }
 
     if (response && response.status === 409) {
       setIsLoading(false);
-      setInvalidCourseName(true);
-      toast.error("Course name existed");
+
+      const error = await response.json();
+
+      if (error.message.includes("Course name")) {
+        setInvalidCourseName(true);
+        toast.error("Course name existed");
+      } else if (error.message.includes("Course code")) {
+        setInvalidCourseCode(true);
+        toast.error("Course code existed");
+      }
       return;
     }
 
@@ -137,6 +151,11 @@ export default function CourseForm({
       emptyInput = true;
     }
 
+    if (courseCode === "") {
+      setEmptyCourseCode(true);
+      emptyInput = true;
+    }
+
     if (!programme.value || programme.value === -1) {
       setEmptyProgramme(true);
       emptyInput = true;
@@ -146,7 +165,7 @@ export default function CourseForm({
   }
 
   function onChangeProgramme(
-    onChangeProgramme: SingleValue<reactSelectOptionType>
+    onChangeProgramme: SingleValue<reactSelectOptionType>,
   ) {
     if (!onChangeProgramme) {
       return;
@@ -158,8 +177,17 @@ export default function CourseForm({
   function onChangeCourseName(onChangeCourseName: string) {
     if (onChangeCourseName !== "") {
       setEmptyCourseName(false);
+      setInvalidCourseName(false);
     }
     setCourseName(onChangeCourseName);
+  }
+
+  function onChangeCourseCode(onChangeCourseCode: string) {
+    if (onChangeCourseCode !== "") {
+      setEmptyCourseCode(false);
+      setInvalidCourseCode(false);
+    }
+    setCourseCode(onChangeCourseCode);
   }
 
   async function getAllProgrammes(token: string) {
@@ -220,6 +248,23 @@ export default function CourseForm({
                   />
                 </AdminInputFieldWrapper>
               </div>
+              <div className="flex-1">
+                <AdminInputFieldWrapper
+                  isEmpty={emptyCourseCode}
+                  isInvalid={invalidCourseCode}
+                  invalidMessage="Course Code already exists"
+                >
+                  <NormalTextField
+                    text={courseCode}
+                    onChange={onChangeCourseCode}
+                    isInvalid={emptyCourseCode || invalidCourseCode}
+                    placeholder="Course Code"
+                  />
+                </AdminInputFieldWrapper>
+              </div>
+            </div>
+
+            <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
               <div className="flex-1">
                 <AdminInputFieldWrapper isEmpty={emptyProgramme}>
                   <SingleFilter

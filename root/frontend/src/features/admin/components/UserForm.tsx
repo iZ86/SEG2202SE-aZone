@@ -76,7 +76,7 @@ export default function UserForm({
     {
       value: -1,
       label: "",
-    }
+    },
   );
   const [enrollmentSubjectTypes, setEnrollmentSubjectTypes] = useState<
     reactSelectOptionType[]
@@ -90,7 +90,7 @@ export default function UserForm({
     reactSelectOptionType[]
   >([]);
   const [courseOptions, setCourseOptions] = useState<reactSelectOptionType[]>(
-    []
+    [],
   );
   const [programmeIntakeOptions, setProgrammeIntakeOptions] = useState<
     reactSelectOptionType[]
@@ -142,7 +142,7 @@ export default function UserForm({
       if (activeTab === "Student Information") {
         const studentResponse: Response | undefined = await getStudentByIdAPI(
           token,
-          studentId
+          studentId,
         );
 
         if (!studentResponse || !studentResponse.ok) {
@@ -178,7 +178,7 @@ export default function UserForm({
 
         // Filter active and history programmes
         const studentCoursesHistory = (data || []).filter(
-          (p: StudentCourseProgrammeIntake) => p.courseStatus !== 1
+          (p: StudentCourseProgrammeIntake) => p.courseStatus !== 1,
         );
         setStudentCoursesHistory(studentCoursesHistory);
 
@@ -207,7 +207,7 @@ export default function UserForm({
             label: intake.intakeId + " - Semester " + intake.semester,
           }));
         setProgrammeIntake(
-          activeProgrammeIntakes[0] || { value: -1, label: "" }
+          activeProgrammeIntakes[0] || { value: -1, label: "" },
         );
       } else if (activeTab === "Enroll in Subjects") {
         const enrollmentSubjectTypesResponse: Response | undefined =
@@ -270,9 +270,9 @@ export default function UserForm({
                       " • Group " +
                       classTypeDetail.grouping +
                       "",
-                  })
-                )
-              )
+                  }),
+                ),
+              ),
           );
 
         setEnrollmentSubjectTypesOptions(enrollmentSubjectTypesOptions);
@@ -307,7 +307,7 @@ export default function UserForm({
                 timetable.grouping +
                 "",
             };
-          }
+          },
         );
 
         setEnrollmentSubjectTypes(enrolledSubjects);
@@ -319,7 +319,7 @@ export default function UserForm({
     const setupEditAdminForm = async (token: string, adminId: number) => {
       const response: Response | undefined = await getAdminByIdAPI(
         token,
-        adminId
+        adminId,
       );
 
       if (!response?.ok) {
@@ -448,7 +448,7 @@ export default function UserForm({
         email,
         phoneNumber,
         password,
-        status.value
+        status.value,
       );
     } else if (type === "Edit") {
       if (isAdmin) {
@@ -458,7 +458,7 @@ export default function UserForm({
           firstName,
           lastName,
           email,
-          phoneNumber
+          phoneNumber,
         );
       } else {
         response = await updateStudentByIdAPI(
@@ -469,7 +469,7 @@ export default function UserForm({
           email,
           phoneNumber,
           password,
-          status.value
+          status.value,
         );
       }
     } else {
@@ -490,7 +490,7 @@ export default function UserForm({
       toast.success(
         `${type === "Add" ? "Created new" : "Updated"} ${
           isAdmin ? "Admin" : "Student"
-        }`
+        }`,
       );
       return;
     } else {
@@ -498,7 +498,7 @@ export default function UserForm({
       toast.error(
         `Failed to ${type === "Add" ? "Create new" : "Update"} ${
           isAdmin ? "Admin" : "Student"
-        }`
+        }`,
       );
     }
   }
@@ -532,7 +532,7 @@ export default function UserForm({
         authToken as string,
         id,
         course.value,
-        programmeIntake.value
+        programmeIntake.value,
       );
 
     if (response && response.status === 409) {
@@ -556,7 +556,7 @@ export default function UserForm({
   }
 
   async function handleSubmitEnrollmentSubjectTypes(
-    e: FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>,
   ) {
     e.preventDefault();
 
@@ -585,7 +585,7 @@ export default function UserForm({
       await createStudentEnrollmentSubjectTypesByStudentIdAPI(
         authToken as string,
         id,
-        enrollmentSubjectTypes.map((est) => est.value)
+        enrollmentSubjectTypes.map((est) => est.value),
       );
 
     if (response && response.status === 409) {
@@ -594,7 +594,7 @@ export default function UserForm({
       const clashedId = data.enrollmentSubjectTypeIds[0];
 
       const clashedOption = enrollmentSubjectTypesOptions.find(
-        (est) => est.value === clashedId
+        (est) => est.value === clashedId,
       );
 
       setIsEnrollmentSubjectTypeTimeClashed(true);
@@ -618,21 +618,20 @@ export default function UserForm({
 
   const handleDeleteStudentCourseProgrammeIntake = async (
     courseId: number,
-    programmeIntakeId: number
+    programmeIntakeId: number,
   ) => {
     if (!authToken) return;
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete course history for Student ID ${id}?`
+      `Are you sure you want to delete course history for Student ID ${id}?`,
     );
     if (!confirmDelete) return;
 
-    const response =
-      await deleteStudentCourseProgrammeIntakeAPI(
-        authToken,
-        id,
-        courseId,
-        programmeIntakeId
-      );
+    const response = await deleteStudentCourseProgrammeIntakeAPI(
+      authToken,
+      id,
+      courseId,
+      programmeIntakeId,
+    );
 
     if (response && response.ok) {
       navigate("/admin/users");
@@ -739,6 +738,7 @@ export default function UserForm({
   function onChangeEmail(onChangeEmail: string) {
     if (onChangeEmail !== "") {
       setEmptyEmail(false);
+      setInvalidEmail(false);
     }
     setEmail(onChangeEmail);
   }
@@ -767,7 +767,7 @@ export default function UserForm({
   }
 
   function onChangeProgramme(
-    onChangeProgramme: SingleValue<reactSelectOptionType>
+    onChangeProgramme: SingleValue<reactSelectOptionType>,
   ) {
     if (!onChangeProgramme) {
       return;
@@ -785,7 +785,7 @@ export default function UserForm({
   }
 
   function onChangeProgrammeIntake(
-    onChangeProgrammeIntake: SingleValue<reactSelectOptionType>
+    onChangeProgrammeIntake: SingleValue<reactSelectOptionType>,
   ) {
     if (!onChangeProgrammeIntake) {
       return;
@@ -795,7 +795,7 @@ export default function UserForm({
   }
 
   function onChangeEnrollmentSubjectTypes(
-    onChangeEnrollmentSubjectTypes: MultiValue<reactSelectOptionType>
+    onChangeEnrollmentSubjectTypes: MultiValue<reactSelectOptionType>,
   ) {
     const onChangeEnrollmentSubjectTypesValues: reactSelectOptionType[] = [];
     if (onChangeEnrollmentSubjectTypes.length !== 0) {
@@ -803,7 +803,7 @@ export default function UserForm({
     }
     for (let i = 0; i < onChangeEnrollmentSubjectTypes.length; i++) {
       onChangeEnrollmentSubjectTypesValues.push(
-        onChangeEnrollmentSubjectTypes[i]
+        onChangeEnrollmentSubjectTypes[i],
       );
     }
     setEnrollmentSubjectTypes(onChangeEnrollmentSubjectTypesValues);
@@ -835,7 +835,7 @@ export default function UserForm({
   async function getCoursesByProgrammeId(token: string, programmeId: number) {
     const response: Response | undefined = await getCoursesByProgrammeIdAPI(
       token,
-      programmeId
+      programmeId,
     );
 
     if (!response?.ok) {
@@ -860,7 +860,7 @@ export default function UserForm({
 
   async function getProgrammeIntakesByProgrammeId(
     token: string,
-    programmeId: number
+    programmeId: number,
   ) {
     const response: Response | undefined =
       await getProgrammeIntakesByProgrammeIdAPI(token, programmeId);
@@ -912,7 +912,7 @@ export default function UserForm({
                   role:
                     | "Student Information"
                     | "Course History"
-                    | "Enroll in Subjects"
+                    | "Enroll in Subjects",
                 ) => (
                   <button
                     key={role}
@@ -926,7 +926,7 @@ export default function UserForm({
                   >
                     {role}
                   </button>
-                )
+                ),
               )}
             </div>
           )}
@@ -1155,7 +1155,7 @@ export default function UserForm({
                   Student's Course History
                 </h1>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white mt-4">
-                  <div className="h-[300px] overflow-y-auto">
+                  <div className="h-75 overflow-y-auto">
                     <table className="min-w-full text-left rounded-4xl">
                       <thead className="bg-slate-50 text-slate-500">
                         <tr className="text-sm">
@@ -1199,11 +1199,11 @@ export default function UserForm({
                                 </td>
                                 <td className="px-6 py-5">
                                   {new Date(
-                                    student.semesterStartDate
+                                    student.semesterStartDate,
                                   ).toLocaleDateString()}{" "}
                                   -{" "}
                                   {new Date(
-                                    student.semesterEndDate
+                                    student.semesterEndDate,
                                   ).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-5">
@@ -1214,7 +1214,7 @@ export default function UserForm({
                                     onClick={() =>
                                       handleDeleteStudentCourseProgrammeIntake(
                                         student.courseId,
-                                        student.programmeIntakeId
+                                        student.programmeIntakeId,
                                       )
                                     }
                                     className="text-red-tomato hover:text-red-600 cursor-pointer"
@@ -1226,7 +1226,7 @@ export default function UserForm({
                                   </button>
                                 </td>
                               </tr>
-                            )
+                            ),
                           )
                         )}
                       </tbody>

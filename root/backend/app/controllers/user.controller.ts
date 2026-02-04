@@ -1,18 +1,13 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
+import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
 import userService from "../services/user.service";
-import courseService from "../services/course.service";
-import programmeService from "../services/programme.service";
-import { CourseData } from "../models/course-model";
-import { ProgrammeIntakeData } from "../models/programme-model";
-import { ResultSetHeader } from "mysql2";
 
 export default class UserController {
   async getAdmins(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number = Number(req.query.page as string) || 1;
+    const pageSize: number = Number(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<UserData[]> = await userService.getAdmins(query, pageSize, page);
@@ -31,8 +26,8 @@ export default class UserController {
   }
 
   async getStudents(req: Request, res: Response) {
-    const page: number = parseInt(req.query.page as string) || 1;
-    const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+    const page: number = Number(req.query.page as string) || 1;
+    const pageSize: number = Number(req.query.pageSize as string) || 15;
     const query: string = req.query.query as string;
 
     const response: Result<UserData[]> = await userService.getStudents(query, pageSize, page);
@@ -52,7 +47,7 @@ export default class UserController {
   }
 
   async getAdminById(req: Request, res: Response) {
-    const adminId: number = parseInt(req.params.adminId);
+    const adminId: number = Number(req.params.adminId);
 
     if (!adminId || isNaN(adminId)) {
       return res.sendError.badRequest("Invalid adminId");
@@ -71,7 +66,7 @@ export default class UserController {
   }
 
   async getStudentById(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
+    const studentId: number = Number(req.params.studentId);
 
     if (!studentId || isNaN(studentId)) {
       return res.sendError.badRequest("Invalid studentId");
@@ -97,13 +92,7 @@ export default class UserController {
     const password: string = req.body.password;
     const userStatus: number = req.body.userStatus;
 
-    const isEmailDuplicated: Result<UserData> = await userService.getStudentByEmail(email);
-
-    if (isEmailDuplicated.isSuccess()) {
-      return res.sendError.conflict("Email already exist");
-    }
-
-    const response: Result<ResultSetHeader> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
+    const response: Result<UserData> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -111,41 +100,19 @@ export default class UserController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
 
   async updateStudentById(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
+    const studentId: number = Number(req.params.studentId);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
     const userStatus: number = req.body.userStatus;
-
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.badRequest("Invalid studentId");
-    }
-
-    /**
-     * Check if the user is using the email before updating
-     * If user is using the old email, doesn't needs to check if the email is duplicated
-     */
-    const isEmailBelongsToUser: Result<UserData> = await userService.getStudentByIdAndEmail(studentId, email);
-
-    if (!isEmailBelongsToUser.isSuccess()) {
-      const isEmailDuplicated: Result<UserData> = await userService.getStudentByEmail(email);
-
-      if (isEmailDuplicated.isSuccess()) {
-        return res.sendError.conflict("Email already exist");
-      }
-    }
-
-    const userResponse: boolean = await userService.isUserExist(studentId);
-
-    if (!userResponse) {
-      return res.sendError.notFound("Invalid userId");
-    }
 
     const response: Result<UserData | undefined> = await userService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
 
@@ -155,56 +122,23 @@ export default class UserController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
 
   async updateAdminById(req: Request, res: Response) {
-    const adminId: number = parseInt(req.params.adminId);
+    const adminId: number = Number(req.params.adminId);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
 
-    if (!adminId || isNaN(adminId)) {
-      return res.sendError.badRequest("Invalid adminId");
-    }
-
-    const userResponse: boolean = await userService.isUserExist(adminId);
-
-    if (!userResponse) {
-      return res.sendError.notFound("Invalid userId");
-    }
-
     const response: Result<UserData> = await userService.updateAdminById(adminId, firstName, lastName, email, phoneNumber);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
-
-  async deleteUserById(req: Request, res: Response) {
-    const userId: number = parseInt(req.params.userId);
-
-    if (!userId || isNaN(userId)) {
-      return res.sendError.badRequest("Invalid userId");
-    }
-
-    const userResponse: boolean = await userService.isUserExist(userId);
-
-    if (!userResponse) {
-      return res.sendError.notFound("Invalid userId");
-    }
-
-    const response: Result<null> = await userService.deleteUserById(userId);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
@@ -278,7 +212,7 @@ export default class UserController {
   }
 
   async getStudentTimetableByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId as string);
+    const studentId: number = Number(req.params.studentId as string);
 
     const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(studentId);
     const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(studentId);

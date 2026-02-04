@@ -20,7 +20,6 @@ interface IUserRepostory {
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: number): Promise<ResultSetHeader>;
   createStudent(studentId: number): Promise<ResultSetHeader>;
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
-  deleteUserById(userId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
@@ -243,20 +242,6 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  isUserExist(userId: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query(
-        "SELECT EXISTS(SELECT 1 FROM REGISTERED_USER " +
-        "WHERE userId = ?) AS userExists;",
-        [userId],
-        (err, res: any[]) => {
-          if (err) reject(err);
-          resolve(Boolean(res[0].userExists));
-        }
-      );
-    });
-  };
-
   isAdminExist(adminId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       databaseConn.query(
@@ -321,19 +306,6 @@ class UserRepository implements IUserRepostory {
         "UPDATE REGISTERED_USER SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, status = ? " +
         "WHERE userId = ?;",
         [firstName, lastName, phoneNumber, email, userStatus, userId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        }
-      );
-    });
-  };
-
-  deleteUserById(userId: number): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "DELETE FROM REGISTERED_USER WHERE userId = ?;",
-        [userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

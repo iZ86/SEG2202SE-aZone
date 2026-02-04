@@ -24,7 +24,7 @@ export default function CourseTable() {
         token,
         pageSize,
         page,
-        searchTerm
+        searchTerm,
       );
 
       if (!response || !response.ok) {
@@ -42,7 +42,7 @@ export default function CourseTable() {
       setCourses(data.courses);
       setTotalPages(Math.ceil(data.courseCount / pageSize));
     },
-    [searchTerm, pageSize]
+    [searchTerm, pageSize],
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function CourseTable() {
   const handleDelete = async (courseId: number) => {
     if (!authToken) return;
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete Course ID ${courseId}?`
+      `Are you sure you want to delete Course ID ${courseId}?`,
     );
     if (!confirmDelete) return;
 
@@ -83,7 +83,7 @@ export default function CourseTable() {
       <div className="items-center space-x-4 mt-4 sm:flex">
         <input
           type="text"
-          placeholder="Search with Course ID, or Course Name..."
+          placeholder="Search with Course ID, Course Name, or Course Code..."
           className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -103,12 +103,13 @@ export default function CourseTable() {
 
       <section className="mt-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="h-[300px] overflow-y-auto">
+          <div className="h-75 overflow-y-auto">
             <table className="min-w-full text-left">
               <thead className="bg-slate-50 text-slate-500">
                 <tr className="text-sm">
                   <th className="px-6 py-4 font-medium">Course ID</th>
                   <th className="px-6 py-4 font-medium">Course Name</th>
+                  <th className="px-6 py-4 font-medium">Course Code</th>
                   <th className="px-6 py-4 font-medium">Programme Name</th>
                   <th className="px-6 py-4 font-medium">Edit</th>
                   <th className="px-6 py-4 font-medium">Delete</th>
@@ -117,7 +118,7 @@ export default function CourseTable() {
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {courses.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="text-center py-6 text-gray-500">
+                    <td colSpan={6} className="text-center py-6 text-gray-500">
                       No course found.
                     </td>
                   </tr>
@@ -126,6 +127,7 @@ export default function CourseTable() {
                   <tr key={`${course.courseId}`} className="text-sm">
                     <td className="px-6 py-5">{course.courseId}</td>
                     <td className="px-6 py-5">{course.courseName}</td>
+                    <td className="px-6 py-5">{course.courseCode}</td>
                     <td className="px-6 py-5">{course.programmeName}</td>
                     <td className="px-6 py-5 text-slate-500">
                       <Link
