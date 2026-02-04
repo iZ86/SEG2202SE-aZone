@@ -152,7 +152,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
-      SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, sm.studyMode, pi.semesterStartDate, pi.semesterEndDate
+      SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, sm.studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId 
       FROM PROGRAMME_INTAKE pi
       INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId
       INNER JOIN INTAKE i ON pi.intakeId = i.intakeId
@@ -183,7 +183,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -203,7 +203,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, semesterEndDate " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -221,7 +221,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, semesterEndDate " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -241,7 +241,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, semesterEndDate " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +

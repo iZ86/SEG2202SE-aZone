@@ -13,6 +13,7 @@ export interface ProgrammeIntakeData extends RowDataPacket {
   semester: number;
   semesterStartDate: Date;
   semesterEndDate: Date;
+  enrollmentId: number | null;
 }
 
 export interface ProgrammeHistoryData extends RowDataPacket {
