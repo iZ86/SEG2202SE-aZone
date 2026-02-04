@@ -156,7 +156,7 @@ class CourseService implements ICourseService {
     const course: Result<CourseProgrammeData> = await this.getCourseById(courseId);
 
     if (!course.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
+      throw new Error("updateCourseById updated course not found");
     }
 
     return Result.succeed(course.getData(), "Course update success");
