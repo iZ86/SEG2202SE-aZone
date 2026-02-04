@@ -98,7 +98,7 @@ class CourseService implements ICourseService {
 
     const course: Result<CourseProgrammeData> = await this.getCourseById(createCourseResult.insertId);
     if (!course.isSuccess()) {
-      throw new Error("createCourse course created not found");
+      throw new Error("createCourse created course created not found");
     }
 
     return Result.succeed(course.getData(), "Course create success");
