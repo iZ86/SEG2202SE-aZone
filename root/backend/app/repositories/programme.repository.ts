@@ -18,6 +18,7 @@ interface IProgrammeRepository {
   getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined>;
   getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>;
+  getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]>;
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
@@ -191,6 +192,26 @@ class ProgrammeRepository implements IProgrammeRepository {
         "WHERE pi.programmeId = ? ",
         [
           programmeId
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ProgrammeIntakeData[]>(
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId " +
+        "FROM PROGRAMME_INTAKE pi " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE pi.enrollmentId = ? ",
+        [
+          enrollmentId
         ],
         (err, res) => {
           if (err) reject(err);

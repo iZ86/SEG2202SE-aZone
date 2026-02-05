@@ -20,6 +20,7 @@ interface IProgrammeService {
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
   getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>>;
+  getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
@@ -114,6 +115,21 @@ class ProgrammeService implements IProgrammeService {
     const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByProgrammeId(programmeId);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
+  }
+
+  async getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
+
+    // Check enrollmentId exists.
+    const enrollmentResult: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
+
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
+    }
+
+    // Get Programme Intakes.
+    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByEnrollmentId(enrollmentId)
+
+    return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
 
   async getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>> {

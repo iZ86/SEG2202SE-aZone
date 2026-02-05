@@ -196,7 +196,29 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   async deleteEnrollmentById(enrollmentId: number): Promise<Result<null>> {
-    await enrollmentRepository.deleteEnrollmentById(enrollmentId);
+
+    // Check if enrollmentId exists.
+    const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
+
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
+    }
+
+    // Check if any programmeIntakes are under this enrollmentId.
+    const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByEnrollmentId(enrollmentId);
+    if (!programmeIntakesResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+    }
+
+    const programmeIntakes: ProgrammeIntakeData[] = programmeIntakesResult.getData();
+    if (programmeIntakes.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Enrollment cannot be deleted because it is still linked to programme intakes. Please remove the enrollment from all programme intakes before deleting");
+    }
+
+    const deleteEnrollmentResult: ResultSetHeader = await enrollmentRepository.deleteEnrollmentById(enrollmentId);
+    if (deleteEnrollmentResult.affectedRows === 0) {
+      throw new Error("deleteEnrollmentById failed to delete")
+    }
 
     return Result.succeed(null, "Enrollment delete success");
   }

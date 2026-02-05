@@ -92,7 +92,7 @@ export default class EnrollmentController {
     // Optional
     const programmeIntakeIds: number[] = req.body.programmeIntakeIds || [];
 
-    
+
     const response = await enrollmentService.updateEnrollmentWithProgrammeIntakesById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime, programmeIntakeIds);
 
 
@@ -109,19 +109,9 @@ export default class EnrollmentController {
   }
 
   async deleteEnrollmentById(req: Request, res: Response) {
-    const enrollmentId: number = parseInt(req.params.enrollmentId as string);
+    const enrollmentId: number = Number(req.params.enrollmentId);
 
-    if (!enrollmentId || isNaN(enrollmentId)) {
-      return res.sendError.badRequest("Invalid enrollmentId");
-    }
 
-    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
-
-    if (!enrollmentResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid enrollmentId");
-    }
-
-    await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId);
     const response = await enrollmentService.deleteEnrollmentById(enrollmentId);
 
     if (response.isSuccess()) {
@@ -130,6 +120,8 @@ export default class EnrollmentController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
