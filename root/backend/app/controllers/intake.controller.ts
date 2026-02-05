@@ -52,12 +52,6 @@ export default class IntakeController {
   async createIntake(req: Request, res: Response) {
     const intakeId: number = req.body.intakeId;
 
-    const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
-
-    if (isIntakeDuplicated.isSuccess()) {
-      return res.sendError.conflict("intakeId existed");
-    }
-
     const response = await intakeService.createIntake(intakeId);
 
     if (response.isSuccess()) {
@@ -66,6 +60,8 @@ export default class IntakeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
@@ -73,18 +69,6 @@ export default class IntakeController {
   async updateIntakeById(req: Request, res: Response) {
     const intakeId: number = Number(req.params.intakeId as string);
     const newIntakeId: number = req.body.intakeId;
-
-    const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(newIntakeId);
-
-    if (isIntakeDuplicated.isSuccess()) {
-      return res.sendError.conflict("intakeId existed");
-    }
-
-    const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
-
-    if (!intakeResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid intakeId");
-    }
 
     const response = await intakeService.updateIntakeById(intakeId, newIntakeId);
 
@@ -94,6 +78,10 @@ export default class IntakeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
+        default:
+          return res.sendError.internal(response.getMessage());
       }
     }
   }
