@@ -1,6 +1,22 @@
 import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
 
+export const studentParamValidator: any = [
+  param('studentId')
+    .exists().withMessage("Invalid studentId")
+    .isInt().withMessage("Invalid studentId")
+    .toInt(),
+  validate,
+];
+
+export const adminParamValidator: any = [
+  param('adminId')
+    .exists().withMessage("Invalid adminId")
+    .isInt().withMessage("Invalid adminId")
+    .toInt(),
+  validate,
+];
+
 export const createStudentValidator: any = [
   body('firstName')
     .trim()
@@ -30,10 +46,6 @@ export const createStudentValidator: any = [
 ];
 
 export const updateStudentValidator: any = [
-  param('studentId')
-    .exists().withMessage("Invalid studentId")
-    .isInt().withMessage("Invalid studentId")
-    .toInt(),
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')
@@ -58,10 +70,6 @@ export const updateStudentValidator: any = [
 ];
 
 export const updateAdminValidator: any = [
-  param('adminId')
-    .exists().withMessage("Invalid adminId")
-    .isInt().withMessage("Invalid adminId")
-    .toInt(),
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')
