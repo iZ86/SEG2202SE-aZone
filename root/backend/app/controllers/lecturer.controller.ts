@@ -56,12 +56,6 @@ export default class LecturerController {
     const email: string = req.body.email;
     const phoneNumber: string = req.body.phoneNumber;
 
-    const isLecturerDuplicated: Result<LecturerData> = await lecturerService.getLecturerByEmail(email);
-
-    if (isLecturerDuplicated.isSuccess()) {
-      return res.sendError.conflict("Lecturer duplciated");
-    }
-
     const response: Result<LecturerData> = await lecturerService.createLecturer(firstName, lastName, lecturerTitleId, email, phoneNumber);
 
     if (response.isSuccess()) {
@@ -70,6 +64,8 @@ export default class LecturerController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
@@ -82,22 +78,6 @@ export default class LecturerController {
     const email: string = req.body.email;
     const phoneNumber: string = req.body.phoneNumber;
 
-    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
-
-    if (!lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid lecturerId");
-    }
-
-    const isEmailBelongsToLecturer: Result<LecturerData> = await lecturerService.getLecturerByIdAndEmail(lecturerId, email);
-
-    if (!isEmailBelongsToLecturer.isSuccess()) {
-      const isEmailDuplicated: Result<LecturerData> = await lecturerService.getLecturerByEmail(email);
-
-      if (isEmailDuplicated.isSuccess()) {
-        return res.sendError.conflict("Email already exist");
-      }
-    }
-
     const response = await lecturerService.updateLecturerById(lecturerId, firstName, lastName, lecturerTitleId, email, phoneNumber);
 
     if (response.isSuccess()) {
@@ -106,16 +86,13 @@ export default class LecturerController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
 
   async deleteLecturerById(req: Request, res: Response) {
-    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
-
-    if (!lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid lecturerId");
-    }
     const lecturerId: number = Number(req.params.lecturerId as string);
 
     const response = await lecturerService.deleteLecturerById(lecturerId);
