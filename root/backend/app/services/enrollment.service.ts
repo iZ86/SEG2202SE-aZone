@@ -11,7 +11,7 @@ interface IEnrollmentService {
   getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
   getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>>;
   createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>>;
-  updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
+  updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>>;
   deleteEnrollmentById(enrollmentId: number): Promise<Result<null>>;
   getEnrollmentCount(query: string): Promise<Result<number>>;
   getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<EnrollmentProgrammeIntakeData[]>>;
@@ -114,16 +114,85 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment.getData(), "Enrollment create success");
   }
 
-  async updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
-    await enrollmentRepository.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+  async updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>> {
 
-    const enrollmentResponse: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentById(enrollmentId);
+    // Check enrollment exist
+    const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
 
-    if (!enrollmentResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment updated not found");
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
     }
 
-    return Result.succeed(enrollmentResponse, "Enrollment update success");
+    /**
+     * Because enrollmentStartDateTime and enrollmentEndDateTime is unique, check if its tied to the enrollmentId or not.
+     * If not tied, check if other enrollmentId has the combination of time or not.
+     */
+    const currentEnrollmentData: EnrollmentData = enrollmentResult.getData();
+    if (new Date(enrollmentStartDateTime).getTime() !== new Date(currentEnrollmentData.enrollmentStartDateTime).getTime() && new Date(enrollmentEndDateTime).getTime() !== new Date(currentEnrollmentData.enrollmentEndDateTime).getTime()) {
+      const isDateTimeDuplicated: Result<EnrollmentData> = await this.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
+
+
+      if (isDateTimeDuplicated.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentStartDateTime and enrollmentEndDateTime already exists");
+      }
+    }
+
+    if (programmeIntakeIds.length > 0) {
+
+      // Check programIntakeIds exist.
+      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByIds(programmeIntakeIds);
+      if (!programmeIntakesResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+      }
+
+      // Check if they already have an enrollmentId.
+      const programmeIntakeIdsWithEnrollmentId: number[] = [];
+      const enrollmentIds: number[] = [];
+
+      programmeIntakesResult.getData().map(p => {
+        if (p.enrollmentId && p.enrollmentId !== enrollmentId) {
+          programmeIntakeIdsWithEnrollmentId.push(p.programmeIntakeId);
+          enrollmentIds.push(p.enrollmentId);
+        }
+      })
+
+      if (programmeIntakeIdsWithEnrollmentId.length > 0) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, `programmeIntakeIds: [${programmeIntakeIdsWithEnrollmentId.join(", ")}] already belongs to enrollmentIds: [${enrollmentIds.join(", ")}]`);
+      }
+    }
+
+
+    // Update enrollment.
+    const updateEnrollmentResult: ResultSetHeader = await enrollmentRepository.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
+    if (updateEnrollmentResult.affectedRows === 0) {
+      throw new Error("updateEnrollmentById failed to update");
+    }
+
+
+    const enrollment: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
+
+    if (!enrollment) {
+      throw new Error("updateEnrollmentById updated enrollment not found");
+    }
+
+
+    // Remove all the programmeIntakes that has this enrollmentId.
+    const deleteProgrammeIntakeEnrollmentIdByEnrollmentIdResult: Result<null> = await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId);
+    if (!deleteProgrammeIntakeEnrollmentIdByEnrollmentIdResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, deleteProgrammeIntakeEnrollmentIdByEnrollmentIdResult.getMessage());
+    }
+
+    // Update the programmeIntakes.
+    if (programmeIntakeIds.length > 0) {
+
+      // Enroll programmeIntakeIds provided to the newly created enrollmentId.
+      const updateProgrammeIntakeEnrollmentIdByIdsResult: Result<ProgrammeIntakeData[]> = await programmeService.updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds, enrollmentId);
+      if (!updateProgrammeIntakeEnrollmentIdByIdsResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, updateProgrammeIntakeEnrollmentIdByIdsResult.getMessage());
+      }
+    }
+
+    return Result.succeed(enrollment.getData(), "Enrollment update success");
   }
 
   async deleteEnrollmentById(enrollmentId: number): Promise<Result<null>> {

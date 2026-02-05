@@ -227,6 +227,13 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>> {
+
+    const enrollmentResult: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
+    }
+
+    // It can be 0 rows affected. Therefore, no checks needed.
     await programmeRepository.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId);
 
     return Result.succeed(null, "Programme intake enrollmentId delete success");

@@ -86,42 +86,15 @@ export default class EnrollmentController {
   }
 
   async updateEnrollmentById(req: Request, res: Response) {
-    const enrollmentId: number = parseInt(req.params.enrollmentId as string);
+    const enrollmentId: number = Number(req.params.enrollmentId);
     const enrollmentStartDateTime: Date = req.body.enrollmentStartDateTime;
     const enrollmentEndDateTime: Date = req.body.enrollmentEndDateTime;
-    const programmeIntakeIds: number[] = req.body.programmeIntakeIds;
+    // Optional
+    const programmeIntakeIds: number[] = req.body.programmeIntakeIds || [];
 
-    if (!enrollmentId || isNaN(enrollmentId)) {
-      return res.sendError.badRequest("Invalid enrollmentId");
-    }
+    
+    const response = await enrollmentService.updateEnrollmentWithProgrammeIntakesById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime, programmeIntakeIds);
 
-    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
-
-    if (!enrollmentResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid enrollmentId");
-    }
-
-    const isEnrollmentBelongsToEnrollmentId: Result<EnrollmentData> = await enrollmentService.getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
-
-    if (!isEnrollmentBelongsToEnrollmentId.isSuccess()) {
-      const isDateTimeDuplicated: Result<EnrollmentData> = await enrollmentService.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
-
-      if (isDateTimeDuplicated.isSuccess()) {
-        return res.sendError.conflict("enrollmentStartDateTime and enrollmentEndDateTime existed");
-      }
-    }
-
-    const response = await enrollmentService.updateEnrollmentById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
-
-    await programmeService.deleteProgrammeIntakeEnrollmentIdByEnrollmentId(response.getData().enrollmentId);
-
-    if (programmeIntakeIds && programmeIntakeIds.length > 0) {
-      await Promise.all(
-        programmeIntakeIds.map((programmeIntakeId) =>
-          programmeService.updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds, response.getData().enrollmentId)
-        )
-      );
-    }
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -129,6 +102,8 @@ export default class EnrollmentController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }

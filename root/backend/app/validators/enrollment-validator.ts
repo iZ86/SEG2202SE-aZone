@@ -1,5 +1,13 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
+
+export const enrollmentParamValidator: any = [
+  param('enrollmentId')
+    .exists().withMessage("Invalid enrollmentId")
+    .isInt().withMessage("Invalid enrollmentId")
+    .toInt(),
+  validate,
+]
 
 export const createAndUpdateEnrollmentValidator: any = [
   body('enrollmentStartDateTime')
