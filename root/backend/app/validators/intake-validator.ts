@@ -11,9 +11,8 @@ export const intakeParamValidator: any = [
 
 export const createAndUpdateIntakeValidator: any = [
   body('intakeId')
-    .trim()
     .notEmpty().withMessage('Missing intakeId')
-    .matches(/^(20\d{2})(0[1-9]|1[0-2])$/)
-    .withMessage("Invalid intakeId format. Must be in YYYYMM format (e.g., 202503, 202508, 202408)."),
+    .isInt({ min: 200001, max: 209912 }) // covers years 2000-2099, months 01-12
+    .withMessage("Invalid intakeId format. Must be an integer in YYYYMM format (e.g., 202503, 202508, 202408)."),
   validate,
 ];
