@@ -32,7 +32,7 @@ export default function IntakeForm({
     const setupEditIntakeForm = async (token: string, intakeId: number) => {
       const response: Response | undefined = await getIntakeByIdAPI(
         token,
-        intakeId
+        intakeId,
       );
 
       if (!response?.ok) {
@@ -85,7 +85,7 @@ export default function IntakeForm({
       response = await updateIntakeByIdAPI(
         authToken as string,
         id,
-        parseInt(intakeId)
+        parseInt(intakeId),
       );
     }
 
@@ -101,6 +101,11 @@ export default function IntakeForm({
       navigate("/admin/intakes");
       toast.success(`${type === "Add" ? "Created new" : "Updated"} intake`);
       return;
+    } else {
+      navigate("/admin/intakes");
+      toast.error(
+        `Failed to ${type === "Add" ? "Create new" : "Update"} intake`,
+      );
     }
   }
 
