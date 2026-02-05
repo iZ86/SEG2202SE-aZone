@@ -37,10 +37,6 @@ export default class IntakeController {
   async getIntakeById(req: Request, res: Response) {
     const intakeId: number = parseInt(req.params.intakeId as string);
 
-    if (!intakeId || isNaN(intakeId)) {
-      return res.sendError.badRequest("Invalid intakeId");
-    }
-
     const response: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
     if (response.isSuccess()) {
@@ -78,10 +74,6 @@ export default class IntakeController {
     const intakeId: number = parseInt(req.params.intakeId as string);
     const newIntakeId: number = req.body.intakeId;
 
-    if (!intakeId || isNaN(intakeId)) {
-      return res.sendError.badRequest("Invalid intakeId");
-    }
-
     const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(newIntakeId);
 
     if (isIntakeDuplicated.isSuccess()) {
@@ -108,10 +100,6 @@ export default class IntakeController {
 
   async deleteIntakeById(req: Request, res: Response) {
     const intakeId: number = parseInt(req.params.intakeId as string);
-
-    if (!intakeId || isNaN(intakeId)) {
-      return res.sendError.badRequest("Invalid intakeId");
-    }
 
     const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
