@@ -111,13 +111,12 @@ export default class LecturerController {
   }
 
   async deleteLecturerById(req: Request, res: Response) {
-    const lecturerId: number = parseInt(req.params.lecturerId as string);
-
     const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
     if (!lecturerResponse.isSuccess()) {
       return res.sendError.notFound("Invalid lecturerId");
     }
+    const lecturerId: number = Number(req.params.lecturerId as string);
 
     const response = await lecturerService.deleteLecturerById(lecturerId);
 
