@@ -48,12 +48,6 @@ export default class VenueController {
   async createVenue(req: Request, res: Response) {
     const venue: string = req.body.venue;
 
-    const isVenueDuplicated: Result<VenueData> = await venueService.getVenueByVenue(venue);
-
-    if (isVenueDuplicated.isSuccess()) {
-      return res.sendError.conflict("Venue duplciated");
-    }
-
     const response: Result<VenueData> = await venueService.createVenue(venue);
 
     if (response.isSuccess()) {
@@ -62,6 +56,8 @@ export default class VenueController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
@@ -74,22 +70,6 @@ export default class VenueController {
       return res.sendError.badRequest("Invalid venueId");
     }
 
-    const venueResponse: Result<VenueData> = await venueService.getVenueById(venueId);
-
-    if (!venueResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid venueId");
-    }
-
-    const isVenueBelongsToVenueId: Result<VenueData> = await venueService.getVenueByIdAndVenue(venueId, venue);
-
-    if (!isVenueBelongsToVenueId.isSuccess()) {
-      const isVenueDuplicated: Result<VenueData> = await venueService.getVenueByVenue(venue);
-
-      if (isVenueDuplicated.isSuccess()) {
-        return res.sendError.conflict("Venue duplciated");
-      }
-    }
-
     const response = await venueService.updateVenueById(venueId, venue);
 
     if (response.isSuccess()) {
@@ -98,6 +78,8 @@ export default class VenueController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
@@ -107,12 +89,6 @@ export default class VenueController {
 
     if (!venueId || isNaN(venueId)) {
       return res.sendError.badRequest("Invalid venueId");
-    }
-
-    const venueResponse: Result<VenueData> = await venueService.getVenueById(venueId);
-
-    if (!venueResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid venueId");
     }
 
     const response = await venueService.deleteVenueById(venueId);

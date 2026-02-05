@@ -41,42 +41,70 @@ class VenueService implements IVenueService {
     return Result.succeed(venueData, "Venue retrieve success");
   }
 
+  async createVenue(venue: string): Promise<Result<VenueData>> {
+    const venueResult: Result<VenueData> = await this.getVenueByVenue(venue);
 
     if (venueResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Venue duplicated");
     }
 
+    const createVenueResult: ResultSetHeader = await venueRepository.createVenue(venue);
 
-  async createVenue(venue: string): Promise<Result<VenueData>> {
-    const response = await venueRepository.createVenue(venue);
-
-    const venueResponse: VenueData | undefined = await venueRepository.getVenueById(response.insertId);
-
-    if (!venueResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue created not found");
+    if (createVenueResult.affectedRows === 0) {
+      throw new Error("createVenue failed to insert");
     }
 
-    return Result.succeed(venueResponse, "Venue create success");
+    const venueResponse: Result<VenueData> = await this.getVenueById(createVenueResult.insertId);
+
+    if (!venueResponse.isSuccess()) {
+      throw new Error("createVenue created venue not found");
+    }
+
+    return Result.succeed(venueResponse.getData(), "Venue create success");
   }
 
   async updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>> {
-    const updateVenueResponse: ResultSetHeader = await venueRepository.updateVenueById(venueId, venue);
+    const venueResult: Result<VenueData> = await this.getVenueById(venueId);
 
-    if (updateVenueResponse.affectedRows === 0) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to update venue");
+    if (!venueResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, venueResult.getMessage());
     }
 
-    const venueResponse: VenueData | undefined = await venueRepository.getVenueById(venueId);
+    if (venueResult.getData().venue !== venue) {
+      const isVenueExistResult: Result<VenueData> = await this.getVenueByVenue(venue);
 
-    if (!venueResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Venue updated not found");
+      if (isVenueExistResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Venue duplicated");
+      }
     }
 
-    return Result.succeed(venueResponse, "Venue update success");
+    const updateVenueResult: ResultSetHeader = await venueRepository.updateVenueById(venueId, venue);
+
+    if (updateVenueResult.affectedRows === 0) {
+      throw new Error("updateVenueById failed to update");
+    }
+
+    const venueResponse: Result<VenueData> = await this.getVenueById(venueId);
+
+    if (!venueResponse.isSuccess()) {
+      throw new Error("updateVenueById updated venue not found");
+    }
+
+    return Result.succeed(venueResponse.getData(), "Venue update success");
   }
 
   async deleteVenueById(venueId: number): Promise<Result<null>> {
-    await venueRepository.deleteVenueById(venueId);
+    const venueResult: Result<VenueData> = await this.getVenueById(venueId);
+
+    if (!venueResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, venueResult.getMessage());
+    }
+
+    const deleteVenueResult: ResultSetHeader = await venueRepository.deleteVenueById(venueId);
+
+    if (deleteVenueResult.affectedRows === 0) {
+      throw new Error("deleteVenueById failed to delete");
+    }
 
     return Result.succeed(null, "Venue delete success");
   }
