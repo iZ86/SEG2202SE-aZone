@@ -2,7 +2,8 @@ export default {
   HOST: "localhost",
   USER: "root",
   PASSWORD: "",
-  DB: "azone_database"
+  DB: "azone_database",
+  TIMEZONE: "Z"
 };
 
 // import "dotenv/config";
