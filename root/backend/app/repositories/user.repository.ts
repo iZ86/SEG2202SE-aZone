@@ -8,10 +8,8 @@ interface IUserRepostory {
   getStudents(query: string, pageSize: number, page: number): Promise<UserData[]>;
   getUserById(userId: number): Promise<UserData | undefined>;
   getUserByEmail(email: string): Promise<UserData | undefined>;
-  getUserByIdAndEmail(userId: number, email: string): Promise<UserData | undefined>;
   getStudentById(studentId: number): Promise<UserData | undefined>;
   getStudentByEmail(email: string): Promise<UserData | undefined>;
-  getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined>;
   getAdminById(adminId: number): Promise<UserData | undefined>;
   getAdminCount(query: string): Promise<number>;
   getStudentCount(query: string): Promise<number>;
@@ -113,22 +111,6 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getUserByIdAndEmail(userId: number, email: string): Promise<UserData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<UserData[]>(
-        "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
-        "FROM REGISTERED_USER " +
-        "WHERE email = ? " +
-        "AND userId = ?;",
-        [email, userId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
-
   getStudentById(studentId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
@@ -153,23 +135,6 @@ class UserRepository implements IUserRepostory {
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email COLLATE utf8mb4_general_ci = ?;",
         [email],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getStudentByIdAndEmail(studentId: number, email: string): Promise<UserData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
-        "FROM REGISTERED_USER ru " +
-        "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
-        "WHERE ru.email = ? " +
-        "AND s.studentId = ?;",
-        [email, studentId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
