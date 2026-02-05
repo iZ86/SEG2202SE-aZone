@@ -49,10 +49,6 @@ export default class UserController {
   async getAdminById(req: Request, res: Response) {
     const adminId: number = Number(req.params.adminId);
 
-    if (!adminId || isNaN(adminId)) {
-      return res.sendError.badRequest("Invalid adminId");
-    }
-
     const response: Result<UserData> = await userService.getAdminById(adminId);
 
     if (response.isSuccess()) {
@@ -67,10 +63,6 @@ export default class UserController {
 
   async getStudentById(req: Request, res: Response) {
     const studentId: number = Number(req.params.studentId);
-
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.badRequest("Invalid studentId");
-    }
 
     const response: Result<UserData> = await userService.getStudentById(studentId);
 
