@@ -35,10 +35,6 @@ export default class LecturerController {
   }
 
   async getLecturerById(req: Request, res: Response) {
-
-    if (!lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid lecturerId");
-    }
     const lecturerId: number = Number(req.params.lecturerId as string);
 
     const response: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
@@ -86,10 +82,6 @@ export default class LecturerController {
     const email: string = req.body.email;
     const phoneNumber: string = req.body.phoneNumber;
 
-    if (!lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid lecturerId");
-    }
-
     const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
     if (!lecturerResponse.isSuccess()) {
@@ -120,10 +112,6 @@ export default class LecturerController {
 
   async deleteLecturerById(req: Request, res: Response) {
     const lecturerId: number = parseInt(req.params.lecturerId as string);
-
-    if (!lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid lecturerId");
-    }
 
     const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
@@ -159,10 +147,6 @@ export default class LecturerController {
   }
 
   async getLecturerTitleById(req: Request, res: Response) {
-
-    if (!lecturerTitleId || isNaN(lecturerTitleId)) {
-      return res.sendError.badRequest("Invalid lecturerTitleId");
-    }
     const lecturerTitleId: number = Number(req.params.lecturerTitleId as string);
 
     const response: Result<LecturerTitleData> = await lecturerService.getLecturerTitleById(lecturerTitleId);
