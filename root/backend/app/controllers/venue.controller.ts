@@ -29,10 +29,6 @@ export default class VenueController {
   async getVenueById(req: Request, res: Response) {
     const venueId: number = Number(req.params.venueId as string);
 
-    if (!venueId || isNaN(venueId)) {
-      return res.sendError.badRequest("Invalid venueId");
-    }
-
     const response: Result<VenueData> = await venueService.getVenueById(venueId);
 
     if (response.isSuccess()) {
@@ -66,10 +62,6 @@ export default class VenueController {
     const venueId: number = Number(req.params.venueId as string);
     const venue: string = req.body.venue;
 
-    if (!venueId || isNaN(venueId)) {
-      return res.sendError.badRequest("Invalid venueId");
-    }
-
     const response = await venueService.updateVenueById(venueId, venue);
 
     if (response.isSuccess()) {
@@ -86,10 +78,6 @@ export default class VenueController {
 
   async deleteVenueById(req: Request, res: Response) {
     const venueId: number = Number(req.params.venueId as string);
-
-    if (!venueId || isNaN(venueId)) {
-      return res.sendError.badRequest("Invalid venueId");
-    }
 
     const response = await venueService.deleteVenueById(venueId);
 
