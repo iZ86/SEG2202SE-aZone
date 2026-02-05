@@ -1,5 +1,13 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
+
+export const intakeParamValidator: any = [
+  param('intakeId')
+    .exists().withMessage("Invalid intakeId")
+    .isInt().withMessage("Invalid intakeId")
+    .toInt(),
+  validate,
+];
 
 export const createAndUpdateIntakeValidator: any = [
   body('intakeId')
