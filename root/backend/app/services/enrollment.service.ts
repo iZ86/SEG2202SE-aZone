@@ -61,7 +61,7 @@ class EnrollmentService implements IEnrollmentService {
     const isDateTimeDuplicated: Result<EnrollmentData> = await this.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
 
     if (isDateTimeDuplicated.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentStartDateTime and enrollmentEndDateTime existed");
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentStartDateTime and enrollmentEndDateTime already exists");
     }
 
 
