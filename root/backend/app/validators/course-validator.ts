@@ -9,22 +9,10 @@ export const courseParamValidator: any = [
   validate,
 ]
 
-export const createCourseValidator: any = [
+export const createAndUpdateCourseValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
     .isNumeric().withMessage('programmeId must be number'),
-  body('courseCode')
-    .trim()
-    .notEmpty().withMessage('Missing courseCode')
-    .isString().withMessage('courseCode must be string'),
-  body('courseName')
-    .trim()
-    .notEmpty().withMessage('Missing courseName')
-    .isString().withMessage('courseName must be string'),
-  validate,
-];
-
-export const updateCourseValidator: any = [
   body('courseCode')
     .trim()
     .notEmpty().withMessage('Missing courseCode')
