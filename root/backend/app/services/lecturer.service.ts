@@ -7,7 +7,6 @@ interface ILecturerService {
   getLecturers(query: string, pageSize: number | null, page: number | null): Promise<Result<LecturerData[]>>;
   getLecturerById(lecturerId: number): Promise<Result<LecturerData>>;
   getLecturerByEmail(email: string): Promise<Result<LecturerData>>;
-  getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<Result<LecturerData>>;
   createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   deleteLecturerById(lecturerId: number): Promise<Result<null>>;
@@ -43,15 +42,9 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturerData, "Lecturer retrieve success");
   }
 
-  async getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<Result<LecturerData>> {
-    const lecturerData: LecturerData | undefined = await lecturerRepository.getLecturerByIdAndEmail(lecturerId, email);
 
-    if (!lecturerData) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Lecturer not found");
     }
 
-    return Result.succeed(lecturerData, "Lecturer retrieve success");
-  }
 
   async createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
     const response = await lecturerRepository.createLecturer(firstName, lastName, lecturerTitleId, email, phoneNumber);
