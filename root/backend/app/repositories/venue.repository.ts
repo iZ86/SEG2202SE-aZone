@@ -7,7 +7,6 @@ interface IVenueRepository {
   getVenues(query: string, pageSize: number, page: number): Promise<VenueData[]>;
   getVenueById(venueId: number): Promise<VenueData | undefined>;
   getVenueByVenue(venue: string): Promise<VenueData | undefined>;
-  getVenueByIdAndVenue(venueId: number, venue: string): Promise<VenueData | undefined>;
   createVenue(venue: string): Promise<ResultSetHeader>;
   updateVenueById(venueId: number, venue: string): Promise<ResultSetHeader>;
   deleteVenueById(venueId: number): Promise<ResultSetHeader>;
@@ -60,22 +59,6 @@ class VenueRepository implements IVenueRepository {
         "FROM VENUE " +
         "WHERE venue = ?;",
         [venue],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getVenueByIdAndVenue(venueId: number, venue: string): Promise<VenueData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<VenueData[]>(
-        "SELECT * " +
-        "FROM VENUE " +
-        "WHERE venue = ? " +
-        "AND venueId = ?;",
-        [venue, venueId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
