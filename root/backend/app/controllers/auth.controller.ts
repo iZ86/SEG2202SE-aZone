@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import authService from "../services/auth.service";
-import userService from "../services/user.service";
-import { UserData } from "../models/user-model";
 
 export default class AuthController {
   async login(req: Request, res: Response) {
@@ -65,16 +63,6 @@ export default class AuthController {
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
 
-    const isEmailBelongsToUser: Result<UserData> = await userService.getUserByIdAndEmail(userId, email);
-
-    if (!isEmailBelongsToUser.isSuccess()) {
-      const isEmailDuplicated: Result<UserData> = await userService.getUserByEmail(email);
-
-      if (isEmailDuplicated.isSuccess()) {
-        return res.sendError.conflict("Email already exist");
-      }
-    }
-
     const response = await authService.updateMe(userId, phoneNumber, email);
 
     if (response.isSuccess()) {
@@ -83,6 +71,8 @@ export default class AuthController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
         default:
           return res.sendError.badRequest(response.getMessage());
       }

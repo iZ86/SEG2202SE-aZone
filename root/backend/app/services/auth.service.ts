@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import authRepository from "../repositories/auth.repository";
 import userRepository from "../repositories/user.repository";
 import { UserData } from "../models/user-model";
+import userService from "./user.service";
+import { ResultSetHeader } from "mysql2";
 
 interface IAuthService {
   loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>>;
@@ -97,14 +99,35 @@ class AuthService implements IAuthService {
 
   /** Did not separate this to two different methods for student and admin because it takes all userId. */
   async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
-    await authRepository.updateMe(userId, phoneNumber, email);
-    const user: UserData | undefined = await userRepository.getUserById(userId);
+    const userResult: Result<UserData> = await userService.getUserById(userId);
 
-    if (!user) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get updated user");
+    if (!userResult) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
     }
 
-    return Result.succeed(user, "Update me success");
+    const currentUserData: UserData = userResult.getData();
+
+    if (currentUserData.email !== email) {
+      const isEmailExistResult: Result<UserData> = await userService.getUserByEmail(email);
+
+      if (isEmailExistResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Email already exist");
+      }
+    }
+
+    const updateUserResult: ResultSetHeader = await authRepository.updateMe(userId, phoneNumber, email);
+
+    if (updateUserResult.affectedRows === 0) {
+      throw new Error("updateMe failed to update");
+    }
+
+    const user: Result<UserData> = await userService.getUserById(userId);
+
+    if (!user.isSuccess()) {
+      throw new Error("updateMe user updated not found");
+    }
+
+    return Result.succeed(user.getData(), "Update me success");
   }
 }
 
