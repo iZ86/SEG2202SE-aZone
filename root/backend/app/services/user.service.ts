@@ -10,11 +10,9 @@ interface IUserService {
   getStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getUserById(userId: number): Promise<Result<UserData>>;
   getUserByEmail(email: string): Promise<Result<UserData>>;
-  getUserByIdAndEmail(userId: number, email: string): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   getStudentByEmail(email: string): Promise<Result<UserData>>;
-  getStudentByIdAndEmail(studentId: number, email: string): Promise<Result<UserData>>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
@@ -56,16 +54,6 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-  async getUserByIdAndEmail(userId: number, email: string): Promise<Result<UserData>> {
-    const student: UserData | undefined = await userRepository.getUserByIdAndEmail(userId, email);
-
-    if (!student) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
-    }
-
-    return Result.succeed(student, "Student retrieve success");
-  }
-
   async getStudentById(studentId: number): Promise<Result<UserData>> {
     const student: UserData | undefined = await userRepository.getStudentById(studentId);
 
@@ -78,16 +66,6 @@ class UserService implements IUserService {
 
   async getStudentByEmail(email: string): Promise<Result<UserData>> {
     const student: UserData | undefined = await userRepository.getStudentByEmail(email);
-
-    if (!student) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");
-    }
-
-    return Result.succeed(student, "Student retrieve success");
-  }
-
-  async getStudentByIdAndEmail(studentId: number, email: string): Promise<Result<UserData>> {
-    const student: UserData | undefined = await userRepository.getStudentByIdAndEmail(studentId, email);
 
     if (!student) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student not found");

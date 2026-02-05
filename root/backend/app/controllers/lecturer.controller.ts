@@ -6,8 +6,8 @@ import lecturerService from "../services/lecturer.service";
 
 export default class LecturerController {
   async getLecturers(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const page: number | null = Number(req.query.page as string) || null;
+    const pageSize: number | null = Number(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
     const response: Result<LecturerData[]> = await lecturerService.getLecturers(query, pageSize, page);
@@ -35,11 +35,7 @@ export default class LecturerController {
   }
 
   async getLecturerById(req: Request, res: Response) {
-    const lecturerId: number = parseInt(req.params.lecturerId as string);
-
-    if (!lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid lecturerId");
-    }
+    const lecturerId: number = Number(req.params.lecturerId as string);
 
     const response: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
@@ -60,12 +56,6 @@ export default class LecturerController {
     const email: string = req.body.email;
     const phoneNumber: string = req.body.phoneNumber;
 
-    const isLecturerDuplicated: Result<LecturerData> = await lecturerService.getLecturerByEmail(email);
-
-    if (isLecturerDuplicated.isSuccess()) {
-      return res.sendError.conflict("Lecturer duplciated");
-    }
-
     const response: Result<LecturerData> = await lecturerService.createLecturer(firstName, lastName, lecturerTitleId, email, phoneNumber);
 
     if (response.isSuccess()) {
@@ -74,37 +64,19 @@ export default class LecturerController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
 
   async updateLecturerById(req: Request, res: Response) {
-    const lecturerId: number = parseInt(req.params.lecturerId as string);
+    const lecturerId: number = Number(req.params.lecturerId as string);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const lecturerTitleId: number = req.body.lecturerTitleId;
     const email: string = req.body.email;
     const phoneNumber: string = req.body.phoneNumber;
-
-    if (!lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid lecturerId");
-    }
-
-    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
-
-    if (!lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid lecturerId");
-    }
-
-    const isEmailBelongsToLecturer: Result<LecturerData> = await lecturerService.getLecturerByIdAndEmail(lecturerId, email);
-
-    if (!isEmailBelongsToLecturer.isSuccess()) {
-      const isEmailDuplicated: Result<LecturerData> = await lecturerService.getLecturerByEmail(email);
-
-      if (isEmailDuplicated.isSuccess()) {
-        return res.sendError.conflict("Email already exist");
-      }
-    }
 
     const response = await lecturerService.updateLecturerById(lecturerId, firstName, lastName, lecturerTitleId, email, phoneNumber);
 
@@ -114,22 +86,14 @@ export default class LecturerController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
 
   async deleteLecturerById(req: Request, res: Response) {
-    const lecturerId: number = parseInt(req.params.lecturerId as string);
-
-    if (!lecturerId || isNaN(lecturerId)) {
-      return res.sendError.badRequest("Invalid lecturerId");
-    }
-
-    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
-
-    if (!lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid lecturerId");
-    }
+    const lecturerId: number = Number(req.params.lecturerId as string);
 
     const response = await lecturerService.deleteLecturerById(lecturerId);
 
@@ -159,11 +123,7 @@ export default class LecturerController {
   }
 
   async getLecturerTitleById(req: Request, res: Response) {
-    const lecturerTitleId: number = parseInt(req.params.lecturerTitleId as string);
-
-    if (!lecturerTitleId || isNaN(lecturerTitleId)) {
-      return res.sendError.badRequest("Invalid lecturerTitleId");
-    }
+    const lecturerTitleId: number = Number(req.params.lecturerTitleId as string);
 
     const response: Result<LecturerTitleData> = await lecturerService.getLecturerTitleById(lecturerTitleId);
 

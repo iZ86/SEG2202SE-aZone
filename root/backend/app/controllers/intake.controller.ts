@@ -6,8 +6,8 @@ import intakeService from "../services/intake.service";
 
 export default class IntakeController {
   async getIntakes(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const page: number | null = Number(req.query.page as string) || null;
+    const pageSize: number | null = Number(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
     const response: Result<IntakeData[]> = await intakeService.getIntakes(query, pageSize, page);
@@ -35,11 +35,7 @@ export default class IntakeController {
   }
 
   async getIntakeById(req: Request, res: Response) {
-    const intakeId: number = parseInt(req.params.intakeId as string);
-
-    if (!intakeId || isNaN(intakeId)) {
-      return res.sendError.badRequest("Invalid intakeId");
-    }
+    const intakeId: number = Number(req.params.intakeId as string);
 
     const response: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
@@ -56,12 +52,6 @@ export default class IntakeController {
   async createIntake(req: Request, res: Response) {
     const intakeId: number = req.body.intakeId;
 
-    const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
-
-    if (isIntakeDuplicated.isSuccess()) {
-      return res.sendError.conflict("intakeId existed");
-    }
-
     const response = await intakeService.createIntake(intakeId);
 
     if (response.isSuccess()) {
@@ -70,29 +60,15 @@ export default class IntakeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
 
   async updateIntakeById(req: Request, res: Response) {
-    const intakeId: number = parseInt(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId as string);
     const newIntakeId: number = req.body.intakeId;
-
-    if (!intakeId || isNaN(intakeId)) {
-      return res.sendError.badRequest("Invalid intakeId");
-    }
-
-    const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(newIntakeId);
-
-    if (isIntakeDuplicated.isSuccess()) {
-      return res.sendError.conflict("intakeId existed");
-    }
-
-    const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
-
-    if (!intakeResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid intakeId");
-    }
 
     const response = await intakeService.updateIntakeById(intakeId, newIntakeId);
 
@@ -102,16 +78,16 @@ export default class IntakeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
+        default:
+          return res.sendError.internal(response.getMessage());
       }
     }
   }
 
   async deleteIntakeById(req: Request, res: Response) {
-    const intakeId: number = parseInt(req.params.intakeId as string);
-
-    if (!intakeId || isNaN(intakeId)) {
-      return res.sendError.badRequest("Invalid intakeId");
-    }
+    const intakeId: number = Number(req.params.intakeId as string);
 
     const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 

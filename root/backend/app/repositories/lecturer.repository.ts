@@ -7,7 +7,6 @@ interface ILecturerRepository {
   getLecturers(query: string, pageSize: number | null, page: number | null): Promise<LecturerData[]>;
   getLecturerById(lecturerId: number): Promise<LecturerData | undefined>;
   getLecturerByEmail(email: string): Promise<LecturerData | undefined>;
-  getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<LecturerData | undefined>;
   createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader>;
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader>;
   deleteLecturerById(lecturerId: number): Promise<ResultSetHeader>;
@@ -73,22 +72,6 @@ class LecturerRepository implements ILecturerRepository {
         "FROM LECTURER " +
         "WHERE email = ?;",
         [email],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<LecturerData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<LecturerData[]>(
-        "SELECT * " +
-        "FROM LECTURER " +
-        "WHERE email = ? " +
-        "AND lecturerId = ?;",
-        [email, lecturerId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);

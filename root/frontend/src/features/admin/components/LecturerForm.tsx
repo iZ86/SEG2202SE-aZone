@@ -197,6 +197,7 @@ export default function LecturerForm({
   function onChangeEmail(onChangeEmail: string) {
     if (onChangeEmail !== "") {
       setEmptyEmail(false);
+      setInvalidEmail(false);
     }
     setEmail(onChangeEmail);
   }

@@ -25,7 +25,7 @@ export default function IntakeTable() {
         token,
         pageSize,
         page,
-        searchTerm
+        searchTerm,
       );
 
       if (!response || !response.ok) {
@@ -43,7 +43,7 @@ export default function IntakeTable() {
       setIntakes(data.intakes);
       setTotalPages(Math.ceil(data.intakeCount / pageSize));
     },
-    [searchTerm, pageSize]
+    [searchTerm, pageSize],
   );
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function IntakeTable() {
   const handleDelete = async (intakeId: number) => {
     if (!authToken) return;
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete Intake ID ${intakeId}?`
+      `Are you sure you want to delete Intake ID ${intakeId}?`,
     );
     if (!confirmDelete) return;
 
@@ -104,7 +104,7 @@ export default function IntakeTable() {
 
       <section className="mt-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="h-[300px] overflow-y-auto">
+          <div className="h-75 overflow-y-auto">
             <table className="min-w-full text-left">
               <thead className="bg-slate-50 text-slate-500">
                 <tr className="text-sm">

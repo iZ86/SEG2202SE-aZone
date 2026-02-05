@@ -1,3 +1,4 @@
+import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { IntakeData } from "../models/intake-model";
@@ -30,31 +31,69 @@ class IntakeService implements IIntakeService {
   }
 
   async createIntake(intakeId: number): Promise<Result<IntakeData>> {
-    const response = await intakeRepository.createIntake(intakeId);
+    const intakeResult: Result<IntakeData> = await this.getIntakeById(intakeId);
 
-    const intake: IntakeData | undefined = await intakeRepository.getIntakeById(response.insertId);
-
-    if (!intake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake created not found");
+    if (intakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Intake already exists");
     }
 
-    return Result.succeed(intake, "Intake create success");
+    const createIntakeResult: ResultSetHeader = await intakeRepository.createIntake(intakeId);
+
+    if (createIntakeResult.affectedRows === 0) {
+      throw new Error("createIntake failed to insert");
+    }
+
+    const intake: Result<IntakeData> = await this.getIntakeById(createIntakeResult.insertId);
+
+    if (!intake.isSuccess()) {
+      throw new Error("createIntake created intake not found");
+    }
+
+    return Result.succeed(intake.getData(), "Intake create success");
   }
 
   async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>> {
-    await intakeRepository.updateIntakeById(intakeId, newIntakeId);
+    const intakeResult: Result<IntakeData> = await this.getIntakeById(intakeId);
 
-    const intake: IntakeData | undefined = await intakeRepository.getIntakeById(newIntakeId);
-
-    if (!intake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Intake updated not found");
+    if (!intakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, intakeResult.getMessage());
     }
 
-    return Result.succeed(intake, "Intake update success");
+    if (intakeResult.getData().intakeId !== newIntakeId) {
+      const isIntakeExistResult: Result<IntakeData> = await this.getIntakeById(newIntakeId);
+
+      if (isIntakeExistResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Intake already exists");
+      }
+    }
+
+    const updateIntakeResult: ResultSetHeader = await intakeRepository.updateIntakeById(intakeId, newIntakeId);
+
+    if (updateIntakeResult.affectedRows === 0) {
+      throw new Error("updateIntakeById failed to update");
+    }
+
+    const intake: Result<IntakeData> = await this.getIntakeById(newIntakeId);
+
+    if (!intake.isSuccess()) {
+      throw new Error("updateIntakeById updated intake not found");
+    }
+
+    return Result.succeed(intake.getData(), "Intake update success");
   }
 
   async deleteIntakeById(intakeId: number): Promise<Result<null>> {
-    await intakeRepository.deleteIntakeById(intakeId);
+    const intakeResult: Result<IntakeData> = await this.getIntakeById(intakeId);
+
+    if (!intakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, intakeResult.getMessage());
+    }
+
+    const deleteIntakeResult: ResultSetHeader = await intakeRepository.deleteIntakeById(intakeId);
+
+    if (deleteIntakeResult.affectedRows === 0) {
+      throw new Error("deleteIntakeById failed to delete");
+    }
 
     return Result.succeed(null, "Intake delete success");
   }

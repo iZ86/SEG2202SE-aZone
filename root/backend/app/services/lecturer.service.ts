@@ -1,3 +1,4 @@
+import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { LecturerData, LecturerTitleData } from "../models/lecturer-model";
@@ -7,7 +8,6 @@ interface ILecturerService {
   getLecturers(query: string, pageSize: number | null, page: number | null): Promise<Result<LecturerData[]>>;
   getLecturerById(lecturerId: number): Promise<Result<LecturerData>>;
   getLecturerByEmail(email: string): Promise<Result<LecturerData>>;
-  getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<Result<LecturerData>>;
   createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   deleteLecturerById(lecturerId: number): Promise<Result<null>>;
@@ -43,50 +43,70 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturerData, "Lecturer retrieve success");
   }
 
-  async getLecturerByIdAndEmail(lecturerId: number, email: string): Promise<Result<LecturerData>> {
-    const lecturerData: LecturerData | undefined = await lecturerRepository.getLecturerByIdAndEmail(lecturerId, email);
-
-    if (!lecturerData) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Lecturer not found");
-    }
-
-    return Result.succeed(lecturerData, "Lecturer retrieve success");
-  }
-
   async createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
-    const response = await lecturerRepository.createLecturer(firstName, lastName, lecturerTitleId, email, phoneNumber);
+    const lecturerResult: Result<LecturerData> = await this.getLecturerByEmail(email);
 
-    if (!response.insertId) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to create lecturer");
+    if (lecturerResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Lecturer email already exists");
     }
 
-    const lecturerResponse: LecturerData | undefined = await lecturerRepository.getLecturerById(response.insertId);
+    const createLecturerResult: ResultSetHeader = await lecturerRepository.createLecturer(firstName, lastName, lecturerTitleId, email, phoneNumber);
 
-    if (!lecturerResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Lecturer created not found");
+    if (createLecturerResult.affectedRows === 0) {
+      throw new Error("createLecturer failed to insert");
     }
 
-    return Result.succeed(lecturerResponse, "Lecturer create success");
+    const lecturer: Result<LecturerData> = await this.getLecturerById(createLecturerResult.insertId);
+
+    if (!lecturer.isSuccess()) {
+      throw new Error("createCourse created course created not found");
+    }
+
+    return Result.succeed(lecturer.getData(), "Lecturer create success");
   }
 
   async updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
-    const updateLecturerResponse = await lecturerRepository.updateLecturerById(lecturerId, firstName, lastName, lecturerTitleId, email, phoneNumber);
+    const lecturerResult: Result<LecturerData> = await this.getLecturerById(lecturerId);
 
-    if (updateLecturerResponse.affectedRows === 0) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to update lecturer");
+    if (!lecturerResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, lecturerResult.getMessage());
     }
 
-    const lecturerResponse: LecturerData | undefined = await lecturerRepository.getLecturerById(lecturerId);
+    if (lecturerResult.getData().email !== email) {
+      const isLecturerEmailExistResult: Result<LecturerData> = await this.getLecturerByEmail(email);
 
-    if (!lecturerResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Lecturer updated not found");
+      if (isLecturerEmailExistResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Lecturer email already exists");
+      }
     }
 
-    return Result.succeed(lecturerResponse, "Lecturer update success");
+    const updateLecturerResult: ResultSetHeader = await lecturerRepository.updateLecturerById(lecturerId, firstName, lastName, lecturerTitleId, email, phoneNumber);
+
+    if (updateLecturerResult.affectedRows === 0) {
+      throw new Error("updateLecturerById failed to update");
+    }
+
+    const lecturer: Result<LecturerData> = await this.getLecturerById(lecturerId);
+
+    if (!lecturer.isSuccess()) {
+      throw new Error("createCourse created course created not found");
+    }
+
+    return Result.succeed(lecturer.getData(), "Lecturer update success");
   }
 
   async deleteLecturerById(lecturerId: number): Promise<Result<null>> {
-    await lecturerRepository.deleteLecturerById(lecturerId);
+    const lecturerResult: Result<LecturerData> = await this.getLecturerById(lecturerId);
+
+    if (!lecturerResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, lecturerResult.getMessage());
+    }
+
+    const deleteLecturerResult: ResultSetHeader = await lecturerRepository.deleteLecturerById(lecturerId);
+
+    if (deleteLecturerResult.affectedRows === 0) {
+      throw new Error("deleteLecturerById failed to delete");
+    }
 
     return Result.succeed(null, "Lecturer delete success");
   }

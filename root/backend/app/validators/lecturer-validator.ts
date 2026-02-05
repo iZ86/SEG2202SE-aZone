@@ -1,5 +1,21 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
+
+export const lecturerParamValidator: any = [
+  param('lecturerId')
+    .exists().withMessage("Invalid lecturerId")
+    .isInt().withMessage("Invalid lecturerId")
+    .toInt(),
+  validate,
+];
+
+export const lecturerTitleParamValidator: any = [
+  param('lecturerTitleId')
+    .exists().withMessage("Invalid lecturerId")
+    .isInt().withMessage("Invalid lecturerId")
+    .toInt(),
+  validate,
+];
 
 export const createAndUpdateLecturerValidator: any = [
   body('firstName')

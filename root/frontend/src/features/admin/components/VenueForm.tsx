@@ -113,6 +113,7 @@ export default function VenueForm({
   function onChangeVenue(onChangeVenue: string) {
     if (onChangeVenue !== "") {
       setEmptyVenue(false);
+      setInvalidVenue(false);
     }
     setVenue(onChangeVenue);
   }

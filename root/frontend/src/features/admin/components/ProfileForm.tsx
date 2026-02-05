@@ -89,7 +89,7 @@ export default function ProfileForm() {
     const newBlob = await uploadBlobAPI(authToken, selectedFile);
     const response = await updateProfilePictureAPI(
       authToken,
-      newBlob?.url as string
+      newBlob?.url as string,
     );
 
     if (response && response.ok) {
@@ -157,6 +157,7 @@ export default function ProfileForm() {
   function onChangeEmail(onChangeEmail: string) {
     if (onChangeEmail !== "") {
       setEmptyEmailInput(false);
+      setInvalidEmail(false);
     }
     setEmailInput(onChangeEmail);
   }
@@ -288,7 +289,11 @@ export default function ProfileForm() {
             </h3>
 
             <div className="space-y-6">
-              <AdminInputFieldWrapper isEmpty={emptyEmailInput} isInvalid={invalidEmail} invalidMessage="Email already exists">
+              <AdminInputFieldWrapper
+                isEmpty={emptyEmailInput}
+                isInvalid={invalidEmail}
+                invalidMessage="Email already exists"
+              >
                 <NormalTextField
                   text={emailInput}
                   placeholder="Email (e.g., john@example.com)"
