@@ -212,10 +212,10 @@ class ProgrammeService implements IProgrammeService {
     if (!enrollmentResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
     }
-    
+
     const updateProgrammeIntakeEnrollmentIdByIdsResult: ResultSetHeader = await programmeRepository.updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds, enrollmentId);
     if (updateProgrammeIntakeEnrollmentIdByIdsResult.affectedRows === 0) {
-      throw new Error ("updateProgrammeIntakeEnrollmentIdByIds failed to update");
+      throw new Error("updateProgrammeIntakeEnrollmentIdByIds failed to update");
     }
 
     const programmeIntakes: Result<ProgrammeIntakeData[]> = await this.getProgrammeIntakesByIds(programmeIntakeIds);
