@@ -6,8 +6,8 @@ import intakeService from "../services/intake.service";
 
 export default class IntakeController {
   async getIntakes(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const page: number | null = Number(req.query.page as string) || null;
+    const pageSize: number | null = Number(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
     const response: Result<IntakeData[]> = await intakeService.getIntakes(query, pageSize, page);
@@ -35,7 +35,7 @@ export default class IntakeController {
   }
 
   async getIntakeById(req: Request, res: Response) {
-    const intakeId: number = parseInt(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId as string);
 
     const response: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
@@ -71,7 +71,7 @@ export default class IntakeController {
   }
 
   async updateIntakeById(req: Request, res: Response) {
-    const intakeId: number = parseInt(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId as string);
     const newIntakeId: number = req.body.intakeId;
 
     const isIntakeDuplicated: Result<IntakeData> = await intakeService.getIntakeById(newIntakeId);
@@ -99,7 +99,7 @@ export default class IntakeController {
   }
 
   async deleteIntakeById(req: Request, res: Response) {
-    const intakeId: number = parseInt(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId as string);
 
     const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
