@@ -26,6 +26,39 @@ export interface StudentEnrollmentSubjectOrganizedData {
   }[];
 };
 
+export interface EnrollmentSubjectWithTypesData extends RowDataPacket {
+  enrollmentSubjectId: number;
+  enrollmentId: number;
+  enrollmentStartDateTime: Date;
+  enrollmentEndDateTime: Date;
+  subjectId: number;
+  subjectCode: string;
+  subjectName: string;
+  description: string;
+  creditHours: number;
+  lecturerId: number;
+  firstName: string;
+  lastName: string;
+  lecturerTitleId: number;
+  lecturerTitle: string;
+  email: string;
+  phoneNumber: string;
+  classTypes: {
+    classTypeId: number;
+    classType: string;
+    classTypeDetails: {
+      enrollmentSubjectTypeId: number;
+      grouping: number;
+      dayId: number;
+      day: string;
+      startTime: Date;
+      endTime: Date;
+      numberOfSeats: number;
+    }[];
+  }[];
+};
+
+
 export interface EnrollmentData extends RowDataPacket {
   enrollmentId: number;
   enrollmentStartDateTime: Date;
@@ -139,4 +172,14 @@ export interface StudentEnrolledSubjectTypeIds {
 export interface MonthlyEnrollmentData extends RowDataPacket {
   month: string;
   enrollmentCount: number;
+}
+
+export interface EnrollmentSubjectClassData extends RowDataPacket {
+  classTypeId: number;
+  venueId: number;
+  startTime: Date;
+  endTime: Date;
+  dayId: number;
+  numberOfSeats: number;
+  grouping: number;
 }
