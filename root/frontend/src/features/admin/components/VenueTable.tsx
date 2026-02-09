@@ -24,7 +24,7 @@ export default function VenueTable() {
         token,
         pageSize,
         page,
-        searchTerm
+        searchTerm,
       );
 
       if (!response || !response.ok) {
@@ -42,7 +42,7 @@ export default function VenueTable() {
       setVenues(data.venues);
       setTotalPages(Math.ceil(data.venueCount / pageSize));
     },
-    [searchTerm, pageSize]
+    [searchTerm, pageSize],
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function VenueTable() {
   const handleDelete = async (venueId: number) => {
     if (!authToken) return;
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete Venue ID ${venueId}?`
+      `Are you sure you want to delete Venue ID ${venueId}?`,
     );
     if (!confirmDelete) return;
 
@@ -103,7 +103,7 @@ export default function VenueTable() {
 
       <section className="mt-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="h-[300px] overflow-y-auto">
+          <div className="h-72 overflow-y-auto">
             <table className="min-w-full text-left">
               <thead className="bg-slate-50 text-slate-500">
                 <tr className="text-sm">

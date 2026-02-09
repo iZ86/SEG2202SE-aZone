@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 
 export default function ProgrammeIntakeTable() {
   const [programmeIntakes, setProgrammeIntakes] = useState<ProgrammeIntake[]>(
-    []
+    [],
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -29,7 +29,7 @@ export default function ProgrammeIntakeTable() {
         token,
         pageSize,
         page,
-        searchTerm
+        searchTerm,
       );
 
       if (!response || !response.ok) {
@@ -47,7 +47,7 @@ export default function ProgrammeIntakeTable() {
       setProgrammeIntakes(data.programmeIntakes);
       setTotalPages(Math.ceil(data.programmeIntakeCount / pageSize));
     },
-    [searchTerm, pageSize]
+    [searchTerm, pageSize],
   );
 
   useEffect(() => {
@@ -67,13 +67,13 @@ export default function ProgrammeIntakeTable() {
   const handleDelete = async (programmeIntakeId: number) => {
     if (!authToken) return;
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete Programme Intake ID ${programmeIntakeId}?`
+      `Are you sure you want to delete Programme Intake ID ${programmeIntakeId}?`,
     );
     if (!confirmDelete) return;
 
     const response = await deleteProgrammeIntakeByIdAPI(
       authToken,
-      programmeIntakeId
+      programmeIntakeId,
     );
     if (response && response.ok) {
       navigate("/admin/programme-intakes");
@@ -111,7 +111,7 @@ export default function ProgrammeIntakeTable() {
 
       <section className="mt-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="h-[300px] overflow-y-auto">
+          <div className="h-72 overflow-y-auto">
             <table className="min-w-full text-left">
               <thead className="bg-slate-50 text-slate-500">
                 <tr className="text-sm">
@@ -151,11 +151,11 @@ export default function ProgrammeIntakeTable() {
                     <td className="px-6 py-5">{programmeIntake.semester}</td>
                     <td className="px-6 py-5">
                       {new Date(
-                        programmeIntake.semesterStartDate
+                        programmeIntake.semesterStartDate,
                       ).toLocaleDateString() +
                         " - " +
                         new Date(
-                          programmeIntake.semesterEndDate
+                          programmeIntake.semesterEndDate,
                         ).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-5 text-slate-500">

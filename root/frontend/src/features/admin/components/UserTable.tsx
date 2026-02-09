@@ -45,7 +45,7 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
       setUsers(data.users);
       setTotalPages(Math.ceil(data.userCount / pageSize));
     },
-    [activeTab, searchTerm, pageSize]
+    [activeTab, searchTerm, pageSize],
   );
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
 
       <section className="mt-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="h-[300px] overflow-y-auto">
+          <div className="h-72 overflow-y-auto">
             <table className="min-w-full text-left">
               <thead className="bg-slate-50 text-slate-500">
                 <tr className="text-sm">
