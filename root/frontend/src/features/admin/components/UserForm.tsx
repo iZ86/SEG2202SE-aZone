@@ -12,7 +12,6 @@ import {
   updateStudentByIdAPI,
 } from "../api/students";
 import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
-import MediumButton from "@components/MediumButton";
 import NormalTextField from "@components/NormalTextField";
 import PasswordTextField from "@components/PasswordTextField";
 import SingleFilter from "@components/SingleFilter";
@@ -39,6 +38,7 @@ import {
 import type { EnrollmentSubjectResponse } from "@datatypes/enrollmentType";
 import { MultiFilter } from "@components/MultiFilter";
 import type { ClassType, ClassTypeDetail } from "@datatypes/classTypeType";
+import SmallButton from "@components/SmallButton";
 
 export default function UserForm({
   type,
@@ -887,118 +887,116 @@ export default function UserForm({
   }
 
   return (
-    <section className="flex-1 bg-white rounded-lg border">
+    <section className="flex justify-center items-center">
       {isLoading && <LoadingOverlay />}
       <div className="flex flex-col">
         {/* Header */}
-        <div className="flex flex-col w-full px-10 py-6">
+        <div>
           <h1 className="font-bold text-slate-900">
             {type === "Edit" ? "Edit" : "Create New"}{" "}
             {!isAdmin ? "Student" : "Admin"}
+            {type === "Edit" &&
+              !isAdmin &&
+              activeTab === "Student Information" &&
+              "'s Information"}
+            {type === "Edit" &&
+              !isAdmin &&
+              activeTab === "Course History" &&
+              "'s Course"}
+            {type === "Edit" &&
+              !isAdmin &&
+              activeTab === "Enroll in Subjects" &&
+              "'s Subjects"}
           </h1>
-          <p className="mt-1 text-slate-400">
-            {!isAdmin &&
-              type === "Edit" &&
-              "Make changes to the student information below."}
-            {isAdmin &&
-              type === "Edit" &&
-              "Make changes to the admin information below."}
-          </p>
 
-          {type == "Edit" && !isAdmin && (
-            <div className="flex space-x-8 border-b border-gray-300 mt-8">
-              {tabs.map(
-                (
-                  role:
-                    | "Student Information"
-                    | "Course History"
-                    | "Enroll in Subjects",
-                ) => (
-                  <button
-                    key={role}
-                    className={`pb-2 font-semibold cursor-pointer ${
-                      activeTab === role
-                        ? "border-b-2 border-blue-600 text-blue-600"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
-                    onClick={() => setActiveTab(role)}
-                    type="button"
-                  >
-                    {role}
-                  </button>
-                ),
-              )}
-            </div>
+          {type === "Edit" ? (
+            <p className="mt-1 text-slate-400">
+              {`Make changes to the ${!isAdmin ? "student's" : "admin's"} ${activeTab === "Student Information" ? "personal information" : activeTab === "Course History" ? "course history" : activeTab === "Enroll in Subjects" ? "enrolled subjects" : ""} below.`}
+            </p>
+          ) : (
+            <p className="mt-1 text-slate-400">
+              Create a new student by filling in the form below.
+            </p>
           )}
         </div>
 
-        <hr className="border-slate-200 w-full border" />
+        <div className="flex flex-col justify-center items-center bg-white rounded-xl border mt-4 shadow-lg">
+          <div className="flex flex-col w-full">
+            {type == "Edit" && !isAdmin && (
+              <div className="flex space-x-8 border-b border-gray-300 mt-4 px-8">
+                {tabs.map(
+                  (
+                    role:
+                      | "Student Information"
+                      | "Course History"
+                      | "Enroll in Subjects",
+                  ) => (
+                    <button
+                      key={role}
+                      className={`pb-2 font-semibold cursor-pointer text-sm ${
+                        activeTab === role
+                          ? "border-b-2 border-blue-600 text-blue-600"
+                          : "text-gray-500 hover:text-gray-700"
+                      }`}
+                      onClick={() => setActiveTab(role)}
+                      type="button"
+                    >
+                      {role}
+                    </button>
+                  ),
+                )}
+              </div>
+            )}
+          </div>
 
-        <div className="flex flex-col px-10 py-6 justify-center items-center gap-y-14">
           {activeTab === "Student Information" && (
             <form
               onSubmit={handleSubmitUser}
-              className="gap-y-8 flex flex-col justify-center items-center"
+              className="py-10 px-8 gap-y-8 flex flex-col justify-center items-center"
             >
-              {type === "Edit" && !isAdmin && (
-                <h1 className="font-bold text-slate-900 self-start">
-                  Edit Student's Information
-                </h1>
-              )}
-              <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-                <div className="flex-1">
-                  <AdminInputFieldWrapper isEmpty={emptyFirstName}>
-                    <NormalTextField
-                      text={firstName}
-                      onChange={onChangeFirstName}
-                      isInvalid={emptyFirstName}
-                      placeholder="First Name"
-                    />
-                  </AdminInputFieldWrapper>
-                </div>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-xs md:w-2xl lg:w-4xl xl:w-5xl">
+                <AdminInputFieldWrapper isEmpty={emptyFirstName}>
+                  <NormalTextField
+                    text={firstName}
+                    onChange={onChangeFirstName}
+                    isInvalid={emptyFirstName}
+                    placeholder="First Name"
+                  />
+                </AdminInputFieldWrapper>
 
-                <div className="flex-1">
-                  <AdminInputFieldWrapper isEmpty={emptyLastName}>
-                    <NormalTextField
-                      text={lastName}
-                      onChange={onChangeLastName}
-                      isInvalid={emptyLastName}
-                      placeholder="Last Name"
-                    />
-                  </AdminInputFieldWrapper>
-                </div>
-              </div>
+                <AdminInputFieldWrapper isEmpty={emptyLastName}>
+                  <NormalTextField
+                    text={lastName}
+                    onChange={onChangeLastName}
+                    isInvalid={emptyLastName}
+                    placeholder="Last Name"
+                  />
+                </AdminInputFieldWrapper>
 
-              <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-                <div className="flex-1">
-                  <AdminInputFieldWrapper
-                    isEmpty={emptyEmail}
-                    isInvalid={invalidEmail}
-                    invalidMessage="Email already exists."
-                  >
-                    <NormalTextField
-                      text={email}
-                      onChange={onChangeEmail}
-                      isInvalid={emptyEmail || invalidEmail}
-                      placeholder="Email (e.g., john@example.com)"
-                    />
-                  </AdminInputFieldWrapper>
-                </div>
-                <div className="flex-1">
-                  <AdminInputFieldWrapper isEmpty={emptyPhoneNumber}>
-                    <NormalTextField
-                      text={phoneNumber}
-                      onChange={onChangePhoneNumber}
-                      isInvalid={emptyPhoneNumber}
-                      placeholder="Phone Number (e.g., 0123456789)"
-                    />
-                  </AdminInputFieldWrapper>
-                </div>
-              </div>
+                <AdminInputFieldWrapper
+                  isEmpty={emptyEmail}
+                  isInvalid={invalidEmail}
+                  invalidMessage="Email already exists."
+                >
+                  <NormalTextField
+                    text={email}
+                    onChange={onChangeEmail}
+                    isInvalid={emptyEmail || invalidEmail}
+                    placeholder="Email (e.g., john@example.com)"
+                  />
+                </AdminInputFieldWrapper>
 
-              {type === "Add" && (
-                <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-                  <div className="flex-1">
+                <AdminInputFieldWrapper isEmpty={emptyPhoneNumber}>
+                  <NormalTextField
+                    text={phoneNumber}
+                    onChange={onChangePhoneNumber}
+                    isInvalid={emptyPhoneNumber}
+                    placeholder="Phone Number (e.g., 0123456789)"
+                  />
+                </AdminInputFieldWrapper>
+
+                {type === "Add" && (
+                  <>
                     <AdminInputFieldWrapper isEmpty={emptyPassword}>
                       <PasswordTextField
                         password={password}
@@ -1006,14 +1004,13 @@ export default function UserForm({
                         invalidPassword={emptyPassword}
                         placeholder="Password"
                       />
+                      {!isPasswordMatched && (
+                        <p className="text-red-500 mt-1">
+                          Passwords do not match
+                        </p>
+                      )}
                     </AdminInputFieldWrapper>
-                    {!isPasswordMatched && (
-                      <p className="text-red-500 mt-1">
-                        Passwords do not match
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex-1">
+
                     <AdminInputFieldWrapper isEmpty={emptyConfirmPassword}>
                       <PasswordTextField
                         password={confirmPassword}
@@ -1022,28 +1019,24 @@ export default function UserForm({
                         placeholder="Confirm Password"
                       />
                     </AdminInputFieldWrapper>
-                  </div>
-                </div>
-              )}
+                  </>
+                )}
 
-              {!isAdmin && (
-                <>
-                  <div className="flex flex-col xl:flex-row w-xs sm:w-xl xl:w-5xl gap-x-10 gap-y-8 xl:gap-y-0">
-                    <div className="flex-1">
-                      <SingleFilter
-                        placeholder="Select Student Status"
-                        options={statusOptions}
-                        value={status}
-                        isInvalid={emptyStatus}
-                        onChange={onChangeStatus}
-                      />
-                    </div>
+                {!isAdmin && (
+                  <div className="xl:col-span-2">
+                    <SingleFilter
+                      placeholder="Select Student Status"
+                      options={statusOptions}
+                      value={status}
+                      isInvalid={emptyStatus}
+                      onChange={onChangeStatus}
+                    />
                   </div>
-                </>
-              )}
+                )}
+              </div>
 
               <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
-                <MediumButton
+                <SmallButton
                   buttonText={
                     type === "Edit" ? "Save Changes" : "Create New Student"
                   }
@@ -1052,7 +1045,7 @@ export default function UserForm({
                   hoverBgColor="hover:bg-blue-600"
                   textColor="text-white"
                 />
-                <MediumButton
+                <SmallButton
                   buttonText="Cancel"
                   submit={false}
                   backgroundColor="bg-slate-400"
@@ -1068,50 +1061,45 @@ export default function UserForm({
             <>
               <form
                 onSubmit={handleSubmitCourse}
-                className="gap-y-8 flex flex-col justify-center items-center"
+                className="pb-10 pt-4 px-8 flex flex-col justify-center items-center"
               >
-                <h1 className="font-bold text-slate-900 self-start">
-                  Edit Student's Course
-                </h1>
-                <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
-                  <div className="flex-1">
-                    <AdminInputFieldWrapper
-                      isEmpty={emptyProgramme}
-                      isInvalid={isStudentCourseProgrammeIntakeExist}
-                      invalidMessage="Please Select a Different Programme"
-                    >
-                      <SingleFilter
-                        placeholder="Select Student Programme"
-                        value={programme}
-                        options={programmeOptions}
-                        isInvalid={
-                          emptyProgramme || isStudentCourseProgrammeIntakeExist
-                        }
-                        onChange={onChangeProgramme}
-                      />
-                    </AdminInputFieldWrapper>
-                  </div>
-                  <div className="flex-1">
-                    <AdminInputFieldWrapper
-                      isEmpty={emptyCourse}
-                      isInvalid={isStudentCourseProgrammeIntakeExist}
-                      invalidMessage="Please Select a Different Course"
-                    >
-                      <SingleFilter
-                        placeholder="Select Student Course"
-                        value={course}
-                        options={courseOptions}
-                        isInvalid={
-                          emptyCourse || isStudentCourseProgrammeIntakeExist
-                        }
-                        onChange={onChangeCourse}
-                      />
-                    </AdminInputFieldWrapper>
-                  </div>
-                </div>
+                <h2 className="font-bold text-slate-900 self-start">
+                  Course Enrollment
+                </h2>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-xs md:w-2xl lg:w-4xl xl:w-5xl mt-4">
+                  <AdminInputFieldWrapper
+                    isEmpty={emptyProgramme}
+                    isInvalid={isStudentCourseProgrammeIntakeExist}
+                    invalidMessage="Please Select a Different Programme"
+                  >
+                    <SingleFilter
+                      placeholder="Select Student Programme"
+                      value={programme}
+                      options={programmeOptions}
+                      isInvalid={
+                        emptyProgramme || isStudentCourseProgrammeIntakeExist
+                      }
+                      onChange={onChangeProgramme}
+                    />
+                  </AdminInputFieldWrapper>
 
-                <div className="flex flex-col sm:flex-row w-xs sm:w-5xl gap-x-10 gap-y-8 sm:gap-y-0">
-                  <div className="flex-1">
+                  <AdminInputFieldWrapper
+                    isEmpty={emptyCourse}
+                    isInvalid={isStudentCourseProgrammeIntakeExist}
+                    invalidMessage="Please Select a Different Course"
+                  >
+                    <SingleFilter
+                      placeholder="Select Student Course"
+                      value={course}
+                      options={courseOptions}
+                      isInvalid={
+                        emptyCourse || isStudentCourseProgrammeIntakeExist
+                      }
+                      onChange={onChangeCourse}
+                    />
+                  </AdminInputFieldWrapper>
+
+                  <div className="xl:col-span-2">
                     <AdminInputFieldWrapper
                       isEmpty={emptyProgrammeIntake}
                       isInvalid={isStudentCourseProgrammeIntakeExist}
@@ -1131,15 +1119,15 @@ export default function UserForm({
                   </div>
                 </div>
 
-                <div className="justify-center flex mt-10 gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
-                  <MediumButton
+                <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0 mt-6">
+                  <SmallButton
                     buttonText="Save Changes"
                     submit={true}
                     backgroundColor="bg-blue-500"
                     hoverBgColor="hover:bg-blue-600"
                     textColor="text-white"
                   />
-                  <MediumButton
+                  <SmallButton
                     buttonText="Cancel"
                     submit={false}
                     backgroundColor="bg-slate-400"
@@ -1148,133 +1136,131 @@ export default function UserForm({
                     link="/admin/users"
                   />
                 </div>
-              </form>
 
-              <div className="flex flex-col w-xs sm:w-5xl gap-x-10">
-                <h1 className="font-bold text-slate-900">
-                  Student's Course History
-                </h1>
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white mt-4">
-                  <div className="h-72 overflow-y-auto">
-                    <table className="min-w-full text-left rounded-4xl">
-                      <thead className="bg-slate-50 text-slate-500">
-                        <tr className="text-sm">
-                          <th className="px-6 py-4 font-medium">Course</th>
-                          <th className="px-6 py-4 font-medium">Programme</th>
-                          <th className="px-6 py-4 font-medium">
-                            Intake - Semester
-                          </th>
-                          <th className="px-6 py-4 font-medium">
-                            Semester Period
-                          </th>
-                          <th className="px-6 py-4 font-medium">Status</th>
-                          <th className="px-6 py-4 font-medium">Delete</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-700">
-                        {studentCoursesHistory.length === 0 ? (
-                          <tr>
-                            <td
-                              colSpan={6}
-                              className="text-center py-6 text-gray-500"
-                            >
-                              No course history found.
-                            </td>
+                <div className="w-xs md:w-2xl lg:w-4xl xl:w-5xl mt-4">
+                  <h2 className="font-bold text-slate-900 self-start">
+                    Student's Course History
+                  </h2>
+                  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white mt-4">
+                    <div className="h-72 overflow-y-auto">
+                      <table className="min-w-full text-left rounded-4xl">
+                        <thead className="bg-slate-50 text-slate-500">
+                          <tr className="text-sm">
+                            <th className="px-6 py-4 font-medium">Course</th>
+                            <th className="px-6 py-4 font-medium">Programme</th>
+                            <th className="px-6 py-4 font-medium">
+                              Intake - Semester
+                            </th>
+                            <th className="px-6 py-4 font-medium">
+                              Semester Period
+                            </th>
+                            <th className="px-6 py-4 font-medium">Status</th>
+                            <th className="px-6 py-4 font-medium">Delete</th>
                           </tr>
-                        ) : (
-                          studentCoursesHistory.map(
-                            (student: StudentCourseProgrammeIntake) => (
-                              <tr
-                                key={`${student.studentId}`}
-                                className="text-sm"
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                          {studentCoursesHistory.length === 0 ? (
+                            <tr>
+                              <td
+                                colSpan={6}
+                                className="text-center py-6 text-gray-500"
                               >
-                                <td className="px-6 py-5">
-                                  {student.courseName}
-                                </td>
-                                <td className="px-6 py-5">
-                                  {student.programmeName}
-                                </td>
-                                <td className="px-6 py-5">
-                                  {student.intakeId} - {student.semester}
-                                </td>
-                                <td className="px-6 py-5">
-                                  {new Date(
-                                    student.semesterStartDate,
-                                  ).toLocaleDateString()}{" "}
-                                  -{" "}
-                                  {new Date(
-                                    student.semesterEndDate,
-                                  ).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-5">
-                                  {getStatusBadge(student.status)}
-                                </td>
-                                <td className="px-6 py-5 text-slate-500 text-center">
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteStudentCourseProgrammeIntake(
-                                        student.courseId,
-                                        student.programmeIntakeId,
-                                      )
-                                    }
-                                    className="text-red-tomato hover:text-red-600 cursor-pointer"
-                                  >
-                                    <Trash2
-                                      size={16}
-                                      className="inline-block ml-1"
-                                    />
-                                  </button>
-                                </td>
-                              </tr>
-                            ),
-                          )
-                        )}
-                      </tbody>
-                    </table>
+                                No course history found.
+                              </td>
+                            </tr>
+                          ) : (
+                            studentCoursesHistory.map(
+                              (student: StudentCourseProgrammeIntake) => (
+                                <tr
+                                  key={`${student.studentId}`}
+                                  className="text-sm"
+                                >
+                                  <td className="px-6 py-5">
+                                    {student.courseName}
+                                  </td>
+                                  <td className="px-6 py-5">
+                                    {student.programmeName}
+                                  </td>
+                                  <td className="px-6 py-5">
+                                    {student.intakeId} - {student.semester}
+                                  </td>
+                                  <td className="px-6 py-5">
+                                    {new Date(
+                                      student.semesterStartDate,
+                                    ).toLocaleDateString()}{" "}
+                                    -{" "}
+                                    {new Date(
+                                      student.semesterEndDate,
+                                    ).toLocaleDateString()}
+                                  </td>
+                                  <td className="px-6 py-5">
+                                    {getStatusBadge(student.status)}
+                                  </td>
+                                  <td className="px-6 py-5 text-slate-500 text-center">
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteStudentCourseProgrammeIntake(
+                                          student.courseId,
+                                          student.programmeIntakeId,
+                                        )
+                                      }
+                                      className="text-red-tomato hover:text-red-600 cursor-pointer"
+                                    >
+                                      <Trash2
+                                        size={16}
+                                        className="inline-block ml-1"
+                                      />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ),
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </form>
             </>
           )}
 
           {!isAdmin && activeTab === "Enroll in Subjects" && (
             <form
               onSubmit={handleSubmitEnrollmentSubjectTypes}
-              className="gap-y-8 flex flex-col justify-center items-center"
+              className="pb-10 pt-4 px-8 flex flex-col justify-center items-center"
             >
-              <h1 className="font-bold text-slate-900 self-start">
-                Edit Student's Subjects
-              </h1>
-              <div className="flex flex-col xl:flex-row w-xs sm:w-xl md:w-2xl lg:w-4xl xl:w-6xl gap-x-10 gap-y-8 xl:gap-y-0">
-                <div className="flex-1">
-                  <AdminInputFieldWrapper
-                    isEmpty={emptyEnrollmentSubjectTypes}
-                    isInvalid={isEnrollmentSubjectTypeTimeClashed}
-                    invalidMessage="Time clash detected with selected subjects."
-                  >
-                    <MultiFilter
-                      placeholder="Select a Subject to Enroll"
-                      options={enrollmentSubjectTypesOptions}
-                      value={enrollmentSubjectTypes}
-                      isInvalid={
-                        emptyEnrollmentSubjectTypes ||
-                        isEnrollmentSubjectTypeTimeClashed
-                      }
-                      onChange={onChangeEnrollmentSubjectTypes}
-                    />
-                  </AdminInputFieldWrapper>
-                </div>
+              <h2 className="font-bold text-slate-900 self-start">
+                Subject Enrollment
+              </h2>
+              <div className="grid grid-cols-1 gap-6 w-xs md:w-2xl lg:w-4xl xl:w-5xl mt-4">
+                <AdminInputFieldWrapper
+                  isEmpty={emptyEnrollmentSubjectTypes}
+                  isInvalid={isEnrollmentSubjectTypeTimeClashed}
+                  invalidMessage="Time clash detected with selected subjects."
+                >
+                  <MultiFilter
+                    placeholder="Select a Subject to Enroll"
+                    options={enrollmentSubjectTypesOptions}
+                    value={enrollmentSubjectTypes}
+                    isInvalid={
+                      emptyEnrollmentSubjectTypes ||
+                      isEnrollmentSubjectTypeTimeClashed
+                    }
+                    onChange={onChangeEnrollmentSubjectTypes}
+                  />
+                </AdminInputFieldWrapper>
               </div>
 
-              <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
-                <MediumButton
+              <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0 mt-6">
+                <SmallButton
                   buttonText="Save Changes"
                   submit={true}
                   backgroundColor="bg-blue-500"
                   hoverBgColor="hover:bg-blue-600"
                   textColor="text-white"
                 />
-                <MediumButton
+                <SmallButton
                   buttonText="Cancel"
                   submit={false}
                   backgroundColor="bg-slate-400"
