@@ -33,15 +33,15 @@ export default function PasswordTextField({
           pattern="^.{8,}$" // Regex: at least 8 characters.
           title="Password must be at least 8 characters long."
           minLength={8}
-          className={`min-h-12 w-${width} max-w-${maxWidth} rounded-2xl border-2 px-4 outline-hidden peer
+          className={`min-h-12 w-${width} max-w-${maxWidth} rounded-2xl border px-4 outline-hidden peer
                     ${
                       password.length === 0
                         ? invalidPassword
                           ? "border-red-tomato"
-                          : "border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority"
+                          : "border-slate-300 focus:border-blue-air-superiority focus:text-blue-air-superiority"
                         : invalidPassword
-                        ? "border-red-tomato text-red-tomato"
-                        : "border-blue-air-superiority text-blue-air-superiority"
+                          ? "border-red-tomato text-red-tomato"
+                          : "border-blue-air-superiority text-blue-air-superiority"
                     }`}
           onChange={(e) => onChange(e.target.value)}
         />
