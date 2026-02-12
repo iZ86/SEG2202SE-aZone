@@ -1,11 +1,17 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE } from "../enums/enums";
-import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData } from "../models/enrollment-model";
+import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE } from "../enums/enums";
+import { EnrollmentData, EnrollmentProgrammeIntakeData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectTypesData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData } from "../models/enrollment-model";
 import { ProgrammeIntakeData } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeRangeColliding } from "../utils/utils";
 import programmeService from "./programme.service";
+import subjectService from "./subject.service";
+import lecturerService from "./lecturer.service";
+import { SubjectData } from "../models/subject-model";
+import { LecturerData } from "../models/lecturer-model";
+import venueService from "./venue.service";
+import { VenueData } from "../models/venue-model";
 
 interface IEnrollmentService {
   getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
@@ -21,15 +27,16 @@ interface IEnrollmentService {
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentSubjectData[]>>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
+  getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>>
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
-  createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
+  createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>>;
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }>>;
-  getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>>;
+  getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypesData>>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>>;
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<Result<EnrollmentSubjectTypeData>>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<null>>;
@@ -293,6 +300,18 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
+  async getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>> {
+    const enrollmentSubject: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+
+    if (!enrollmentSubject.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubject.getMessage());
+    }
+
+    const enrollmentSubjectTypes: Result<EnrollmentSubjectTypesData> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+
+    return Result.succeed({ ...enrollmentSubject.getData(), enrollmentSubjectTypes: enrollmentSubjectTypes.getData().enrollmentSubjectTypes }, "Enrollment subject retrieve success");
+  }
+
   async getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
     const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
@@ -313,16 +332,127 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
-  async createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>> {
-    const response = await enrollmentRepository.createEnrollmentSubject(enrollmentId, subjectId, lecturerId);
 
-    const enrollmentSubjectResponse: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectById(response.insertId);
+  async createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
 
-    if (!enrollmentSubjectResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject created not found");
+
+    // Check parameters exist.
+    const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
     }
 
-    return Result.succeed(enrollmentSubjectResponse, "Enrollment subject create success");
+
+    const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+    const lecturerResult: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
+    if (!lecturerResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, lecturerResult.getMessage());
+    }
+
+    // Check if an enrollment already contains the subject
+    const isEnrollmentSubjectDuplicated: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
+
+    if (isEnrollmentSubjectDuplicated.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentSubject existed");
+    }
+
+    let index: number = 0;
+    // Check if all the class session data is valid. When the array is not empty
+    if (createEnrollmentSubjectTypes.length > 0) {
+      for (const createEnrollmentSubjectType of createEnrollmentSubjectTypes) {
+        // Check if their foreign keys are valid.
+        const isDayIdValid: boolean =
+          createEnrollmentSubjectType.dayId >= ENUM_DAY.MONDAY &&
+          createEnrollmentSubjectType.dayId <= ENUM_DAY.SUNDAY;
+
+        if (!isDayIdValid) {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid dayId at at index: ${index}`)
+        }
+
+        const isClassTypeIdValid: boolean =
+          createEnrollmentSubjectType.classTypeId >= ENUM_CLASS_TYPE.LECTURE &&
+          createEnrollmentSubjectType.classTypeId <= ENUM_CLASS_TYPE.WORKSHOP;
+
+        if (!isClassTypeIdValid) {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid classTypeId at at index: ${index}`)
+        }
+
+        const venueResult: Result<VenueData> = await venueService.getVenueById(createEnrollmentSubjectType.venueId);
+        if (!venueResult.isSuccess()) {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid venueId at at index: ${index}`)
+        }
+
+
+        const isClassSessionDuplicated: Result<EnrollmentSubjectTypeData> = await this.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(
+          createEnrollmentSubjectType.startTime,
+          createEnrollmentSubjectType.endTime,
+          createEnrollmentSubjectType.venueId,
+          createEnrollmentSubjectType.dayId
+        );
+
+        if (isClassSessionDuplicated.isSuccess()) {
+          return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType at index: ${index} already exists.`);
+        }
+        index++;
+      }
+    }
+
+
+    // Create enrollment subject.
+    const createEnrollmentSubjectResult: ResultSetHeader = await enrollmentRepository.createEnrollmentSubject(enrollmentId, subjectId, lecturerId);
+    if (createEnrollmentSubjectResult.affectedRows === 0) {
+      throw new Error("createEnrollmentSubject failed to insert");
+    }
+
+    const enrollmentSubjectId: number = createEnrollmentSubjectResult.insertId;
+
+
+    const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+    if (!enrollmentSubjectResult.isSuccess()) {
+      throw new Error("createEnrollmentSubject created enrollment subject not found");
+    }
+
+
+    // Add enrollmentSubjectTypes with enrollmentSubjectId.
+    if (createEnrollmentSubjectTypes.length > 0) {
+      const insertEnrollmentSubjectTypes: (string | number | Date)[][] = createEnrollmentSubjectTypes.map(
+        (createEnrollmentSubjectType) => [
+          enrollmentSubjectId,
+          createEnrollmentSubjectType.classTypeId,
+          createEnrollmentSubjectType.venueId,
+          createEnrollmentSubjectType.startTime,
+          createEnrollmentSubjectType.endTime,
+          createEnrollmentSubjectType.dayId,
+          createEnrollmentSubjectType.numberOfSeats,
+          createEnrollmentSubjectType.grouping
+        ]
+      );
+
+
+      const createEnrollmentSubjectTypesResult: ResultSetHeader = await enrollmentRepository.createEnrollmentSubjectTypes(insertEnrollmentSubjectTypes);
+      if (createEnrollmentSubjectTypesResult.affectedRows === 0) {
+        throw new Error("createEnrollmentSubjectTypes failed to insert");
+      }
+
+      const enrollmentSubjectTypesResult: Result<EnrollmentSubjectTypesData> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+
+      if (!enrollmentSubjectTypesResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectTypesResult.getMessage());
+      }
+
+      const enrollmentSubjectTypesData: EnrollmentSubjectTypeData[] = enrollmentSubjectTypesResult.getData().enrollmentSubjectTypes;
+      if (enrollmentSubjectTypesData.length === 0) {
+        throw new Error("createEnrollmentSubjectTypes created enrollment subject types not found");
+      }
+    }
+
+    const enrollmentSubjectTypesResult: Result<EnrollmentSubjectWithTypesData> = await this.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
+
+    return Result.succeed(enrollmentSubjectTypesResult.getData(), "Enrollment subject create success");
   }
 
   async updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>> {
@@ -475,14 +605,18 @@ class EnrollmentService implements IEnrollmentService {
     );
   }
 
-  async getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>> {
-    const enrollmentSubjectType: EnrollmentSubjectTypeData[] = await enrollmentRepository.getEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
 
-    if (!enrollmentSubjectType) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject type not found");
+  async getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypesData>> {
+
+    // Check if parameter exist.
+    const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+    if (!enrollmentSubjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectResult.getMessage());
     }
 
-    return Result.succeed(enrollmentSubjectType, "Enrollment subject type retrieve success");
+    const enrollmentSubjectTypes: EnrollmentSubjectTypeData[] = await enrollmentRepository.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+
+    return Result.succeed({ enrollmentSubjectId: enrollmentSubjectId, enrollmentSubjectTypes: enrollmentSubjectTypes }, "Enrollment subject type retrieve success");
   }
 
   async getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>> {
@@ -508,6 +642,13 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   async deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<null>> {
+
+    // Check if parameter exist.
+    const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+    if (!enrollmentSubjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectResult.getMessage());
+    }
+
     await enrollmentRepository.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId);
 
     return Result.succeed(null, "Enrollment subject type delete success");
