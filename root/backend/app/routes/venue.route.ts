@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import VenueController from "../controllers/venue.controller";
-import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
+import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
 import { createAndUpdateVenueValidator, venueParamValidator } from "../validators/venue-validator";
 
 class VenueRoute {
