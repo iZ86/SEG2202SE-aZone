@@ -24,7 +24,7 @@ interface IEnrollmentRepository {
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader>;
   getEnrollmentSubjectCount(query: string): Promise<number>;
-  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule>;
+  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule | undefined>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
   getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData>;
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
@@ -400,7 +400,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule> {
+  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSchedule[]>(
         "SELECT scpi.programmeIntakeId, e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime " +
