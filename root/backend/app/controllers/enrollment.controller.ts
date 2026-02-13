@@ -377,25 +377,6 @@ export default class EnrollmentController {
     }
   }
 
-  async getEnrollmentSubjectTypesByEnrollmentSubjectId(req: Request, res: Response) {
-    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
-
-    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
-      return res.sendError.badRequest("Invalid enrollmentSubjectId");
-    }
-
-    const response: Result<EnrollmentSubjectTypesData> = await enrollmentService.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
-
-    if (response.isSuccess()) {
-      return res.sendSuccess.ok(response.getData(), response.getMessage());
-    } else {
-      switch (response.getErrorCode()) {
-        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(response.getMessage());
-      }
-    }
-  }
-
   async createStudentEnrollmentSubjectTypes(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
     const isAdmin: boolean = req.user.isAdmin;
