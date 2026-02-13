@@ -88,7 +88,7 @@ export default class EnrollmentController {
     const programmeIntakeIds: number[] = req.body.programmeIntakeIds || [];
 
 
-    const response = await enrollmentService.updateEnrollmentWithProgrammeIntakesById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime, programmeIntakeIds);
+    const response: Result<EnrollmentWithProgrammeIntakesData> = await enrollmentService.updateEnrollmentWithProgrammeIntakesById(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime, programmeIntakeIds);
 
 
     if (response.isSuccess()) {
