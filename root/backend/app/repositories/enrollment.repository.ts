@@ -12,7 +12,6 @@ interface IEnrollmentRepository {
   getEnrollmentCount(query: string): Promise<number>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
-  getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<EnrollmentProgrammeIntakeData[]>;
   getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined>;
   createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
@@ -169,24 +168,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<EnrollmentProgrammeIntakeData[]> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<EnrollmentProgrammeIntakeData[]>(
-        "SELECT e.* , pi.*, p.programmeName, sm.studyMode " +
-        "FROM ENROLLMENT e " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
-        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
-        "WHERE e.enrollmentId = ?;",
-        [enrollmentId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
         }
       );
     });
