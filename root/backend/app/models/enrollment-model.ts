@@ -1,4 +1,5 @@
 import { RowDataPacket } from "mysql2";
+import { ProgrammeIntakeData } from "./programme-model";
 
 export interface StudentEnrollmentSubjectOrganizedData {
   subjectId: number;
@@ -31,6 +32,10 @@ export interface EnrollmentData extends RowDataPacket {
   enrollmentStartDateTime: Date;
   enrollmentEndDateTime: Date;
 };
+
+export interface EnrollmentWithProgrammeIntakesData extends EnrollmentData {
+  programmeIntakes: ProgrammeIntakeData[];
+}
 
 export interface EnrollmentProgrammeIntakeData extends RowDataPacket {
   enrollmentId: number;

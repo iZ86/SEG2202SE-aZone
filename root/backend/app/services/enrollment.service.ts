@@ -62,6 +62,21 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment, "Enrollment retrieve success");
   }
 
+  async getEnrollmentWithProgrammeIntakesById(enrollmentId: number): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
+    const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
+
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
+    }
+
+    const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByEnrollmentId(enrollmentId);
+    if (!programmeIntakesResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+    }
+
+    return Result.succeed({ ...enrollmentResult.getData(), programmeIntakes: programmeIntakesResult.getData()}, "Enrollment retrieve success");
+  }
+
   async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>> {
 
     // Check parameters duplicated.
