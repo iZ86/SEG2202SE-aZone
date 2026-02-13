@@ -195,7 +195,7 @@ export default class EnrollmentController {
       return res.sendError.badRequest("Invalid enrollmentSubjectId");
     }
 
-    const response: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
+    const response: Result<EnrollmentSubjectWithTypesData> = await enrollmentService.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -215,7 +215,7 @@ export default class EnrollmentController {
     const enrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[] = req.body.enrollmentSubjectTypes || [];
 
 
-    const response: Result<EnrollmentSubjectTypesData> = await enrollmentService.createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId, subjectId, lecturerId, enrollmentSubjectTypes);
+    const response: Result<EnrollmentSubjectWithTypesData> = await enrollmentService.createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId, subjectId, lecturerId, enrollmentSubjectTypes);
 
 
     if (response.isSuccess()) {
@@ -325,7 +325,7 @@ export default class EnrollmentController {
       })
     );
 
-    const createEnrollmentSubjectTypeResponse: Result<EnrollmentSubjectTypesData> = await enrollmentService.getEnrollmentSubjectTypesByEnrollmentSubjectId(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId);
+    const createEnrollmentSubjectTypeResponse: Result<EnrollmentSubjectWithTypesData> = await enrollmentService.getEnrollmentSubjectWithEnrollmentSubjectTypesById(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId);
 
     if (createEnrollmentSubjectTypeResponse.isSuccess()) {
       return res.sendSuccess.ok(createEnrollmentSubjectTypeResponse.getData(), createEnrollmentSubjectTypeResponse.getMessage());
