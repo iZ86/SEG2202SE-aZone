@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentCourseProgrammeIntakeData, StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData } from "../models/user-model";
+import { StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 
 interface IUserRepostory {
