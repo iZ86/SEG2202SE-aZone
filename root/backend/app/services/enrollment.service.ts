@@ -453,9 +453,9 @@ class EnrollmentService implements IEnrollmentService {
       }
     }
 
-    const enrollmentSubjectTypesResult: Result<EnrollmentSubjectWithTypesData> = await this.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
+    const enrollmentSubjectWithEnrollmentSubjectTypes: Result<EnrollmentSubjectWithTypesData> = await this.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
 
-    return Result.succeed(enrollmentSubjectTypesResult.getData(), "Enrollment subject create success");
+    return Result.succeed(enrollmentSubjectWithEnrollmentSubjectTypes.getData(), "Enrollment subject create success");
   }
 
   async updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>> {
