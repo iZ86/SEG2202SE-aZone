@@ -37,21 +37,6 @@ export interface EnrollmentWithProgrammeIntakesData extends EnrollmentData {
   programmeIntakes: ProgrammeIntakeData[];
 }
 
-export interface EnrollmentProgrammeIntakeData extends RowDataPacket {
-  enrollmentId: number;
-  enrollmentStartDateTime: Date;
-  enrollmentEndDateTime: Date;
-  programmeIntakeId: number;
-  programmeId: number;
-  programmeName: string;
-  intakeId: number;
-  studyModeId: number;
-  studyMode: string;
-  semester: number,
-  semesterStartDate: Date;
-  semesterEndDate: Date;
-};
-
 export interface EnrollmentSubjectData extends RowDataPacket {
   enrollmentSubjectId: number;
   enrollmentId: number;
