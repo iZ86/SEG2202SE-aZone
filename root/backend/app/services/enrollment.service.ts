@@ -17,7 +17,7 @@ interface IEnrollmentService {
   getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
   getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>>;
   getEnrollmentWithProgrammeIntakesById(enrollmentId: number): Promise<Result<EnrollmentWithProgrammeIntakesData>>;
-  createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>>;
+  createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>>;
   updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>>;
   deleteEnrollmentById(enrollmentId: number): Promise<Result<null>>;
   getEnrollmentCount(query: string): Promise<Result<number>>;
@@ -76,7 +76,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({ ...enrollmentResult.getData(), programmeIntakes: programmeIntakesResult.getData()}, "Enrollment retrieve success");
   }
 
-  async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>> {
+  async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
 
     // Check parameters duplicated.
     const isDateTimeDuplicated: Result<EnrollmentData> = await this.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
@@ -132,7 +132,9 @@ class EnrollmentService implements IEnrollmentService {
       }
     }
 
-    return Result.succeed(enrollment.getData(), "Enrollment create success");
+    const enrollmentWithProgrammeIntakes: Result<EnrollmentWithProgrammeIntakesData> = await this.getEnrollmentWithProgrammeIntakesById(createEnrollmentResult.insertId);
+
+    return Result.succeed(enrollmentWithProgrammeIntakes.getData(), "Enrollment create success");
   }
 
   async updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentData>> {

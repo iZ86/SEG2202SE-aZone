@@ -66,7 +66,7 @@ export default class EnrollmentController {
     // Optional
     const programmeIntakeIds: number[] = req.body.programmeIntakeIds || [];
 
-    const response: Result<EnrollmentData> = await enrollmentService.createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime, enrollmentEndDateTime, programmeIntakeIds);
+    const response: Result<EnrollmentWithProgrammeIntakesData> = await enrollmentService.createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime, enrollmentEndDateTime, programmeIntakeIds);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
