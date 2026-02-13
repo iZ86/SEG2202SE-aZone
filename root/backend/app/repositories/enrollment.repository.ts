@@ -12,7 +12,6 @@ interface IEnrollmentRepository {
   getEnrollmentCount(query: string): Promise<number>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
-  getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined>;
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
   getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
@@ -164,22 +163,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "AND enrollmentStartDateTime = ? " +
         "AND enrollmentEndDateTime = ?;",
         [enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<EnrollmentProgrammeIntakeData[]>(
-        "SELECT * " +
-        "FROM ENROLLMENT_PROGRAMME_INTAKE " +
-        "WHERE enrollmentId = ? " +
-        "AND programmeIntakeId = ?;",
-        [enrollmentId, programmeIntakeId],
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
