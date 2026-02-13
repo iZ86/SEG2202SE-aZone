@@ -36,7 +36,7 @@ interface IEnrollmentService {
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }>>;
-  getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypesData>>;
+  getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>>;
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<Result<EnrollmentSubjectTypeData>>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<null>>;
@@ -307,9 +307,12 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubject.getMessage());
     }
 
-    const enrollmentSubjectTypes: Result<EnrollmentSubjectTypesData> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+    const enrollmentSubjectTypes: Result<EnrollmentSubjectTypeData[]> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+    if (!enrollmentSubjectTypes.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectTypes.getMessage())
+    }
 
-    return Result.succeed({ ...enrollmentSubject.getData(), enrollmentSubjectTypes: enrollmentSubjectTypes.getData().enrollmentSubjectTypes }, "Enrollment subject retrieve success");
+    return Result.succeed({ ...enrollmentSubject.getData(), enrollmentSubjectTypes: enrollmentSubjectTypes.getData() }, "Enrollment subject retrieve success");
   }
 
   async getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
@@ -438,13 +441,13 @@ class EnrollmentService implements IEnrollmentService {
         throw new Error("createEnrollmentSubjectTypes failed to insert");
       }
 
-      const enrollmentSubjectTypesResult: Result<EnrollmentSubjectTypesData> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+      const enrollmentSubjectTypesResult: Result<EnrollmentSubjectTypeData[]> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
 
       if (!enrollmentSubjectTypesResult.isSuccess()) {
         return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectTypesResult.getMessage());
       }
 
-      const enrollmentSubjectTypesData: EnrollmentSubjectTypeData[] = enrollmentSubjectTypesResult.getData().enrollmentSubjectTypes;
+      const enrollmentSubjectTypesData: EnrollmentSubjectTypeData[] = enrollmentSubjectTypesResult.getData();
       if (enrollmentSubjectTypesData.length === 0) {
         throw new Error("createEnrollmentSubjectTypes created enrollment subject types not found");
       }
@@ -603,7 +606,7 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
-  async getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypesData>> {
+  async getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>> {
 
     // Check if parameter exist.
     const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
@@ -613,7 +616,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrollmentSubjectTypes: EnrollmentSubjectTypeData[] = await enrollmentRepository.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
 
-    return Result.succeed({ enrollmentSubjectId: enrollmentSubjectId, enrollmentSubjectTypes: enrollmentSubjectTypes }, "Enrollment subject type retrieve success");
+    return Result.succeed(enrollmentSubjectTypes, "Enrollment subject type retrieve success");
   }
 
   async getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>> {
