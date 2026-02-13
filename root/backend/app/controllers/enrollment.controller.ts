@@ -41,21 +41,17 @@ export default class EnrollmentController {
     }
   }
 
-  async getEnrollmentById(req: Request, res: Response) {
+  async getEnrollmentWithProgrammeIntakesById(req: Request, res: Response) {
     const enrollmentId: number = parseInt(req.params.enrollmentId as string);
 
     if (!enrollmentId || isNaN(enrollmentId)) {
       return res.sendError.badRequest("Invalid enrollmentId");
     }
 
-    const response: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
-    const enrollmentProgrammeIntakesResponse: Result<EnrollmentProgrammeIntakeData[]> = await enrollmentService.getEnrollmentProgrammeIntakesByEnrollmentId(enrollmentId);
+    const response: Result<EnrollmentWithProgrammeIntakesData> = await enrollmentService.getEnrollmentWithProgrammeIntakesById(enrollmentId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok({
-        enrollments: response.getData(),
-        programmeIntakes: enrollmentProgrammeIntakesResponse.getData(),
-      }, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
