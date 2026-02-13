@@ -13,7 +13,6 @@ interface IEnrollmentRepository {
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentProgrammeIntakeByEnrollmentIdAndProgrammeIntakeId(enrollmentId: number, programmeIntakeId: number): Promise<EnrollmentProgrammeIntakeData | undefined>;
-  createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
   getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
@@ -184,20 +183,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  createEnrollmentProgrammeIntake(enrollmentId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "INSERT INTO ENROLLMENT_PROGRAMME_INTAKE (enrollmentId, programmeIntakeId) " +
-        "VALUES (?, ?);",
-        [enrollmentId, programmeIntakeId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
         }
       );
     });
