@@ -1,4 +1,4 @@
-import { Application, Request, Response } from "express";
+import { Application } from "express";
 import userRoute from "./user.route";
 import authRoute from "./auth.route";
 import courseRoute from "./course.route";
