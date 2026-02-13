@@ -81,6 +81,7 @@ export interface EnrollmentSubjectTypesData {
 
 export interface EnrollmentSubjectTypeData extends RowDataPacket {
   enrollmentSubjectTypeId: number;
+  enrollmentSubjectId: number;
   classTypeId: number;
   classType: string;
   venueId: number;
