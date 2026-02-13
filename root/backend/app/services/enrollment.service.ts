@@ -594,15 +594,12 @@ class EnrollmentService implements IEnrollmentService {
 
   async getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {
     const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await enrollmentRepository.getEnrollmentScheduleByStudentId(studentId);
-    return Result.succeed(
-      studentEnrollmentSchedule ?? {
-        programmeIntakeId: null,
-        enrollmentId: null,
-        enrollmentStartDateTime: null,
-        enrollmentEndDateTime: null
-      },
-      "Student enrollment schedule retrieve success"
-    );
+
+    if (!studentEnrollmentSchedule) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "No enrollment at the moment");
+    }
+
+    return Result.succeed(studentEnrollmentSchedule, "Student enrollment schedule retrieve success");
   }
 
 

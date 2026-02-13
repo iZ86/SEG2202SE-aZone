@@ -217,7 +217,7 @@ export default class EnrollmentController {
 
     const response: Result<EnrollmentSubjectTypesData> = await enrollmentService.createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId, subjectId, lecturerId, enrollmentSubjectTypes);
 
-    
+
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
     } else {
@@ -365,10 +365,15 @@ export default class EnrollmentController {
   async getEnrollmentScheduleByStudentId(req: Request, res: Response) {
     const studentId: number = req.user.userId as number;
 
-    const studentEnrollmentScheduleResponse: Result<StudentEnrollmentSchedule> = await enrollmentService.getEnrollmentScheduleByStudentId(studentId);
+    const response: Result<StudentEnrollmentSchedule> = await enrollmentService.getEnrollmentScheduleByStudentId(studentId);
 
-    if (studentEnrollmentScheduleResponse.isSuccess()) {
-      return res.sendSuccess.ok(studentEnrollmentScheduleResponse.getData(), studentEnrollmentScheduleResponse.getMessage());
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
     }
   }
 
