@@ -152,7 +152,7 @@ class SubjectRepository implements ISubjectRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res[0].totalCount);
+          resolve(res[0]?.totalCount ?? 0);
         }
       );
     });
@@ -222,7 +222,7 @@ class SubjectRepository implements ISubjectRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res[0].totalCount);
+          resolve(res[0]?.totalCount ?? 0);
         }
       );
     });

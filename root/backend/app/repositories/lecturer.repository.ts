@@ -139,7 +139,7 @@ class LecturerRepository implements ILecturerRepository {
         ],
         (err, res) => {
           if (err) reject(err);
-          resolve(res[0].totalCount);
+          resolve(res[0]?.totalCount ?? 0);
         }
       );
     });
