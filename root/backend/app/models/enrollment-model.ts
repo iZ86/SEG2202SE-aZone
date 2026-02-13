@@ -70,14 +70,6 @@ export interface EnrollmentSubjectWithTypesData extends EnrollmentSubjectData {
   enrollmentSubjectTypes: EnrollmentSubjectTypeData[];
 }
 
-/** This model is used when returning enrollmentSubjectTypes.
- * But this is only because of enrollment.service getEnrollmentSubjectTypesByEnrollmentId.
- * Currently, this is the only method that gets erollmentSubjectType and returns it as a response.
- **/
-export interface EnrollmentSubjectTypesData {
-  enrollmentSubjectId: number;
-  enrollmentSubjectTypes: EnrollmentSubjectTypeData[];
-}
 
 export interface EnrollmentSubjectTypeData extends RowDataPacket {
   enrollmentSubjectTypeId: number;
