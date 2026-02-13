@@ -26,7 +26,7 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectCount(query: string): Promise<number>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule | undefined>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
-  getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData>;
+  getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData | undefined>;
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined>;
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: Date, endTime: Date, dayId: number, numberOfSeats: number, grouping: number): Promise<ResultSetHeader>;
@@ -475,7 +475,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData> {
+  getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
         "SELECT est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping " +
