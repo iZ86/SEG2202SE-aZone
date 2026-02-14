@@ -3,8 +3,8 @@ import validate from "../middlewares/validate";
 
 export const enrollmentParamValidator: any = [
   param('enrollmentId')
-    .exists().withMessage("Invalid enrollmentId")
-    .isInt().withMessage("Invalid enrollmentId")
+    .exists().withMessage("Missing enrollmentId")
+    .isInt().withMessage("enrollmentId must be number")
     .toInt(),
   validate,
 ]
