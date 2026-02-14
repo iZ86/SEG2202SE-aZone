@@ -9,6 +9,14 @@ export const enrollmentParamValidator: any = [
   validate,
 ]
 
+export const enrollmentSubjectParamValidator: any = [
+  param('enrollmentSubjectId')
+    .exists().withMessage("Missing enrollmentSubjectId")
+    .isInt().withMessage("enrollmentSubjectId must be number")
+    .toInt(),
+  validate,
+]
+
 export const createAndUpdateEnrollmentValidator: any = [
   body('enrollmentStartDateTime')
     .trim()

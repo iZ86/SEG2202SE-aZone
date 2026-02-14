@@ -32,7 +32,7 @@ class EnrollmentRoute {
     this.router.post("/subjects/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, enrollStudentSubjectsValidator, asyncHandler(this.controller.createStudentEnrollmentSubjectTypesByStudentId));
 
 
-    this.router.put("/subject/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateEnrollmentSubjectValidator, asyncHandler(this.controller.updateEnrollmentSubjectById));
+    this.router.put("/subject/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentSubjectParamValidator, createAndUpdateEnrollmentSubjectValidator, asyncHandler(this.controller.updateEnrollmentSubjectById));
     this.router.put("/:enrollmentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentParamValidator, createAndUpdateEnrollmentValidator, asyncHandler(this.controller.updateEnrollmentById));
 
 

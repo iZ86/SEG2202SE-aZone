@@ -227,16 +227,13 @@ export default class EnrollmentController {
   }
 
   async updateEnrollmentSubjectById(req: Request, res: Response) {
-    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
+    const enrollmentSubjectId: number = Number(req.params.enrollmentSubjectId);
     const enrollmentId: number = req.body.enrollmentId;
     const subjectId: number = req.body.subjectId;
     const lecturerId: number = req.body.lecturerId;
 
     const enrollmentSubject: CreateEnrollmentSubjectTypeData[] = req.body.enrollmentSubjectsTypes || [];
 
-    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
-      return res.sendError.badRequest("Invalid enrollmentSubjectId");
-    }
 
     const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
     const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
