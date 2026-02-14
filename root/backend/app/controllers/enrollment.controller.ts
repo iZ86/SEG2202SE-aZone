@@ -232,16 +232,7 @@ export default class EnrollmentController {
     const subjectId: number = req.body.subjectId;
     const lecturerId: number = req.body.lecturerId;
 
-    const enrollmentSubjects: {
-      enrollmentSubjectTypeId: number;
-      classTypeId: number;
-      venueId: number;
-      startTime: Date;
-      endTime: Date;
-      dayId: number;
-      numberOfSeats: number;
-      grouping: number;
-    }[] = req.body.enrollmentSubjects || [];
+    const enrollmentSubject: CreateEnrollmentSubjectTypeData[] = req.body.enrollmentSubjectsTypes || [];
 
     if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
       return res.sendError.badRequest("Invalid enrollmentSubjectId");
