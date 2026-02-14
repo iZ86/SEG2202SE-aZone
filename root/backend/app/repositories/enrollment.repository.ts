@@ -12,7 +12,6 @@ interface IEnrollmentRepository {
   getEnrollmentCount(query: string): Promise<number>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
-  deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
   getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
@@ -166,20 +165,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "DELETE FROM ENROLLMENT_PROGRAMME_INTAKE " +
-        "WHERE enrollmentId = ?;",
-        [enrollmentId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
         }
       );
     });

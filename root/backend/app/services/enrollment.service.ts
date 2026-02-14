@@ -23,7 +23,6 @@ interface IEnrollmentService {
   getEnrollmentCount(query: string): Promise<Result<number>>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
-  deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentSubjectData[]>>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>>
@@ -272,12 +271,6 @@ class EnrollmentService implements IEnrollmentService {
     }
 
     return Result.succeed(enrollment, "Enrollment retrieve success");
-  }
-
-  async deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId: number): Promise<Result<null>> {
-    await enrollmentRepository.deleteEnrollmentProgrammeIntakeByEnrollmentId(enrollmentId);
-
-    return Result.succeed(null, "Enrollment programme intake delete success");
   }
 
   async getEnrollmentSubjects(query: string = "", pageSize: number | null, page: number | null): Promise<Result<EnrollmentSubjectData[]>> {
