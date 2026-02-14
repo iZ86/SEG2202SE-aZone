@@ -19,6 +19,9 @@ import {
   CartesianGrid,
   Area,
   AreaChart,
+  Pie,
+  PieChart,
+  Cell,
 } from "recharts";
 import { getProgrammeDistributionAPI } from "../api/programmes";
 import {
@@ -131,8 +134,8 @@ export default function InformationPanel() {
       }[] = data.map(
         (p: { programmeName: string; count: number; percentage: number }) => ({
           programmeName: p.programmeName,
-          count: p.count,
-          percentage: p.percentage,
+          count: Number(p.count),
+          percentage: Number(p.percentage),
         }),
       );
 
@@ -351,33 +354,74 @@ export default function InformationPanel() {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 flex-1/4 flex flex-col">
-            <h3 className="text-black mb-4 font-semibold">
+            <h3 className="text-black font-semibold">
               Student's Programme Distribution
             </h3>
 
-            <div>
-              {programmeDistribution.map((item) => (
-                <div key={item.programmeName} className="mb-4 space-y-1">
-                  <div className="flex justify-between text-sm font-medium text-slate-700">
-                    <span className="font-semibold">{item.programmeName}</span>
-                    <span>{item.percentage}%</span>
-                  </div>
+            <div className="h-52 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={programmeDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="percentage"
+                    stroke="none"
+                  >
+                    {programmeDistribution.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={programmeColors[entry.programmeName] || "#64748B"}
+                      />
+                    ))}
+                  </Pie>
 
-                  <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      backgroundColor: "#1e293b",
+                      color: "#fff",
+                      boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)",
+                      padding: "12px",
+                    }}
+                    itemStyle={{ color: "#60a5fa", fontWeight: "bold" }}
+                    labelStyle={{ display: "none" }}
+                    formatter={(value: number | undefined) => {
+                      return [`${value ?? 0}%`];
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="space-y-3">
+              {programmeDistribution.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between text-xs font-medium"
+                >
+                  <div className="flex items-center gap-2">
                     <div
-                      className="h-2 rounded-full transition-all duration-700"
+                      className="w-2.5 h-2.5 rounded-full"
                       style={{
-                        width: `${item.percentage}%`,
                         backgroundColor:
-                          programmeColors[item.programmeName] ?? "#64748B", // fallback
+                          programmeColors[item.programmeName] || "#64748B",
                       }}
-                    />
+                    ></div>
+                    <span className="text-black font-semibold">
+                      {item.programmeName} ({item.count} students)
+                    </span>
                   </div>
+                  <span className="text-slate-900">{item.percentage}%</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-center mt-auto">
+            <div className="flex justify-center mt-4">
               <Link
                 className="text-blue-500 hover:text-blue-600 font-semibold"
                 to={"/admin/programmes"}
