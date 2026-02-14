@@ -74,6 +74,7 @@ CREATE TABLE PROGRAMME_INTAKE (
     semesterStartDate DATE NOT NULL,
     semesterEndDate DATE NOT NULL,
     enrollmentId INT,
+    status INT NOT NULL,
     FOREIGN KEY (programmeId) REFERENCES PROGRAMME(programmeId)
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
@@ -230,10 +231,10 @@ INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
 ("Full Time"),
 ("Part Time");
 
-INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`) VALUES
-(1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1),
-(2, 2, 202508, 1, 1, '2025-08-16', '2026-12-12', 1),
-(3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1);
+INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`, `status`) VALUES
+(1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1, 1),
+(2, 2, 202508, 1, 1, '2025-08-16', '2026-12-12', 1, 1),
+(3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1, 1);
 
 
 INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
