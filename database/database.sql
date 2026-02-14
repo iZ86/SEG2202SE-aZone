@@ -157,9 +157,11 @@ CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
         ON DELETE CASCADE,
     FOREIGN KEY (dayId) REFERENCES DAY(dayId)
         ON DELETE CASCADE,
-    UNIQUE (enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId)
     FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId)
         ON DELETE CASCADE,
+    UNIQUE (enrollmentSubjectId, classTypeId, grouping),
+    UNIQUE (enrollmentSubjectId, venueId, startTime, endTime, dayId),
+    UNIQUE (enrollmentSubjectId, startTime, endTime, dayId, lecturerId)
 );
 
 CREATE TABLE SUBJECT_STATUS (
