@@ -60,3 +60,8 @@ export interface ProgrammeDistribution extends RowDataPacket {
   count: number;
   percentage: number;
 }
+
+export interface SemesterSchedule {
+  semesterStartDate: Date;
+  semesterEndDate: Date;
+}

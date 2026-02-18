@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS } from "../enums/enums";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
@@ -396,6 +396,17 @@ class ProgrammeService implements IProgrammeService {
     const ProgrammeDistribution: ProgrammeDistribution[] = await programmeRepository.getProgrammeDistribution();
 
     return Result.succeed(ProgrammeDistribution, "Programme retrieve success");
+  }
+
+  async getProgrammeIntakesByStatus(status: number): Promise<Result<ProgrammeIntakeData[]>> {
+
+    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid programme intake status");
+    }
+    // Get Programme Intakes.
+    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByStatus(status)
+
+    return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
 }
 

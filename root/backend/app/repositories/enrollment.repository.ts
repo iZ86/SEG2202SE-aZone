@@ -5,6 +5,7 @@ import { TotalCount } from "../models/general-model";
 
 interface IEnrollmentRepository {
   getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]>;
+  getEnrollmentsByIds(enrollmentIds: number[]): Promise<EnrollmentData[]>;
   getEnrollmentById(enrollmentId: number): Promise<EnrollmentData | undefined>;
   createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
   updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
@@ -24,6 +25,7 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
   getEnrollmentSubjectTypeById(enrollmentSubjectTypeId: number): Promise<EnrollmentSubjectTypeData | undefined>;
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
+  getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined>;
   createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: string, endTime: string, dayId: number, numberOfSeats: number, grouping: number, lecturerId: number): Promise<ResultSetHeader>;
   createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader>;
@@ -32,6 +34,7 @@ interface IEnrollmentRepository {
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
   getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]>;
   getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]>;
+  getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -54,6 +57,21 @@ class EnrollmentRepository implements IEnrollmentRepository {
       }
 
       databaseConn.query<EnrollmentData[]>(sql, params,
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getEnrollmentsByIds(enrollmentIds: number[]): Promise<EnrollmentData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentData[]>(
+        "SELECT * " +
+        "FROM ENROLLMENT " +
+        "WHERE enrollmentId IN (?);",
+        [enrollmentIds],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
@@ -447,6 +465,25 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
+  getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectTypeData[]>(
+        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
+        "FROM ENROLLMENT_SUBJECT_TYPE est " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE es.enrollmentId IN (?);",
+        [enrollmentIds],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
@@ -556,6 +593,27 @@ class EnrollmentRepository implements IEnrollmentRepository {
       );
     });
   }
+
+  async getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectTypeData[]>(
+        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
+        "FROM ENROLLMENT_SUBJECT_TYPE est " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE enrollmentId = ?;",
+        [enrollmentId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
 }
+
+
 
 export default new EnrollmentRepository();

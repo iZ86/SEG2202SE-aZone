@@ -33,6 +33,7 @@ interface IProgrammeRepository {
   getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
+  getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -540,6 +541,26 @@ class ProgrammeRepository implements IProgrammeRepository {
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
         "WHERE scpi.status = 1 " +
         "GROUP BY p.programmeName;",
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ProgrammeIntakeData[]>(
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "FROM PROGRAMME_INTAKE pi " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE pi.status = ?;",
+        [
+          status
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
