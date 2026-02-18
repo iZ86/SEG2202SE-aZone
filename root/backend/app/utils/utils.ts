@@ -34,3 +34,31 @@ export function isDateRangeClashing(
   // Check for collision
   return !(endTime <= startTimeTwo || endTimeTwo <= startTime);
 }
+
+/**
+ * Helper function used to help check time clashing between two enrollment subject type.
+ * @param startOne 
+ * @param endOne 
+ * @param startTwo 
+ * @param endTwo 
+ * @returns 
+ */
+export function isTimeClashing(
+    startOne: string,
+    endOne: string,
+    startTwo: string,
+    endTwo: string
+  ): boolean {
+    const toSeconds = (t: string): number => {
+      const [h, m, s] = t.split(":").map(Number);
+      return h * 3600 + m * 60;
+    };
+
+    const s1 = toSeconds(startOne);
+    const e1 = toSeconds(endOne);
+    const s2 = toSeconds(startTwo);
+    const e2 = toSeconds(endTwo);
+
+    // Two ranges collide if each starts before the other ends
+    return s1 < e2 && s2 < e1;
+  }
