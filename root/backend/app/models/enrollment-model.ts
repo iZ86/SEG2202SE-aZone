@@ -74,6 +74,7 @@ export interface EnrollmentSubjectTypeData extends RowDataPacket {
   day: string;
   numberOfSeats: number;
   grouping: number;
+  lecturerId: number;
 };
 
 export interface StudentEnrollmentSubjectData extends RowDataPacket {
