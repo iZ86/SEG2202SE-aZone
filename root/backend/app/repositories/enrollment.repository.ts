@@ -486,7 +486,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
   createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "INSERT INTO ENROLLMENT_SUBJECT_TYPE (enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping) " +
+        "INSERT INTO ENROLLMENT_SUBJECT_TYPE (enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping, lecturerId) " +
         "VALUES ?;",
         [enrollmentSubjectTypes],
         (err, res) => {

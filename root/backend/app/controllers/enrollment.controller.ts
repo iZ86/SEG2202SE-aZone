@@ -304,8 +304,8 @@ export default class EnrollmentController {
     }
 
     await Promise.all(
-      enrollmentSubjects.map(async (enrollmentSubject) => {
-        await enrollmentService.createEnrollmentSubjectType(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId, enrollmentSubject.classTypeId, enrollmentSubject.venueId, enrollmentSubject.startTime, enrollmentSubject.endTime, enrollmentSubject.dayId, enrollmentSubject.numberOfSeats, enrollmentSubject.grouping);
+      enrollmentSubjectTypes.map(async (enrollmentSubjectType) => {
+        await enrollmentService.createEnrollmentSubjectType(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId, enrollmentSubjectType.classTypeId, enrollmentSubjectType.venueId, enrollmentSubjectType.startTime, enrollmentSubjectType.endTime, enrollmentSubjectType.dayId, enrollmentSubjectType.numberOfSeats, enrollmentSubjectType.grouping, enrollmentSubjectType.lecturerId);
       })
     );
 

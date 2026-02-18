@@ -420,7 +420,8 @@ class EnrollmentService implements IEnrollmentService {
           createEnrollmentSubjectType.endTime,
           createEnrollmentSubjectType.dayId,
           createEnrollmentSubjectType.numberOfSeats,
-          createEnrollmentSubjectType.grouping
+          createEnrollmentSubjectType.grouping,
+          createEnrollmentSubjectType.lecturerId
         ]
       );
 

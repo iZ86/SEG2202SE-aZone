@@ -146,4 +146,5 @@ export interface CreateEnrollmentSubjectTypeData {
   dayId: number;
   numberOfSeats: number;
   grouping: number;
+  lecturerId: number;
 }
