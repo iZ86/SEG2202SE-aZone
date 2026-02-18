@@ -10,7 +10,7 @@ export const asyncHandler = (fn: Function) => (req: Request, res: Response, next
     .catch(next);
 };
 
-export function isTimeRangeColliding(
+export function isDateRangeClashing(
   startTime: Date,
   endTime: Date,
   startTimeTwo: Date,

@@ -4,7 +4,7 @@ import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE } from "../enums/enums";
 import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData } from "../models/enrollment-model";
 import { ProgrammeIntakeData } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
-import { isTimeRangeColliding } from "../utils/utils";
+import { isDateRangeClashing } from "../utils/utils";
 import programmeService from "./programme.service";
 import subjectService from "./subject.service";
 import lecturerService from "./lecturer.service";
@@ -737,7 +737,7 @@ class EnrollmentService implements IEnrollmentService {
       }
 
       const hasClash = dayIdAndTime[dayId].some(existingTime =>
-        isTimeRangeColliding(
+        isDateRangeClashing(
           existingTime.startTime,
           existingTime.endTime,
           startTime,
