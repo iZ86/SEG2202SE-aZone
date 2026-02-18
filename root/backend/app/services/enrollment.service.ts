@@ -90,7 +90,12 @@ class EnrollmentService implements IEnrollmentService {
       // Check programIntakeIds exist.
       const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByIds(programmeIntakeIds);
       if (!programmeIntakesResult.isSuccess()) {
-        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+        switch (programmeIntakesResult.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+          case ENUM_ERROR_CODE.CONFLICT:
+            return Result.fail(ENUM_ERROR_CODE.CONFLICT, programmeIntakesResult.getMessage());
+        }
       }
 
       // Check if they already have an enrollmentId.
@@ -164,7 +169,12 @@ class EnrollmentService implements IEnrollmentService {
       // Check programIntakeIds exist.
       const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByIds(programmeIntakeIds);
       if (!programmeIntakesResult.isSuccess()) {
-        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+        switch (programmeIntakesResult.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+          case ENUM_ERROR_CODE.CONFLICT:
+            return Result.fail(ENUM_ERROR_CODE.CONFLICT, programmeIntakesResult.getMessage());
+        }
       }
 
       // Check if they already have an enrollmentId.

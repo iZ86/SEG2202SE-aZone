@@ -143,6 +143,14 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>> {
+
+    const duplicateProgrammeIntakesIds: { [programmeIntakeId: number]: boolean } = {};
+    for (const programmeIntakeId of programmeIntakeIds) {
+      if (duplicateProgrammeIntakesIds[programmeIntakeId]) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, `Duplicate programmeIntakeId found: ${programmeIntakeId}`)
+      }
+    }
+
     const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByIds(programmeIntakeIds);
 
     if (programmeIntakes.length === 0) {
@@ -220,7 +228,12 @@ class ProgrammeService implements IProgrammeService {
     // Check programmeIntakeIds exist.
     const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await this.getProgrammeIntakesByIds(programmeIntakeIds);
     if (!programmeIntakesResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+      switch (programmeIntakesResult.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return Result.fail(ENUM_ERROR_CODE.CONFLICT, programmeIntakesResult.getMessage());
+      }
     }
 
     // Check if enrollmentId exist.
@@ -236,7 +249,14 @@ class ProgrammeService implements IProgrammeService {
 
     const programmeIntakes: Result<ProgrammeIntakeData[]> = await this.getProgrammeIntakesByIds(programmeIntakeIds);
     if (!programmeIntakes.isSuccess()) {
-      throw new Error("updateProgrammeIntakeEnrollmentIdByIds updated programme intakes not found");
+      if (!programmeIntakesResult.isSuccess()) {
+        switch (programmeIntakesResult.getErrorCode()) {
+          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+            throw new Error("updateProgrammeIntakeEnrollmentIdByIds updated programme intakes not found");
+          case ENUM_ERROR_CODE.CONFLICT:
+            return Result.fail(ENUM_ERROR_CODE.CONFLICT, programmeIntakesResult.getMessage());
+        }
+      }
     }
 
     return Result.succeed(programmeIntakes.getData(), "Programme intake update success");
