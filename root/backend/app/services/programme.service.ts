@@ -158,10 +158,10 @@ class ProgrammeService implements IProgrammeService {
     );
 
     if (missingIds.length > 0) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Programme intake not found for IDs: [${missingIds.join(", ")}]`);
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `programmeIntakeIds not found: [${missingIds.join(", ")}]`);
     }
 
-    return Result.succeed(programmeIntakes, "Programme retrieve success");
+    return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
 
 
