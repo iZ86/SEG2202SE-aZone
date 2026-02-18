@@ -140,8 +140,8 @@ export interface CreateEnrollmentSubjectTypeData {
   enrollmentSubjectId: number;
   classTypeId: number;
   venueId: number;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   dayId: number;
   numberOfSeats: number;
   grouping: number;
