@@ -139,7 +139,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
     }
 
-    return Result.succeed(programmeIntake, "Programme retrieve success");
+    return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
   async getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>> {
@@ -180,7 +180,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
     }
 
-    return Result.succeed(programmeIntake, "Programme retrieve success");
+    return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
   async getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>> {
@@ -190,7 +190,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
     }
 
-    return Result.succeed(programmeIntake, "Programme retrieve success");
+    return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
   async createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
@@ -202,7 +202,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake created not found");
     }
 
-    return Result.succeed(programmeIntake, "Programme Intake create success");
+    return Result.succeed(programmeIntake, "Programme intake create success");
   }
 
   async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
@@ -214,13 +214,13 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake updated not found");
     }
 
-    return Result.succeed(programmeIntake, "Programme Intake update success");
+    return Result.succeed(programmeIntake, "Programme intake update success");
   }
 
   async deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>> {
     await programmeRepository.deleteProgrammeIntakeById(programmeIntakeId);
 
-    return Result.succeed(null, "Programme Intake delete success");
+    return Result.succeed(null, "Programme intake delete success");
   }
 
   async updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
