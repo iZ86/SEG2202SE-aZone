@@ -68,8 +68,8 @@ export interface EnrollmentSubjectTypeData extends RowDataPacket {
   classType: string;
   venueId: number;
   venue: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   dayId: number;
   day: string;
   numberOfSeats: number;
