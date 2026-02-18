@@ -87,5 +87,10 @@ export const createAndUpdateEnrollmentSubjectValidator: any = [
     .trim()
     .notEmpty().withMessage('grouping cannot be empty')
     .isNumeric().withMessage('grouping must be numeric'),
+  body('enrollmentSubjectTypes.*.lecturerId')
+    .trim()
+    .notEmpty().withMessage('lecturerId cannot be empty')
+    .isNumeric().withMessage('lecturerId must be numeric')
+    .toInt(),
   validate,
 ];
