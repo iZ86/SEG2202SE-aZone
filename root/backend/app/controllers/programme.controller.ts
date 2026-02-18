@@ -210,6 +210,7 @@ export default class ProgrammeController {
     const semester: number = req.body.semester;
     const semesterStartDate: Date = req.body.semesterStartDate;
     const semesterEndDate: Date = req.body.semesterEndDate;
+    const status: number = Number(req.body.status);
 
     const programmeIdResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
@@ -225,7 +226,7 @@ export default class ProgrammeController {
       return res.sendError.conflict("programmeIntake duplciated");
     }
 
-    const response = await programmeService.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate);
+    const response = await programmeService.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -247,6 +248,7 @@ export default class ProgrammeController {
     const semester: number = req.body.semester;
     const semesterStartDate: Date = req.body.semesterStartDate;
     const semesterEndDate: Date = req.body.semesterEndDate;
+    const status: number = Number(req.body.status);
 
     if (!programmeIntakeId || isNaN(programmeIntakeId)) {
       return res.sendError.badRequest("Invalid programmeIntakeId");
@@ -272,7 +274,7 @@ export default class ProgrammeController {
       }
     }
 
-    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate);
+    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());

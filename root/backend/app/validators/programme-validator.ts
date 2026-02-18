@@ -28,6 +28,10 @@ export const createAndUpdateProgrammeIntakeValidator: any = [
   body('semesterEndDate')
     .notEmpty().withMessage('Missing semesterEndDate')
     .isDate().withMessage('semesterEndDate must be (YYYY-MM-DD) format'),
+  body('status')
+    .notEmpty().withMessage('Missing status')
+    .isNumeric().withMessage('status must be numeric')
+    .toInt(),
   validate,
 ];
 
