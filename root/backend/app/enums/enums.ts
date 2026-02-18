@@ -37,3 +37,7 @@ export enum ENUM_CLASS_TYPE {
   WORKSHOP = 4,
 }
 
+export enum ENUM_PROGRAMME_INTAKE_STATUS {
+  INACTIVE = 0,
+  ACTIVE = 1,
+}
