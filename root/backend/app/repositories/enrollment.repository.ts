@@ -26,7 +26,6 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined>;
-  createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: string, endTime: string, dayId: number, numberOfSeats: number, grouping: number, lecturerId: number): Promise<ResultSetHeader>;
   createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader>;
   deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
@@ -485,20 +484,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res[0]);
-        }
-      );
-    });
-  }
-
-  createEnrollmentSubjectType(enrollmentSubjectId: number, classTypeId: number, venueId: number, startTime: string, endTime: string, dayId: number, numberOfSeats: number, grouping: number, lectuerId: number): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "INSERT INTO ENROLLMENT_SUBJECT_TYPE (enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping, lecturerId) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-        [enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping, lectuerId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
         }
       );
     });
