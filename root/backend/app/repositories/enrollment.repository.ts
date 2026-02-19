@@ -27,7 +27,6 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined>;
   createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader>;
-  deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader>;
   deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
   getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]>;
@@ -500,18 +499,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
           resolve(res);
         }
       );
-    });
-  }
-
-  deleteEnrollmentSubjectTypeByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ResultSetHeader>(
-        "DELETE FROM ENROLLMENT_SUBJECT_TYPE WHERE enrollmentSubjectId = ?;",
-        [enrollmentSubjectId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        });
     });
   }
 
