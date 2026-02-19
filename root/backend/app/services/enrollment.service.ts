@@ -390,7 +390,7 @@ class EnrollmentService implements IEnrollmentService {
           return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid venueId at at index: ${index}`)
         }
 
-        // Check if there is any grouping clashing within the enrollmentSubject
+        // Check if there is any grouping clashing within the enrollmentSubjectTypes.
         // Because this is create, it wont exist in db.
         if (!classTypeIdAndGroupingDictionary[createEnrollmentSubjectType.classTypeId]) {
           classTypeIdAndGroupingDictionary[createEnrollmentSubjectType.classTypeId] = {};
@@ -417,7 +417,7 @@ class EnrollmentService implements IEnrollmentService {
           venueIdAndEnrollmentSubjectTypeDictionary[createEnrollmentSubjectType.venueId].push({ index: index, enrollmentSubjectType: createEnrollmentSubjectType });
         }
 
-        // Check if there is any clashing with lecturer and time with provided enrollmentSubjectTypes
+        // Check if there is any clashing with lecturer and time with provided enrollmentSubjectTypes.
         if (!lecturerIdAndEnrollmentSubjectTypeDictionary[createEnrollmentSubjectType.lecturerId]) {
           lecturerIdAndEnrollmentSubjectTypeDictionary[createEnrollmentSubjectType.lecturerId] = [];
           lecturerIdAndEnrollmentSubjectTypeDictionary[createEnrollmentSubjectType.lecturerId].push({ index: index, enrollmentSubjectType: createEnrollmentSubjectType });
@@ -432,6 +432,8 @@ class EnrollmentService implements IEnrollmentService {
         }
         index++;
       }
+
+      // Below here is all database checks for enrollmentSubjectTypes.
 
       // Now checking the enrollmentSubjectTypes if there is any existing clashing for venue and schedule AND lecturer and schedule in database.
       // Check enrollmentSubjectTypes with the same enrollmentId first.
