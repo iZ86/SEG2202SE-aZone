@@ -536,7 +536,7 @@ class EnrollmentService implements IEnrollmentService {
     // Create enrollment subject.
     const createEnrollmentSubjectResult: ResultSetHeader = await enrollmentRepository.createEnrollmentSubject(enrollmentId, subjectId, lecturerId);
     if (createEnrollmentSubjectResult.affectedRows === 0) {
-      throw new Error("createEnrollmentSubject failed to insert");
+      throw new Error("createEnrollmentSubjectWithSubjectTypes failed to insert enrollment subject");
     }
 
     const enrollmentSubjectId: number = createEnrollmentSubjectResult.insertId;
@@ -544,7 +544,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
     if (!enrollmentSubjectResult.isSuccess()) {
-      throw new Error("createEnrollmentSubject created enrollment subject not found");
+      throw new Error("createEnrollmentSubjectWithSubjectTypes created enrollment subject not found");
     }
 
 
@@ -567,7 +567,7 @@ class EnrollmentService implements IEnrollmentService {
 
       const createEnrollmentSubjectTypesResult: ResultSetHeader = await enrollmentRepository.createEnrollmentSubjectTypes(insertEnrollmentSubjectTypes);
       if (createEnrollmentSubjectTypesResult.affectedRows === 0) {
-        throw new Error("createEnrollmentSubjectTypes failed to insert");
+        throw new Error("createEnrollmentSubjectWithSubjectTypes failed to insert enrollment subject types");
       }
 
       const enrollmentSubjectTypesResult: Result<EnrollmentSubjectTypeData[]> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
@@ -578,7 +578,7 @@ class EnrollmentService implements IEnrollmentService {
 
       const enrollmentSubjectTypesData: EnrollmentSubjectTypeData[] = enrollmentSubjectTypesResult.getData();
       if (enrollmentSubjectTypesData.length === 0) {
-        throw new Error("createEnrollmentSubjectTypes created enrollment subject types not found");
+        throw new Error("createEnrollmentSubjectWithSubjectTypes created enrollment subject types not found");
       }
     }
 
