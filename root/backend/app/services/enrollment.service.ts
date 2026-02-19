@@ -203,7 +203,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrollment: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
 
-    if (!enrollment) {
+    if (!enrollment.isSuccess()) {
       throw new Error("updateEnrollmentById updated enrollment not found");
     }
 
