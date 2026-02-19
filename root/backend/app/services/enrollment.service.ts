@@ -72,7 +72,7 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
     }
 
-    return Result.succeed({ ...enrollmentResult.getData(), programmeIntakes: programmeIntakesResult.getData()}, "Enrollment retrieve success");
+    return Result.succeed({ ...enrollmentResult.getData(), programmeIntakes: programmeIntakesResult.getData() }, "Enrollment retrieve success");
   }
 
   async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
@@ -479,7 +479,7 @@ class EnrollmentService implements IEnrollmentService {
 
       const programmeIntakes: ProgrammeIntakeData[] = programmeIntakesResult.getData();
       if (programmeIntakes.length > 0) {
-        
+
         // Filter by enrollmentId
         const programmeIntakeByEnrollmentId = programmeIntakes.filter(intake => intake.enrollmentId === enrollmentId);
 
