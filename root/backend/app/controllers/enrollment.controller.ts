@@ -243,16 +243,10 @@ export default class EnrollmentController {
     }
   }
 
-  async deleteEnrollmentSubjectById(req: Request, res: Response) {
+  async deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(req: Request, res: Response) {
     const enrollmentSubjectId: number = Number(req.params.enrollmentSubjectId);
 
-    const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
-
-    if (!enrollmentSubjectResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid enrollmentSubjectId");
-    }
-
-    const response = await enrollmentService.deleteEnrollmentSubjectById(enrollmentSubjectId);
+    const response = await enrollmentService.deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.delete();

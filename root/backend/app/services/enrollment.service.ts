@@ -30,7 +30,7 @@ interface IEnrollmentService {
   getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
-  deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>>;
+  deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>>;
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }>>;
@@ -969,8 +969,19 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectWithEnrollmentSubjectTypes.getData(), "Enrollment subject update success");
   }
 
-  async deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>> {
-    await enrollmentRepository.deleteEnrollmentSubjectById(enrollmentSubjectId);
+  async deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>> {
+
+    // Check if enrollmentSubjectId
+    const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+    if (!enrollmentSubjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectResult.getMessage());
+    }
+
+    // ON DELETE CASCADE is active on ENROLLMENT_SUBJECT_TYPE, so deleting this will delete all the related enrollment subject types.
+    const deleteEnrollmentSubjectResult: ResultSetHeader = await enrollmentRepository.deleteEnrollmentSubjectById(enrollmentSubjectId);
+    if (deleteEnrollmentSubjectResult.affectedRows === 0) {
+      throw new Error("deleteEnrollmentSubjectById failed to delete");
+    }
 
     return Result.succeed(null, "Enrollment subject delete success");
   }
