@@ -246,7 +246,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const programmeIntakes: ProgrammeIntakeData[] = programmeIntakesResult.getData();
     if (programmeIntakes.length > 0) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Enrollment cannot be deleted because it is still linked to programme intakes. Please remove the enrollment from all programme intakes before deleting");
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Enrollment cannot be deleted because there are still programme intakes linked to it. Please remove all the programme intakes before deleting");
     }
 
     const deleteEnrollmentResult: ResultSetHeader = await enrollmentRepository.deleteEnrollmentById(enrollmentId);
