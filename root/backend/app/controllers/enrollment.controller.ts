@@ -244,11 +244,7 @@ export default class EnrollmentController {
   }
 
   async deleteEnrollmentSubjectById(req: Request, res: Response) {
-    const enrollmentSubjectId: number = parseInt(req.params.enrollmentSubjectId as string);
-
-    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
-      return res.sendError.badRequest("Invalid enrollmentSubjectId");
-    }
+    const enrollmentSubjectId: number = Number(req.params.enrollmentSubjectId);
 
     const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
 
