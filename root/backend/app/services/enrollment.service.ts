@@ -584,6 +584,11 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrollmentSubjectWithEnrollmentSubjectTypes: Result<EnrollmentSubjectWithTypesData> = await this.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
 
+    if (!enrollmentSubjectWithEnrollmentSubjectTypes.isSuccess()) {
+      throw new Error("createEnrollmentSubjectWithEnrollmentSubjectTypes failed to get created data");
+    }
+
+
     return Result.succeed(enrollmentSubjectWithEnrollmentSubjectTypes.getData(), "Enrollment subject create success");
   }
 
