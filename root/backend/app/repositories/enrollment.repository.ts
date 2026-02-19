@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, StudentEnrolledSubject, MonthlyEnrollmentData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, StudentEnrolledSubject, MonthlyEnrollmentData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
@@ -35,6 +35,10 @@ interface IEnrollmentRepository {
   getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]>;
   getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]>;
   getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]>;
+  updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType: UpdateEnrollmentSubjectTypeData): Promise<ResultSetHeader>;
+  deleteEnrollmentSubjectTypesByEnrollmentSubjectIdAndNotIds(enrollmentSubjectId: number, enrollmentSubjectTypeIds: number[]): Promise<ResultSetHeader>;
+  deleteEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader>;
+  getEnrollmentSubjectTypesByEnrollmentIdAndNotEnrollmentSubjectId(enrollmentId: number, enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
@@ -612,6 +616,73 @@ class EnrollmentRepository implements IEnrollmentRepository {
       );
     });
   }
+
+  async updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType: UpdateEnrollmentSubjectTypeData): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE ENROLLMENT_SUBJECT_TYPE SET classTypeId = ?, venueId = ?, startTime = ?, endTime = ?, dayId = ?, numberOfSeats = ?, grouping = ?, lecturerId = ? " +
+        "WHERE enrollmentSubjectTypeId = ?;",
+        [updateEnrollmentSubjectType.classTypeId, updateEnrollmentSubjectType.venueId, updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime,
+        updateEnrollmentSubjectType.dayId, updateEnrollmentSubjectType.numberOfSeats, updateEnrollmentSubjectType.grouping, updateEnrollmentSubjectType.lecturerId, updateEnrollmentSubjectType.enrollmentSubjectTypeId
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      )
+    })
+  }
+
+  async deleteEnrollmentSubjectTypesByEnrollmentSubjectIdAndNotIds(enrollmentSubjectId: number, enrollmentSubjectTypeIds: number[]): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM ENROLLMENT_SUBJECT_TYPE " +
+        "WHERE enrollmentSubjectId = ? " +
+        "AND enrollmentSubjectTypeId NOT IN (?);",
+        [enrollmentSubjectId, enrollmentSubjectTypeIds],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      )
+    })
+  }
+
+
+  async deleteEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "DELETE FROM ENROLLMENT_SUBJECT_TYPE " +
+        "WHERE enrollmentSubjectId = ?;",
+        [enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      )
+    })
+  }
+
+  async getEnrollmentSubjectTypesByEnrollmentIdAndNotEnrollmentSubjectId(enrollmentId: number, enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectTypeData[]>(
+        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
+        "FROM ENROLLMENT_SUBJECT_TYPE est " +
+        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+        "INNER JOIN DAY d ON est.dayId = d.dayId " +
+        "WHERE es.enrollmentId = ? " +
+        "AND est.enrollmentSubjectId != ?;",
+        [enrollmentId, enrollmentSubjectId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
 }
 
 

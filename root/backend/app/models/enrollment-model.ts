@@ -138,7 +138,6 @@ export interface MonthlyEnrollmentData extends RowDataPacket {
 }
 
 export interface CreateEnrollmentSubjectTypeData {
-  enrollmentSubjectId: number;
   classTypeId: number;
   venueId: number;
   startTime: string;
@@ -147,4 +146,8 @@ export interface CreateEnrollmentSubjectTypeData {
   numberOfSeats: number;
   grouping: number;
   lecturerId: number;
+}
+
+export interface UpdateEnrollmentSubjectTypeData extends CreateEnrollmentSubjectTypeData {
+  enrollmentSubjectTypeId: number | null;
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import subjectService from "../services/subject.service";
 import { SubjectData } from "../models/subject-model";
@@ -226,97 +226,24 @@ export default class EnrollmentController {
     }
   }
 
-  async updateEnrollmentSubjectById(req: Request, res: Response) {
+  async updateEnrollmentSubjectWithEnrollmentSubjectTypesById(req: Request, res: Response) {
     const enrollmentSubjectId: number = Number(req.params.enrollmentSubjectId);
     const enrollmentId: number = req.body.enrollmentId;
     const subjectId: number = req.body.subjectId;
     const lecturerId: number = req.body.lecturerId;
 
-    const enrollmentSubject: CreateEnrollmentSubjectTypeData[] = req.body.enrollmentSubjectsTypes || [];
+    const enrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[] = req.body.enrollmentSubjectTypes || [];
 
+    const response: Result<EnrollmentSubjectData> = await enrollmentService.updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId, enrollmentSubjectTypes);
 
-    const enrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectById(enrollmentSubjectId);
-    const enrollmentResponse: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
-    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-    const lecturerResponse: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
-
-    if (!enrollmentSubjectResponse.isSuccess() || !enrollmentResponse.isSuccess() || !subjectResponse.isSuccess() || !lecturerResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid enrollmentSubjectId or enrollmentId or subjectId or lecturerId");
-    }
-
-    const isEnrollmentIdAndSubjectIdBelongsToEnrollmentSubjectId: Result<SubjectData> = await enrollmentService.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId, enrollmentId, subjectId);
-
-    if (!isEnrollmentIdAndSubjectIdBelongsToEnrollmentSubjectId.isSuccess()) {
-      const isEnrollmentSujectDuplicated: Result<EnrollmentSubjectData> = await enrollmentService.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
-
-      if (isEnrollmentSujectDuplicated.isSuccess()) {
-        return res.sendError.conflict("enrollmentSubject existed");
-      }
-    }
-
-    if (enrollmentSubjects.length > 0) {
-      for (const [index, enrollmentSubject] of enrollmentSubjects.entries()) {
-        // Find duplicate venue, time and day.
-        const isClassSessionDuplicated: Result<EnrollmentSubjectTypeData> = await enrollmentService.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(
-          enrollmentSubject.startTime,
-          enrollmentSubject.endTime,
-          enrollmentSubject.venueId,
-          enrollmentSubject.dayId
-        );
-
-        if (isClassSessionDuplicated.isSuccess()) {
-          // If updating the same data, ignore it.
-          if (isClassSessionDuplicated.getData().enrollmentSubjectTypeId === parseInt(enrollmentSubject.enrollmentSubjectTypeId.toString())) {
-            continue;
-          }
-          return res.sendError.conflict(`enrollmentSubjectType duplicated at index:${index}`);
-        }
-
-        const isDayIdValid: boolean =
-          enrollmentSubject.dayId >= ENUM_DAY.MONDAY &&
-          enrollmentSubject.dayId <= ENUM_DAY.SUNDAY;
-
-        const isClassTypeIdValid: boolean =
-          enrollmentSubject.classTypeId >= ENUM_CLASS_TYPE.LECTURE &&
-          enrollmentSubject.classTypeId <= ENUM_CLASS_TYPE.WORKSHOP;
-
-        const isVenueIdValid = await venueService.getVenueById(enrollmentSubject.venueId);
-
-        if (!isVenueIdValid.isSuccess() || !isDayIdValid || !isClassTypeIdValid) {
-          return res.sendError.badRequest("Invalid venueId, or dayId, or classTypeId");
-        }
-      }
-    }
-
-    const updateEnrollmentSubjectResponse: Result<EnrollmentSubjectData> = await enrollmentService.updateEnrollmentSubjectById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
-
-    await enrollmentService.deleteEnrollmentSubjectTypeByEnrollmentSubjectId(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId);
-
-    if (enrollmentSubjects.length === 0) {
-      if (updateEnrollmentSubjectResponse.isSuccess()) {
-        return res.sendSuccess.create(updateEnrollmentSubjectResponse.getData(), updateEnrollmentSubjectResponse.getMessage());
-      } else {
-        switch (updateEnrollmentSubjectResponse.getErrorCode()) {
-          case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-            return res.sendError.notFound(updateEnrollmentSubjectResponse.getMessage());
-        }
-      }
-    }
-
-    await Promise.all(
-      enrollmentSubjectTypes.map(async (enrollmentSubjectType) => {
-        await enrollmentService.createEnrollmentSubjectType(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId, enrollmentSubjectType.classTypeId, enrollmentSubjectType.venueId, enrollmentSubjectType.startTime, enrollmentSubjectType.endTime, enrollmentSubjectType.dayId, enrollmentSubjectType.numberOfSeats, enrollmentSubjectType.grouping, enrollmentSubjectType.lecturerId);
-      })
-    );
-
-    const createEnrollmentSubjectTypeResponse: Result<EnrollmentSubjectWithTypesData> = await enrollmentService.getEnrollmentSubjectWithEnrollmentSubjectTypesById(updateEnrollmentSubjectResponse.getData().enrollmentSubjectId);
-
-    if (createEnrollmentSubjectTypeResponse.isSuccess()) {
-      return res.sendSuccess.ok(createEnrollmentSubjectTypeResponse.getData(), createEnrollmentSubjectTypeResponse.getMessage());
+    if (response.isSuccess()) {
+      return res.sendSuccess.create(response.getData(), response.getMessage());
     } else {
-      switch (createEnrollmentSubjectTypeResponse.getErrorCode()) {
+      switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
-          return res.sendError.notFound(createEnrollmentSubjectTypeResponse.getMessage());
+          return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }

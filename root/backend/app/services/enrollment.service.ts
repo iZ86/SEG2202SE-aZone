@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS } from "../enums/enums";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeClashing, isDateRangeClashing } from "../utils/utils";
@@ -29,7 +29,7 @@ interface IEnrollmentService {
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
-  updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>>;
+  updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>>;
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
@@ -667,16 +667,299 @@ class EnrollmentService implements IEnrollmentService {
     return merged;
   }
 
-  async updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<Result<EnrollmentSubjectData>> {
-    await enrollmentRepository.updateEnrollmentSubjectById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
 
-    const enrollmentSubjectResponse: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectById(enrollmentSubjectId);
+  async updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
 
-    if (!enrollmentSubjectResponse) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject updated not found");
+
+    // Check parameters exist.
+    const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+    if (!enrollmentSubjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectResult.getMessage());
     }
 
-    return Result.succeed(enrollmentSubjectResponse, "Enrollment subject update success");
+    const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
+    if (!enrollmentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentResult.getMessage());
+    }
+
+
+    const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+    const lecturerResult: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
+    if (!lecturerResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, lecturerResult.getMessage());
+    }
+
+
+    // Check if an enrollment already contains the subject
+    const isEnrollmentSubjectDuplicated: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
+
+    if (isEnrollmentSubjectDuplicated.isSuccess()) {
+      const enrollmentSubjectDuplicated: EnrollmentSubjectData = isEnrollmentSubjectDuplicated.getData();
+      if (enrollmentSubjectDuplicated.enrollmentSubjectId !== enrollmentSubjectId) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, `subjectId [${subjectId}] already belongs to enrollmentId [${enrollmentId}]`);
+      }
+    }
+
+
+
+
+    // Check if all the class session data is valid. When the array is not empty
+    if (updateEnrollmentSubjectTypes.length > 0) {
+
+      const classTypeIdAndGroupingDictionary: { [classTypeId: number]: { [grouping: number]: number } } = {};
+      const venueIdAndEnrollmentSubjectTypeDictionary: { [venueId: number]: { ["index"]: number;["enrollmentSubjectType"]: CreateEnrollmentSubjectTypeData }[] } = {};
+      const lecturerIdAndEnrollmentSubjectTypeDictionary: { [lecturerId: number]: { ["index"]: number;["enrollmentSubjectType"]: CreateEnrollmentSubjectTypeData }[] } = {};
+
+      let index: number = 0;
+
+      for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
+        // Check if their foreign keys are valid.
+
+        if (!(updateEnrollmentSubjectType.dayId in ENUM_DAY)) {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid dayId at at index: ${index}`)
+        }
+
+        if (!(updateEnrollmentSubjectType.classTypeId in ENUM_CLASS_TYPE)) {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid classTypeId at at index: ${index}`)
+        }
+
+        const venueResult: Result<VenueData> = await venueService.getVenueById(updateEnrollmentSubjectType.venueId);
+        if (!venueResult.isSuccess()) {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid venueId at at index: ${index}`)
+        }
+
+        // Check if there is any grouping clashing within the enrollmentSubjectTypes.
+        /**
+         * In createEnrollmentWithSubjectTypesById, this classTypeId and grouping validation did not need to enter the database for checks.
+         * That was because there wasn't any existing enrollmentSubjectType under the enrollmentSubject because enrollmentSubject also didnt exist.
+         * However, in update's case, there is also no need to do a database check. This is because, the update will affect ALL enrollmentSubjectType under enrollmentSubject,
+         * So if there is any clashing this validation check here will cover it. IF there is a clashing row, but it isn't in the client's request, it also doesn't matter.
+         * Because if it isn't in the client's request, it will be deleted. Therefore, there is no need to check in the database.
+         */
+        if (!classTypeIdAndGroupingDictionary[updateEnrollmentSubjectType.classTypeId]) {
+          classTypeIdAndGroupingDictionary[updateEnrollmentSubjectType.classTypeId] = {};
+          classTypeIdAndGroupingDictionary[updateEnrollmentSubjectType.classTypeId][updateEnrollmentSubjectType.grouping] = index;
+        } else {
+          if (classTypeIdAndGroupingDictionary[updateEnrollmentSubjectType.classTypeId][updateEnrollmentSubjectType.grouping] === undefined) {
+            classTypeIdAndGroupingDictionary[updateEnrollmentSubjectType.classTypeId][updateEnrollmentSubjectType.grouping] = index;
+          } else {
+            return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType classType and grouping at index [${index}] is clashing with enrollmentSubjectType at index [${classTypeIdAndGroupingDictionary[updateEnrollmentSubjectType.classTypeId][updateEnrollmentSubjectType.grouping]}]`);
+          }
+        }
+
+        // Check if there is any clashing with place and time with provided enrollmentSubjectTypes.
+        if (!venueIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.venueId]) {
+          venueIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.venueId] = [];
+          venueIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.venueId].push({ index: index, enrollmentSubjectType: updateEnrollmentSubjectType });
+        } else {
+          for (const venueIdAndEnrollmentSubjectType of venueIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.venueId]) {
+            if (isTimeClashing(updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime, venueIdAndEnrollmentSubjectType.enrollmentSubjectType.startTime,
+              venueIdAndEnrollmentSubjectType.enrollmentSubjectType.endTime) && (updateEnrollmentSubjectType.dayId === venueIdAndEnrollmentSubjectType.enrollmentSubjectType.dayId)) {
+              return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType venue and class schedule at index [${index}] is clashing with enrollmentSubjectType at index [${venueIdAndEnrollmentSubjectType.index}]`);
+            }
+          }
+          venueIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.venueId].push({ index: index, enrollmentSubjectType: updateEnrollmentSubjectType });
+        }
+
+        // Check if there is any clashing with lecturer and time with provided enrollmentSubjectTypes.
+        if (!lecturerIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.lecturerId]) {
+          lecturerIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.lecturerId] = [];
+          lecturerIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.lecturerId].push({ index: index, enrollmentSubjectType: updateEnrollmentSubjectType });
+        } else {
+          for (const lecturerIdAndEnrollmentSubjectType of lecturerIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.lecturerId]) {
+            if (isTimeClashing(updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime, lecturerIdAndEnrollmentSubjectType.enrollmentSubjectType.startTime,
+              lecturerIdAndEnrollmentSubjectType.enrollmentSubjectType.endTime) && (updateEnrollmentSubjectType.dayId === lecturerIdAndEnrollmentSubjectType.enrollmentSubjectType.dayId)) {
+              return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType lecturer and class schedule at index [${index}] is clashing with enrollmentSubjectType at index [${lecturerIdAndEnrollmentSubjectType.index}]`);
+            }
+          }
+          lecturerIdAndEnrollmentSubjectTypeDictionary[updateEnrollmentSubjectType.lecturerId].push({ index: index, enrollmentSubjectType: updateEnrollmentSubjectType });
+        }
+        index++;
+      }
+
+      // Below here is all database checks for enrollmentSubjectTypes.
+
+      // Now checking the enrollmentSubjectTypes if there is any existing clashing for venue and schedule AND lecturer and schedule in database.
+      // Check enrollmentSubjectTypes with the same enrollmentId first.
+      const enrollmentSubjectTypes: EnrollmentSubjectTypeData[] = await enrollmentRepository.getEnrollmentSubjectTypesByEnrollmentIdAndNotEnrollmentSubjectId(enrollmentId, enrollmentSubjectId);
+
+      if (enrollmentSubjectTypes.length > 0) {
+        let index: number = 0;
+        for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
+          for (const enrollmentSubjectType of enrollmentSubjectTypes) {
+
+            if ((updateEnrollmentSubjectType.venueId === enrollmentSubjectType.venueId) &&
+              (updateEnrollmentSubjectType.dayId === enrollmentSubjectType.dayId) &&
+              isTimeClashing(updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime, enrollmentSubjectType.startTime, enrollmentSubjectType.endTime)) {
+              return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType venue and class schedule at index [${index}] is clashing with existing enrollmentSubjectTypeId: ${enrollmentSubjectType.enrollmentSubjectTypeId}`)
+            }
+          }
+          index++;
+        }
+
+        index = 0;
+
+        for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
+          for (const enrollmentSubjectType of enrollmentSubjectTypes) {
+            if ((updateEnrollmentSubjectType.lecturerId === enrollmentSubjectType.lecturerId) &&
+              (updateEnrollmentSubjectType.dayId === enrollmentSubjectType.dayId) &&
+              isTimeClashing(updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime, enrollmentSubjectType.startTime, enrollmentSubjectType.endTime)) {
+              return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType lecturer and class schedule at index [${index}] is clashing with existing enrollmentSubjectTypeId: ${enrollmentSubjectType.enrollmentSubjectTypeId}`)
+            }
+          }
+          index++;
+        }
+      }
+
+      // Below onwards check enrollmentSubjectTypes of different enrollmentId.
+      // However, their programIntake semesterStartDate and semesterEndDate must overlap with the provided enrollmentId.
+      // Otherwise, there is no clashing occur.
+
+      // Get programmeIntakes by enrollmentId and active status.
+      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByStatus(ENUM_PROGRAMME_INTAKE_STATUS.ACTIVE);
+      if (!programmeIntakesResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
+      }
+
+      const programmeIntakes: ProgrammeIntakeData[] = programmeIntakesResult.getData();
+      if (programmeIntakes.length > 0) {
+
+        // Filter by enrollmentId
+        const programmeIntakeByEnrollmentId = programmeIntakes.filter(intake => intake.enrollmentId === enrollmentId);
+
+        // Get the semester schedule ranges.
+        const semesterDateRanges: { semesterStartDate: Date; semesterEndDate: Date }[] = this.mergeSemesterScheduleRanges(programmeIntakeByEnrollmentId);
+
+        // Filter out the current enrollmentId
+        const otherProgrammeIntakes = programmeIntakes.filter(intake => intake.enrollmentId !== enrollmentId);
+
+        // Get other enrollmentIds from the clashing semesterStartDate and semesterEndDate.
+        const enrollmentIds: number[] = this.findEnrollmentIdsFromOverlappingSemesterSchedule(otherProgrammeIntakes, semesterDateRanges);
+
+        if (enrollmentIds.length > 0) {
+          const enrollmentSubjectTypesByEnrollmentIdsResult: Result<EnrollmentSubjectTypeData[]> = await this.getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds);
+
+          if (!enrollmentSubjectTypesByEnrollmentIdsResult.isSuccess()) {
+            return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectTypesByEnrollmentIdsResult.getMessage());
+          }
+
+          const enrollmentSubjectTypesByEnrollmentIds: EnrollmentSubjectTypeData[] = enrollmentSubjectTypesByEnrollmentIdsResult.getData();
+
+          if (enrollmentSubjectTypesByEnrollmentIds.length > 0) {
+            let index: number = 0;
+            for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
+              for (const enrollmentSubjectType of enrollmentSubjectTypesByEnrollmentIds) {
+                if ((updateEnrollmentSubjectType.venueId === enrollmentSubjectType.venueId) &&
+                  (updateEnrollmentSubjectType.dayId === enrollmentSubjectType.dayId) &&
+                  isTimeClashing(updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime, enrollmentSubjectType.startTime, enrollmentSubjectType.endTime)
+                ) {
+                  return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType venue and schedule at index [${index}] is clashing with existing enrollmentSubjectTypeId: ${enrollmentSubjectType.enrollmentSubjectTypeId}`)
+                }
+              }
+              index++;
+            }
+
+            index = 0;
+            for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
+              for (const enrollmentSubjectType of enrollmentSubjectTypesByEnrollmentIds) {
+                if ((updateEnrollmentSubjectType.lecturerId === enrollmentSubjectType.lecturerId) &&
+                  (updateEnrollmentSubjectType.dayId === enrollmentSubjectType.dayId) &&
+                  isTimeClashing(updateEnrollmentSubjectType.startTime, updateEnrollmentSubjectType.endTime, enrollmentSubjectType.startTime, enrollmentSubjectType.endTime)
+                ) {
+                  return Result.fail(ENUM_ERROR_CODE.CONFLICT, `enrollmentSubjectType lecturer and schedule at index [${index}] is clashing with existing enrollmentSubjectTypeId: ${enrollmentSubjectType.enrollmentSubjectTypeId}`)
+                }
+              }
+              index++;
+            }
+          }
+        }
+      }
+    }
+
+
+    const updateEnrollmentSubjectResult: ResultSetHeader = await enrollmentRepository.updateEnrollmentSubjectById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId);
+    if (updateEnrollmentSubjectResult.affectedRows === 0) {
+      throw new Error("updateEnrollmentSubjectWithSubjectTypesById failed to update enrollment subject");
+    }
+
+    const enrollmentSubject: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
+    if (!enrollmentSubject.isSuccess()) {
+      throw new Error("updateEnrollmentSubjectWithSubjectTypesById updated enrollmentSubject not found");
+    }
+
+
+    // Update all existing enrollmentSubjectTypes that exist.
+    const updateEnrollmentSubjectTypeIds: number[] = [];
+    const updateEnrollmentSubjectTypeWithoutId: UpdateEnrollmentSubjectTypeData[] = [];
+    for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
+      if (updateEnrollmentSubjectType.enrollmentSubjectTypeId) {
+        const updateEnrollmentSubjectTypeResult: ResultSetHeader = await enrollmentRepository.updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType);
+        if (updateEnrollmentSubjectTypeResult.affectedRows === 0) {
+          throw new Error("updateEnrollmentSubjectWithSubjectTypesById failed to update enrollmentSubjectType");
+        }
+        updateEnrollmentSubjectTypeIds.push(updateEnrollmentSubjectType.enrollmentSubjectTypeId);
+      } else {
+        updateEnrollmentSubjectTypeWithoutId.push(updateEnrollmentSubjectType);
+      }
+    }
+
+
+    // The affected rows can be 0, so no need to check.
+    // This condition needs to be done as you can't bulk delete or insert an empty array.
+    if (updateEnrollmentSubjectTypeIds.length > 0) {
+      await enrollmentRepository.deleteEnrollmentSubjectTypesByEnrollmentSubjectIdAndNotIds(enrollmentSubjectId, updateEnrollmentSubjectTypeIds);
+    } else {
+      await enrollmentRepository.deleteEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+    }
+
+
+
+    // Add enrollmentSubjectTypes with enrollmentSubjectId.
+    if (updateEnrollmentSubjectTypeWithoutId.length > 0) {
+      const insertEnrollmentSubjectTypes: (string | number | Date)[][] = updateEnrollmentSubjectTypeWithoutId.map(
+        (updateEnrollmentSubjectTypeWithoutId) => [
+          enrollmentSubjectId,
+          updateEnrollmentSubjectTypeWithoutId.classTypeId,
+          updateEnrollmentSubjectTypeWithoutId.venueId,
+          updateEnrollmentSubjectTypeWithoutId.startTime,
+          updateEnrollmentSubjectTypeWithoutId.endTime,
+          updateEnrollmentSubjectTypeWithoutId.dayId,
+          updateEnrollmentSubjectTypeWithoutId.numberOfSeats,
+          updateEnrollmentSubjectTypeWithoutId.grouping,
+          updateEnrollmentSubjectTypeWithoutId.lecturerId
+        ]
+      );
+
+
+      const createEnrollmentSubjectTypesResult: ResultSetHeader = await enrollmentRepository.createEnrollmentSubjectTypes(insertEnrollmentSubjectTypes);
+      if (createEnrollmentSubjectTypesResult.affectedRows === 0) {
+        throw new Error("updateEnrollmentSubjectWithSubjectTypes failed to insert enrollmentSubjectTypes");
+      }
+
+      const enrollmentSubjectTypesResult: Result<EnrollmentSubjectTypeData[]> = await this.getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId);
+
+      if (!enrollmentSubjectTypesResult.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrollmentSubjectTypesResult.getMessage());
+      }
+
+      const enrollmentSubjectTypesData: EnrollmentSubjectTypeData[] = enrollmentSubjectTypesResult.getData();
+      if (enrollmentSubjectTypesData.length === 0) {
+        throw new Error("updateEnrollmentSubjectWithSubjectTypes created enrollment subject types not found");
+      }
+    }
+
+
+    const enrollmentSubjectWithEnrollmentSubjectTypes: Result<EnrollmentSubjectWithTypesData> = await this.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
+    if (!enrollmentSubjectWithEnrollmentSubjectTypes.isSuccess()) {
+      throw new Error("updateEnrollmentSubjectWithSubjectTypes failed to get updated data");
+    }
+
+
+    return Result.succeed(enrollmentSubjectWithEnrollmentSubjectTypes.getData(), "Enrollment subject update success");
   }
 
   async deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<null>> {
