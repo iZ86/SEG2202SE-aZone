@@ -607,7 +607,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON est.venueId = v.venueId " +
         "INNER JOIN DAY d ON est.dayId = d.dayId " +
-        "WHERE enrollmentId = ?;",
+        "WHERE es.enrollmentId = ?;",
         [enrollmentId],
         (err, res) => {
           if (err) reject(err);
