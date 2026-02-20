@@ -75,23 +75,6 @@ export default class ProgrammeController {
     const programmeId: number = Number(req.params.programmeId);
     const programmeName: string = req.body.programmeName;
 
-
-    const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
-
-    if (!programme.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeId");
-    }
-
-    const isProgrammeNameBelongsToProgrammeId: Result<ProgrammeData> = await programmeService.getProgrammeByIdAndName(programmeId, programmeName);
-
-    if (!isProgrammeNameBelongsToProgrammeId.isSuccess()) {
-      const isProgrammeNameDuplicated: Result<ProgrammeData> = await programmeService.getProgrammeByName(programmeName);
-
-      if (isProgrammeNameDuplicated.isSuccess()) {
-        return res.sendError.conflict("Programme name duplciated");
-      }
-    }
-
     const response = await programmeService.updateProgrammeById(programmeId, programmeName);
 
     if (response.isSuccess()) {
@@ -100,6 +83,8 @@ export default class ProgrammeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }

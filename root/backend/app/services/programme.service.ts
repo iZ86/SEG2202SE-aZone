@@ -101,14 +101,38 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
-    await programmeRepository.updateProgrammeById(programmeId, programmeName);
-    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeById(programmeId);
 
-    if (!programme) {
+    // Check param exist.
+    const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
+
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
+    }
+
+    const programmeData: ProgrammeData = programmeResult.getData();
+
+    // Check if programmeName is already occupied by other programme or not.
+    if (programmeData.programmeName !== programmeName) {
+
+      const isProgrammeNameDuplicated: Result<ProgrammeData> = await this.getProgrammeByName(programmeName);
+
+      if (isProgrammeNameDuplicated.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Programme name duplicated");
+      }
+    }
+
+    // Update programme.
+    const updateProgrammeResult: ResultSetHeader = await programmeRepository.updateProgrammeById(programmeId, programmeName);
+    if (updateProgrammeResult.affectedRows === 0) {
+      throw new Error("updateProgrammeById failed to update");
+    }
+    
+    const programme: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
+    if (!programme.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme updated not found");
     }
 
-    return Result.succeed(programme, "Programme update success");
+    return Result.succeed(programme.getData(), "Programme update success");
   }
 
   async deleteProgrammeById(programmeId: number): Promise<Result<null>> {
