@@ -72,12 +72,9 @@ export default class ProgrammeController {
   }
 
   async updateProgrammeById(req: Request, res: Response) {
-    const programmeId: number = parseInt(req.params.programmeId as string);
+    const programmeId: number = Number(req.params.programmeId);
     const programmeName: string = req.body.programmeName;
 
-    if (!programmeId || isNaN(programmeId)) {
-      return res.sendError.badRequest("Invalid programmeId");
-    }
 
     const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
 
