@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import ProgrammeController from "../controllers/programme.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateProgrammeIntakeValidator, createAndUpdateProgrammeValidator, createStudentCourseProgrammeIntakeValidator } from "../validators/programme-validator";
+import { programmeParamValidator, createAndUpdateProgrammeIntakeValidator, createAndUpdateProgrammeValidator, createStudentCourseProgrammeIntakeValidator } from "../validators/programme-validator";
 
 class ProgrammeRoute {
   router = Router();
