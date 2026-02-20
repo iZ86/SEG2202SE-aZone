@@ -20,8 +20,7 @@ export const createAndUpdateSubjectValidator: any = [
     .notEmpty().withMessage('Missing creditHours')
     .isNumeric().withMessage('creditHours must be a number'),
   body('courseIds')
-    .isArray({ min: 1 }).withMessage('courseIds must be an array and at least one value')
-    .notEmpty().withMessage('Array cannot be empty'),
+    .isArray({ min: 1 }).withMessage('courseIds must be an array and at least one value'),
   body('courseIds.*')
     .isNumeric().withMessage('All items must be a number'),
   validate,

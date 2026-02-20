@@ -29,8 +29,7 @@ export const createAndUpdateEnrollmentValidator: any = [
     .isISO8601().withMessage("enrollmentEndDateTime must be a date time"),
   body('programmeIntakeIds')
     .optional()
-    .isArray({ min: 1 }).withMessage('programmeIntakeIds must be an array and at least one value')
-    .notEmpty().withMessage('Array cannot be empty'),
+    .isArray({ min: 1 }).withMessage('programmeIntakeIds must be an array and at least one value'),
   body('programmeIntakeIds.*')
     .isNumeric().withMessage('All programmeIntakeIds must be a number'),
   validate,
@@ -38,8 +37,7 @@ export const createAndUpdateEnrollmentValidator: any = [
 
 export const enrollStudentSubjectsValidator: any = [
   body('enrollmentSubjectTypeIds')
-    .isArray().withMessage('enrollmentSubjectTypeIds must be an array of numbers with atleast one value')
-    .notEmpty().withMessage('Array cannot be empty'),
+    .isArray({min: 1}).withMessage('enrollmentSubjectTypeIds must be an array of numbers with atleast one value'),
   validate,
 ];
 
