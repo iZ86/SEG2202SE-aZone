@@ -3,7 +3,7 @@ import validate from "../middlewares/validate";
 
 export const venueParamValidator: any = [
   param('venueId')
-    .exists().withMessage("Invalid venueId")
+    .exists().withMessage("Missing venueId")
     .isInt().withMessage("venueId must be a number")
     .toInt(),
   validate,

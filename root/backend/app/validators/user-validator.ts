@@ -3,7 +3,7 @@ import validate from "../middlewares/validate";
 
 export const studentParamValidator: any = [
   param('studentId')
-    .exists().withMessage("Invalid studentId")
+    .exists().withMessage("Missing studentId")
     .isInt().withMessage("studentId must be a number")
     .toInt(),
   validate,
@@ -11,7 +11,7 @@ export const studentParamValidator: any = [
 
 export const adminParamValidator: any = [
   param('adminId')
-    .exists().withMessage("Invalid adminId")
+    .exists().withMessage("Missing adminId")
     .isInt().withMessage("adminId must be a number")
     .toInt(),
   validate,

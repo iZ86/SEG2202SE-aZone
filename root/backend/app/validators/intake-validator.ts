@@ -3,7 +3,7 @@ import validate from "../middlewares/validate";
 
 export const intakeParamValidator: any = [
   param('intakeId')
-    .exists().withMessage("Invalid intakeId")
+    .exists().withMessage("Missing intakeId")
     .isInt().withMessage("intakeId must be a number")
     .toInt(),
   validate,
