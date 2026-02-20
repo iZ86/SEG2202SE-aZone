@@ -78,12 +78,14 @@ class ProgrammeService implements IProgrammeService {
 
   async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
 
+    // Check if programmeName is already used.
     const isProgrammeNameDuplicated: Result<ProgrammeData> = await this.getProgrammeByName(programmeName);
 
     if (isProgrammeNameDuplicated.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Programme name duplciated");
     }
 
+    // create Programme
     const createProgrammeResult: ResultSetHeader = await programmeRepository.createProgramme(programmeName);
     if (createProgrammeResult.affectedRows === 0) {
       throw new Error("createProgramme failed to insert");
