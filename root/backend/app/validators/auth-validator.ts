@@ -5,14 +5,14 @@ import { ENUM_USER_ROLE } from "../enums/enums";
 export const loginValidator: any = [
   body('userId')
     .notEmpty().withMessage('Missing userId')
-    .isNumeric().withMessage('userId must be number'),
+    .isNumeric().withMessage('userId must be a number'),
   body('password')
     .trim()
     .notEmpty().withMessage('Missing password')
-    .isString().withMessage('Password must be string'),
+    .isString().withMessage('Password must be a string'),
   body('role')
     .notEmpty().withMessage('Missing role')
-    .isNumeric().withMessage('Role must be number')
+    .isNumeric().withMessage('Role must be a number')
     .isIn(Object.values(ENUM_USER_ROLE)).withMessage('Invalid user role'),
   validate,
 ];

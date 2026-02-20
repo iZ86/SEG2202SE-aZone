@@ -5,11 +5,11 @@ export const createAndUpdateSubjectValidator: any = [
   body('subjectName')
     .trim()
     .notEmpty().withMessage('Missing subjectName')
-    .isString().withMessage('subjectName must be string'),
+    .isString().withMessage('subjectName must be a string'),
   body('subjectCode')
     .trim()
     .notEmpty().withMessage('Missing subjectCode')
-    .isString().withMessage('subjectCode must be string'),
+    .isString().withMessage('subjectCode must be a string'),
   body('description')
     .trim()
     .optional()
@@ -18,11 +18,11 @@ export const createAndUpdateSubjectValidator: any = [
   body('creditHours')
     .trim()
     .notEmpty().withMessage('Missing creditHours')
-    .isNumeric().withMessage('creditHours must be numeric'),
+    .isNumeric().withMessage('creditHours must be a number'),
   body('courseIds')
     .isArray({ min: 1 }).withMessage('courseIds must be an array and at least one value')
     .notEmpty().withMessage('Array cannot be empty'),
   body('courseIds.*')
-    .isNumeric().withMessage('All items must be numeric'),
+    .isNumeric().withMessage('All items must be a number'),
   validate,
 ];

@@ -12,24 +12,24 @@ export const courseParamValidator: any = [
 export const createAndUpdateCourseValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
-    .isNumeric().withMessage('programmeId must be number'),
+    .isNumeric().withMessage('programmeId must be a number'),
   body('courseCode')
     .trim()
     .notEmpty().withMessage('Missing courseCode')
-    .isString().withMessage('courseCode must be string'),
+    .isString().withMessage('courseCode must be a string'),
   body('courseName')
     .trim()
     .notEmpty().withMessage('Missing courseName')
-    .isString().withMessage('courseName must be string'),
+    .isString().withMessage('courseName must be a string'),
   validate,
 ];
 
 export const createCourseSubjectValidator: any = [
   body('courseId')
     .notEmpty().withMessage('Missing courseId')
-    .isNumeric().withMessage('courseId must be number'),
+    .isNumeric().withMessage('courseId must be a number'),
   body('subjectId')
     .notEmpty().withMessage('Missing subjectId')
-    .isNumeric().withMessage('subjectId must be number'),
+    .isNumeric().withMessage('subjectId must be a number'),
   validate,
 ];

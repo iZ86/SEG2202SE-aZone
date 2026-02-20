@@ -4,7 +4,7 @@ import validate from "../middlewares/validate";
 export const intakeParamValidator: any = [
   param('intakeId')
     .exists().withMessage("Invalid intakeId")
-    .isInt().withMessage("Invalid intakeId")
+    .isInt().withMessage("intakeId must be a number")
     .toInt(),
   validate,
 ];
