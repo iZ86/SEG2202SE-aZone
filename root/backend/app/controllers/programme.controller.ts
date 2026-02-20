@@ -57,12 +57,6 @@ export default class ProgrammeController {
   async createProgramme(req: Request, res: Response) {
     const programmeName: string = req.body.programmeName;
 
-    const isProgrammeNameDuplicated: Result<ProgrammeData> = await programmeService.getProgrammeByName(programmeName);
-
-    if (isProgrammeNameDuplicated.isSuccess()) {
-      return res.sendError.conflict("Programme name duplciated");
-    }
-
     const response = await programmeService.createProgramme(programmeName);
 
     if (response.isSuccess()) {
@@ -71,6 +65,8 @@ export default class ProgrammeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }

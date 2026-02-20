@@ -77,15 +77,25 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
-    const response: ResultSetHeader = await programmeRepository.createProgramme(programmeName);
 
-    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeById(response.insertId);
+    const isProgrammeNameDuplicated: Result<ProgrammeData> = await this.getProgrammeByName(programmeName);
 
-    if (!programme) {
+    if (isProgrammeNameDuplicated.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Programme name duplciated");
+    }
+
+    const createProgrammeResult: ResultSetHeader = await programmeRepository.createProgramme(programmeName);
+    if (createProgrammeResult.affectedRows === 0) {
+      throw new Error("createProgramme failed to insert");
+    }
+
+    const programme: Result<ProgrammeData> = await this.getProgrammeById(createProgrammeResult.insertId);
+
+    if (!programme.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme created not found");
     }
 
-    return Result.succeed(programme, "Programme create success");
+    return Result.succeed(programme.getData(), "Programme create success");
   }
 
   async updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
