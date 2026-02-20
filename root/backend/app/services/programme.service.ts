@@ -92,7 +92,7 @@ class ProgrammeService implements IProgrammeService {
     const programme: Result<ProgrammeData> = await this.getProgrammeById(createProgrammeResult.insertId);
 
     if (!programme.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme created not found");
+      throw new Error("createProgramme created programme not found");
     }
 
     return Result.succeed(programme.getData(), "Programme create success");
