@@ -183,20 +183,6 @@ export default class ProgrammeController {
     const semesterEndDate: Date = req.body.semesterEndDate;
     const status: number = req.body.status;
 
-    const programmeIdResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
-
-    const intakeIdResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
-
-    if (!programmeIdResponse.isSuccess() || !intakeIdResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeId or intakeId");
-    }
-
-    const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
-
-    if (isProgrammeIntakeDuplicated.isSuccess()) {
-      return res.sendError.conflict("programmeIntake duplciated");
-    }
-
     const response = await programmeService.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
 
     if (response.isSuccess()) {
@@ -204,6 +190,8 @@ export default class ProgrammeController {
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
           return res.sendError.notFound(response.getMessage());
       }
     }

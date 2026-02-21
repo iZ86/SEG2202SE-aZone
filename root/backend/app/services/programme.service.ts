@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS, ENUM_STUDY_MODE } from "../enums/enums";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
@@ -10,6 +10,8 @@ import { UserData } from "../models/user-model";
 import enrollmentService from "./enrollment.service";
 import { EnrollmentData } from "../models/enrollment-model";
 import { IsExist } from "../models/general-model";
+import intakeService from "./intake.service";
+import { IntakeData } from "../models/intake-model";
 
 interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
@@ -248,15 +250,46 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
-    const response: ResultSetHeader = await programmeRepository.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
 
-    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(response.insertId);
 
-    if (!programmeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake created not found");
+    // Check param exists or not.
+    const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
     }
 
-    return Result.succeed(programmeIntake, "Programme intake create success");
+    const intakeResult: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
+    if (!intakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, intakeResult.getMessage());
+    }
+
+    if (!(studyModeId in ENUM_STUDY_MODE)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
+    }
+
+    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "status not found");
+    }
+
+
+    // Check if there is a programmeIntake that exists with the same programmeId, intakeId, and semester.
+    const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
+
+    if (isProgrammeIntakeDuplicated.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "programmeIntake already exists");
+    }
+
+    const createProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
+    if (createProgrammeIntakeResult.affectedRows === 0) {
+      throw new Error("createProgrammeIntake failed to insert")
+    }
+
+    const programmeIntake: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(createProgrammeIntakeResult.insertId);
+    if (!programmeIntake.isSuccess()) {
+      throw new Error("createProgrammeIntake created programmeIntake not found");
+    }
+
+    return Result.succeed(programmeIntake.getData(), "Programme intake create success");
   }
 
   async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
