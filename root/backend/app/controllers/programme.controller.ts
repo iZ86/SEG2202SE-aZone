@@ -90,13 +90,9 @@ export default class ProgrammeController {
   }
 
   async deleteProgrammeById(req: Request, res: Response) {
-    const programmeId: number = parseInt(req.params.programmeId as string);
-
-    if (!programmeId || isNaN(programmeId)) {
-      return res.sendError.badRequest("Invalid programmeId");
-    }
 
     const programme: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
+    const programmeId: number = Number(req.params.programmeId);
 
     if (!programme.isSuccess()) {
       return res.sendError.notFound("Invalid programmeId");
