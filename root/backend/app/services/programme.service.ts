@@ -129,7 +129,7 @@ class ProgrammeService implements IProgrammeService {
     if (updateProgrammeResult.affectedRows === 0) {
       throw new Error("updateProgrammeById failed to update");
     }
-    
+
     const programme: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
     if (!programme.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme updated not found");
@@ -293,15 +293,52 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
-    await programmeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
 
-    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(programmeIntakeId);
-
-    if (!programmeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake updated not found");
+    // Check param exist.
+    const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+    if (!programmeIntakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResult.getMessage());
     }
 
-    return Result.succeed(programmeIntake, "Programme intake update success");
+    const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
+    }
+
+    const intakeResult: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
+    if (!intakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, intakeResult.getMessage());
+    }
+
+    if (!(studyModeId in ENUM_STUDY_MODE)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
+    }
+
+    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "status not found");
+    }
+
+    // Check if there is an existing programmeIntake with the same programmeId, intakeId, and semester.
+    const programmeIntakeData: ProgrammeIntakeData = programmeIntakeResult.getData();
+    if (programmeIntakeData.programmeId !== programmeId || programmeIntakeData.intakeId !== intakeId || programmeIntakeData.semester !== semester) {
+      const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
+
+      if (isProgrammeIntakeDuplicated.isSuccess()) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, "A programme intake with the same programmeId, intakeId, and semester already exists");
+      }
+    }
+    
+    const updateProgrammeIntakeResult: ResultSetHeader = await programmeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
+    if (updateProgrammeIntakeResult.affectedRows === 0) {
+      throw new Error("updateProgrammeIntakeById failed to update");
+    }
+
+    const programmeIntake: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+    if (!programmeIntake.isSuccess()) {
+      throw new Error("updateProgrammeIntakeById updated programmeIntake not found");
+    }
+
+    return Result.succeed(programmeIntake.getData(), "Programme intake update success");
   }
 
   async deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>> {

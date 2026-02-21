@@ -208,26 +208,6 @@ export default class ProgrammeController {
     const status: number = req.body.status;
 
 
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
-
-    const programmeIdResponse: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
-
-    const intakeIdResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
-
-    if (!programmeIntakeResponse.isSuccess() || !programmeIdResponse.isSuccess() || !intakeIdResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeIntakeId, or programmeId, or intakeId");
-    }
-
-    const isProgrammeIntakeBelongsToProgrammeIntakeId: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId, programmeId, intakeId, semester);
-
-    if (!isProgrammeIntakeBelongsToProgrammeIntakeId.isSuccess()) {
-      const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
-
-      if (isProgrammeIntakeDuplicated.isSuccess()) {
-        return res.sendError.conflict("programmeIntake duplciated");
-      }
-    }
-
     const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
 
     if (response.isSuccess()) {
@@ -236,6 +216,8 @@ export default class ProgrammeController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
