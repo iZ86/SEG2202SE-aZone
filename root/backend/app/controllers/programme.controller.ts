@@ -225,12 +225,6 @@ export default class ProgrammeController {
   async deleteProgrammeIntakeById(req: Request, res: Response) {
     const programmeIntakeId: number = Number(req.params.programmeIntakeId);
 
-    const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
-
-    if (!programmeIntakeResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid programmeIntakeId");
-    }
-
     const response = await programmeService.deleteProgrammeIntakeById(programmeIntakeId);
 
     if (response.isSuccess()) {

@@ -342,7 +342,18 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>> {
-    await programmeRepository.deleteProgrammeIntakeById(programmeIntakeId);
+
+    // Check if programmeIntake exists.
+    const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+
+    if (!programmeIntakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResult.getMessage());
+    }
+
+    const deleteProgrammeIntakeResult: ResultSetHeader = await programmeRepository.deleteProgrammeIntakeById(programmeIntakeId);
+    if (deleteProgrammeIntakeResult.affectedRows === 0) {
+      throw new Error("deleteProgrammeIntakeById failed to delete");
+    }
 
     return Result.succeed(null, "Programme intake delete success");
   }
