@@ -9,6 +9,14 @@ export const programmeParamValidator: any = [
   validate,
 ]
 
+export const programmeIntakeParamValidator: any = [
+  param('programmeIntakeId')
+    .exists().withMessage("Missing programmeIntakeId")
+    .isInt().withMessage("programmeIntakeId must be a number")
+    .toInt(),
+  validate,
+]
+
 export const createAndUpdateProgrammeValidator: any = [
   body('programmeName')
     .trim()
