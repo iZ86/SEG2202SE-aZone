@@ -20,22 +20,28 @@ export const createAndUpdateProgrammeValidator: any = [
 export const createAndUpdateProgrammeIntakeValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
-    .isNumeric().withMessage('programmeId must be a number'),
+    .isNumeric().withMessage('programmeId must be a number')
+    .toInt(),
   body('intakeId')
     .notEmpty().withMessage('Missing intakeId')
-    .isNumeric().withMessage('intakeId must be a number'),
+    .isNumeric().withMessage('intakeId must be a number')
+    .toInt(),
   body('studyModeId')
     .notEmpty().withMessage('Missing studyModeId')
-    .isNumeric().withMessage('studyModeId must be a number'),
+    .isNumeric().withMessage('studyModeId must be a number')
+    .toInt(),
   body('semester')
     .notEmpty().withMessage('Missing semester')
-    .isNumeric().withMessage('semester must be a number'),
+    .isNumeric().withMessage('semester must be a number')
+    .toInt(),
   body('semesterStartDate')
     .notEmpty().withMessage('Missing semesterStartDate')
-    .isDate().withMessage('semesterStartDate must be a (YYYY-MM-DD) format'),
+    .isDate().withMessage('semesterStartDate must be a (YYYY-MM-DD) format')
+    .toDate(),
   body('semesterEndDate')
     .notEmpty().withMessage('Missing semesterEndDate')
-    .isDate().withMessage('semesterEndDate must be a (YYYY-MM-DD) format'),
+    .isDate().withMessage('semesterEndDate must be a (YYYY-MM-DD) format')
+    .toDate(),
   body('status')
     .notEmpty().withMessage('Missing status')
     .isNumeric().withMessage('status must be a number')
