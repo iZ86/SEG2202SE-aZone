@@ -83,7 +83,7 @@ class ProgrammeService implements IProgrammeService {
     const isProgrammeNameDuplicated: Result<ProgrammeData> = await this.getProgrammeByName(programmeName);
 
     if (isProgrammeNameDuplicated.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Programme name duplciated");
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Programme name already exists");
     }
 
     // create Programme
