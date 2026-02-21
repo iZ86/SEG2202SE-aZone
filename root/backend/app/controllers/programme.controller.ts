@@ -207,9 +207,6 @@ export default class ProgrammeController {
     const semesterEndDate: Date = req.body.semesterEndDate;
     const status: number = req.body.status;
 
-    if (!programmeIntakeId || isNaN(programmeIntakeId)) {
-      return res.sendError.badRequest("Invalid programmeIntakeId");
-    }
 
     const programmeIntakeResponse: Result<ProgrammeIntakeData> = await programmeService.getProgrammeIntakeById(programmeIntakeId);
 
