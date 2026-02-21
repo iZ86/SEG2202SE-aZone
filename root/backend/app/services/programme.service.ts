@@ -276,7 +276,7 @@ class ProgrammeService implements IProgrammeService {
     const isProgrammeIntakeDuplicated: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
 
     if (isProgrammeIntakeDuplicated.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "programmeIntake already exists");
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "A programme intake with the same programmeId, intakeId, and semester already exists");
     }
 
     const createProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createProgrammeIntake(programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
