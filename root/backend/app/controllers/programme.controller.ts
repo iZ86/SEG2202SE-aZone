@@ -198,7 +198,7 @@ export default class ProgrammeController {
   }
 
   async updateProgrammeIntakeById(req: Request, res: Response) {
-    const programmeIntakeId: number = parseInt(req.params.programmeIntakeId);
+    const programmeIntakeId: number = Number(req.params.programmeIntakeId);
     const programmeId: number = req.body.programmeId;
     const intakeId: number = req.body.intakeId;
     const studyModeId: number = req.body.studyModeId;
