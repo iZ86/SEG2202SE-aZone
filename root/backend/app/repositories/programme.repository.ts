@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import databaseConn from "../database/db-connection";
-import { TotalCount } from "../models/general-model";
+import { IsExist, TotalCount } from "../models/general-model";
 import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
 
@@ -34,6 +34,7 @@ interface IProgrammeRepository {
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
   getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]>;
+  isExistProgrammeIntakesByProgrammeId(programmeId: number): Promise<IsExist | undefined>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -564,6 +565,24 @@ class ProgrammeRepository implements IProgrammeRepository {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
+        }
+      );
+    });
+  }
+
+  isExistProgrammeIntakesByProgrammeId(programmeId: number): Promise<IsExist | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<IsExist[]>(
+        "SELECT 1 AS value " +
+        "FROM PROGRAMME_INTAKE " +
+        "WHERE programmeId = ? " +
+        "LIMIT 1",
+        [
+          programmeId
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
         }
       );
     });

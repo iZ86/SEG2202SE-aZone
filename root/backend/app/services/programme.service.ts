@@ -9,6 +9,7 @@ import userService from "./user.service";
 import { UserData } from "../models/user-model";
 import enrollmentService from "./enrollment.service";
 import { EnrollmentData } from "../models/enrollment-model";
+import { IsExist } from "../models/general-model";
 
 interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
@@ -136,7 +137,24 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async deleteProgrammeById(programmeId: number): Promise<Result<null>> {
-    await programmeRepository.deleteProgrammeById(programmeId);
+    // Check param exist.
+    const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
+    }
+
+
+    // Make sure no programme intakes before deleting.
+    const isExistProgrammeIntakeByProgrammeId: IsExist | undefined = await programmeRepository.isExistProgrammeIntakesByProgrammeId(programmeId);
+    if (isExistProgrammeIntakeByProgrammeId && isExistProgrammeIntakeByProgrammeId.value) {
+      return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Programme cannot be deleted because there are still programme intakes linked to it. Please remove all the programme intakes before deleting");
+    }
+
+
+    const deleteProgrammeResult: ResultSetHeader = await programmeRepository.deleteProgrammeById(programmeId);
+    if (deleteProgrammeResult.affectedRows === 0) {
+      throw new Error("deleteProgrammeById failed to delete");
+    }
 
     return Result.succeed(null, "Programme delete success");
   }
