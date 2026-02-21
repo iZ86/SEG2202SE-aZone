@@ -327,7 +327,7 @@ class ProgrammeService implements IProgrammeService {
         return Result.fail(ENUM_ERROR_CODE.CONFLICT, "A programme intake with the same programmeId, intakeId, and semester already exists");
       }
     }
-    
+
     const updateProgrammeIntakeResult: ResultSetHeader = await programmeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
     if (updateProgrammeIntakeResult.affectedRows === 0) {
       throw new Error("updateProgrammeIntakeById failed to update");
