@@ -41,3 +41,8 @@ export enum ENUM_PROGRAMME_INTAKE_STATUS {
   INACTIVE = 0,
   ACTIVE = 1,
 }
+
+export enum ENUM_STUDY_MODE {
+  FULL_TIME = 1,
+  PART_TIME = 2
+}
