@@ -361,9 +361,9 @@ export default class ProgrammeController {
   }
 
   async deleteStudentCourseProgrammeIntake(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId);
-    const courseId: number = parseInt(req.params.courseId);
-    const programmeIntakeId: number = parseInt(req.params.programmeIntakeId);
+    const studentId: number = Number(req.params.studentId);
+    const courseId: number = Number(req.params.courseId);
+    const programmeIntakeId: number = Number(req.params.programmeIntakeId);
 
     // TODO: IT TAKES FROM THE PARAMS THEREFORE NEED TO CHECK
 
