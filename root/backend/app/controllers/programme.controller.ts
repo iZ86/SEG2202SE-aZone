@@ -370,7 +370,7 @@ export default class ProgrammeController {
     const response: Result<null> = await programmeService.deleteStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.create(response.getData(), response.getMessage());
+      return res.sendSuccess.delete();
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
