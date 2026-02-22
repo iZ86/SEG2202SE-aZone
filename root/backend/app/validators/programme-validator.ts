@@ -61,14 +61,17 @@ export const createStudentCourseProgrammeIntakeValidator: any = [
   body('studentId')
     .trim()
     .notEmpty().withMessage('Missing studentId')
-    .isNumeric().withMessage('studentId must be a number'),
+    .isNumeric().withMessage('studentId must be a number')
+    .toInt(),
   body('programmeIntakeId')
     .trim()
     .notEmpty().withMessage('Missing programmeIntakeId')
-    .isNumeric().withMessage('programmeIntakeId must be a number'),
+    .isNumeric().withMessage('programmeIntakeId must be a number')
+    .toInt(),
   body('courseId')
     .trim()
     .notEmpty().withMessage('Missing courseId')
-    .isNumeric().withMessage('courseId must be a number'),
+    .isNumeric().withMessage('courseId must be a number')
+    .toInt(),
   validate,
 ];
