@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
-import intakeService from "../services/intake.service";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
-import { IntakeData } from "../models/intake-model";
 
 export default class ProgrammeController {
   async getProgrammes(req: Request, res: Response) {
