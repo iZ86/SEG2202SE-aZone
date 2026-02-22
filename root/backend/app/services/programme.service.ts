@@ -474,7 +474,7 @@ class ProgrammeService implements IProgrammeService {
     await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
 
     // Create new student course programme intake.
-    const createStudentCourseProgrammeIntakeResult = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    const createStudentCourseProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
     if (createStudentCourseProgrammeIntakeResult.affectedRows === 0) {
       throw new Error("createStudentCourseProgrammeIntake failed to insert");
     }
