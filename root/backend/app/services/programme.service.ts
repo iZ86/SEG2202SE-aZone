@@ -512,7 +512,7 @@ class ProgrammeService implements IProgrammeService {
     // Check if student course programe intake exist or not.
     const studentCourseProgrammeIntakeResponse: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
     if (!studentCourseProgrammeIntakeResponse.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found.");
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentCourseProgrammeIntakeResponse.getMessage());
     }
 
 
