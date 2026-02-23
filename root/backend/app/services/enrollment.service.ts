@@ -1148,11 +1148,12 @@ class EnrollmentService implements IEnrollmentService {
   async getEnrollmentsByIds(enrollmentIds: number[]): Promise<Result<EnrollmentData[]>> {
 
 
-    const duplicateEnrollmentId: { [enrollmentId: number]: boolean } = {};
+    const duplicateEnrollmentIds: { [enrollmentId: number]: boolean } = {};
     for (const enrollmentId of enrollmentIds) {
-      if (duplicateEnrollmentId[enrollmentId]) {
+      if (duplicateEnrollmentIds[enrollmentId]) {
         return Result.fail(ENUM_ERROR_CODE.CONFLICT, `Duplicate enrollmentId found: ${enrollmentId}`)
       }
+      duplicateEnrollmentIds[enrollmentId] = true;
     }
 
     const enrollments: EnrollmentData[] = await enrollmentRepository.getEnrollmentsByIds(enrollmentIds);
