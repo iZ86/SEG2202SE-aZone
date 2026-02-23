@@ -205,6 +205,7 @@ class ProgrammeService implements IProgrammeService {
       if (duplicateProgrammeIntakesIds[programmeIntakeId]) {
         return Result.fail(ENUM_ERROR_CODE.CONFLICT, `Duplicate programmeIntakeId found: ${programmeIntakeId}`)
       }
+      duplicateProgrammeIntakesIds[programmeIntakeId] = true;
     }
 
     const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByIds(programmeIntakeIds);
