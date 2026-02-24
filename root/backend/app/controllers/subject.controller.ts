@@ -137,12 +137,8 @@ export default class SubjectController {
   }
 
   async deleteSubjectById(req: Request, res: Response) {
-    const subjectId: number = parseInt(req.params.subjectId as string);
+    const subjectId: number = Number(req.params.subjectId);
     const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-
-    if (!subjectId || isNaN(subjectId)) {
-      return res.sendError.badRequest("Invalid subjectId");
-    }
 
     if (!subjectResponse.isSuccess()) {
       return res.sendError.notFound("Invalid subjectId");
