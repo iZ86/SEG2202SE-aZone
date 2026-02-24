@@ -18,7 +18,7 @@ interface ICourseService {
   getCourseCount(query: string): Promise<Result<number>>;
   getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
-  getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>>;
+  getCourseSubjectsBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>>;
 }
 
 class CourseService implements ICourseService {
@@ -195,7 +195,7 @@ class CourseService implements ICourseService {
     return Result.succeed(courseSubject, "Course subject retrieve success");
   }
 
-  async getCourseSubjectBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>> {
+  async getCourseSubjectsBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>> {
     const courseSubject: CourseSubjectData[] = await courseRepository.getCourseSubjectsBySubjectId(subjectId);
 
     if (!courseSubject.length) {

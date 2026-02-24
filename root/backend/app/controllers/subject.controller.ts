@@ -76,7 +76,7 @@ export default class SubjectController {
     }
 
     const response: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-    const courseSubjectResponse: Result<CourseSubjectData[]> = await courseService.getCourseSubjectBySubjectId(subjectId);
+    const courseSubjectResponse: Result<CourseSubjectData[]> = await courseService.getCourseSubjectsBySubjectId(subjectId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
