@@ -20,6 +20,7 @@ interface ICourseRepository {
   createCourseSubject(courseId: number, subjectId: number): Promise<ResultSetHeader>;
   deleteCourseSubjectByAndSubjectId(subjectId: number): Promise<ResultSetHeader>;
   getCoursesByIds(courseIds: number[]): Promise<CourseData[]>;
+  createCourseSubjects(courseSubjects: number[][]): Promise<ResultSetHeader>;
 }
 
 class CourseRepository implements ICourseRepository {
@@ -297,6 +298,20 @@ class CourseRepository implements ICourseRepository {
         "FROM COURSE c " +
         "WHERE c.courseId IN (?);",
         [courseIds],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
+  createCourseSubjects(courseSubjectsIds: number[][]): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "INSERT INTO COURSE_SUBJECT (courseId, subjectId) " +
+        "VALUES ?;",
+        [courseSubjectsIds],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
