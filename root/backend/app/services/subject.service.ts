@@ -115,7 +115,7 @@ class SubjectService implements ISubjectService {
       );
     }
 
-    const subject: CourseSubjectData[] | undefined = await courseRepository.getCourseSubjectBySubjectId(subjectId);
+    const subject: CourseSubjectData[] | undefined = await courseRepository.getCourseSubjectsBySubjectId(subjectId);
 
     if (!subject) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Subject created not found");
