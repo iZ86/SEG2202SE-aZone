@@ -1,4 +1,5 @@
 import { RowDataPacket } from "mysql2";
+import { CourseSubjectData } from "./course-model";
 
 export interface SubjectData extends RowDataPacket {
   subjectId: number;
@@ -31,4 +32,8 @@ export interface StudentSubjectOverviewData extends RowDataPacket {
   subjectCode: string;
   subjectName: string;
   creditHours: number;
+}
+
+export interface SubjectWithCourseSubjectData extends SubjectData {
+  courseSubjects: CourseSubjectData[]
 }
