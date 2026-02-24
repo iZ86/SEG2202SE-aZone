@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import SubjectController from "../controllers/subject.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateSubjectValidator } from "../validators/subject-validator";
+import { createAndUpdateSubjectValidator, subjectParamValidator } from "../validators/subject-validator";
 
 class SubjectRoute {
   router = Router();
@@ -21,7 +21,7 @@ class SubjectRoute {
 
     this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateSubjectValidator, asyncHandler(this.controller.createSubject));
 
-    this.router.put("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateSubjectValidator, asyncHandler(this.controller.updateSubjectById));
+    this.router.put("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, subjectParamValidator, createAndUpdateSubjectValidator, asyncHandler(this.controller.updateSubjectById));
 
     this.router.delete("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.deleteSubjectById));
 

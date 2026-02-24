@@ -113,16 +113,12 @@ export default class SubjectController {
   }
 
   async updateSubjectById(req: Request, res: Response) {
-    const subjectId: number = parseInt(req.params.subjectId as string);
+    const subjectId: number = Number(req.params.subjectId);
     const subjectName: string = req.body.subjectName;
     const subjectCode: string = req.body.subjectCode;
     const description: string = req.body.description;
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
-
-    if (!subjectId || isNaN(subjectId)) {
-      return res.sendError.badRequest("Invalid subjectId");
-    }
 
     const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
 
