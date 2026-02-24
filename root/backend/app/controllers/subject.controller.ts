@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
-import { SubjectData, StudentSubjectData, StudentSubjectOverviewData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData } from "../models/subject-model";
 import courseService from "../services/course.service";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 
@@ -98,13 +98,7 @@ export default class SubjectController {
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
 
-    const isSubjectNameDuplicated: Result<SubjectData> = await subjectService.getSubjectBySubjectCode(subjectCode);
-
-    if (isSubjectNameDuplicated.isSuccess()) {
-      return res.sendError.conflict("Subject code duplciated");
-    }
-
-    const response = await subjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
+    const response: Result<SubjectWithCourseSubjectData> = await subjectService.createSubject(subjectName, subjectCode, description, creditHours, courseIds);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -112,6 +106,8 @@ export default class SubjectController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
