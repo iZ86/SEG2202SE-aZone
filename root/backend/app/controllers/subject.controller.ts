@@ -138,11 +138,6 @@ export default class SubjectController {
 
   async deleteSubjectById(req: Request, res: Response) {
     const subjectId: number = Number(req.params.subjectId);
-    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-
-    if (!subjectResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid subjectId");
-    }
 
     const response = await subjectService.deleteSubjectById(subjectId);
 

@@ -164,7 +164,22 @@ class SubjectService implements ISubjectService {
   }
 
   async deleteSubjectById(subjectId: number): Promise<Result<null>> {
-    await subjectRepository.deleteSubjectById(subjectId);
+    // Check param exists or not
+    const subjectResult: Result<SubjectData> = await this.getSubjectById(subjectId);
+
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+    const deleteCourseSubjectsBySubjectIdResult: Result<null> = await courseService.deleteCourseSubjectsBySubjectId(subjectId);
+    if (!deleteCourseSubjectsBySubjectIdResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, deleteCourseSubjectsBySubjectIdResult.getMessage());
+    }
+
+    const deleteSubjectResult: ResultSetHeader = await subjectRepository.deleteSubjectById(subjectId);
+    if (deleteSubjectResult.affectedRows === 0) {
+      throw new Error("deleteSubjectById failed to delete");
+    }
 
     return Result.succeed(null, "Subject delete success");
   }
