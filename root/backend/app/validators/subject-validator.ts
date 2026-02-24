@@ -1,5 +1,13 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import validate from "../middlewares/validate";
+
+export const subjectParamValidator: any = [
+  param('subjectId')
+    .exists().withMessage("Missing subjectId")
+    .isInt().withMessage("subjectId must be a number")
+    .toInt(),
+  validate,
+]
 
 export const createAndUpdateSubjectValidator: any = [
   body('subjectName')
