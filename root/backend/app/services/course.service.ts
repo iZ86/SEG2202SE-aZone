@@ -247,6 +247,36 @@ class CourseService implements ICourseService {
 
     return Result.succeed(courseSubject.getData(), "Course subject create success");
   }
+  async getCoursesByIds(courseIds: number[]): Promise<Result<CourseData[]>> {
+    const duplicateCourseIds: { [courseId: number]: boolean } = {};
+    for (const courseId of courseIds) {
+      if (duplicateCourseIds[courseId]) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, `Duplicate courseId found: ${courseId}`)
+      }
+      duplicateCourseIds[courseId] = true;
+    }
+
+
+    const courses: CourseData[] = await courseRepository.getCoursesByIds(courseIds);
+
+    if (courses.length === 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `courseIds not found: [${courseIds.join(", ")}]`);
+    }
+
+    const foundIds = new Set(
+      courses.map(c => c.courseId)
+    );
+
+    const missingIds = courseIds.filter(
+      id => !foundIds.has(id)
+    );
+
+    if (missingIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `courseIds not found: [${missingIds.join(", ")}]`);
+    }
+
+    return Result.succeed(courses, "courses retrieve success");
+  }
 }
 
 export default new CourseService();
