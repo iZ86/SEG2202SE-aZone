@@ -19,6 +19,7 @@ interface ICourseService {
   getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   getCourseSubjectsBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>>;
+  deleteCourseSubjectsBySubjectId(subjectId: number): Promise<Result<null>>;
 }
 
 class CourseService implements ICourseService {
@@ -334,6 +335,23 @@ class CourseService implements ICourseService {
     }
 
     return Result.succeed(courses, "courses retrieve success");
+  }
+
+  async deleteCourseSubjectsBySubjectId(subjectId: number): Promise<Result<null>> {
+
+    // Check if course exist.
+    const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+    const deleteCourseResult: ResultSetHeader = await courseRepository.deleteCourseSubjectsBySubjectId(subjectId);
+    if (deleteCourseResult.affectedRows === 0) {
+      throw new Error("deleteCourseById failed to delete");
+    }
+
+    return Result.succeed(null, "Course delete success");
   }
 }
 

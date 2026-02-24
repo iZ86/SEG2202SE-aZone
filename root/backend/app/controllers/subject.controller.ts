@@ -120,31 +120,9 @@ export default class SubjectController {
     const creditHours: number = req.body.creditHours;
     const courseIds: number[] = req.body.courseIds;
 
-    const subjectResponse: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
 
-    if (!subjectResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid subjectId");
-    }
 
-    if (
-      !Array.isArray(courseIds) ||
-      courseIds.length === 0 ||
-      courseIds.some((id) => isNaN(id))
-    ) {
-      return res.sendError.badRequest("Invalid or missing courseIds");
-    }
-
-    const isSubjectCodeBelongsToSubjectId: Result<SubjectData> = await subjectService.getSubjectByIdAndSubjectCode(subjectId, subjectCode);
-
-    if (!isSubjectCodeBelongsToSubjectId.isSuccess()) {
-      const isSubjectNameDuplicated: Result<SubjectData> = await subjectService.getSubjectBySubjectCode(subjectCode);
-
-      if (isSubjectNameDuplicated.isSuccess()) {
-        return res.sendError.conflict("Subject code duplciated");
-      }
-    }
-
-    const response = await subjectService.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours, courseIds);
+    const response: Result<SubjectWithCourseSubjectData> = await subjectService.updateSubjectById(subjectId, subjectCode, subjectName, description, creditHours, courseIds);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
@@ -152,6 +130,8 @@ export default class SubjectController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
       }
     }
   }
