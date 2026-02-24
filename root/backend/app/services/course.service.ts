@@ -247,6 +247,64 @@ class CourseService implements ICourseService {
 
     return Result.succeed(courseSubject.getData(), "Course subject create success");
   }
+
+  /** This is used by subject.service createSubject.
+   * Creates multiple course subject from different courseIds, but one subjectId
+   */
+  async createCourseSubjectsBySubjectId(courseIds: number[], subjectId: number): Promise<Result<CourseSubjectData[]>> {
+
+    // Check params exist.
+    // Never checked for duplicate courseIds because getCoursesById already does it.
+    const courseIdsResult: Result<CourseData[]> = await this.getCoursesByIds(courseIds);
+    if (!courseIdsResult.isSuccess()) {
+      switch (courseIdsResult.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseIdsResult.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return Result.fail(ENUM_ERROR_CODE.CONFLICT, courseIdsResult.getMessage());
+      }
+    }
+
+    const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+
+    const courseSubjectsResult: Result<CourseSubjectData[]> = await this.getCourseSubjectsBySubjectId(subjectId);
+    if (!courseSubjectsResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseSubjectsResult.getMessage());
+    }
+
+    const courseSubjectsData: CourseSubjectData[] = courseSubjectsResult.getData();
+    if (courseSubjectsData.length > 0) {
+      for (const courseId of courseIds) {
+        for (const courseSubjectData of courseSubjectsData) {
+          if (courseId === courseSubjectData.courseId) {
+            return Result.fail(ENUM_ERROR_CODE.CONFLICT, `courseId {${courseId}} and subjectId {${subjectId}} is already an existing courseSubject`);
+          }
+        }
+      }
+    }
+
+    const insertCourseSubjectIds: number[][] = [];
+    for (const courseId of courseIds) {
+      insertCourseSubjectIds.push([courseId, subjectId]);
+    }
+
+    const createCourseSubjectsBySubjectIdResult: ResultSetHeader = await courseRepository.createCourseSubjects(insertCourseSubjectIds);
+    if (createCourseSubjectsBySubjectIdResult.affectedRows === 0) {
+      throw new Error("createCourseSubjectsBySubjectId failed to insert");
+    }
+
+    const courseSubjects: Result<CourseSubjectData[]> = await this.getCourseSubjectsBySubjectId(subjectId);
+    if (!courseSubjects.isSuccess()) {
+      throw new Error("createCourseSubjectsBySubjectId created course subjects not found");
+    }
+
+    return Result.succeed(courseSubjects.getData(), "Course subjects create success");
+  }
+
   async getCoursesByIds(courseIds: number[]): Promise<Result<CourseData[]>> {
     const duplicateCourseIds: { [courseId: number]: boolean } = {};
     for (const courseId of courseIds) {
