@@ -100,7 +100,7 @@ class SubjectService implements ISubjectService {
       }
     }
 
-    return Result.succeed({...subject.getData(), courseSubjects: createCourseSubjectResult.getData()}, "Subject create success");
+    return Result.succeed({ ...subject.getData(), courseSubjects: createCourseSubjectResult.getData() }, "Subject create success");
   }
 
   async updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>> {
