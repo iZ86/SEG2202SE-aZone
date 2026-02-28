@@ -99,8 +99,8 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   grouping: number;
   dayId: number;
   day: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   numberOfStudentsEnrolled: number;
   numberOfSeats: number;
 };

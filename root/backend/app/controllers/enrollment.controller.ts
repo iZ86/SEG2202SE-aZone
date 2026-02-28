@@ -276,9 +276,9 @@ export default class EnrollmentController {
   async createStudentEnrollmentSubjectTypes(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
     const isAdmin: boolean = req.user.isAdmin;
-    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+    const enrollmentSubjectTypeIds: number[] = req.body.enrollmentSubjectTypeIds;
 
-    const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(userId, studentEnrollmentSubjectTypes, isAdmin);
+    const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.enrollStudentSubjects(userId, enrollmentSubjectTypeIds, isAdmin);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
@@ -295,7 +295,7 @@ export default class EnrollmentController {
   async createStudentEnrollmentSubjectTypesByStudentId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId as string);
     const isAdmin: boolean = req.user.isAdmin;
-    const studentEnrollmentSubjectTypes: StudentEnrolledSubjectTypeIds = req.body;
+    const enrollmentSubjectTypeIds: number[] = req.body.enrollmentSubjectTypeIds;
 
     if (!studentId || isNaN(studentId)) {
       return res.sendError.notFound("Invalid studentId");
@@ -307,7 +307,7 @@ export default class EnrollmentController {
       return res.sendError.notFound("Invalid studentId");
     }
 
-    const response: Result<StudentEnrolledSubjectTypeIds> = await enrollmentService.enrollStudentSubjects(studentId, studentEnrollmentSubjectTypes, isAdmin);
+    const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.enrollStudentSubjects(studentId, enrollmentSubjectTypeIds, isAdmin);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
