@@ -23,6 +23,7 @@ interface IEnrollmentRepository {
   getEnrollmentSubjectCount(query: string): Promise<number>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule | undefined>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]>;
+  getEnrollmentSubjectTypesByIds(enrollmentSubjectTypeIds: number[]): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<EnrollmentSubjectTypeData | undefined>;
@@ -397,6 +398,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
+
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
@@ -427,7 +429,22 @@ class EnrollmentRepository implements IEnrollmentRepository {
       );
     });
   }
-  
+
+  getEnrollmentSubjectTypesByIds(enrollmentSubjectTypeIds: number[]): Promise<EnrollmentSubjectTypeData[]> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<EnrollmentSubjectTypeData[]>(
+        "SELECT est.* " +
+        "FROM ENROLLMENT_SUBJECT_TYPE est " +
+        "WHERE est.enrollmentSubjectTypeId IN (?);",
+        [enrollmentSubjectTypeIds],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  }
+
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
