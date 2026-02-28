@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import userService from "../services/user.service";
 import { UserData } from "../models/user-model";
@@ -123,7 +123,7 @@ export default class EnrollmentController {
     const isAdmin: boolean = req.user.isAdmin as boolean;
 
     if (isStudent) {
-      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
+      const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.getEnrollmentSubjectsByStudentId(userId);
       if (response.isSuccess()) {
         return res.sendSuccess.ok(response.getData(), response.getMessage());
       } else {
@@ -168,7 +168,7 @@ export default class EnrollmentController {
   async getEnrollmentSubjectsByStudentId(req: Request, res: Response) {
     const studentId: number = parseInt(req.params.studentId as string);
 
-    const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await enrollmentService.getEnrollmentSubjectsByStudentId(studentId);
+    const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.getEnrollmentSubjectsByStudentId(studentId);
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {

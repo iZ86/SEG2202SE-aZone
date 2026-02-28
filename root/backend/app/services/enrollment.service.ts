@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS } from "../enums/enums";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeClashing, isDateRangeClashing } from "../utils/utils";
@@ -33,7 +33,7 @@ interface IEnrollmentService {
   deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>>;
   getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
-  getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }>>;
+  getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>>;
   enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>>;
@@ -990,116 +990,23 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectCount ? enrollmentSubjectCount : 0, "Enrollment subject count retrieve success");
   }
 
-  async getEnrollmentSubjectsByStudentId(studentId: number):
-    Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }>> {
+  async getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
-    const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await enrollmentRepository.getEnrollmentScheduleByStudentId(studentId);
+    // Check if params exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
 
-    if (!studentEnrollmentSchedule) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "No enrollment at the moment");
+    // Check if student has enrollment or not
+    const studentEnrollmentScheduleResult: Result<StudentEnrollmentSchedule> = await this.getEnrollmentScheduleByStudentId(studentId);
+    if (!studentEnrollmentScheduleResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentEnrollmentScheduleResult.getMessage());
     }
 
     const studentEnrollmentSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjectsByStudentId(studentId);
 
-    const studentEnrollmentSubjectsOrganizedMap:
-      {
-        [subjectId: number]: {
-          subjectId: StudentEnrollmentSubjectData["subjectId"],
-          subjectCode: StudentEnrollmentSubjectData["subjectCode"],
-          subjectName: StudentEnrollmentSubjectData["subjectName"],
-          creditHours: StudentEnrollmentSubjectData["creditHours"],
-          lecturerId: StudentEnrollmentSubjectData["lecturerId"],
-          firstName: StudentEnrollmentSubjectData["firstName"],
-          lastName: StudentEnrollmentSubjectData["lastName"],
-          lecturerTitleId: StudentEnrollmentSubjectData["lecturerTitleId"],
-          lecturerTitle: StudentEnrollmentSubjectData["lecturerTitle"],
-          classTypes: {
-            [classTypeId: number]: {
-              classTypeId: StudentEnrollmentSubjectData["classTypeId"],
-              classType: StudentEnrollmentSubjectData["classType"],
-              classTypeDetails: {
-                enrollmentSubjectTypeId: StudentEnrollmentSubjectData["enrollmentSubjectTypeId"],
-                grouping: StudentEnrollmentSubjectData["grouping"],
-                dayId: StudentEnrollmentSubjectData["dayId"],
-                day: StudentEnrollmentSubjectData["day"],
-                startTime: StudentEnrollmentSubjectData["startTime"],
-                endTime: StudentEnrollmentSubjectData["endTime"],
-                numberOfStudentsEnrolled: StudentEnrollmentSubjectData["numberOfStudentsEnrolled"],
-                numberOfSeats: StudentEnrollmentSubjectData["numberOfSeats"];
-              }[];
-            };
-          };
-        };
-      } = {};
-
-
-    // Loop through all the enrollment subjects.
-    for (const studentEnrollmentSubject of studentEnrollmentSubjects) {
-
-      // If the subject does not exist in the new map datastructure add it with empty classTypes.
-      if (!studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId]) {
-        studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId] = {
-          subjectId: studentEnrollmentSubject.subjectId,
-          subjectCode: studentEnrollmentSubject.subjectCode,
-          subjectName: studentEnrollmentSubject.subjectName,
-          creditHours: studentEnrollmentSubject.creditHours,
-          lecturerId: studentEnrollmentSubject.lecturerId,
-          firstName: studentEnrollmentSubject.firstName,
-          lastName: studentEnrollmentSubject.lastName,
-          lecturerTitleId: studentEnrollmentSubject.lecturerTitleId,
-          lecturerTitle: studentEnrollmentSubject.lecturerTitle,
-          classTypes: {}
-        };
-      }
-
-      // If the subject does exist. However, the classType does not, add the class type.
-      if (!studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId].classTypes[studentEnrollmentSubject.classTypeId]) {
-        studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId].classTypes[studentEnrollmentSubject.classTypeId] = {
-          classTypeId: studentEnrollmentSubject.classTypeId,
-          classType: studentEnrollmentSubject.classType,
-          classTypeDetails: []
-        };
-      }
-
-      // If the class type exist, add the respective class detail.
-      studentEnrollmentSubjectsOrganizedMap[studentEnrollmentSubject.subjectId].classTypes[studentEnrollmentSubject.classTypeId].classTypeDetails.push({
-        enrollmentSubjectTypeId: studentEnrollmentSubject.enrollmentSubjectTypeId,
-        grouping: studentEnrollmentSubject.grouping,
-        dayId: studentEnrollmentSubject.dayId,
-        day: studentEnrollmentSubject.day,
-        startTime: studentEnrollmentSubject.startTime,
-        endTime: studentEnrollmentSubject.endTime,
-        numberOfStudentsEnrolled: studentEnrollmentSubject.numberOfStudentsEnrolled,
-        numberOfSeats: studentEnrollmentSubject.numberOfSeats
-      });
-    }
-
-    // The response data.
-    const studentEnrollmentSubjectsOrganized: StudentEnrollmentSubjectOrganizedData[] = [];
-
-    // Since everything is in Key-Value datastructure format, this will convert it to array for response.
-    for (let subjectId in studentEnrollmentSubjectsOrganizedMap) {
-      let studentEnrollmentSubject = studentEnrollmentSubjectsOrganizedMap[subjectId];
-      let classTypes: StudentEnrollmentSubjectOrganizedData["classTypes"] = [];
-      for (let classTypeId in studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes) {
-        classTypes.push(studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes[classTypeId]);
-      }
-      studentEnrollmentSubjectsOrganizedMap[subjectId].classTypes = classTypes;
-      studentEnrollmentSubjectsOrganized.push({
-        subjectId: studentEnrollmentSubject.subjectId,
-        subjectCode: studentEnrollmentSubject.subjectCode,
-        subjectName: studentEnrollmentSubject.subjectName,
-        creditHours: studentEnrollmentSubject.creditHours,
-        lecturerId: studentEnrollmentSubject.lecturerId,
-        firstName: studentEnrollmentSubject.firstName,
-        lastName: studentEnrollmentSubject.lastName,
-        lecturerTitleId: studentEnrollmentSubject.lecturerTitleId,
-        lecturerTitle: studentEnrollmentSubject.lecturerTitle,
-        classTypes: classTypes
-      });
-    }
-
-    return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule, studentEnrollmentSubjects: studentEnrollmentSubjectsOrganized }, "Student enrollment subject retrieve success");
+    return Result.succeed({ ...studentEnrollmentScheduleResult.getData(), enrollmentSubjectTypes: studentEnrollmentSubjects }, "Student enrollment subject retrieve success");
   }
 
 
@@ -1192,7 +1099,7 @@ class EnrollmentService implements IEnrollmentService {
   async enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>> {
     const currDate: Date = new Date();
 
-    const enrollmentSubjectsResult: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]; }> = await this.getEnrollmentSubjectsByStudentId(studentId);
+    const studentEnrollmentSubjectsResult: Result<StudentEnrollmentScheduleWithSubjectData> = await this.getEnrollmentSubjectsByStudentId(studentId);
 
     // Check if the student enroll or not.
     if (!isAdmin) {
