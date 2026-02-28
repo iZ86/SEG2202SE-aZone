@@ -1,31 +1,6 @@
 import { RowDataPacket } from "mysql2";
 import { ProgrammeIntakeData } from "./programme-model";
 
-export interface StudentEnrollmentSubjectOrganizedData {
-  subjectId: number;
-  subjectCode: string;
-  subjectName: string;
-  creditHours: number;
-  lecturerId: number;
-  firstName: string;
-  lastName: string;
-  lecturerTitleId: number;
-  lecturerTitle: string;
-  classTypes: {
-    classTypeId: number;
-    classType: string;
-    classTypeDetails: {
-      enrollmentSubjectTypeId: number;
-      grouping: number;
-      dayId: number;
-      day: string;
-      startTime: Date;
-      endTime: Date;
-      numberOfStudentsEnrolled: number;
-      numberOfSeats: number;
-    }[];
-  }[];
-};
 
 export interface EnrollmentData extends RowDataPacket {
   enrollmentId: number;
@@ -105,26 +80,6 @@ export interface StudentEnrollmentSubjectData extends RowDataPacket {
   numberOfSeats: number;
 };
 
-export interface StudentEnrolledSubject extends RowDataPacket {
-  subjectId: number;
-  subjectCode: string;
-  subjectName: string;
-  creditHours: number;
-  lecturerId: number;
-  firstName: string;
-  lastName: string;
-  lecturerTitleId: number;
-  lecturerTitle: string;
-  enrollmentSubjectTypeId: number;
-  classTypeId: number;
-  classType: string;
-  grouping: number;
-  dayId: number;
-  day: string;
-  startTime: Date;
-  endTime: Date;
-}
-
 export interface StudentEnrollmentSchedule extends RowDataPacket {
   programmeIntakeId: number;
   enrollmentId: number;
@@ -132,9 +87,6 @@ export interface StudentEnrollmentSchedule extends RowDataPacket {
   enrollmentEndDateTime: Date;
 }
 
-export interface StudentEnrolledSubjectTypeIds {
-  enrollmentSubjectTypeIds: number[];
-}
 
 export interface MonthlyEnrollmentData extends RowDataPacket {
   month: string;

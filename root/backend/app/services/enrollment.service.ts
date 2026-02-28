@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS } from "../enums/enums";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, EnrollmentSubjectTypeData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeClashing } from "../utils/utils";

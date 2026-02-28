@@ -1,4 +1,4 @@
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, StudentEnrolledSubject, MonthlyEnrollmentData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, UpdateEnrollmentSubjectTypeData } from "../models/enrollment-model";
 import databaseConn from "../database/db-connection";
 import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";

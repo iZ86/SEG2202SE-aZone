@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData, StudentEnrolledSubjectTypeIds, StudentEnrolledSubject, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import userService from "../services/user.service";
 import { UserData } from "../models/user-model";
