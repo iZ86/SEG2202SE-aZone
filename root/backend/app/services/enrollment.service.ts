@@ -1086,6 +1086,39 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
+  async getEnrollmentSubjectTypesByIds(enrollmentSubjectTypesIds: number[]): Promise<Result<EnrollmentSubjectTypeData[]>> {
+
+
+    const duplicateEnrollmentSubjectTypeIds: { [enrollmentSubjectTypeId: number]: boolean } = {};
+    for (const enrollmentSubjectTypeId of enrollmentSubjectTypesIds) {
+      if (duplicateEnrollmentSubjectTypeIds[enrollmentSubjectTypeId]) {
+        return Result.fail(ENUM_ERROR_CODE.CONFLICT, `Duplicate enrollmentSubjectTypeIds found: ${enrollmentSubjectTypeId}`)
+      }
+      duplicateEnrollmentSubjectTypeIds[enrollmentSubjectTypeId] = true;
+    }
+
+    const enrollmentSubjectTypes: EnrollmentSubjectTypeData[] = await enrollmentRepository.getEnrollmentSubjectTypesByIds(enrollmentSubjectTypesIds);
+    if (enrollmentSubjectTypes.length === 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `enrollmentSubjectTypeIds not found: [${enrollmentSubjectTypesIds.join(", ")}]`);
+    }
+
+
+    const foundIds = new Set(
+      enrollmentSubjectTypes.map(e => e.enrollmentSubjectTypeId)
+    );
+
+    const missingIds = enrollmentSubjectTypesIds.filter(
+      id => !foundIds.has(id)
+    );
+
+    if (missingIds.length > 0) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `enrollmentSubjectTypeIds not found: [${missingIds.join(", ")}]`);
+    }
+
+    return Result.succeed(enrollmentSubjectTypes, "Enrollment subject types retrieve success");
+  }
+
+
   async getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>> {
     const enrollmentSubjectType: EnrollmentSubjectTypeData | undefined = await enrollmentRepository.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime, endTime, venueId, dayId);
 
