@@ -332,7 +332,7 @@ export default class EnrollmentController {
     const isStudent: boolean = req.user.isStudent as boolean;
 
     if (isStudent) {
-      const response: Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[]; }> = await enrollmentService.getEnrolledSubjectsByStudentId(userId);
+      const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.getEnrolledSubjectsByStudentId(userId);
 
       if (response.isSuccess()) {
         return res.sendSuccess.create(response.getData(), response.getMessage());
