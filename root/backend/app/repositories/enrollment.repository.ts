@@ -30,7 +30,7 @@ interface IEnrollmentRepository {
   createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader>;
   deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
-  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]>;
+  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]>;
   getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]>;
   getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]>;
   updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType: UpdateEnrollmentSubjectTypeData): Promise<ResultSetHeader>;
@@ -372,12 +372,12 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrolledSubject[]> {
+  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
-      databaseConn.query<StudentEnrolledSubject[]>(
+      databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
         "lt.lecturerTitle, est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.grouping, d.dayId, d.day, est.startTime, " +
-        "est.endTime " +
+        "est.endTime, COUNT(sest.enrollmentSubjectTypeId) as numberOfStudentsEnrolled, est.numberOfSeats " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
@@ -388,7 +388,9 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN VENUE v ON est.venueId = v.venueId " +
         "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "WHERE es.enrollmentId = ? " +
-        "AND sest.studentId = ?; ",
+        "AND sest.studentId = ? " +
+        "GROUP BY est.enrollmentSubjectTypeId " +
+        "ORDER BY est.grouping ASC;",
         [enrollmentId, studentId],
         (err, res) => {
           if (err) reject(err);

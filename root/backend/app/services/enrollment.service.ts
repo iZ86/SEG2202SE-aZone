@@ -37,7 +37,7 @@ interface IEnrollmentService {
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>>;
   getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>>;
   enrollStudentSubjects(studentId: number, studentEnrolledSubjectTypeIds: StudentEnrolledSubjectTypeIds, isAdmin: boolean): Promise<Result<StudentEnrolledSubjectTypeIds>>;
-  getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[]; }>>;
+  getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>>;
 }
 
@@ -1243,10 +1243,8 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "enrollmentSubjectId time clash", { enrollmentSubjectTypeIds: errorEnrollmentSubjectTypeIds });
     }
 
-    const enrolledSubjects: Result<{
-      studentEnrollmentSchedule: StudentEnrollmentSchedule;
-      studentEnrolledSubjects: StudentEnrolledSubject[];
-    }> = await this.getEnrolledSubjectsByStudentId(studentId);
+    // Get enrolled subjects of student.
+    const enrolledSubjectsResult: Result<StudentEnrollmentScheduleWithSubjectData> = await this.getEnrolledSubjectsByStudentId(studentId);
 
     if (!enrolledSubjects.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, enrolledSubjects.getMessage());
@@ -1301,8 +1299,17 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(studentEnrolledSubjectTypeIds, "Student enrolled successfully.");
   }
 
-  async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<{ studentEnrollmentSchedule: StudentEnrollmentSchedule; studentEnrolledSubjects: StudentEnrolledSubject[]; }>> {
+  // Make this return StudentEnrollmentSubjectData
+  async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
+    // Check param exists.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
+    // Check if theres an existing enrollment open for student or not.
+    // Cause can't get enrolled subjects for a non existant enrollment.
     const studentEnrollmentSchedule: Result<StudentEnrollmentSchedule> = await this.getEnrollmentScheduleByStudentId(studentId);
 
     const currDate = new Date();
@@ -1312,9 +1319,9 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "No enrollment at this time.");
     }
 
-    const enrolledSubjects: StudentEnrolledSubject[] = await enrollmentRepository.getEnrolledSubjectsByStudentId(studentId, studentEnrollmentSchedule.getData().enrollmentId);
+    const enrolledSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrolledSubjectsByStudentId(studentId, studentEnrollmentSchedule.getData().enrollmentId);
 
-    return Result.succeed({ studentEnrollmentSchedule: studentEnrollmentSchedule.getData(), studentEnrolledSubjects: enrolledSubjects }, "enrolled subjects retrieve success");
+    return Result.succeed({ ...studentEnrollmentSchedule.getData(), enrollmentSubjectTypes: enrolledSubjects }, "enrolled subjects retrieve success");
   }
 
   async getMonthlyEnrollmentCount(duration: number = 6): Promise<Result<MonthlyEnrollmentData[]>> {
