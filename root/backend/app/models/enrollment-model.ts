@@ -77,6 +77,10 @@ export interface EnrollmentSubjectTypeData extends RowDataPacket {
   lecturerId: number;
 };
 
+export interface StudentEnrollmentScheduleWithSubjectData extends StudentEnrollmentSchedule {
+  enrollmentSubjectTypes: StudentEnrollmentSubjectData[];
+}
+
 export interface StudentEnrollmentSubjectData extends RowDataPacket {
   subjectId: number;
   subjectCode: string;
