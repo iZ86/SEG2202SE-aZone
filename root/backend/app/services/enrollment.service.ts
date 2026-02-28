@@ -1319,7 +1319,7 @@ class EnrollmentService implements IEnrollmentService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "No enrollment at this time.");
     }
 
-    const enrolledSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrolledSubjectsByStudentId(studentId, studentEnrollmentSchedule.getData().enrollmentId);
+    const enrolledSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrolledSubjectsByStudentIdAndEnrollmentId(studentId, studentEnrollmentSchedule.getData().enrollmentId);
 
     return Result.succeed({ ...studentEnrollmentSchedule.getData(), enrollmentSubjectTypes: enrolledSubjects }, "enrolled subjects retrieve success");
   }

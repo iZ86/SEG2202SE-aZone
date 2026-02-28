@@ -30,7 +30,7 @@ interface IEnrollmentRepository {
   createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader>;
   deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader>;
   createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader>;
-  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]>;
+  getEnrolledSubjectsByStudentIdAndEnrollmentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]>;
   getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]>;
   getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]>;
   updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType: UpdateEnrollmentSubjectTypeData): Promise<ResultSetHeader>;
@@ -372,7 +372,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrolledSubjectsByStudentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]> {
+  getEnrolledSubjectsByStudentIdAndEnrollmentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
