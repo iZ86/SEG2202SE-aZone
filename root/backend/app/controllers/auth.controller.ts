@@ -20,7 +20,7 @@ export default class AuthController {
         response = await authService.loginAdmin(userId, password);
         break;
       default:
-        return res.sendError.internal("Unexpected login error");
+        throw new Error("login unexpected error");
     }
 
     if (response.isSuccess()) {
