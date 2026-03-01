@@ -26,7 +26,7 @@ interface ICourseService {
 }
 
 class CourseService implements ICourseService {
-  public async getCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
+  public async getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
     const courses: CourseProgrammeData[] = await courseRepository.getCourses(query, pageSize, page);
 
     return Result.succeed(courses, "Courses retrieve success");
