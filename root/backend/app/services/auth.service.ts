@@ -18,7 +18,7 @@ interface IAuthService {
 }
 
 class AuthService implements IAuthService {
-  async loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>> {
+  public async loginStudent(studentId: number, password: string): Promise<Result<{ token: string; }>> {
     const basicStudentLoginData: BasicStudentLoginData | undefined = await authRepository.getBasicStudentLoginData(studentId);
 
     // Return fail if studentId invalid
@@ -47,7 +47,7 @@ class AuthService implements IAuthService {
     return Result.succeed({ token: token }, "Login success");
   }
 
-  async loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>> {
+  public async loginAdmin(userId: number, password: string): Promise<Result<{ token: string; }>> {
     const basicAdminLoginData: BasicAdminLoginData | undefined = await authRepository.getBasicAdminLoginData(userId);
 
     // Return fail if studentId invalid
@@ -77,7 +77,7 @@ class AuthService implements IAuthService {
   }
 
   /** Gets student personal information. */
-  async getStudentMe(studentId: number): Promise<Result<UserData>> {
+  public async getStudentMe(studentId: number): Promise<Result<UserData>> {
     let studentData: UserData | undefined = await userRepository.getStudentById(studentId);
     if (!studentData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId");
@@ -87,7 +87,7 @@ class AuthService implements IAuthService {
   }
 
   /** Gets admin personal information. */
-  async getAdminMe(adminId: number): Promise<Result<UserData>> {
+  public async getAdminMe(adminId: number): Promise<Result<UserData>> {
     let adminData: UserData | undefined = await userRepository.getAdminById(adminId);
     if (!adminData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid adminId");
@@ -97,7 +97,7 @@ class AuthService implements IAuthService {
   }
 
   /** Did not separate this to two different methods for student and admin because it takes all userId. */
-  async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
+  public async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
     const userResult: Result<UserData> = await userService.getUserById(userId);
 
     if (!userResult) {
