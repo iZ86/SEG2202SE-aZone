@@ -26,13 +26,13 @@ interface ICourseService {
 }
 
 class CourseService implements ICourseService {
-  async getCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
+  public async getCourses(query: string = "", pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
     const courses: CourseProgrammeData[] = await courseRepository.getCourses(query, pageSize, page);
 
     return Result.succeed(courses, "Courses retrieve success");
   }
 
-  async getCourseById(courseId: number): Promise<Result<CourseProgrammeData>> {
+  public async getCourseById(courseId: number): Promise<Result<CourseProgrammeData>> {
     const course: CourseProgrammeData | undefined = await courseRepository.getCourseById(courseId);
 
     if (!course) {
@@ -42,7 +42,7 @@ class CourseService implements ICourseService {
     return Result.succeed(course, "Course retrieve success");
   }
 
-  async getCourseByCourseCode(courseCode: string): Promise<Result<CourseData>> {
+  private async getCourseByCourseCode(courseCode: string): Promise<Result<CourseData>> {
     const course: CourseData | undefined = await courseRepository.getCourseByCourseCode(courseCode);
 
     if (!course) {
@@ -52,7 +52,7 @@ class CourseService implements ICourseService {
     return Result.succeed(course, "Course retrieve success");
   }
 
-  async getCourseByName(courseName: string): Promise<Result<CourseData>> {
+  public async getCourseByName(courseName: string): Promise<Result<CourseData>> {
     const course: CourseData | undefined = await courseRepository.getCourseByName(courseName);
 
     if (!course) {
@@ -62,7 +62,7 @@ class CourseService implements ICourseService {
     return Result.succeed(course, "Course retrieve success");
   }
 
-  async getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>> {
+  public async getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>> {
     const courses: CourseProgrammeData[] | undefined = await courseRepository.getCoursesByProgrammeId(programmeId);
 
     if (!courses) {
@@ -72,7 +72,7 @@ class CourseService implements ICourseService {
     return Result.succeed(courses, "Courses retrieve success");
   }
 
-  async createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
+  public async createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
 
     // Check parameters exist.
     const courseCodeResult: Result<CourseData> = await this.getCourseByCourseCode(courseCode);
@@ -108,7 +108,7 @@ class CourseService implements ICourseService {
     return Result.succeed(course.getData(), "Course create success");
   }
 
-  async updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
+  public async updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>> {
 
     // Check parameters exist.
     const courseResult: Result<CourseProgrammeData> = await this.getCourseById(courseId);
@@ -166,7 +166,7 @@ class CourseService implements ICourseService {
     return Result.succeed(course.getData(), "Course update success");
   }
 
-  async deleteCourseById(courseId: number): Promise<Result<null>> {
+  public async deleteCourseById(courseId: number): Promise<Result<null>> {
 
     // Check if course exist.
     const courseResult: Result<CourseData> = await this.getCourseById(courseId);
@@ -183,13 +183,13 @@ class CourseService implements ICourseService {
     return Result.succeed(null, "Course delete success");
   }
 
-  async getCourseCount(query: string = ""): Promise<Result<number>> {
+  public async getCourseCount(query: string = ""): Promise<Result<number>> {
     const courseCount: number = await courseRepository.getCourseCount(query);
 
     return Result.succeed(courseCount ? courseCount : 0, "Course count retrieve success");
   }
 
-  async getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
+  public async getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
     const courseSubject: CourseSubjectData | undefined = await courseRepository.getCourseSubjectById(courseId, subjectId);
 
     if (!courseSubject) {
@@ -199,7 +199,7 @@ class CourseService implements ICourseService {
     return Result.succeed(courseSubject, "Course subject retrieve success");
   }
 
-  async getCourseSubjectsBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>> {
+  public async getCourseSubjectsBySubjectId(subjectId: number): Promise<Result<CourseSubjectData[]>> {
 
     // Check param exist
     const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
@@ -213,7 +213,7 @@ class CourseService implements ICourseService {
   }
 
 
-  async createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
+   public async createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
 
     // Check parameters exist
     const courseResult: Result<CourseData> = await this.getCourseById(courseId);
@@ -255,7 +255,7 @@ class CourseService implements ICourseService {
   /** This is used by subject.service createSubject.
    * Creates multiple course subject from different courseIds, but one subjectId
    */
-  async createCourseSubjectsBySubjectId(courseIds: number[], subjectId: number): Promise<Result<CourseSubjectData[]>> {
+  public async createCourseSubjectsBySubjectId(courseIds: number[], subjectId: number): Promise<Result<CourseSubjectData[]>> {
 
     // Check params exist.
     // Never checked for duplicate courseIds because getCoursesById already does it.
@@ -309,7 +309,7 @@ class CourseService implements ICourseService {
     return Result.succeed(courseSubjects.getData(), "Course subjects create success");
   }
 
-  async getCoursesByIds(courseIds: number[]): Promise<Result<CourseData[]>> {
+  public async getCoursesByIds(courseIds: number[]): Promise<Result<CourseData[]>> {
     const duplicateCourseIds: { [courseId: number]: boolean } = {};
     for (const courseId of courseIds) {
       if (duplicateCourseIds[courseId]) {
@@ -340,7 +340,7 @@ class CourseService implements ICourseService {
     return Result.succeed(courses, "courses retrieve success");
   }
 
-  async deleteCourseSubjectsBySubjectId(subjectId: number): Promise<Result<null>> {
+  public async deleteCourseSubjectsBySubjectId(subjectId: number): Promise<Result<null>> {
 
     // Check if course exist.
     const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
