@@ -24,7 +24,7 @@ interface ICourseRepository {
 }
 
 class CourseRepository implements ICourseRepository {
-  getCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]> {
+  public getCourses(query: string, pageSize: number, page: number): Promise<CourseProgrammeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
@@ -50,7 +50,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseById(courseId: number): Promise<CourseProgrammeData | undefined> {
+  public getCourseById(courseId: number): Promise<CourseProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
         "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
@@ -68,7 +68,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseByCourseCode(courseCode: string): Promise<CourseData | undefined> {
+  public getCourseByCourseCode(courseCode: string): Promise<CourseData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseData[]>(
         "SELECT courseId, courseCode, courseName " +
@@ -83,7 +83,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseByName(courseName: string): Promise<CourseData | undefined> {
+  public getCourseByName(courseName: string): Promise<CourseData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseData[]>(
         "SELECT courseId, courseCode, courseName " +
@@ -98,7 +98,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined> {
+  public getCoursesByProgrammeId(programmeId: number): Promise<CourseProgrammeData[] | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseProgrammeData[]>(
         "SELECT c.courseId, c.courseCode, c.courseName, p.programmeId, p.programmeName " +
@@ -116,7 +116,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  createCourse(courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
+  public createCourse(courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO COURSE (courseCode, courseName, programmeId) " +
@@ -130,7 +130,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
+  public updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE COURSE SET courseCode = ?, courseName = ?, programmeId = ? " +
@@ -144,7 +144,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  deleteCourseById(courseId: number): Promise<ResultSetHeader> {
+  public deleteCourseById(courseId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM COURSE WHERE courseId = ?;",
@@ -157,7 +157,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseCount(query: string): Promise<number> {
+  public getCourseCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -177,7 +177,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseSubjectsBySubjectId(subjectId: number): Promise<CourseSubjectData[]> {
+  public getCourseSubjectsBySubjectId(subjectId: number): Promise<CourseSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseSubjectData[]>(
         "SELECT c.courseId, c.courseName, s.* " +
@@ -196,7 +196,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseSubjectById(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined> {
+  public getCourseSubjectById(courseId: number, subjectId: number): Promise<CourseSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseSubjectData[]>(
         "SELECT c.courseId, c.courseName, s.* " +
@@ -218,7 +218,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCourseSubjectCount(query: string): Promise<number> {
+  public getCourseSubjectCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(DISTINCT s.subjectId) AS totalCount " +
@@ -242,7 +242,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean> {
+  public isCourseSubjectExist(courseId: number, subjectId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       databaseConn.query(
         "SELECT EXISTS(SELECT 1 " +
@@ -264,7 +264,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  createCourseSubject(courseId: number, subjectId: number): Promise<ResultSetHeader> {
+  public createCourseSubject(courseId: number, subjectId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO COURSE_SUBJECT (courseId, subjectId) " +
@@ -278,7 +278,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  deleteCourseSubjectsBySubjectId(subjectId: number): Promise<ResultSetHeader> {
+  public deleteCourseSubjectsBySubjectId(subjectId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM COURSE_SUBJECT WHERE subjectId = ?;",
@@ -291,7 +291,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  getCoursesByIds(courseIds: number[]): Promise<CourseData[]> {
+  public getCoursesByIds(courseIds: number[]): Promise<CourseData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<CourseData[]>(
         "SELECT c.courseId, c.courseCode, c.courseCode " +
@@ -306,7 +306,7 @@ class CourseRepository implements ICourseRepository {
     });
   }
 
-  createCourseSubjects(courseSubjectsIds: number[][]): Promise<ResultSetHeader> {
+  public createCourseSubjects(courseSubjectsIds: number[][]): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO COURSE_SUBJECT (courseId, subjectId) " +
