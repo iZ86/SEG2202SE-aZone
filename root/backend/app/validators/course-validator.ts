@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import validate from "../middlewares/validate";
 
 export const courseParamValidator: any = [
@@ -6,6 +6,23 @@ export const courseParamValidator: any = [
     .exists().withMessage("Missing courseId")
     .isInt().withMessage("courseId must be a number")
     .toInt(),
+  validate,
+]
+
+export const getCoursesQueryValidator: any = [
+  query('page')
+    .optional()
+    .isInt().withMessage('page must be a number'),
+  validate,
+  query('pageSize')
+    .optional()
+    .isInt().withMessage('pageSize must be a number'),
+  query('query')
+    .optional()
+    .isString().withMessage('query must be a string'),
+  query('programmeId')
+    .optional()
+    .isInt().withMessage('programmeId must be a number'),
   validate,
 ]
 
