@@ -9,7 +9,7 @@ interface IAuthRepository {
 }
 
 class AuthRepository implements IAuthRepository {
-  getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData | undefined> {
+  public getBasicStudentLoginData(studentId: number): Promise<BasicStudentLoginData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<BasicStudentLoginData[]>(
         "SELECT s.studentId, ru.userId, ru.email, ru.password FROM REGISTERED_USER ru INNER JOIN STUDENT s ON ru.userId = s.studentId WHERE s.studentId = ?;",
@@ -22,7 +22,7 @@ class AuthRepository implements IAuthRepository {
     });
   }
 
-  getBasicAdminLoginData(adminId: number): Promise<BasicAdminLoginData | undefined> {
+  public getBasicAdminLoginData(adminId: number): Promise<BasicAdminLoginData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<BasicAdminLoginData[]>(
         "SELECT a.adminId, ru.userId, ru.email, ru.password FROM REGISTERED_USER ru INNER JOIN ADMIN a ON ru.userId = a.adminId WHERE a.adminId = ?;",
@@ -35,7 +35,7 @@ class AuthRepository implements IAuthRepository {
     });
   }
 
-  updateMe(userId: number, phoneNumber: string, email: string): Promise<ResultSetHeader> {
+  public updateMe(userId: number, phoneNumber: string, email: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE REGISTERED_USER SET phoneNumber = ?, email = ? " +
