@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import CourseController from "../controllers/course.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
-import { createCourseSubjectValidator, createAndUpdateCourseValidator, courseParamValidator} from "../validators/course-validator";
+import { createCourseSubjectValidator, createAndUpdateCourseValidator, courseParamValidator, getCoursesQueryValidator} from "../validators/course-validator";
 
 class CourseRoute {
   router = Router();
@@ -14,7 +14,7 @@ class CourseRoute {
 
   initializeRoutes() {
 
-    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getCourses));
+    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getCoursesQueryValidator, asyncHandler(this.controller.getCourses));
     this.router.get("/count", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getCoursesCount));
     this.router.get("/:courseId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, courseParamValidator, asyncHandler(this.controller.getCourseById));
 

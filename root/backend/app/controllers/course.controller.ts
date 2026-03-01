@@ -9,12 +9,12 @@ export default class CourseController {
   // Gets a list of courses based on query OR not
   // OR gets a list of courses based on programmeId
   async getCourses(req: Request, res: Response) {
-    const page: number = Number(req.query.page as string) || 1;
-    const pageSize: number = Number(req.query.pageSize as string) || 15;
+    const page: number = Number(req.query.page) || 1;
+    const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
-    const programmeIdStr: string = req.query.programmeId as string || "";
+    const programmeId: number = Number(req.query.programmeId) || -1;
 
-    if (programmeIdStr.length === 0) {
+    if (programmeId === -1) {
       const response: Result<CourseData[]> = await courseService.getCourses(query, pageSize, page);
       const courseCount: Result<number> = await courseService.getCourseCount(query);
 
@@ -31,11 +31,7 @@ export default class CourseController {
       }
 
     } else {
-      const programmeId: number = Number(programmeIdStr);
 
-      if (!programmeId || isNaN(programmeId)) {
-        return res.sendError.badRequest("Invalid programmeId");
-      }
       const response: Result<CourseData[]> = await courseService.getCoursesByProgrammeId(programmeId);
 
       if (response.isSuccess()) {
