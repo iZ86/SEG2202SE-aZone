@@ -90,7 +90,7 @@ class AuthService implements IAuthService {
   async getAdminMe(adminId: number): Promise<Result<UserData>> {
     let adminData: UserData | undefined = await userRepository.getAdminById(adminId);
     if (!adminData) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Failed to get user");
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid adminId");
     }
 
     return Result.succeed(adminData, "Get me success");
