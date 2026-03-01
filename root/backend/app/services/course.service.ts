@@ -15,6 +15,7 @@ interface ICourseService {
   getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
   createCourse(courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
   updateCourseById(courseId: number, courseCode: string, courseName: string, programmeId: number): Promise<Result<CourseProgrammeData>>;
+  deleteCourseById(courseId: number): Promise<Result<null>>;
   getCourseCount(query: string): Promise<Result<number>>;
   getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
   createCourseSubject(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>>;
