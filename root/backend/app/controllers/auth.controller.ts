@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import authService from "../services/auth.service";
+import { UserData } from "../models/user-model";
 
 export default class AuthController {
   async login(req: Request, res: Response) {
@@ -36,7 +37,7 @@ export default class AuthController {
   async getMe(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
     const isAdmin: boolean = req.user.isAdmin as boolean;
-    let response = undefined;
+    let response: Result<UserData>;
 
     if (isAdmin) {
       response = await authService.getAdminMe(userId);
