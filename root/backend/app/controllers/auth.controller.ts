@@ -28,8 +28,6 @@ export default class AuthController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
           return res.sendError.forbidden(response.getMessage());
-        default:
-          return res.sendError.badRequest(response.getMessage());
       }
     }
   }
@@ -52,8 +50,6 @@ export default class AuthController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.INVALID_CREDS:
           return res.sendError.forbidden(response.getMessage());
-        default:
-          return res.sendError.badRequest(response.getMessage());
       }
     }
   }
@@ -73,8 +69,6 @@ export default class AuthController {
           return res.sendError.notFound(response.getMessage());
         case ENUM_ERROR_CODE.CONFLICT:
           return res.sendError.conflict(response.getMessage());
-        default:
-          return res.sendError.badRequest(response.getMessage());
       }
     }
   }
