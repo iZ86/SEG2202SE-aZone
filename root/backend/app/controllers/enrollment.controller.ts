@@ -267,12 +267,6 @@ export default class EnrollmentController {
     const enrollmentSubjectTypeIds: number[] = req.body.enrollmentSubjectTypeIds;
 
 
-    const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
-
-    if (!studentResponse.isSuccess()) {
-      return res.sendError.notFound("Invalid studentId");
-    }
-
     const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.enrollStudentSubjects(studentId, enrollmentSubjectTypeIds, isAdmin);
 
     if (response.isSuccess()) {
