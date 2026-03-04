@@ -189,7 +189,7 @@ class CourseService implements ICourseService {
   public async getCourseCount(query: string = ""): Promise<Result<number>> {
     const courseCount: number = await courseRepository.getCourseCount(query);
 
-    return Result.succeed(courseCount ? courseCount : 0, "Course count retrieve success");
+    return Result.succeed(courseCount, "Course count retrieve success");
   }
 
   public async getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
