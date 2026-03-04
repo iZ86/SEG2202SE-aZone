@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSchedule, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
+import { EnrollmentSubjectData, StudentEnrollmentSchedule, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData} from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import userService from "../services/user.service";
 import { UserData } from "../models/user-model";
@@ -12,22 +12,10 @@ export default class EnrollmentController {
     const pageSize: number = Number(req.query.pageSize) || 1;
     const query: string = req.query.query as string || "";
 
-    const response: Result<EnrollmentData[]> = await enrollmentService.getEnrollments(query, pageSize, page);
-    const enrollmentCount: Result<number> = await enrollmentService.getEnrollmentCount(query);
-
-    let apiResponse: object = {
-      enrollments: response.getData(),
-    };
-
-    if (page != null && pageSize != null) {
-      apiResponse = {
-        enrollments: response.getData(),
-        enrollmentCount: enrollmentCount.isSuccess() ? enrollmentCount.getData() : 0,
-      };
-    }
+    const response: Result<EnrollmentWithCountData> = await enrollmentService.getEnrollments(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(apiResponse, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

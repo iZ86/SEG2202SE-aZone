@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS } from "../enums/enums";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData} from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData} from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeClashing } from "../utils/utils";
@@ -16,7 +16,7 @@ import { UserData } from "../models/user-model";
 import userService from "./user.service";
 
 interface IEnrollmentService {
-  getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>>;
+  getEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentWithCountData>>;
   getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>>;
   getEnrollmentWithProgrammeIntakesById(enrollmentId: number): Promise<Result<EnrollmentWithProgrammeIntakesData>>;
   createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>>;
@@ -44,10 +44,12 @@ interface IEnrollmentService {
 }
 
 class EnrollmentService implements IEnrollmentService {
-  async getEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentData[]>> {
+  async getEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentWithCountData>> {
     const enrollments: EnrollmentData[] = await enrollmentRepository.getEnrollments(query, pageSize, page);
 
-    return Result.succeed(enrollments, "Enrollments retrieve success");
+    const enrollmentCount: Result<number> = await this.getEnrollmentCount(query);
+
+    return Result.succeed({enrollments: enrollments, enrollmentCount: enrollmentCount.getData()}, "Enrollments retrieve success");
   }
 
   async getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>> {
