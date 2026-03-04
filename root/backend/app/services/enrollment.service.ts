@@ -262,7 +262,7 @@ class EnrollmentService implements IEnrollmentService {
   async getEnrollmentCount(query: string = ""): Promise<Result<number>> {
     const enrollmentCount: number = await enrollmentRepository.getEnrollmentCount(query);
 
-    return Result.succeed(enrollmentCount ? enrollmentCount : 0, "Enrollment count retrieve success");
+    return Result.succeed(enrollmentCount, "Enrollment count retrieve success");
   }
 
   async getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
