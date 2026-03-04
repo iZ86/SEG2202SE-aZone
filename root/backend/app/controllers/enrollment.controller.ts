@@ -262,13 +262,10 @@ export default class EnrollmentController {
   }
 
   async createStudentEnrollmentSubjectTypesByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId as string);
+    const studentId: number = Number(req.params.studentId);
     const isAdmin: boolean = req.user.isAdmin;
     const enrollmentSubjectTypeIds: number[] = req.body.enrollmentSubjectTypeIds;
 
-    if (!studentId || isNaN(studentId)) {
-      return res.sendError.notFound("Invalid studentId");
-    }
 
     const studentResponse: Result<UserData> = await userService.getStudentById(studentId);
 
