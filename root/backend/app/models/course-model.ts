@@ -35,3 +35,8 @@ export interface CourseProgrammeSubjectData extends RowDataPacket {
   description: string;
   creditHours: number;
 }
+
+export interface CourseProgrammeWithCountData {
+  courses: CourseProgrammeData[];
+  courseCount: number;
+}
