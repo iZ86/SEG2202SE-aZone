@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface IEnrollmentRepository {
-  getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]>;
+  getEnrollments(query: string, pageSize: number, page: number): Promise<EnrollmentData[]>;
   getEnrollmentsByIds(enrollmentIds: number[]): Promise<EnrollmentData[]>;
   getEnrollmentById(enrollmentId: number): Promise<EnrollmentData | undefined>;
   createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader>;
@@ -40,25 +40,19 @@ interface IEnrollmentRepository {
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
-  getEnrollments(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentData[]> {
+  getEnrollments(query: string, pageSize: number, page: number): Promise<EnrollmentData[]> {
+    const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      let sql: string = `
-      SELECT *
-      FROM ENROLLMENT
-      WHERE enrollmentId LIKE ?
-      ORDER BY enrollmentStartDateTime ASC `;
-
-      const params: any[] = [
-        "%" + query + "%",
-      ];
-
-      if (page != null && pageSize != null) {
-        const offset: number = (page - 1) * pageSize;
-        sql += "LIMIT ? OFFSET ? ";
-        params.push(pageSize, offset);
-      }
-
-      databaseConn.query<EnrollmentData[]>(sql, params,
+      databaseConn.query<EnrollmentData[]>(
+        "SELECT e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime " +
+        "FROM ENROLLMENT e " +
+        "WHERE e.enrollmentId LIKE ? " +
+        "ORDER BY e.enrollmentStartDateTime ASC " +
+        "LIMIT ? OFFSET ?;",
+        ["%" + query + "%",
+          pageSize,
+          offset
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
