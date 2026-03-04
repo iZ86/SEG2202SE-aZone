@@ -138,7 +138,7 @@ export default class EnrollmentController {
   }
 
   async getEnrollmentSubjectsByStudentId(req: Request, res: Response) {
-    const studentId: number = parseInt(req.params.studentId as string);
+    const studentId: number = Number(req.params.studentId);
 
     const response: Result<StudentEnrollmentScheduleWithSubjectData> = await enrollmentService.getEnrollmentSubjectsByStudentId(studentId);
     if (response.isSuccess()) {
