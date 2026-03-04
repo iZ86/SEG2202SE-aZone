@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import courseService from "../services/course.service";
-import { CourseData } from "../models/course-model";
+import { CourseData, CourseProgrammeWithCountData } from "../models/course-model";
 
 export default class CourseController {
 
@@ -15,14 +15,10 @@ export default class CourseController {
     const programmeId: number = Number(req.query.programmeId) || -1;
 
     if (programmeId === -1) {
-      const response: Result<CourseData[]> = await courseService.getCourses(query, pageSize, page);
-      const courseCount: Result<number> = await courseService.getCourseCount(query);
+      const response: Result<CourseProgrammeWithCountData> = await courseService.getCourses(query, pageSize, page);
 
       if (response.isSuccess()) {
-        return res.sendSuccess.ok({
-          courses: response.getData(),
-          courseCount: courseCount.isSuccess() ? courseCount.getData() : 0,
-        }, response.getMessage());
+        return res.sendSuccess.ok(response.getData(), response.getMessage());
       } else {
         switch (response.getErrorCode()) {
           case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { CourseData, CourseProgrammeData, CourseSubjectData } from "../models/course-model";
+import { CourseData, CourseProgrammeData, CourseProgrammeWithCountData, CourseSubjectData } from "../models/course-model";
 import courseRepository from "../repositories/course.repository";
 import programmeService from "./programme.service";
 import { ProgrammeData } from "../models/programme-model";
@@ -9,7 +9,7 @@ import subjectService from "./subject.service";
 import { SubjectData } from "../models/subject-model";
 
 interface ICourseService {
-  getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>>;
+  getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeWithCountData>>;
   getCourseById(courseId: number): Promise<Result<CourseProgrammeData>>;
   getCourseByName(courseName: string): Promise<Result<CourseData>>;
   getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>>;
@@ -26,10 +26,13 @@ interface ICourseService {
 }
 
 class CourseService implements ICourseService {
-  public async getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeData[]>> {
+  public async getCourses(query: string, pageSize: number, page: number): Promise<Result<CourseProgrammeWithCountData>> {
+    
     const courses: CourseProgrammeData[] = await courseRepository.getCourses(query, pageSize, page);
 
-    return Result.succeed(courses, "Courses retrieve success");
+    const courseCount: Result<number> = await this.getCourseCount(query);
+
+    return Result.succeed({courses: courses, courseCount: courseCount.getData()}, "Courses retrieve success");
   }
 
   public async getCourseById(courseId: number): Promise<Result<CourseProgrammeData>> {
