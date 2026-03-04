@@ -44,7 +44,7 @@ interface IEnrollmentService {
 }
 
 class EnrollmentService implements IEnrollmentService {
-  async getEnrollments(query: string = "", pageSize: number | null, page: number | null): Promise<Result<EnrollmentData[]>> {
+  async getEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentData[]>> {
     const enrollments: EnrollmentData[] = await enrollmentRepository.getEnrollments(query, pageSize, page);
 
     return Result.succeed(enrollments, "Enrollments retrieve success");
