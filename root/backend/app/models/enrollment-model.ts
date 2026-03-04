@@ -112,3 +112,8 @@ export interface EnrollmentWithCountData {
   enrollments: EnrollmentData[];
   enrollmentCount: number;
 }
+
+export interface EnrollmentSubjectWithCountData {
+  enrollmentSubjects: EnrollmentSubjectData[];
+  enrollmentSubjectCount: number;
+}
