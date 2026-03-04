@@ -25,11 +25,7 @@ export default class EnrollmentController {
   }
 
   async getEnrollmentWithProgrammeIntakesById(req: Request, res: Response) {
-    const enrollmentId: number = parseInt(req.params.enrollmentId as string);
-
-    if (!enrollmentId || isNaN(enrollmentId)) {
-      return res.sendError.badRequest("Invalid enrollmentId");
-    }
+    const enrollmentId: number = Number(req.params.enrollmentId);
 
     const response: Result<EnrollmentWithProgrammeIntakesData> = await enrollmentService.getEnrollmentWithProgrammeIntakesById(enrollmentId);
 
