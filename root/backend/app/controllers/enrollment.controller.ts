@@ -279,8 +279,6 @@ export default class EnrollmentController {
           return res.sendError.forbidden(response.getMessage());
         case ENUM_ERROR_CODE.CONFLICT:
           return res.sendError.conflict(response.getMessage(), response.getData());
-        case ENUM_ERROR_CODE.BAD_REQUEST:
-          return res.sendError.badRequest(response.getMessage());
       }
     }
   }
