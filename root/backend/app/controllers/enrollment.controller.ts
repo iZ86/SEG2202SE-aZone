@@ -59,7 +59,7 @@ export default class EnrollmentController {
     }
   }
 
-  async updateEnrollmentById(req: Request, res: Response) {
+  async updateEnrollmentWithProgrammeIntakesById(req: Request, res: Response) {
     const enrollmentId: number = Number(req.params.enrollmentId);
     const enrollmentStartDateTime: Date = req.body.enrollmentStartDateTime;
     const enrollmentEndDateTime: Date = req.body.enrollmentEndDateTime;
