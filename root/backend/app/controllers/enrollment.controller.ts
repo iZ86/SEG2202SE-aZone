@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { EnrollmentSubjectData, StudentEnrollmentSchedule, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData} from "../models/enrollment-model";
+import { EnrollmentSubjectData, StudentEnrollmentSchedule, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData, EnrollmentSubjectWithCountData} from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
 import userService from "../services/user.service";
 import { UserData } from "../models/user-model";
@@ -122,22 +122,10 @@ export default class EnrollmentController {
       const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
       const query: string = req.query.query as string || "";
 
-      const response: Result<EnrollmentSubjectData[]> = await enrollmentService.getEnrollmentSubjects(query, pageSize, page);
-      const enrollmentSubjectCount: Result<number> = await enrollmentService.getEnrollmentSubjectCount(query);
-
-      let apiResponse: object = {
-        enrollmentSubjects: response.getData(),
-      };
-
-      if (page != null && pageSize != null) {
-        apiResponse = {
-          enrollmentSubjects: response.getData(),
-          enrollmentSubjectCount: enrollmentSubjectCount.isSuccess() ? enrollmentSubjectCount.getData() : 0,
-        };
-      }
+      const response: Result<EnrollmentSubjectWithCountData> = await enrollmentService.getEnrollmentSubjects(query, pageSize, page);
 
       if (response.isSuccess()) {
-        return res.sendSuccess.ok(apiResponse, response.getMessage());
+        return res.sendSuccess.ok(response.getData(), response.getMessage());
       } else {
         switch (response.getErrorCode()) {
           case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:

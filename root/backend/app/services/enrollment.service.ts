@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS } from "../enums/enums";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData} from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData, EnrollmentSubjectWithCountData} from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeClashing } from "../utils/utils";
@@ -25,7 +25,7 @@ interface IEnrollmentService {
   getEnrollmentCount(query: string): Promise<Result<number>>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
-  getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<Result<EnrollmentSubjectData[]>>;
+  getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>>
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
@@ -285,10 +285,12 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment, "Enrollment retrieve success");
   }
 
-  async getEnrollmentSubjects(query: string = "", pageSize: number | null, page: number | null): Promise<Result<EnrollmentSubjectData[]>> {
+  async getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>> {
     const enrollmentSubjects: EnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjects(query, pageSize, page);
 
-    return Result.succeed(enrollmentSubjects, "Enrollment subjects retrieve success");
+    const enrollmentSubjectCount: Result<number> = await this.getEnrollmentSubjectCount(query);
+
+    return Result.succeed({enrollmentSubjects, enrollmentSubjectCount: enrollmentSubjectCount.getData()}, "Enrollment subjects retrieve success");
   }
 
   async getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>> {
