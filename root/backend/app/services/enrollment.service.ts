@@ -991,7 +991,7 @@ class EnrollmentService implements IEnrollmentService {
   async getEnrollmentSubjectCount(query: string = ""): Promise<Result<number>> {
     const enrollmentSubjectCount: number = await enrollmentRepository.getEnrollmentSubjectCount(query);
 
-    return Result.succeed(enrollmentSubjectCount ? enrollmentSubjectCount : 0, "Enrollment subject count retrieve success");
+    return Result.succeed(enrollmentSubjectCount, "Enrollment subject count retrieve success");
   }
 
   async getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
