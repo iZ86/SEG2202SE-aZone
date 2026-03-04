@@ -107,3 +107,8 @@ export interface CreateEnrollmentSubjectTypeData {
 export interface UpdateEnrollmentSubjectTypeData extends CreateEnrollmentSubjectTypeData {
   enrollmentSubjectTypeId: number | null;
 }
+
+export interface EnrollmentWithCountData {
+  enrollments: EnrollmentData[];
+  enrollmentCount: number;
+}
