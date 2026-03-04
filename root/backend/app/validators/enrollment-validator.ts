@@ -1,7 +1,7 @@
 import { body, param, query } from "express-validator";
 import validate from "../middlewares/validate";
 
-export const getEnrollmentsQueryValidator: any = [
+export const getEnrollmentsAndSubjectsQueryValidator: any = [
   query('page')
     .optional()
     .isInt().withMessage('page must be a number'),
