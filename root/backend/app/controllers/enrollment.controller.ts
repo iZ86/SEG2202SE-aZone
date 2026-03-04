@@ -154,9 +154,6 @@ export default class EnrollmentController {
   async getEnrollmentSubjectWithEnrollmentSubjectTypesById(req: Request, res: Response) {
     const enrollmentSubjectId: number = Number(req.params.enrollmentSubjectId);
 
-    if (!enrollmentSubjectId || isNaN(enrollmentSubjectId)) {
-      return res.sendError.badRequest("Invalid enrollmentSubjectId");
-    }
 
     const response: Result<EnrollmentSubjectWithTypesData> = await enrollmentService.getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId);
 
