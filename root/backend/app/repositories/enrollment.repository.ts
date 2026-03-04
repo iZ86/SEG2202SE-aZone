@@ -13,7 +13,7 @@ interface IEnrollmentRepository {
   getEnrollmentCount(query: string): Promise<number>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
-  getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]>;
+  getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
@@ -184,34 +184,31 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjects(query: string, pageSize: number | null, page: number | null): Promise<EnrollmentSubjectData[]> {
+  getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]> {
+    const offset: number = (page - 1) * pageSize;
+
     return new Promise((resolve, reject) => {
-      let sql: string = `
-      SELECT *
-      FROM ENROLLMENT_SUBJECT es
-      INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId
-      INNER JOIN SUBJECT s ON es.subjectid = s.subjectId
-      INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId
-      INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId
-      WHERE es.enrollmentSubjectId LIKE ?
-      OR s.subjectName LIKE ?
-      OR l.firstName LIKE ?
-      OR l.lastName LIKE ? `;
-
-      const params: any[] = [
+      databaseConn.query<EnrollmentSubjectData[]>(
+        "SELECT es.enrollmentSubjectId, e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime, " +
+        "s.subjectId, s.subjectCode, s.subjectName, s.description, s.creditHours, " +
+        "l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, lt.lecturerTitle, l.email, l.phoneNumber " +
+        "FROM ENROLLMENT_SUBJECT es " +
+        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+        "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
+        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+        "WHERE es.enrollmentSubjectId LIKE ? " +
+        "OR s.subjectName LIKE ? " +
+        "OR l.firstName LIKE ? " +
+        "OR l.lastName LIKE ? " +
+        "LIMIT ? OFFSET ?;",
+        ["%" + query + "%",
         "%" + query + "%",
         "%" + query + "%",
         "%" + query + "%",
-        "%" + query + "%",
-      ];
-
-      if (page != null && pageSize != null) {
-        const offset: number = (page - 1) * pageSize;
-        sql += "LIMIT ? OFFSET ? ";
-        params.push(pageSize, offset);
-      }
-
-      databaseConn.query<EnrollmentSubjectData[]>(sql, params,
+        pageSize,
+        offset
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
