@@ -59,7 +59,7 @@ export default class LecturerController {
   }
 
   async updateLecturerById(req: Request, res: Response) {
-    const lecturerId: number = Number(req.params.lecturerId as string);
+    const lecturerId: number = Number(req.params.lecturerId);
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const lecturerTitleId: number = req.body.lecturerTitleId;
