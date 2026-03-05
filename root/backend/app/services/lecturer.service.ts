@@ -1,11 +1,11 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { LecturerData, LecturerTitleData } from "../models/lecturer-model";
+import { LecturerWithCountData, LecturerData, LecturerTitleData } from "../models/lecturer-model";
 import lecturerRepository from "../repositories/lecturer.repository";
 
 interface ILecturerService {
-  getLecturers(query: string, pageSize: number | null, page: number | null): Promise<Result<LecturerData[]>>;
+  getLecturers(query: string, pageSize: number, page: number): Promise<Result<LecturerWithCountData>>;
   getLecturerById(lecturerId: number): Promise<Result<LecturerData>>;
   getLecturerByEmail(email: string): Promise<Result<LecturerData>>;
   createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
@@ -17,10 +17,12 @@ interface ILecturerService {
 }
 
 class LecturerService implements ILecturerService {
-  async getLecturers(query: string = "", pageSize: number | null, page: number | null): Promise<Result<LecturerData[]>> {
+  async getLecturers(query: string, pageSize: number, page: number): Promise<Result<LecturerWithCountData>> {
     const lecturers: LecturerData[] = await lecturerRepository.getLecturers(query, pageSize, page);
 
-    return Result.succeed(lecturers, "Lecturers retrieve success");
+    const lecturerCount: Result<number> = await this.getLecturerCount(query);
+
+    return Result.succeed({lecturers, lecturerCount: lecturerCount.getData()}, "Lecturers retrieve success");
   }
 
   async getLecturerById(lecturerId: number): Promise<Result<LecturerData>> {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { LecturerData, LecturerTitleData } from "../models/lecturer-model";
+import { LecturerData, LecturerTitleData, LecturerWithCountData } from "../models/lecturer-model";
 import lecturerService from "../services/lecturer.service";
 
 export default class LecturerController {
@@ -10,22 +10,10 @@ export default class LecturerController {
     const pageSize: number | null = Number(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<LecturerData[]> = await lecturerService.getLecturers(query, pageSize, page);
-    const lecturerCount: Result<number> = await lecturerService.getLecturerCount(query);
-
-    let apiResponse: object = {
-      lecturers: response.getData(),
-    };
-
-    if (page != null && pageSize != null) {
-      apiResponse = {
-        lecturers: response.getData(),
-        lecturerCount: lecturerCount.isSuccess() ? lecturerCount.getData() : 0,
-      };
-    }
+    const response: Result<LecturerWithCountData> = await lecturerService.getLecturers(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(apiResponse, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
