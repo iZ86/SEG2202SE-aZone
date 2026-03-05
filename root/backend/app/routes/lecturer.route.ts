@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import LecturerController from "../controllers/lecturer.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
-import { createAndUpdateLecturerValidator, lecturerParamValidator, lecturerTitleParamValidator } from "../validators/lecturer-validator";
+import { createAndUpdateLecturerValidator, lecturerParamValidator, lecturerTitleParamValidator, getLecturersQueryValidator } from "../validators/lecturer-validator";
 
 class LecturerRoute {
   router = Router();
@@ -13,7 +13,7 @@ class LecturerRoute {
   }
 
   initializeRoutes() {
-    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getLecturers));
+    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getLecturersQueryValidator, asyncHandler(this.controller.getLecturers));
     this.router.get("/titles", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getLecturerTitles));
     this.router.get("/titles/:lecturerTitleId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, lecturerTitleParamValidator, asyncHandler(this.controller.getLecturerTitleById));
     this.router.get("/:lecturerId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, lecturerParamValidator, asyncHandler(this.controller.getLecturerById));
