@@ -7,7 +7,6 @@ import lecturerRepository from "../repositories/lecturer.repository";
 interface ILecturerService {
   getLecturers(query: string, pageSize: number, page: number): Promise<Result<LecturerWithCountData>>;
   getLecturerById(lecturerId: number): Promise<Result<LecturerData>>;
-  getLecturerByEmail(email: string): Promise<Result<LecturerData>>;
   createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   deleteLecturerById(lecturerId: number): Promise<Result<null>>;
