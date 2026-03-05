@@ -299,7 +299,7 @@ export default class EnrollmentController {
         }
       }
     } else {
-      return res.sendError.forbidden("trest");
+      throw new Error("getEnrolledSubjectsByStudentId role is not a student");
     }
   }
 
