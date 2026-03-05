@@ -12,7 +12,6 @@ interface IEnrollmentRepository {
   deleteEnrollmentById(enrollmentId: number): Promise<ResultSetHeader>;
   getEnrollmentCount(query: string): Promise<number>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
-  getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined>;
   getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
@@ -167,22 +166,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<EnrollmentData[]>(
-        "SELECT enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime " +
-        "FROM ENROLLMENT " +
-        "WHERE enrollmentId = ? " +
-        "AND enrollmentStartDateTime = ? " +
-        "AND enrollmentEndDateTime = ?;",
-        [enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
 
   getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]> {
     const offset: number = (page - 1) * pageSize;
