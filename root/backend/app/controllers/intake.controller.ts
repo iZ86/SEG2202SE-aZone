@@ -75,7 +75,7 @@ export default class IntakeController {
   }
 
   async deleteIntakeById(req: Request, res: Response) {
-    const intakeId: number = Number(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId);
 
     const intakeResponse: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
