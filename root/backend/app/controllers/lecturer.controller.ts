@@ -111,7 +111,7 @@ export default class LecturerController {
   }
 
   async getLecturerTitleById(req: Request, res: Response) {
-    const lecturerTitleId: number = Number(req.params.lecturerTitleId as string);
+    const lecturerTitleId: number = Number(req.params.lecturerTitleId);
 
     const response: Result<LecturerTitleData> = await lecturerService.getLecturerTitleById(lecturerTitleId);
 
