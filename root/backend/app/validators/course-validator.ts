@@ -13,7 +13,6 @@ export const getCoursesQueryValidator: any = [
   query('page')
     .optional()
     .isInt().withMessage('page must be a number'),
-  validate,
   query('pageSize')
     .optional()
     .isInt().withMessage('pageSize must be a number'),
