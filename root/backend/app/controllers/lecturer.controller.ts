@@ -81,7 +81,7 @@ export default class LecturerController {
   }
 
   async deleteLecturerById(req: Request, res: Response) {
-    const lecturerId: number = Number(req.params.lecturerId as string);
+    const lecturerId: number = Number(req.params.lecturerId);
 
     const response = await lecturerService.deleteLecturerById(lecturerId);
 
