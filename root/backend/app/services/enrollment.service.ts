@@ -28,7 +28,6 @@ interface IEnrollmentService {
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>>
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
-  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>>;
@@ -318,15 +317,6 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
-  async getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
-    const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId, enrollmentId, subjectId);
-
-    if (!enrollmentSubject) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject not found");
-    }
-
-    return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
-  }
 
 
   async createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
