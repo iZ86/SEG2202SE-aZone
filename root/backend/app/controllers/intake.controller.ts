@@ -23,7 +23,7 @@ export default class IntakeController {
   }
 
   async getIntakeById(req: Request, res: Response) {
-    const intakeId: number = Number(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId);
 
     const response: Result<IntakeData> = await intakeService.getIntakeById(intakeId);
 
