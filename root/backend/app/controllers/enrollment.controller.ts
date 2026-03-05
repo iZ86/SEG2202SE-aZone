@@ -275,8 +275,6 @@ export default class EnrollmentController {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
           return res.sendError.notFound(response.getMessage(), response.getData());
-        case ENUM_ERROR_CODE.FORBIDDEN:
-          return res.sendError.forbidden(response.getMessage());
         case ENUM_ERROR_CODE.CONFLICT:
           return res.sendError.conflict(response.getMessage(), response.getData());
       }
