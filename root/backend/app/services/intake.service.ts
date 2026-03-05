@@ -10,11 +10,10 @@ interface IIntakeService {
   createIntake(intakeId: number): Promise<Result<IntakeData>>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>>;
   deleteIntakeById(intakeId: number): Promise<Result<null>>;
-  getIntakeCount(query: string): Promise<Result<number>>;
 }
 
 class IntakeService implements IIntakeService {
-  async getIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeWithCountData>> {
+  public async getIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeWithCountData>> {
     const intakes: IntakeData[] = await intakeRepository.getIntakes(query, pageSize, page);
 
     const intakeCount: Result<number> = await this.getIntakeCount(query);
@@ -22,7 +21,7 @@ class IntakeService implements IIntakeService {
     return Result.succeed({intakes, intakeCount: intakeCount.getData()}, "Intakes retrieve success");
   }
 
-  async getIntakeById(intakeId: number): Promise<Result<IntakeData>> {
+  public async getIntakeById(intakeId: number): Promise<Result<IntakeData>> {
     const intake: IntakeData | undefined = await intakeRepository.getIntakeById(intakeId);
 
     if (!intake) {
@@ -32,7 +31,7 @@ class IntakeService implements IIntakeService {
     return Result.succeed(intake, "Intake retrieve success");
   }
 
-  async createIntake(intakeId: number): Promise<Result<IntakeData>> {
+  public async createIntake(intakeId: number): Promise<Result<IntakeData>> {
     const intakeResult: Result<IntakeData> = await this.getIntakeById(intakeId);
 
     if (intakeResult.isSuccess()) {
@@ -54,7 +53,7 @@ class IntakeService implements IIntakeService {
     return Result.succeed(intake.getData(), "Intake create success");
   }
 
-  async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>> {
+  public async updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>> {
     const intakeResult: Result<IntakeData> = await this.getIntakeById(intakeId);
 
     if (!intakeResult.isSuccess()) {
@@ -84,7 +83,7 @@ class IntakeService implements IIntakeService {
     return Result.succeed(intake.getData(), "Intake update success");
   }
 
-  async deleteIntakeById(intakeId: number): Promise<Result<null>> {
+  public async deleteIntakeById(intakeId: number): Promise<Result<null>> {
     const intakeResult: Result<IntakeData> = await this.getIntakeById(intakeId);
 
     if (!intakeResult.isSuccess()) {
@@ -100,7 +99,7 @@ class IntakeService implements IIntakeService {
     return Result.succeed(null, "Intake delete success");
   }
 
-  async getIntakeCount(query: string = ""): Promise<Result<number>> {
+  private async getIntakeCount(query: string = ""): Promise<Result<number>> {
     const intakeCount: number = await intakeRepository.getIntakeCount(query);
 
     return Result.succeed(intakeCount, "Intake count retrieve success");
