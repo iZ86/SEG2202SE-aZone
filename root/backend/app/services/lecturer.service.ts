@@ -10,7 +10,6 @@ interface ILecturerService {
   createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>>;
   deleteLecturerById(lecturerId: number): Promise<Result<null>>;
-  getLecturerCount(query: string): Promise<Result<number>>;
   getLecturerTitles(): Promise<Result<LecturerTitleData[]>>;
   getLecturerTitleById(lecturerTitleId: number): Promise<Result<LecturerTitleData>>;
 }
