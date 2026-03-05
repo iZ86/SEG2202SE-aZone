@@ -13,7 +13,7 @@ interface IIntakeRepository {
 }
 
 class IntakeRepository implements IIntakeRepository {
-  getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]> {
+  public getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<IntakeData[]>(
@@ -33,7 +33,7 @@ class IntakeRepository implements IIntakeRepository {
     });
   }
 
-  getIntakeById(intakeId: number): Promise<IntakeData | undefined> {
+  public getIntakeById(intakeId: number): Promise<IntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<IntakeData[]>(
         "SELECT intakeId " +
@@ -48,7 +48,7 @@ class IntakeRepository implements IIntakeRepository {
     });
   }
 
-  createIntake(intakeId: number): Promise<ResultSetHeader> {
+  public createIntake(intakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO INTAKE (intakeId) " +
@@ -62,7 +62,7 @@ class IntakeRepository implements IIntakeRepository {
     });
   }
 
-  updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader> {
+  public updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE Intake SET intakeId = ? " +
@@ -76,7 +76,7 @@ class IntakeRepository implements IIntakeRepository {
     });
   }
 
-  deleteIntakeById(intakeId: number): Promise<ResultSetHeader> {
+  public deleteIntakeById(intakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM INTAKE WHERE intakeId = ?;",
@@ -89,7 +89,7 @@ class IntakeRepository implements IIntakeRepository {
     });
   }
 
-  getIntakeCount(query: string): Promise<number> {
+  public getIntakeCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
