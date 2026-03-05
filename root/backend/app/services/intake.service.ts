@@ -1,11 +1,11 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { IntakeData } from "../models/intake-model";
+import { IntakeData, IntakeWithCountData } from "../models/intake-model";
 import intakeRepository from "../repositories/intake.repository";
 
 interface IIntakeService {
-  getIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<IntakeData[]>>;
+  getIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeWithCountData>>;
   getIntakeById(intakeId: number): Promise<Result<IntakeData>>;
   createIntake(intakeId: number): Promise<Result<IntakeData>>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<Result<IntakeData>>;
@@ -14,10 +14,12 @@ interface IIntakeService {
 }
 
 class IntakeService implements IIntakeService {
-  async getIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<IntakeData[]>> {
+  async getIntakes(query: string, pageSize: number, page: number): Promise<Result<IntakeWithCountData>> {
     const intakes: IntakeData[] = await intakeRepository.getIntakes(query, pageSize, page);
 
-    return Result.succeed(intakes, "Intakes retrieve success");
+    const intakeCount: Result<number> = await this.getIntakeCount(query);
+
+    return Result.succeed({intakes, intakeCount: intakeCount.getData()}, "Intakes retrieve success");
   }
 
   async getIntakeById(intakeId: number): Promise<Result<IntakeData>> {

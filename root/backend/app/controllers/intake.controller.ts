@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { IntakeData } from "../models/intake-model";
+import { IntakeData, IntakeWithCountData } from "../models/intake-model";
 import intakeService from "../services/intake.service";
 
 export default class IntakeController {
@@ -10,22 +10,10 @@ export default class IntakeController {
     const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<IntakeData[]> = await intakeService.getIntakes(query, pageSize, page);
-    const intakeCount: Result<number> = await intakeService.getIntakeCount(query);
-
-    let apiResponse: object = {
-      intakes: response.getData(),
-    };
-
-    if (page != null && pageSize != null) {
-      apiResponse = {
-        intakes: response.getData(),
-        intakeCount: intakeCount.isSuccess() ? intakeCount.getData() : 0,
-      };
-    }
+    const response: Result<IntakeWithCountData> = await intakeService.getIntakes(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(apiResponse, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
