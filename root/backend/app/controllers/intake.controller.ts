@@ -6,8 +6,8 @@ import intakeService from "../services/intake.service";
 
 export default class IntakeController {
   async getIntakes(req: Request, res: Response) {
-    const page: number | null = Number(req.query.page as string) || null;
-    const pageSize: number | null = Number(req.query.pageSize as string) || null;
+    const page: number = Number(req.query.page) || 1;
+    const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<IntakeData[]> = await intakeService.getIntakes(query, pageSize, page);
