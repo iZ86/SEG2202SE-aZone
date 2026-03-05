@@ -55,7 +55,7 @@ export default class IntakeController {
   }
 
   async updateIntakeById(req: Request, res: Response) {
-    const intakeId: number = Number(req.params.intakeId as string);
+    const intakeId: number = Number(req.params.intakeId);
     const newIntakeId: number = req.body.intakeId;
 
     const response = await intakeService.updateIntakeById(intakeId, newIntakeId);
