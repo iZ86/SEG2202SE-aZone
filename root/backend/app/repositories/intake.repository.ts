@@ -4,7 +4,7 @@ import { ResultSetHeader } from "mysql2";
 import { TotalCount } from "../models/general-model";
 
 interface IIntakeRepository {
-  getIntakes(query: string, pageSize: number | null, page: number | null): Promise<IntakeData[]>;
+  getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]>;
   getIntakeById(intakeId: number): Promise<IntakeData | undefined>;
   createIntake(intakeId: number): Promise<ResultSetHeader>;
   updateIntakeById(intakeId: number, newIntakeId: number): Promise<ResultSetHeader>;
@@ -13,24 +13,18 @@ interface IIntakeRepository {
 }
 
 class IntakeRepository implements IIntakeRepository {
-  getIntakes(query: string, pageSize: number | null, page: number | null): Promise<IntakeData[]> {
+  getIntakes(query: string, pageSize: number, page: number): Promise<IntakeData[]> {
+    const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      let sql: string = `
-      SELECT intakeId
-      FROM INTAKE
-      WHERE intakeId LIKE ? `;
-
-      const params: any[] = [
-        "%" + query + "%",
-      ];
-
-      if (page != null && pageSize != null) {
-        const offset: number = (page - 1) * pageSize;
-        sql += "LIMIT ? OFFSET ? ";
-        params.push(pageSize, offset);
-      }
-
-      databaseConn.query<IntakeData[]>(sql, params,
+      databaseConn.query<IntakeData[]>(
+        "SELECT i.intakeId " +
+        "FROM INTAKE i " +
+        "WHERE i.intakeId LIKE ? " +
+        "LIMIT ? OFFSET ?;",
+        ["%" + query + "%",
+          pageSize,
+          offset
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
