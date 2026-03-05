@@ -22,26 +22,21 @@ interface IEnrollmentService {
   createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>>;
   updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>>;
   deleteEnrollmentById(enrollmentId: number): Promise<Result<null>>;
-  getEnrollmentCount(query: string): Promise<Result<number>>;
-  getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
   getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>>
-  getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>>;
   createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>>;
   deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>>;
-  getEnrollmentSubjectCount(query: string): Promise<Result<number>>;
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
-  getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>>;
   enrollStudentSubjects(studentId: number, enrollmentSubjectTypesIds: number[], isAdmin: boolean): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>>;
 }
 
 class EnrollmentService implements IEnrollmentService {
-  async getEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentWithCountData>> {
+  public async getEnrollments(query: string, pageSize: number, page: number): Promise<Result<EnrollmentWithCountData>> {
     const enrollments: EnrollmentData[] = await enrollmentRepository.getEnrollments(query, pageSize, page);
 
     const enrollmentCount: Result<number> = await this.getEnrollmentCount(query);
@@ -49,7 +44,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({enrollments: enrollments, enrollmentCount: enrollmentCount.getData()}, "Enrollments retrieve success");
   }
 
-  async getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>> {
+  public async getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>> {
     const enrollment: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentById(enrollmentId);
 
     if (!enrollment) {
@@ -59,7 +54,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment, "Enrollment retrieve success");
   }
 
-  async getEnrollmentWithProgrammeIntakesById(enrollmentId: number): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
+  public async getEnrollmentWithProgrammeIntakesById(enrollmentId: number): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
     const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
 
     if (!enrollmentResult.isSuccess()) {
@@ -74,7 +69,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({ ...enrollmentResult.getData(), programmeIntakes: programmeIntakesResult.getData() }, "Enrollment retrieve success");
   }
 
-  async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
+  public async createEnrollmentWithProgrammeIntakes(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
 
     // Check parameters duplicated.
     const isDateTimeDuplicated: Result<EnrollmentData> = await this.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
@@ -140,7 +135,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentWithProgrammeIntakes.getData(), "Enrollment create success");
   }
 
-  async updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
+  public async updateEnrollmentWithProgrammeIntakesById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date, programmeIntakeIds: number[]): Promise<Result<EnrollmentWithProgrammeIntakesData>> {
 
     // Check enrollment exist
     const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
@@ -228,7 +223,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentWithProgrammeIntakes.getData(), "Enrollment update success");
   }
 
-  async deleteEnrollmentById(enrollmentId: number): Promise<Result<null>> {
+  public async deleteEnrollmentById(enrollmentId: number): Promise<Result<null>> {
 
     // Check if enrollmentId exists.
     const enrollmentResult: Result<EnrollmentData> = await this.getEnrollmentById(enrollmentId);
@@ -256,13 +251,13 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(null, "Enrollment delete success");
   }
 
-  async getEnrollmentCount(query: string = ""): Promise<Result<number>> {
+  private async getEnrollmentCount(query: string = ""): Promise<Result<number>> {
     const enrollmentCount: number = await enrollmentRepository.getEnrollmentCount(query);
 
     return Result.succeed(enrollmentCount, "Enrollment count retrieve success");
   }
 
-  async getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
+  private async getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
     const enrollment: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime, enrollmentEndDateTime);
 
     if (!enrollment) {
@@ -272,8 +267,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment, "Enrollment retrieve success");
   }
 
-
-  async getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>> {
+  public async getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>> {
     const enrollmentSubjects: EnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjects(query, pageSize, page);
 
     const enrollmentSubjectCount: Result<number> = await this.getEnrollmentSubjectCount(query);
@@ -281,7 +275,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({enrollmentSubjects, enrollmentSubjectCount: enrollmentSubjectCount.getData()}, "Enrollment subjects retrieve success");
   }
 
-  async getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>> {
+  public async getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>> {
     const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectById(enrollmentSubjectId);
 
     if (!enrollmentSubject) {
@@ -291,7 +285,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
-  async getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>> {
+  public async getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>> {
     const enrollmentSubject: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
 
     if (!enrollmentSubject.isSuccess()) {
@@ -306,7 +300,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({ ...enrollmentSubject.getData(), enrollmentSubjectTypes: enrollmentSubjectTypes.getData() }, "Enrollment subject retrieve success");
   }
 
-  async getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
+  private async getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<Result<EnrollmentSubjectData>> {
     const enrollmentSubject: EnrollmentSubjectData | undefined = await enrollmentRepository.getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId, subjectId);
 
     if (!enrollmentSubject) {
@@ -316,9 +310,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubject, "Enrollment subject retrieve success");
   }
 
-
-
-  async createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
+  public async createEnrollmentSubjectWithEnrollmentSubjectTypes(enrollmentId: number, subjectId: number, lecturerId: number, createEnrollmentSubjectTypes: CreateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
 
 
     // Check parameters exist.
@@ -584,7 +576,7 @@ class EnrollmentService implements IEnrollmentService {
    * @param semesterDateRanges 
    * @returns number[]
    */
-  findEnrollmentIdsFromOverlappingSemesterSchedule(programmeIntakes: ProgrammeIntakeData[], semesterDateRanges: SemesterSchedule[]): number[] {
+  private findEnrollmentIdsFromOverlappingSemesterSchedule(programmeIntakes: ProgrammeIntakeData[], semesterDateRanges: SemesterSchedule[]): number[] {
     const overlappingIds = new Set<number>();
 
     // Check each intake against all semester date ranges
@@ -621,7 +613,7 @@ class EnrollmentService implements IEnrollmentService {
    * @param programmeIntakes 
    * @returns SemesterSchedule[]
    */
-  mergeSemesterScheduleRanges(programmeIntakes: ProgrammeIntakeData[]): SemesterSchedule[] {
+  private mergeSemesterScheduleRanges(programmeIntakes: ProgrammeIntakeData[]): SemesterSchedule[] {
 
     const semesterRanges = programmeIntakes.map(intake => ({
       semesterStartDate: new Date(intake.semesterStartDate),
@@ -658,7 +650,7 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
-  async updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
+  public async updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number, updateEnrollmentSubjectTypes: UpdateEnrollmentSubjectTypeData[]): Promise<Result<EnrollmentSubjectWithTypesData>> {
 
 
     // Check parameters exist.
@@ -952,7 +944,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectWithEnrollmentSubjectTypes.getData(), "Enrollment subject update success");
   }
 
-  async deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>> {
+  public async deleteEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<null>> {
 
     // Check if enrollmentSubjectId
     const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
@@ -969,13 +961,13 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(null, "Enrollment subject delete success");
   }
 
-  async getEnrollmentSubjectCount(query: string = ""): Promise<Result<number>> {
+  private async getEnrollmentSubjectCount(query: string = ""): Promise<Result<number>> {
     const enrollmentSubjectCount: number = await enrollmentRepository.getEnrollmentSubjectCount(query);
 
     return Result.succeed(enrollmentSubjectCount, "Enrollment subject count retrieve success");
   }
 
-  async getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
+  public async getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
     // Check if params exist.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -995,7 +987,7 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
-  async getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {
+  public async getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {
     const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await enrollmentRepository.getEnrollmentScheduleByStudentId(studentId);
 
     if (!studentEnrollmentSchedule) {
@@ -1006,7 +998,7 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
-  async getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>> {
+  private async getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>> {
 
     // Check if parameter exist.
     const enrollmentSubjectResult: Result<EnrollmentSubjectData> = await this.getEnrollmentSubjectById(enrollmentSubjectId);
@@ -1019,7 +1011,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectTypes, "Enrollment subject type retrieve success");
   }
 
-  async getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<Result<EnrollmentSubjectTypeData[]>> {
+  private async getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<Result<EnrollmentSubjectTypeData[]>> {
 
     // Check if parameter exist.
     const enrollmentsResult: Result<EnrollmentData[]> = await this.getEnrollmentsByIds(enrollmentIds);
@@ -1037,7 +1029,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectTypes, "Enrollment subject type retrieve success");
   }
 
-  async getEnrollmentsByIds(enrollmentIds: number[]): Promise<Result<EnrollmentData[]>> {
+  private async getEnrollmentsByIds(enrollmentIds: number[]): Promise<Result<EnrollmentData[]>> {
 
 
     const duplicateEnrollmentIds: { [enrollmentId: number]: boolean } = {};
@@ -1071,7 +1063,7 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
-  async getEnrollmentSubjectTypesByIds(enrollmentSubjectTypesIds: number[]): Promise<Result<EnrollmentSubjectTypeData[]>> {
+  private async getEnrollmentSubjectTypesByIds(enrollmentSubjectTypesIds: number[]): Promise<Result<EnrollmentSubjectTypeData[]>> {
 
 
     const duplicateEnrollmentSubjectTypeIds: { [enrollmentSubjectTypeId: number]: boolean } = {};
@@ -1103,9 +1095,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollmentSubjectTypes, "Enrollment subject types retrieve success");
   }
 
-
-
-  async enrollStudentSubjects(studentId: number, enrollmentSubjectTypesIds: number[], isAdmin: boolean): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
+  public async enrollStudentSubjects(studentId: number, enrollmentSubjectTypesIds: number[], isAdmin: boolean): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
     // Check if params exist.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -1299,7 +1289,7 @@ class EnrollmentService implements IEnrollmentService {
   }
 
   // Make this return StudentEnrollmentSubjectData
-  async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
+  public async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
     // Check param exists.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -1323,7 +1313,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({ ...studentEnrollmentSchedule.getData(), enrollmentSubjectTypes: enrolledSubjects }, "enrolled subjects retrieve success");
   }
 
-  async getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>> {
+  public async getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>> {
     const enrollments: MonthlyEnrollmentData[] = await enrollmentRepository.getMonthlyEnrollmentCount(duration);
 
     return Result.succeed(enrollments, "Enrollments retrieve success");
