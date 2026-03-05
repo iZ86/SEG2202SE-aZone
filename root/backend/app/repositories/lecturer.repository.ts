@@ -16,7 +16,7 @@ interface ILecturerRepository {
 }
 
 class LecturerRepository implements ILecturerRepository {
-  getLecturers(query: string, pageSize: number, page: number): Promise<LecturerData[]> {
+  public getLecturers(query: string, pageSize: number, page: number): Promise<LecturerData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<LecturerData[]>(
@@ -45,7 +45,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  getLecturerById(lecturerId: number): Promise<LecturerData | undefined> {
+  public getLecturerById(lecturerId: number): Promise<LecturerData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<LecturerData[]>(
         "SELECT * " +
@@ -61,7 +61,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  getLecturerByEmail(email: string): Promise<LecturerData | undefined> {
+  public getLecturerByEmail(email: string): Promise<LecturerData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<LecturerData[]>(
         "SELECT * " +
@@ -76,7 +76,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader> {
+  public createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO LECTURER (firstName, lastName, lecturerTitleId, email, phoneNumber) " +
@@ -90,7 +90,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader> {
+  public updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE LECTURER SET firstName = ?, lastName = ?, lecturerTitleId = ?, email = ?, phoneNumber = ? " +
@@ -104,7 +104,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  deleteLecturerById(lecturerId: number): Promise<ResultSetHeader> {
+  public deleteLecturerById(lecturerId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM LECTURER WHERE lecturerId = ?;",
@@ -117,7 +117,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  getLecturerCount(query: string): Promise<number> {
+  public getLecturerCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -141,7 +141,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  getLecturerTitles(): Promise<LecturerTitleData[]> {
+  public getLecturerTitles(): Promise<LecturerTitleData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<LecturerTitleData[]>(
         "SELECT * " +
@@ -154,7 +154,7 @@ class LecturerRepository implements ILecturerRepository {
     });
   }
 
-  getLecturerTitleById(lecturerTitleId: number): Promise<LecturerTitleData | undefined> {
+  public getLecturerTitleById(lecturerTitleId: number): Promise<LecturerTitleData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<LecturerTitleData[]>(
         "SELECT * " +
