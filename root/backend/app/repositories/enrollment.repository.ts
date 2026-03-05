@@ -15,7 +15,6 @@ interface IEnrollmentRepository {
   getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined>;
   getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
-  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined>;
   createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader>;
   deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader>;
@@ -239,26 +238,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectByIdAndEnrollmentIdAndSubjectId(enrollmentSubjectId: number, enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<EnrollmentSubjectData[]>(
-        "SELECT * " +
-        "FROM ENROLLMENT_SUBJECT es " +
-        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
-        "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
-        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
-        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "WHERE es.enrollmentSubjectId = ? " +
-        "AND es.enrollmentId = ? " +
-        "AND es.subjectId = ?;",
-        [enrollmentSubjectId, enrollmentId, subjectId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
 
   createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
