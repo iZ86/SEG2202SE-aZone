@@ -14,3 +14,8 @@ export interface LecturerTitleData extends RowDataPacket {
   lecturerTitleId: number;
   lecturerTitle: string;
 }
+
+export interface LecturerWithCountData {
+  lecturers: LecturerData[];
+  lecturerCount: number;
+}
