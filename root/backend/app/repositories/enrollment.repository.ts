@@ -37,7 +37,7 @@ interface IEnrollmentRepository {
 }
 
 class EnrollmentRepository implements IEnrollmentRepository {
-  getEnrollments(query: string, pageSize: number, page: number): Promise<EnrollmentData[]> {
+  public getEnrollments(query: string, pageSize: number, page: number): Promise<EnrollmentData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentData[]>(
@@ -58,7 +58,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentsByIds(enrollmentIds: number[]): Promise<EnrollmentData[]> {
+  public getEnrollmentsByIds(enrollmentIds: number[]): Promise<EnrollmentData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentData[]>(
         "SELECT * " +
@@ -73,7 +73,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentById(enrollmentId: number): Promise<EnrollmentData | undefined> {
+  public getEnrollmentById(enrollmentId: number): Promise<EnrollmentData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentData[]>(
         "SELECT * " +
@@ -88,7 +88,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader> {
+  public createEnrollment(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO ENROLLMENT (enrollmentStartDateTime, enrollmentEndDateTime) " +
@@ -102,7 +102,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader> {
+  public updateEnrollmentById(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE ENROLLMENT SET enrollmentStartDateTime = ?, enrollmentEndDateTime = ? " +
@@ -116,7 +116,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  deleteEnrollmentById(enrollmentId: number): Promise<ResultSetHeader> {
+  public deleteEnrollmentById(enrollmentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM ENROLLMENT WHERE enrollmentId = ?;",
@@ -129,7 +129,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentCount(query: string): Promise<number> {
+  public getEnrollmentCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -146,7 +146,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined> {
+  public getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<EnrollmentData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentData[]>(
         "SELECT * " +
@@ -164,8 +164,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-
-  getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]> {
+  public getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<EnrollmentSubjectData[]> {
     const offset: number = (page - 1) * pageSize;
 
     return new Promise((resolve, reject) => {
@@ -198,7 +197,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined> {
+  public getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<EnrollmentSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectData[]>(
         "SELECT * " +
@@ -217,7 +216,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined> {
+  public getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectData[]>(
         "SELECT * " +
@@ -237,8 +236,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-
-  createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
+  public createEnrollmentSubject(enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO ENROLLMENT_SUBJECT (enrollmentId, subjectId, lecturerId) " +
@@ -252,7 +250,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
+  public updateEnrollmentSubjectById(enrollmentSubjectId: number, enrollmentId: number, subjectId: number, lecturerId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE ENROLLMENT_SUBJECT SET enrollmentId = ?, subjectId = ?, lecturerId = ? " +
@@ -266,7 +264,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader> {
+  public deleteEnrollmentSubjectById(enrollmentSubjectId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM ENROLLMENT_SUBJECT WHERE enrollmentSubjectId = ?;",
@@ -279,7 +277,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectCount(query: string): Promise<number> {
+  public getEnrollmentSubjectCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -306,7 +304,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule | undefined> {
+  public getEnrollmentScheduleByStudentId(studentId: number): Promise<StudentEnrollmentSchedule | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSchedule[]>(
         "SELECT scpi.programmeIntakeId, e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime " +
@@ -324,7 +322,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrolledSubjectsByStudentIdAndEnrollmentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]> {
+  public getEnrolledSubjectsByStudentIdAndEnrollmentId(studentId: number, enrollmentId: number): Promise<StudentEnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
@@ -353,7 +351,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
   }
 
 
-  getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
+  public getEnrollmentSubjectsByStudentId(studentId: number): Promise<StudentEnrollmentSubjectData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
@@ -384,7 +382,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectTypesByIds(enrollmentSubjectTypeIds: number[]): Promise<EnrollmentSubjectTypeData[]> {
+  public getEnrollmentSubjectTypesByIds(enrollmentSubjectTypeIds: number[]): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
         "SELECT est.* " +
@@ -399,7 +397,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
+  public getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
         "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
@@ -418,7 +416,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]> {
+  public getEnrollmentSubjectTypesByEnrollmentIds(enrollmentIds: number[]): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
         "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
@@ -437,8 +435,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-
-  createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader> {
+  public createEnrollmentSubjectTypes(enrollmentSubjectTypes: (string | number | Date)[][]): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO ENROLLMENT_SUBJECT_TYPE (enrollmentSubjectId, classTypeId, venueId, startTime, endTime, dayId, numberOfSeats, grouping, lecturerId) " +
@@ -452,7 +449,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader> {
+  public deleteStudentEnrollmentSubjectTypeByStudentId(studentId: number, enrollmentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE sest " +
@@ -470,7 +467,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader> {
+  public createStudentEnrollmentSubjectType(studentEnrollmentSubjectTypes: number[][]): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO STUDENT_ENROLLMENT_SUBJECT_TYPE (studentId, enrollmentSubjectTypeId, subjectStatusId) VALUES ?;",
@@ -483,7 +480,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]> {
+  public getMonthlyEnrollmentCount(duration: number): Promise<MonthlyEnrollmentData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<MonthlyEnrollmentData[]>(
         "SELECT DATE_FORMAT(enrollmentStartDateTime, '%Y-%m') AS month, COUNT(*) AS enrollmentCount " +
@@ -500,7 +497,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  async getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]> {
+  public getEnrollmentSubjectTypesByEnrollmentId(enrollmentId: number): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
         "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
@@ -519,7 +516,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  async updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType: UpdateEnrollmentSubjectTypeData): Promise<ResultSetHeader> {
+  public updateEnrollmentSubjectTypeById(updateEnrollmentSubjectType: UpdateEnrollmentSubjectTypeData): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE ENROLLMENT_SUBJECT_TYPE SET classTypeId = ?, venueId = ?, startTime = ?, endTime = ?, dayId = ?, numberOfSeats = ?, grouping = ?, lecturerId = ? " +
@@ -535,7 +532,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     })
   }
 
-  async deleteEnrollmentSubjectTypesByEnrollmentSubjectIdAndNotIds(enrollmentSubjectId: number, enrollmentSubjectTypeIds: number[]): Promise<ResultSetHeader> {
+  public deleteEnrollmentSubjectTypesByEnrollmentSubjectIdAndNotIds(enrollmentSubjectId: number, enrollmentSubjectTypeIds: number[]): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM ENROLLMENT_SUBJECT_TYPE " +
@@ -551,7 +548,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
   }
 
 
-  async deleteEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader> {
+  public deleteEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM ENROLLMENT_SUBJECT_TYPE " +
@@ -565,7 +562,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     })
   }
 
-  async getEnrollmentSubjectTypesByEnrollmentIdAndNotEnrollmentSubjectId(enrollmentId: number, enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
+  public getEnrollmentSubjectTypesByEnrollmentIdAndNotEnrollmentSubjectId(enrollmentId: number, enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
         "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
