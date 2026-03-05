@@ -15,7 +15,7 @@ interface ILecturerService {
 }
 
 class LecturerService implements ILecturerService {
-  async getLecturers(query: string, pageSize: number, page: number): Promise<Result<LecturerWithCountData>> {
+  public async getLecturers(query: string, pageSize: number, page: number): Promise<Result<LecturerWithCountData>> {
     const lecturers: LecturerData[] = await lecturerRepository.getLecturers(query, pageSize, page);
 
     const lecturerCount: Result<number> = await this.getLecturerCount(query);
@@ -23,7 +23,7 @@ class LecturerService implements ILecturerService {
     return Result.succeed({lecturers, lecturerCount: lecturerCount.getData()}, "Lecturers retrieve success");
   }
 
-  async getLecturerById(lecturerId: number): Promise<Result<LecturerData>> {
+  public async getLecturerById(lecturerId: number): Promise<Result<LecturerData>> {
     const lecturer: LecturerData | undefined = await lecturerRepository.getLecturerById(lecturerId);
 
     if (!lecturer) {
@@ -33,7 +33,7 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturer, "Lecturer retrieve success");
   }
 
-  async getLecturerByEmail(email: string): Promise<Result<LecturerData>> {
+  private async getLecturerByEmail(email: string): Promise<Result<LecturerData>> {
     const lecturerData: LecturerData | undefined = await lecturerRepository.getLecturerByEmail(email);
 
     if (!lecturerData) {
@@ -43,7 +43,7 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturerData, "Lecturer retrieve success");
   }
 
-  async createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
+  public async createLecturer(firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
     const lecturerResult: Result<LecturerData> = await this.getLecturerByEmail(email);
 
     if (lecturerResult.isSuccess()) {
@@ -65,7 +65,7 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturer.getData(), "Lecturer create success");
   }
 
-  async updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
+  public async updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
     const lecturerResult: Result<LecturerData> = await this.getLecturerById(lecturerId);
 
     if (!lecturerResult.isSuccess()) {
@@ -95,7 +95,7 @@ class LecturerService implements ILecturerService {
     return Result.succeed(lecturer.getData(), "Lecturer update success");
   }
 
-  async deleteLecturerById(lecturerId: number): Promise<Result<null>> {
+  public async deleteLecturerById(lecturerId: number): Promise<Result<null>> {
     const lecturerResult: Result<LecturerData> = await this.getLecturerById(lecturerId);
 
     if (!lecturerResult.isSuccess()) {
@@ -111,19 +111,19 @@ class LecturerService implements ILecturerService {
     return Result.succeed(null, "Lecturer delete success");
   }
 
-  async getLecturerCount(query: string = ""): Promise<Result<number>> {
+  private async getLecturerCount(query: string = ""): Promise<Result<number>> {
     const lecturerCount: number = await lecturerRepository.getLecturerCount(query);
 
     return Result.succeed(lecturerCount, "Lecturer count retrieve success");
   }
 
-  async getLecturerTitles(): Promise<Result<LecturerTitleData[]>> {
+  public async getLecturerTitles(): Promise<Result<LecturerTitleData[]>> {
     const lecturerTitle: LecturerTitleData[] = await lecturerRepository.getLecturerTitles();
 
     return Result.succeed(lecturerTitle, "Lecturer title retrieve success");
   }
 
-  async getLecturerTitleById(lecturerTitleId: number): Promise<Result<LecturerTitleData>> {
+  public async getLecturerTitleById(lecturerTitleId: number): Promise<Result<LecturerTitleData>> {
     const lecturerTitle: LecturerTitleData | undefined = await lecturerRepository.getLecturerTitleById(lecturerTitleId);
 
     if (!lecturerTitle) {
