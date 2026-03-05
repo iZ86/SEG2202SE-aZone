@@ -1353,7 +1353,7 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed({ ...studentEnrollmentSchedule.getData(), enrollmentSubjectTypes: enrolledSubjects }, "enrolled subjects retrieve success");
   }
 
-  async getMonthlyEnrollmentCount(duration: number = 6): Promise<Result<MonthlyEnrollmentData[]>> {
+  async getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>> {
     const enrollments: MonthlyEnrollmentData[] = await enrollmentRepository.getMonthlyEnrollmentCount(duration);
 
     return Result.succeed(enrollments, "Enrollments retrieve success");
