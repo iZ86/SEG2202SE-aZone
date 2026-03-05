@@ -24,7 +24,6 @@ interface IEnrollmentService {
   deleteEnrollmentById(enrollmentId: number): Promise<Result<null>>;
   getEnrollmentCount(query: string): Promise<Result<number>>;
   getEnrollmentByEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
-  getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>>;
   getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>>;
   getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>>;
   getEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectWithTypesData>>
@@ -275,15 +274,6 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrollment, "Enrollment retrieve success");
   }
 
-  async getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId: number, enrollmentStartDateTime: Date, enrollmentEndDateTime: Date): Promise<Result<EnrollmentData>> {
-    const enrollment: EnrollmentData | undefined = await enrollmentRepository.getEnrollmentByIdAndEnrollmentStartDateTimeAndEnrollmentEndDateTime(enrollmentId, enrollmentStartDateTime, enrollmentEndDateTime);
-
-    if (!enrollment) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment not found");
-    }
-
-    return Result.succeed(enrollment, "Enrollment retrieve success");
-  }
 
   async getEnrollmentSubjects(query: string, pageSize: number, page: number): Promise<Result<EnrollmentSubjectWithCountData>> {
     const enrollmentSubjects: EnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjects(query, pageSize, page);
