@@ -116,7 +116,7 @@ class LecturerService implements ILecturerService {
   async getLecturerCount(query: string = ""): Promise<Result<number>> {
     const lecturerCount: number = await lecturerRepository.getLecturerCount(query);
 
-    return Result.succeed(lecturerCount ? lecturerCount : 0, "Lecturer count retrieve success");
+    return Result.succeed(lecturerCount, "Lecturer count retrieve success");
   }
 
   async getLecturerTitles(): Promise<Result<LecturerTitleData[]>> {
