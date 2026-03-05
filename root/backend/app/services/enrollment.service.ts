@@ -35,7 +35,6 @@ interface IEnrollmentService {
   getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>>;
   getEnrollmentSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getEnrollmentSubjectTypesByEnrollmentSubjectId(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectTypeData[]>>;
-  getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>>;
   enrollStudentSubjects(studentId: number, enrollmentSubjectTypesIds: number[], isAdmin: boolean): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>>;
   getMonthlyEnrollmentCount(duration: number): Promise<Result<MonthlyEnrollmentData[]>>;
@@ -1105,15 +1104,6 @@ class EnrollmentService implements IEnrollmentService {
   }
 
 
-  async getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime: Date, endTime: Date, venueId: number, dayId: number): Promise<Result<EnrollmentSubjectTypeData>> {
-    const enrollmentSubjectType: EnrollmentSubjectTypeData | undefined = await enrollmentRepository.getEnrollmentSubjectTypeByStartTimeAndEndTimeAndVenueIdAndDayId(startTime, endTime, venueId, dayId);
-
-    if (!enrollmentSubjectType) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Enrollment subject type not found");
-    }
-
-    return Result.succeed(enrollmentSubjectType, "Enrollment subject type retrieve success");
-  }
 
   async enrollStudentSubjects(studentId: number, enrollmentSubjectTypesIds: number[], isAdmin: boolean): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
