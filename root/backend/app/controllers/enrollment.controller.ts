@@ -304,7 +304,8 @@ export default class EnrollmentController {
   }
 
   async getMonthlyEnrollmentCount(req: Request, res: Response) {
-    const duration: number = Number(req.query.duration);
+    const duration: number = Number(req.query.duration) || 6;
+
     const response: Result<MonthlyEnrollmentData[]> = await enrollmentService.getMonthlyEnrollmentCount(duration);
 
     if (response.isSuccess()) {
