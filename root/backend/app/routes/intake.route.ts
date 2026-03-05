@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import IntakeController from "../controllers/intake.controller";
-import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateIntakeValidator, intakeParamValidator } from "../validators/intake-validator";
+import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
+import { createAndUpdateIntakeValidator, intakeParamValidator, getIntakesQueryValidator} from "../validators/intake-validator";
 
 class IntakeRoute {
   router = Router();
@@ -13,7 +13,7 @@ class IntakeRoute {
   }
 
   initializeRoutes() {
-    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getIntakes));
+    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getIntakesQueryValidator, asyncHandler(this.controller.getIntakes));
     this.router.get("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, asyncHandler(this.controller.getIntakeById));
 
     this.router.put("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, createAndUpdateIntakeValidator, asyncHandler(this.controller.updateIntakeById));
