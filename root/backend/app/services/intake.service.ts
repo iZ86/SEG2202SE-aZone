@@ -103,7 +103,7 @@ class IntakeService implements IIntakeService {
   async getIntakeCount(query: string = ""): Promise<Result<number>> {
     const intakeCount: number = await intakeRepository.getIntakeCount(query);
 
-    return Result.succeed(intakeCount ? intakeCount : 0, "Intake count retrieve success");
+    return Result.succeed(intakeCount, "Intake count retrieve success");
   }
 }
 
