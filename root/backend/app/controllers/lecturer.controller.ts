@@ -23,7 +23,7 @@ export default class LecturerController {
   }
 
   async getLecturerById(req: Request, res: Response) {
-    const lecturerId: number = Number(req.params.lecturerId as string);
+    const lecturerId: number = Number(req.params.lecturerId);
 
     const response: Result<LecturerData> = await lecturerService.getLecturerById(lecturerId);
 
