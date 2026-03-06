@@ -26,7 +26,6 @@ interface IProgrammeService {
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
-  getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>>;
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
@@ -233,15 +232,6 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
-  async getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>> {
-    const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId, programmeId, intakeId, semester);
-
-    if (!programmeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
-    }
-
-    return Result.succeed(programmeIntake, "Programme intake retrieve success");
-  }
 
   async createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
 
