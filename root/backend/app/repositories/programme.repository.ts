@@ -415,7 +415,7 @@ class ProgrammeRepository implements IProgrammeRepository {
 
       const params: any[] = [studentId];
 
-      if (status && status != 0) {
+      if (status != ENUM_PROGRAMME_STATUS.ALL) {
         sql += "AND scpi.status = ?;";
         params.push(status);
       }
