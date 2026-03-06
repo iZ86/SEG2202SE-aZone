@@ -148,29 +148,25 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]> {
+  getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]> {
+    const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      let sql: string = `
-      SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, sm.studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status 
-      FROM PROGRAMME_INTAKE pi
-      INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId
-      INNER JOIN INTAKE i ON pi.intakeId = i.intakeId
-      INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId
-      WHERE p.programmeName LIKE ?
-      OR i.intakeId LIKE ? `;
-
-      const params: any[] = [
-        "%" + query + "%",
-        "%" + query + "%",
-      ];
-
-      if (page != null && pageSize != null) {
-        const offset: number = (page - 1) * pageSize;
-        sql += "LIMIT ? OFFSET ? ";
-        params.push(pageSize, offset);
-      }
-
-      databaseConn.query<ProgrammeIntakeData[]>(sql, params,
+      databaseConn.query<ProgrammeIntakeData[]>(
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, " +
+        "sm.studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "FROM PROGRAMME_INTAKE pi " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
+        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
+        "WHERE p.programmeName LIKE ? " +
+        "OR i.intakeId LIKE ? " +
+        "LIMIT ? OFFSET ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          pageSize,
+          offset
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
