@@ -5,6 +5,11 @@ export interface ProgrammeData extends RowDataPacket {
   programmeName: string;
 }
 
+export interface ProgrammeWithCountData {
+  programmes: ProgrammeData[];
+  programmeCount: number;
+}
+
 export interface ProgrammeIntakeData extends RowDataPacket {
   programmeIntakeId: number;
   programmeId: number;
