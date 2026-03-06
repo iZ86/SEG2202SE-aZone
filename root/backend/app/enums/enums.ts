@@ -14,6 +14,7 @@ export enum ENUM_USER_ROLE {
 }
 
 export enum ENUM_PROGRAMME_STATUS {
+  ALL = 0, // Means all status
   ACTIVE = 1,
   COMPLETED = 2,
   FINISHED = 3,
