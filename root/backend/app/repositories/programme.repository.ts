@@ -28,7 +28,6 @@ interface IProgrammeRepository {
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
   getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]>;
@@ -445,32 +444,6 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   };
 
-  getStudentCourseProgrammeIntakeByStudentId(studentId: number, status: number): Promise<StudentCourseProgrammeIntakeData[] | undefined> {
-    return new Promise((resolve, reject) => {
-      let sql: string = `
-          SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus
-          FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi
-          INNER JOIN COURSE c ON scpi.courseId = c.courseId
-          INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId
-          INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId
-          INNER JOIN INTAKE i ON i.intakeId = pi.intakeId
-          WHERE scpi.studentId = ? `;
-
-      const params: any[] = [studentId];
-
-      if (status && status != 0) {
-        sql += "AND scpi.status = ?;";
-        params.push(status);
-      }
-
-      databaseConn.query<StudentCourseProgrammeIntakeData[]>(sql, params,
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res);
-        }
-      );
-    });
-  };
 
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
