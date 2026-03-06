@@ -93,8 +93,8 @@ export default class ProgrammeController {
   }
 
   async getProgrammeIntakes(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const page: number = Number(req.query.page) || 1;
+    const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<ProgrammeIntakeWithCountData> = await programmeService.getProgrammeIntakes(query, pageSize, page);
