@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS, ENUM_STUDY_MODE } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
 import { CourseData } from "../models/course-model";
@@ -14,7 +14,7 @@ import intakeService from "./intake.service";
 import { IntakeData } from "../models/intake-model";
 
 interface IProgrammeService {
-  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>>;
+  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeWithCountData>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
   getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>>;
   getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
@@ -43,10 +43,12 @@ interface IProgrammeService {
 }
 
 class ProgrammeService implements IProgrammeService {
-  async getProgrammes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeData[]>> {
+  async getProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeWithCountData>> {
     const programmes: ProgrammeData[] = await programmeRepository.getProgrammes(query, pageSize, page);
 
-    return Result.succeed(programmes, "Programmes retrieve success");
+    const programmeCount: Result<number> = await this.getProgrammeCount(query);
+
+    return Result.succeed({programmes, programmeCount: programmeCount.getData()}, "Programmes retrieve success");
   }
 
   async getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>> {
