@@ -423,7 +423,7 @@ class ProgrammeService implements IProgrammeService {
   async getProgrammeIntakeCount(query: string = ""): Promise<Result<number>> {
     const programmeIntakeCount: number = await programmeRepository.getProgrammeIntakeCount(query);
 
-    return Result.succeed(programmeIntakeCount ? programmeIntakeCount : 0, "Programme intake count retrieve success");
+    return Result.succeed(programmeIntakeCount, "Programme intake count retrieve success");
   }
 
   async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
