@@ -36,6 +36,14 @@ export const getProgrammeHistoryQueryValidator: any = [
     .isInt().withMessage('status must be a number'),
   validate,
 ]
+
+export const getAdminProgrammeHistoryQueryValidator: any = [
+  query('studentId')
+    .isInt().withMessage('studentId must be a number'),
+  validate,
+]
+
+
 export const createAndUpdateProgrammeValidator: any = [
   body('programmeName')
     .trim()
