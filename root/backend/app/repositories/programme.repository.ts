@@ -6,7 +6,7 @@ import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
 
 
 interface IProgrammeRepository {
-  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]>;
+  getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
   getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined>;
   getProgrammeByName(programmeName: string): Promise<ProgrammeData | undefined>;
   getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<ProgrammeData | undefined>;
@@ -38,25 +38,21 @@ interface IProgrammeRepository {
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
-  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeData[]> {
+  getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]> {
+    const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      let sql: string = `
-      SELECT programmeId, programmeName
-      FROM PROGRAMME
-      WHERE programmeId LIKE ?
-      OR programmeName LIKE ? `;
-
-      const params: any[] = [
-        "%" + query + "%",
-        "%" + query + "%",
-      ];
-
-      if (page != null && pageSize != null) {
-        const offset: number = (page - 1) * pageSize;
-        sql += "LIMIT ? OFFSET ? ";
-        params.push(pageSize, offset);
-      }
-      databaseConn.query<ProgrammeData[]>(sql, params,
+      databaseConn.query<ProgrammeData[]>(
+        "SELECT p.programmeId, p.programmeName " +
+        "FROM PROGRAMME p " +
+        "WHERE p.programmeId LIKE ? " +
+        "OR p.programmeName LKE ? " +
+        "LIMIT ? OFFSET ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          pageSize,
+          offset
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
