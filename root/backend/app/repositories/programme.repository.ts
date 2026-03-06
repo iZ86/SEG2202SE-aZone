@@ -45,7 +45,7 @@ class ProgrammeRepository implements IProgrammeRepository {
         "SELECT p.programmeId, p.programmeName " +
         "FROM PROGRAMME p " +
         "WHERE p.programmeId LIKE ? " +
-        "OR p.programmeName LKE ? " +
+        "OR p.programmeName LIKE ? " +
         "LIMIT ? OFFSET ?;",
         [
           "%" + query + "%",
