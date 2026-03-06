@@ -17,7 +17,7 @@ export const programmeIntakeParamValidator: any = [
   validate,
 ]
 
-export const getProgrammesQueryValidator: any = [
+export const getProgrammesAndIntakesQueryValidator: any = [
   query('page')
     .optional()
     .isInt().withMessage('page must be a number'),
