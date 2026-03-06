@@ -227,17 +227,8 @@ export default class ProgrammeController {
 
     } else if (isAdmin) {
 
-      const studentIdStr: string = req.query.studentId as string || "";
-
-      if (studentIdStr.length === 0) {
-        return res.sendError.badRequest("Invalid studentId");
-      }
-
-      const studentId: number = parseInt(studentIdStr);
-
-      if (!studentId || isNaN(studentId)) {
-        return res.sendError.badRequest("Invalid studentId");
-      }
+      // Not optional
+      const studentId: number = Number(req.query.studentId);
 
       const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(studentId, status);
 
