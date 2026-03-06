@@ -14,7 +14,6 @@ interface IProgrammeRepository {
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined>;
   getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined>;
-  getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined>;
   getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]>;
@@ -255,26 +254,6 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakeByIdAndProgrammeIdAndIntakeIdAndSemester(programmeIntakeId: number, programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
-        "FROM PROGRAMME_INTAKE pi " +
-        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
-        "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
-        "WHERE pi.programmeIntakeId = ? " +
-        "AND pi.programmeId = ? " +
-        "AND pi.intakeId = ? " +
-        "AND pi.semester = ?;",
-        [programmeIntakeId, programmeId, intakeId, semester],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
 
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
