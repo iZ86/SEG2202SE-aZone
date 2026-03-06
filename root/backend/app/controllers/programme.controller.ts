@@ -4,10 +4,11 @@ import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData } from "../models/programme-model";
 
+
 export default class ProgrammeController {
   async getProgrammes(req: Request, res: Response) {
-    const page: number | null = parseInt(req.query.page as string) || null;
-    const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+    const page: number = Number(req.query.page) || 1;
+    const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<ProgrammeWithCountData> = await programmeService.getProgrammes(query, pageSize, page);
