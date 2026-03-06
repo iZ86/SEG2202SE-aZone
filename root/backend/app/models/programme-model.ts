@@ -24,6 +24,11 @@ export interface ProgrammeIntakeData extends RowDataPacket {
   status: number;
 }
 
+export interface ProgrammeIntakeWithCountData {
+  programmeIntakes: ProgrammeIntakeData[];
+  programmeIntakeCount: number;
+}
+
 export interface ProgrammeHistoryData extends RowDataPacket {
   studentId: number;
   firstName: string;
