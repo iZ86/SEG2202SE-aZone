@@ -21,7 +21,7 @@ class ProgrammeRoute {
     this.router.get("/distribution", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getProgrammeDistribution));
     this.router.get("/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getProgrammeIntakeById));
     this.router.get("/:programmeId/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getProgrammeIntakesByProgrammeId));
-    this.router.get("/:programmeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getProgrammeById));
+    this.router.get("/:programmeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, programmeParamValidator, asyncHandler(this.controller.getProgrammeById));
 
     this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateProgrammeValidator, asyncHandler(this.controller.createProgramme));
     this.router.post("/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateProgrammeIntakeValidator, asyncHandler(this.controller.createProgrammeIntake));
