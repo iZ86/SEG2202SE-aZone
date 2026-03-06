@@ -9,7 +9,6 @@ interface IProgrammeRepository {
   getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]>;
   getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined>;
   getProgrammeByName(programmeName: string): Promise<ProgrammeData | undefined>;
-  getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<ProgrammeData | undefined>;
   createProgramme(programmeName: string): Promise<ResultSetHeader>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader>;
   deleteProgrammeById(programmeId: number): Promise<ResultSetHeader>;
@@ -91,21 +90,6 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<ProgrammeData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<ProgrammeData[]>(
-        "SELECT programmeId, programmeName " +
-        "FROM PROGRAMME " +
-        "WHERE programmeName = ? " +
-        "AND programmeId = ?;",
-        [programmeName, programmeId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
-        }
-      );
-    });
-  }
 
   createProgramme(programmeName: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
