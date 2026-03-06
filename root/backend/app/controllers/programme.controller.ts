@@ -206,7 +206,7 @@ export default class ProgrammeController {
     const userId: number = req.user.userId as number;
     const isStudent: boolean = req.user.isStudent as boolean;
     const isAdmin: boolean = req.user.isAdmin as boolean;
-    const status: number = parseInt(req.query.status as string) || 0;
+    const status: number = Number(req.query.status) || ENUM_PROGRAMME_STATUS.ALL;
 
     if (isStudent) {
 
