@@ -30,6 +30,12 @@ export const getProgrammesAndIntakesQueryValidator: any = [
   validate,
 ]
 
+export const getProgrammeHistoryQueryValidator: any = [
+  query('status')
+    .optional()
+    .isInt().withMessage('status must be a number'),
+  validate,
+]
 export const createAndUpdateProgrammeValidator: any = [
   body('programmeName')
     .trim()
