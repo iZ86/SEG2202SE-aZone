@@ -427,13 +427,21 @@ class ProgrammeService implements IProgrammeService {
   }
 
   async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
-    const studentCourseProgrammeIntake: ProgrammeHistoryData[] | undefined = await programmeRepository.getProgrammeHistoryByStudentId(studentId, status);
 
-    if (!studentCourseProgrammeIntake) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
+
+    // Check status valid or not.
+    if (!(status in ENUM_PROGRAMME_STATUS)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid status");
     }
 
-    return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
+    const programmeHistoryList: ProgrammeHistoryData[] = await programmeRepository.getProgrammeHistoryByStudentId(studentId, status);
+    if (programmeHistoryList.length > 0) {
+      programmeHistoryList.map((programmeHistory) => {
+        const statusText = ENUM_PROGRAMME_STATUS[programmeHistory.status];
+        programmeHistory.statusLabel = statusText.charAt(0) + statusText.slice(1).toLowerCase();
+      })
+    }
+    return Result.succeed(programmeHistoryList, "Students course programme intakes retrieve success");
   }
 
   async getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {

@@ -214,30 +214,7 @@ export default class ProgrammeController {
 
       if (response.isSuccess()) {
         return res.sendSuccess.ok(
-          response.getData().map((data) => {
-            let statusLabel: string;
-            switch (data.courseStatus) {
-              case ENUM_PROGRAMME_STATUS.ACTIVE:
-                statusLabel = "Active";
-                break;
-              case ENUM_PROGRAMME_STATUS.COMPLETED:
-                statusLabel = "Completed";
-                break;
-              case ENUM_PROGRAMME_STATUS.FINISHED:
-                statusLabel = "Finished";
-                break;
-              case ENUM_PROGRAMME_STATUS.DROPPED:
-                statusLabel = "Dropped";
-                break;
-              default:
-                statusLabel = "Unknown";
-            }
-
-            return {
-              ...data,
-              status: statusLabel,
-            };
-          }),
+          response.getData(),
           response.getMessage()
         );
       } else {
@@ -266,30 +243,7 @@ export default class ProgrammeController {
 
       if (response.isSuccess()) {
         return res.sendSuccess.ok(
-          response.getData().map((data) => {
-            let statusLabel: string;
-            switch (data.courseStatus) {
-              case ENUM_PROGRAMME_STATUS.ACTIVE:
-                statusLabel = "Active";
-                break;
-              case ENUM_PROGRAMME_STATUS.COMPLETED:
-                statusLabel = "Completed";
-                break;
-              case ENUM_PROGRAMME_STATUS.FINISHED:
-                statusLabel = "Finished";
-                break;
-              case ENUM_PROGRAMME_STATUS.DROPPED:
-                statusLabel = "Dropped";
-                break;
-              default:
-                statusLabel = "Unknown";
-            }
-
-            return {
-              ...data,
-              status: statusLabel,
-            };
-          }),
+          response.getData(),
           response.getMessage()
         );
       } else {
