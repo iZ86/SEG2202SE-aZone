@@ -405,7 +405,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
-          SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus
+          SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status
           FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi
           INNER JOIN COURSE c ON scpi.courseId = c.courseId
           INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId
