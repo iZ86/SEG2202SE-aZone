@@ -27,7 +27,6 @@ interface IProgrammeRepository {
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]>;
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
   getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]>;
