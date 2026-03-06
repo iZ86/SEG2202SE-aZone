@@ -10,6 +10,18 @@ export const asyncHandler = (fn: Function) => (req: Request, res: Response, next
     .catch(next);
 };
 
+/** Used to run validators if the role is admin. */
+export const runValidatorIfAdmin = (fns: Function[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user.isAdmin) return next();
+    let i = 0;
+    const runNext = () => {
+      if (i >= fns.length) return next();
+      fns[i++](req, res, runNext);
+    };
+    runNext();
+  };
+
 export function isDateRangeClashing(
   startTime: Date,
   endTime: Date,
