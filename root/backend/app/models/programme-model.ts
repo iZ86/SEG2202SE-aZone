@@ -44,7 +44,7 @@ export interface ProgrammeHistoryData extends RowDataPacket {
   semester: number;
   semesterStartDate: Date;
   semesterEndDate: Date;
-  courseStatus: number;
+  status: number;
 }
 
 export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
