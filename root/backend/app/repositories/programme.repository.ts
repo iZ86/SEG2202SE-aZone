@@ -36,7 +36,7 @@ interface IProgrammeRepository {
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
-  getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]> {
+  public getProgrammes(query: string, pageSize: number, page: number): Promise<ProgrammeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeData[]>(
@@ -59,7 +59,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined> {
+  public getProgrammeById(programmeId: number): Promise<ProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeData[]>(
         "SELECT programmeId, programmeName " +
@@ -74,7 +74,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeByName(programmeName: string): Promise<ProgrammeData | undefined> {
+  public getProgrammeByName(programmeName: string): Promise<ProgrammeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeData[]>(
         "SELECT programmeId, programmeName " +
@@ -89,8 +89,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-
-  createProgramme(programmeName: string): Promise<ResultSetHeader> {
+  public createProgramme(programmeName: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO PROGRAMME (programmeName) " +
@@ -104,7 +103,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader> {
+  public updateProgrammeById(programmeId: number, programmeName: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE PROGRAMME SET programmeName = ? " +
@@ -118,7 +117,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  deleteProgrammeById(programmeId: number): Promise<ResultSetHeader> {
+  public deleteProgrammeById(programmeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM PROGRAMME WHERE programmeId = ?;",
@@ -131,7 +130,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]> {
+  public getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<ProgrammeIntakeData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
@@ -158,7 +157,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]> {
+  public getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
@@ -178,7 +177,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]> {
+  public getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
@@ -198,7 +197,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined> {
+  public getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
@@ -216,7 +215,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<ProgrammeIntakeData[]> {
+  public getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
@@ -234,7 +233,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
+  public getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
@@ -254,8 +253,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-
-  createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
+  public createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO PROGRAMME_INTAKE (programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status) " +
@@ -269,7 +267,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
+  public updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE PROGRAMME_INTAKE SET programmeId = ?, intakeId = ?, studyModeId = ?, semester = ?, semesterStartDate = ?, semesterEndDate = ?, status = ? " +
@@ -283,7 +281,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader> {
+  public deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM PROGRAMME_INTAKE WHERE programmeIntakeId = ?;",
@@ -296,7 +294,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<ResultSetHeader> {
+  public updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE PROGRAMME_INTAKE SET enrollmentId = ? " +
@@ -310,7 +308,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader> {
+  public deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE PROGRAMME_INTAKE SET enrollmentId = ? " +
@@ -324,7 +322,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeCount(query: string): Promise<number> {
+  public getProgrammeCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -343,7 +341,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakeCount(query: string): Promise<number> {
+  public getProgrammeIntakeCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -365,7 +363,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]> {
+  public getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
           SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status
@@ -392,7 +390,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   };
 
-  getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
+  public getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentCourseProgrammeIntakeData[]>(
         "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.status AS courseStatus " +
@@ -415,7 +413,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   };
 
-  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader> {
+  public updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET status = ? " +
@@ -431,7 +429,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   };
 
 
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
+  public createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO STUDENT_COURSE_PROGRAMME_INTAKE (studentId, courseId, programmeIntakeId, status) " +
@@ -445,8 +443,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   };
 
-
-  deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
+  public deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM STUDENT_COURSE_PROGRAMME_INTAKE " +
@@ -462,7 +459,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeDistribution(): Promise<ProgrammeDistribution[]> {
+  public getProgrammeDistribution(): Promise<ProgrammeDistribution[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeDistribution[]>(
         "SELECT p.programmeName, COUNT(*) AS count, ROUND(COUNT(*) * 100 / SUM(COUNT(*)) OVER (), 0) AS percentage " +
@@ -479,7 +476,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]> {
+  public getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
@@ -499,7 +496,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  isExistProgrammeIntakesByProgrammeId(programmeId: number): Promise<IsExist | undefined> {
+  public isExistProgrammeIntakesByProgrammeId(programmeId: number): Promise<IsExist | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<IsExist[]>(
         "SELECT 1 AS value " +
