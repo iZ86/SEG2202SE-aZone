@@ -17,7 +17,6 @@ interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeWithCountData>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
   getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>>;
-  getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   createProgramme(programmeName: string): Promise<Result<ProgrammeData>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
@@ -71,15 +70,6 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programme, "Programme retrieve success");
   }
 
-  async getProgrammeByIdAndName(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
-    const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeByIdAndName(programmeId, programmeName);
-
-    if (!programme) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme not found");
-    }
-
-    return Result.succeed(programme, "Programme retrieve success");
-  }
 
   async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
 
