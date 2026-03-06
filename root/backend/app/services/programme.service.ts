@@ -16,7 +16,6 @@ import { IntakeData } from "../models/intake-model";
 interface IProgrammeService {
   getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeWithCountData>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
-  getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>>;
   createProgramme(programmeName: string): Promise<Result<ProgrammeData>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
@@ -25,31 +24,28 @@ interface IProgrammeService {
   getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>>;
-  getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>>;
   updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>>;
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
   updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
-  getProgrammeCount(query: string): Promise<Result<number>>;
-  getProgrammeIntakeCount(query: string): Promise<Result<number>>;
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
-  getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
+  getProgrammeIntakesByStatus(status: number): Promise<Result<ProgrammeIntakeData[]>>;
 }
 
 class ProgrammeService implements IProgrammeService {
-  async getProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeWithCountData>> {
+  public async getProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeWithCountData>> {
     const programmes: ProgrammeData[] = await programmeRepository.getProgrammes(query, pageSize, page);
 
     const programmeCount: Result<number> = await this.getProgrammeCount(query);
 
-    return Result.succeed({programmes, programmeCount: programmeCount.getData()}, "Programmes retrieve success");
+    return Result.succeed({ programmes, programmeCount: programmeCount.getData() }, "Programmes retrieve success");
   }
 
-  async getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>> {
+  public async getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>> {
     const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeById(programmeId);
 
     if (!programme) {
@@ -59,7 +55,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programme, "Programme retrieve success");
   }
 
-  async getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>> {
+  private async getProgrammeByName(programmeName: string): Promise<Result<ProgrammeData>> {
     const programme: ProgrammeData | undefined = await programmeRepository.getProgrammeByName(programmeName);
 
     if (!programme) {
@@ -69,8 +65,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programme, "Programme retrieve success");
   }
 
-
-  async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
+  public async createProgramme(programmeName: string): Promise<Result<ProgrammeData>> {
 
     // Check if programmeName is already used.
     const isProgrammeNameDuplicated: Result<ProgrammeData> = await this.getProgrammeByName(programmeName);
@@ -94,7 +89,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programme.getData(), "Programme create success");
   }
 
-  async updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
+  public async updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>> {
 
     // Check param exist.
     const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
@@ -129,7 +124,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programme.getData(), "Programme update success");
   }
 
-  async deleteProgrammeById(programmeId: number): Promise<Result<null>> {
+  public async deleteProgrammeById(programmeId: number): Promise<Result<null>> {
     // Check param exist.
     const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
     if (!programmeResult.isSuccess()) {
@@ -152,20 +147,20 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme delete success");
   }
 
-  async getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeWithCountData>> {
+  public async getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeWithCountData>> {
     const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakes(query, pageSize, page);
 
     const programmeIntakeCount: Result<number> = await this.getProgrammeIntakeCount(query);
-    return Result.succeed({programmeIntakes, programmeIntakeCount: programmeIntakeCount.getData()}, "Programme retrieve success");
+    return Result.succeed({ programmeIntakes, programmeIntakeCount: programmeIntakeCount.getData() }, "Programme retrieve success");
   }
 
-  async getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>> {
+  public async getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>> {
     const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByProgrammeId(programmeId);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
   }
 
-  async getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
+  public async getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
 
     // Check enrollmentId exists.
     const enrollmentResult: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
@@ -180,7 +175,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
 
-  async getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>> {
+  public async getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>> {
     const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeById(programmeIntakeId);
 
     if (!programmeIntake) {
@@ -190,7 +185,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
-  async getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>> {
+  public async getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>> {
 
     const duplicateProgrammeIntakesIds: { [programmeIntakeId: number]: boolean } = {};
     for (const programmeIntakeId of programmeIntakeIds) {
@@ -222,7 +217,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
 
-  async getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>> {
+  private async getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<Result<ProgrammeIntakeData>> {
     const programmeIntake: ProgrammeIntakeData | undefined = await programmeRepository.getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId, intakeId, semester);
 
     if (!programmeIntake) {
@@ -232,8 +227,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
-
-  async createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
+  public async createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
 
 
     // Check param exists or not.
@@ -276,7 +270,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake.getData(), "Programme intake create success");
   }
 
-  async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
+  public async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
 
     // Check param exist.
     const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
@@ -325,7 +319,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake.getData(), "Programme intake update success");
   }
 
-  async deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>> {
+  public async deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>> {
 
     // Check if programmeIntake exists.
     const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
@@ -342,7 +336,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme intake delete success");
   }
 
-  async updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
+  public async updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>> {
 
     // Check programmeIntakeIds exist.
     const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await this.getProgrammeIntakesByIds(programmeIntakeIds);
@@ -381,7 +375,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntakes.getData(), "Programme intake update success");
   }
 
-  async deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>> {
+  public async deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>> {
 
     const enrollmentResult: Result<EnrollmentData> = await enrollmentService.getEnrollmentById(enrollmentId);
     if (!enrollmentResult.isSuccess()) {
@@ -394,19 +388,19 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme intake enrollmentId delete success");
   }
 
-  async getProgrammeCount(query: string = ""): Promise<Result<number>> {
+  private async getProgrammeCount(query: string = ""): Promise<Result<number>> {
     const programmeCount: number = await programmeRepository.getProgrammeCount(query);
 
     return Result.succeed(programmeCount, "Programme count retrieve success");
   }
 
-  async getProgrammeIntakeCount(query: string = ""): Promise<Result<number>> {
+  private async getProgrammeIntakeCount(query: string = ""): Promise<Result<number>> {
     const programmeIntakeCount: number = await programmeRepository.getProgrammeIntakeCount(query);
 
     return Result.succeed(programmeIntakeCount, "Programme intake count retrieve success");
   }
 
-  async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
+  public async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
 
 
     // Check status valid or not.
@@ -424,7 +418,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeHistoryList, "Students course programme intakes retrieve success");
   }
 
-  async getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+  private async getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
     const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
 
     if (!studentCourseProgrammeIntake) {
@@ -435,7 +429,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   // Enroll the student into a course, and specify a programme intake.
-  async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+  public async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
 
     // Check if parameters exist.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -481,7 +475,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   // Delete enrolled/history of programme intake.
-  async deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
+  public async deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>> {
 
     // Check if the parameters exist or not.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -519,13 +513,13 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Student course programme intake delete success");
   }
 
-  async getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>> {
+  public async getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>> {
     const ProgrammeDistribution: ProgrammeDistribution[] = await programmeRepository.getProgrammeDistribution();
 
     return Result.succeed(ProgrammeDistribution, "Programme retrieve success");
   }
 
-  async getProgrammeIntakesByStatus(status: number): Promise<Result<ProgrammeIntakeData[]>> {
+  public async getProgrammeIntakesByStatus(status: number): Promise<Result<ProgrammeIntakeData[]>> {
 
     if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid programme intake status");
