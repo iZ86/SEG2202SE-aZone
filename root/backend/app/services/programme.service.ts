@@ -416,7 +416,7 @@ class ProgrammeService implements IProgrammeService {
   async getProgrammeCount(query: string = ""): Promise<Result<number>> {
     const programmeCount: number = await programmeRepository.getProgrammeCount(query);
 
-    return Result.succeed(programmeCount ? programmeCount : 0, "Programme count retrieve success");
+    return Result.succeed(programmeCount, "Programme count retrieve success");
   }
 
   async getProgrammeIntakeCount(query: string = ""): Promise<Result<number>> {
