@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS, ENUM_STUDY_MODE } from "../enums/enums";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
 import { CourseData } from "../models/course-model";
@@ -21,7 +21,7 @@ interface IProgrammeService {
   createProgramme(programmeName: string): Promise<Result<ProgrammeData>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
   deleteProgrammeById(programmeId: number): Promise<Result<null>>;
-  getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>>;
+  getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeWithCountData>>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
@@ -163,10 +163,11 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(null, "Programme delete success");
   }
 
-  async getProgrammeIntakes(query: string = "", pageSize: number | null, page: number | null): Promise<Result<ProgrammeIntakeData[]>> {
-    const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakes(query, pageSize, page);
+  async getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeWithCountData>> {
+    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakes(query, pageSize, page);
 
-    return Result.succeed(programmeIntakesData, "Programme retrieve success");
+    const programmeIntakeCount: Result<number> = await this.getProgrammeIntakeCount(query);
+    return Result.succeed({programmeIntakes, programmeIntakeCount: programmeIntakeCount.getData()}, "Programme retrieve success");
   }
 
   async getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>> {

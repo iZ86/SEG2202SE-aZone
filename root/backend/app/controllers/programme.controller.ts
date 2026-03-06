@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
-import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData } from "../models/programme-model";
+import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 
 
 export default class ProgrammeController {
@@ -97,22 +97,10 @@ export default class ProgrammeController {
     const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
     const query: string = req.query.query as string || "";
 
-    const response: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakes(query, pageSize, page);
-    const programmeIntakeCount: Result<number> = await programmeService.getProgrammeIntakeCount(query);
-
-    let apiResponse: object = {
-      programmeIntakes: response.getData(),
-    };
-
-    if (page != null && pageSize != null) {
-      apiResponse = {
-        programmeIntakes: response.getData(),
-        programmeIntakeCount: programmeIntakeCount.isSuccess() ? programmeIntakeCount.getData() : 0,
-      };
-    }
+    const response: Result<ProgrammeIntakeWithCountData> = await programmeService.getProgrammeIntakes(query, pageSize, page);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok(apiResponse, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
