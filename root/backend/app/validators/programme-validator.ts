@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import validate from "../middlewares/validate";
 
 export const programmeParamValidator: any = [
@@ -14,6 +14,19 @@ export const programmeIntakeParamValidator: any = [
     .exists().withMessage("Missing programmeIntakeId")
     .isInt().withMessage("programmeIntakeId must be a number")
     .toInt(),
+  validate,
+]
+
+export const getProgrammesQueryValidator: any = [
+  query('page')
+    .optional()
+    .isInt().withMessage('page must be a number'),
+  query('pageSize')
+    .optional()
+    .isInt().withMessage('pageSize must be a number'),
+  query('query')
+    .optional()
+    .isString().withMessage('query must be a string'),
   validate,
 ]
 
