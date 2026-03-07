@@ -7,7 +7,6 @@ import venueRepository from "../repositories/venue.repository";
 interface IVenueService {
   getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueWithCountData>>;
   getVenueById(venueId: number): Promise<Result<VenueData>>;
-  getVenueByVenue(venue: string): Promise<Result<VenueData>>;
   createVenue(venue: string): Promise<Result<VenueData>>;
   updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>>;
   deleteVenueById(venueId: number): Promise<Result<null>>;
