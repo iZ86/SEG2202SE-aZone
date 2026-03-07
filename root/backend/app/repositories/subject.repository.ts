@@ -17,7 +17,7 @@ interface ISubjectRepository {
 }
 
 class SubjectRepository implements ISubjectRepository {
-  getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]> {
+  public getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
      
@@ -43,7 +43,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectById(subjectId: number): Promise<SubjectData | undefined> {
+  public getSubjectById(subjectId: number): Promise<SubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<SubjectData[]>(
         "SELECT * " +
@@ -60,7 +60,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined> {
+  public getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<SubjectData[]>(
         "SELECT * " +
@@ -75,7 +75,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined> {
+  public getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<SubjectData[]>(
         "SELECT * " +
@@ -91,7 +91,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader> {
+  public createSubject(subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO SUBJECT (subjectCode, subjectName, description, creditHours) " +
@@ -105,7 +105,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader> {
+  public updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE SUBJECT SET subjectCode = ?, subjectName = ?, description = ?, creditHours = ? " +
@@ -119,7 +119,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  deleteSubjectById(subjectId: number): Promise<ResultSetHeader> {
+  public deleteSubjectById(subjectId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM SUBJECT WHERE subjectId = ?;",
@@ -132,7 +132,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectCount(query: string): Promise<number> {
+  public getSubjectCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -153,7 +153,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]> {
+  public getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSubjectData[]>(
@@ -187,8 +187,7 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-
-  getActiveSubjectsOverviewByStudentId(studentId: number): Promise<StudentSubjectOverviewData[]> {
+  public getActiveSubjectsOverviewByStudentId(studentId: number): Promise<StudentSubjectOverviewData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSubjectOverviewData[]>(
         "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours " +
