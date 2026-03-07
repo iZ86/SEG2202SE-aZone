@@ -42,4 +42,8 @@ export interface SubjectWithCountData {
   subjects: SubjectData[];
   subjectCount: number;
 }
+
+export interface StudentSubjectWithCountData {
+  subjects: StudentSubjectData[];
+  subjectCount: number;
 }
