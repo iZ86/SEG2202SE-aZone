@@ -55,7 +55,7 @@ export default class VenueController {
   }
 
   async updateVenueById(req: Request, res: Response) {
-    const venueId: number = Number(req.params.venueId as string);
+    const venueId: number = Number(req.params.venueId);
     const venue: string = req.body.venue;
 
     const response = await venueService.updateVenueById(venueId, venue);
