@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { asyncHandler } from "../utils/utils";
+import { asyncHandler, runValidatorIfStudent } from "../utils/utils";
 import SubjectController from "../controllers/subject.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateSubjectValidator, subjectParamValidator, getSubjectsQueryValidator } from "../validators/subject-validator";
+import { createAndUpdateSubjectValidator, subjectParamValidator, getSubjectsQueryValidator, getStudentSubjectsQueryValidator } from "../validators/subject-validator";
 
 class SubjectRoute {
   router = Router();
@@ -14,7 +14,7 @@ class SubjectRoute {
 
   initializeRoutes() {
 
-    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, getSubjectsQueryValidator, asyncHandler(this.controller.getSubjects));
+    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, getSubjectsQueryValidator, runValidatorIfStudent(getStudentSubjectsQueryValidator), asyncHandler(this.controller.getSubjects));
     this.router.get("/count", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getSubjectsCount));
     this.router.get("/active", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getActiveSubjectsOverviewByStudentId));
     this.router.get("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getSubjectById));
