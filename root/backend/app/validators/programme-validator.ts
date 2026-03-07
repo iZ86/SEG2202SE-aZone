@@ -50,7 +50,8 @@ export const createAndUpdateProgrammeBodyValidator: any = [
   validate,
 ];
 
-export const createAndUpdateProgrammeIntakeBodyValidator: any = [
+
+export const createProgrammeIntakeBodyValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
     .isNumeric().withMessage('programmeId must be a number')
@@ -81,6 +82,10 @@ export const createAndUpdateProgrammeIntakeBodyValidator: any = [
     .toInt(),
   validate,
 ];
+
+export const updateProgrammeIntakeBodyValidator: any = [
+  ...createProgrammeIntakeBodyValidator
+]
 
 export const createStudentCourseProgrammeIntakeBodyValidator: any = [
   body('studentId')
