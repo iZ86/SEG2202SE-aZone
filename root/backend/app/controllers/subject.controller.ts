@@ -63,7 +63,7 @@ export default class SubjectController {
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
         subjects: response.getData(),
-        courses: courseSubjectResponse.getData() || [],
+        courses: courseSubjectResponse.getData(),
       }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
