@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import validate from "../middlewares/validate";
 
 export const subjectParamValidator: any = [
@@ -9,6 +9,18 @@ export const subjectParamValidator: any = [
   validate,
 ]
 
+export const getSubjectsQueryValidator: any = [
+  query('page')
+    .optional()
+    .isInt().withMessage('page must be a number'),
+  query('pageSize')
+    .optional()
+    .isInt().withMessage('pageSize must be a number'),
+  query('query')
+    .optional()
+    .isString().withMessage('query must be a string'),
+  validate,
+]
 export const createAndUpdateSubjectValidator: any = [
   body('subjectName')
     .trim()
