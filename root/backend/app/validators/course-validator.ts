@@ -24,7 +24,7 @@ export const getCoursesQueryValidator: any = [
   validate,
 ]
 
-export const createAndUpdateCourseBodyValidator: any = [
+export const createCourseBodyValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
     .isNumeric().withMessage('programmeId must be a number'),
@@ -38,6 +38,10 @@ export const createAndUpdateCourseBodyValidator: any = [
     .isString().withMessage('courseName must be a string'),
   validate,
 ];
+
+export const updateCourseBodyValidator: any = [
+  ...createCourseBodyValidator
+]
 
 export const createCourseSubjectBodyValidator: any = [
   body('courseId')
