@@ -14,7 +14,7 @@ interface IVenueRepository {
 }
 
 class VenueRepository implements IVenueRepository {
-  getVenues(query: string, pageSize: number, page: number): Promise<VenueData[]> {
+  public getVenues(query: string, pageSize: number, page: number): Promise<VenueData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<VenueData[]>(
@@ -37,7 +37,7 @@ class VenueRepository implements IVenueRepository {
     });
   }
 
-  getVenueById(venueId: number): Promise<VenueData | undefined> {
+  public getVenueById(venueId: number): Promise<VenueData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<VenueData[]>(
         "SELECT * " +
@@ -52,7 +52,7 @@ class VenueRepository implements IVenueRepository {
     });
   }
 
-  getVenueByVenue(venue: string): Promise<VenueData | undefined> {
+  public getVenueByVenue(venue: string): Promise<VenueData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<VenueData[]>(
         "SELECT * " +
@@ -67,7 +67,7 @@ class VenueRepository implements IVenueRepository {
     });
   }
 
-  createVenue(venue: string): Promise<ResultSetHeader> {
+  public createVenue(venue: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO VENUE (venue) " +
@@ -81,7 +81,7 @@ class VenueRepository implements IVenueRepository {
     });
   }
 
-  updateVenueById(venueId: number, venue: string): Promise<ResultSetHeader> {
+  public updateVenueById(venueId: number, venue: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE VENUE SET venue = ? " +
@@ -95,7 +95,7 @@ class VenueRepository implements IVenueRepository {
     });
   }
 
-  deleteVenueById(venueId: number): Promise<ResultSetHeader> {
+  public deleteVenueById(venueId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "DELETE FROM VENUE WHERE venueId = ?;",
@@ -108,7 +108,7 @@ class VenueRepository implements IVenueRepository {
     });
   }
 
-  getVenueCount(query: string): Promise<number> {
+  public getVenueCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
