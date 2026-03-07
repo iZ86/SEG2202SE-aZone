@@ -73,7 +73,7 @@ export default class VenueController {
   }
 
   async deleteVenueById(req: Request, res: Response) {
-    const venueId: number = Number(req.params.venueId as string);
+    const venueId: number = Number(req.params.venueId);
 
     const response = await venueService.deleteVenueById(venueId);
 
