@@ -15,10 +15,10 @@ export default class SubjectController {
 
     if (isStudent) {
 
-      const page: number = parseInt(req.query.page as string) || 1;
-      const pageSize: number = parseInt(req.query.pageSize as string) || 15;
+      const page: number = Number(req.query.page) || 1;
+      const pageSize: number = Number(req.query.pageSize) || 15;
       const query: string = req.query.query as string || "";
-      const semester: number = parseInt(req.query.semester as string) || 0;
+      const semester: number = Number(req.query.semester) || 0;
 
       const response: Result<StudentSubjectData[]> = await subjectService.getSubjectsByStudentId(userId, semester, query, pageSize, page);
       const subjectCount: Result<number> = await subjectService.getSubjectsCountByStudentId(userId, semester, query);
@@ -35,8 +35,8 @@ export default class SubjectController {
       }
     } else if (isAdmin) {
 
-      const page: number | null = parseInt(req.query.page as string) || null;
-      const pageSize: number | null = parseInt(req.query.pageSize as string) || null;
+      const page: number = Number(req.query.page) || 1;
+      const pageSize: number = Number(req.query.pageSize) || 15;
       const query: string = req.query.query as string || "";
 
       const response: Result<SubjectData[]> = await subjectService.getSubjects(query, pageSize, page);
