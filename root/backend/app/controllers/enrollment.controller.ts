@@ -3,8 +3,6 @@ import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import { EnrollmentSubjectData, StudentEnrollmentSchedule, MonthlyEnrollmentData, CreateEnrollmentSubjectTypeData, EnrollmentSubjectWithTypesData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData, EnrollmentSubjectWithCountData} from "../models/enrollment-model";
 import enrollmentService from "../services/enrollment.service";
-import userService from "../services/user.service";
-import { UserData } from "../models/user-model";
 
 export default class EnrollmentController {
   async getEnrollments(req: Request, res: Response) {

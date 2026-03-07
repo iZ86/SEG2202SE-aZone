@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData, StudentTimeTable } from "../models/user-model";
+import { UserData, StudentInformation, UserWithCountData, StudentTimeTable } from "../models/user-model";
 import userService from "../services/user.service";
 
 export default class UserController {

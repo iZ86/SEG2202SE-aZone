@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
-import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, StudentSubjectWithCountData, SubjectWithCountData } from "../models/subject-model";
+import { SubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, StudentSubjectWithCountData, SubjectWithCountData } from "../models/subject-model";
 import courseService from "../services/course.service";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 
