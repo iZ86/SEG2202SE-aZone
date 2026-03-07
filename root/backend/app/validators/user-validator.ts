@@ -30,7 +30,7 @@ export const getStudentsQueryValidator: any = [
   validate,
 ]
 
-export const getAdminQueryValidator: any = [
+export const getAdminsQueryValidator: any = [
   ...getStudentsQueryValidator
 ]
 
