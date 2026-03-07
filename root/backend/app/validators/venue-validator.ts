@@ -21,10 +21,14 @@ export const getVenuesQueryValidator: any = [
   validate,
 ];
 
-export const createAndUpdateVenueBodyValidator: any = [
+export const createVenueBodyValidator: any = [
   body('venue')
     .trim()
     .notEmpty().withMessage('Missing venue')
     .isString().withMessage("venue must be a string"),
   validate,
 ];
+
+export const updateVenueBodyValidator: any = [
+  ...createVenueBodyValidator
+]
