@@ -16,7 +16,6 @@ interface ISubjectService {
   deleteSubjectById(subjectId: number): Promise<Result<null>>;
   getSubjectCount(query: string): Promise<Result<number>>;
   getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectWithCountData>>;
-  getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<Result<number>>;
   getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
 }
 
@@ -198,11 +197,6 @@ class SubjectService implements ISubjectService {
     return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Student subjects retrieve success");
   }
 
-  async getSubjectsCountByStudentId(studentId: number, semester: number, query: string = ""): Promise<Result<number>> {
-    const studentEnrollmentSubjectCount: number = await subjectRepository.getSubjectsCountByStudentId(studentId, semester, query);
-
-    return Result.succeed(studentEnrollmentSubjectCount ? studentEnrollmentSubjectCount : 0, "Student Enrollment Subject count retrieve success");
-  }
 
   async getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
     const studentActiveSubjects: StudentSubjectOverviewData[] = await subjectRepository.getActiveSubjectsOverviewByStudentId(studentId);
