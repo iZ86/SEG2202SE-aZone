@@ -6,8 +6,8 @@ import lecturerService from "../services/lecturer.service";
 
 export default class LecturerController {
   async getLecturers(req: Request, res: Response) {
-    const page: number | null = Number(req.query.page) || 1;
-    const pageSize: number | null = Number(req.query.pageSize) || 15;
+    const page: number = Number(req.query.page) || 1;
+    const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<LecturerWithCountData> = await lecturerService.getLecturers(query, pageSize, page);
