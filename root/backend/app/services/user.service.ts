@@ -11,6 +11,7 @@ interface IUserService {
   getUserById(userId: number): Promise<Result<UserData>>;
   getUserByEmail(email: string): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
+  getUserCount(query: string, role: ENUM_USER_ROLE): Promise<Result<number>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>>;
@@ -21,7 +22,7 @@ interface IUserService {
 }
 
 class UserService implements IUserService {
-  async getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>> {
+  public async getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>> {
     const admins: UserData[] = await userRepository.getAdmins(query, pageSize, page);
 
     const adminCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.ADMIN);
@@ -29,7 +30,7 @@ class UserService implements IUserService {
     return Result.succeed({users: admins, userCount: adminCount.getData()}, "Admins retrieve success");
   }
 
-  async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserWithCountData>> {
+  public async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserWithCountData>> {
     const students: UserData[] = await userRepository.getStudents(query, pageSize, page);
 
 
@@ -38,7 +39,7 @@ class UserService implements IUserService {
     return Result.succeed({users: students, userCount: studentCount.getData()}, "Students retrieve success");
   }
 
-  async getUserById(userId: number): Promise<Result<UserData>> {
+  public async getUserById(userId: number): Promise<Result<UserData>> {
     const student: UserData | undefined = await userRepository.getUserById(userId);
 
     if (!student) {
@@ -48,7 +49,7 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-  async getUserByEmail(email: string): Promise<Result<UserData>> {
+  public async getUserByEmail(email: string): Promise<Result<UserData>> {
     const student: UserData | undefined = await userRepository.getUserByEmail(email);
 
     if (!student) {
@@ -58,7 +59,7 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-  async getStudentById(studentId: number): Promise<Result<UserData>> {
+  public async getStudentById(studentId: number): Promise<Result<UserData>> {
     const student: UserData | undefined = await userRepository.getStudentById(studentId);
 
     if (!student) {
@@ -68,7 +69,7 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-  async getStudentByEmail(email: string): Promise<Result<UserData>> {
+  private async getStudentByEmail(email: string): Promise<Result<UserData>> {
     const student: UserData | undefined = await userRepository.getStudentByEmail(email);
 
     if (!student) {
@@ -78,7 +79,7 @@ class UserService implements IUserService {
     return Result.succeed(student, "Student retrieve success");
   }
 
-  async getAdminById(adminId: number): Promise<Result<UserData>> {
+  public async getAdminById(adminId: number): Promise<Result<UserData>> {
     const admin: UserData | undefined = await userRepository.getAdminById(adminId);
 
     if (!admin) {
@@ -88,7 +89,7 @@ class UserService implements IUserService {
     return Result.succeed(admin, "Admin retrieve success");
   }
 
-  async getUserCount(query: string = "", role: ENUM_USER_ROLE): Promise<Result<number>> {
+  public async getUserCount(query: string = "", role: ENUM_USER_ROLE): Promise<Result<number>> {
     let userCount: number;
 
     switch (role) {
@@ -105,7 +106,7 @@ class UserService implements IUserService {
     return Result.succeed(userCount ? userCount : 0, "User count retrieve success");
   }
 
-  async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>> {
+  public async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>> {
     const isEmailExistResult: Result<UserData> = await this.getStudentByEmail(email);
 
     if (isEmailExistResult.isSuccess()) {
@@ -136,7 +137,7 @@ class UserService implements IUserService {
     return Result.succeed(student.getData(), "Student create success");
   }
 
-  async updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>> {
+  public async updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>> {
     const studentResult: Result<UserData> = await this.getStudentById(studentId);
 
     if (!studentResult) {
@@ -172,7 +173,7 @@ class UserService implements IUserService {
     return Result.succeed(student.getData(), "Student update success");
   }
 
-  async updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>> {
+  public async updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>> {
     const adminResult: Result<UserData> = await this.getAdminById(adminId);
 
     if (!adminResult.isSuccess()) {
@@ -194,7 +195,7 @@ class UserService implements IUserService {
     return Result.succeed(admin.getData(), "Admin update success");
   }
 
-  async updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>> {
+  public async updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>> {
     const userResult: Result<UserData> = await this.getUserById(userId);
 
     if (!userResult) {
@@ -216,7 +217,7 @@ class UserService implements IUserService {
     return Result.succeed(user.getData(), "User update success");
   }
 
-  async getStudentInformationById(studentId: number): Promise<Result<StudentInformation>> {
+  public async getStudentInformationById(studentId: number): Promise<Result<StudentInformation>> {
     const studentInformation: StudentInformation | undefined = await userRepository.getStudentInformationById(studentId);
 
     if (!studentInformation) {
@@ -226,7 +227,7 @@ class UserService implements IUserService {
     return Result.succeed(studentInformation, "Student information retrieve success");
   }
 
-  async getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>> {
+  public async getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>> {
     const studentTimetable: StudentClassData[] = await userRepository.getStudentTimetableById(studentId);
 
     const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData> = await this.getStudentSemesterStartAndEndDateById(studentId);
@@ -238,7 +239,7 @@ class UserService implements IUserService {
     return Result.succeed({timetable: studentTimetable, ...studentSemesterStartAndEndDate.getData()}, "Student timetable retrieve success");
   }
 
-  async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
+  private async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
     const studentSemesterStartAndEndData: StudentSemesterStartAndEndData | undefined = await userRepository.getStudentSemesterStartAndEndDateById(studentId);
 
     if (!studentSemesterStartAndEndData) {
