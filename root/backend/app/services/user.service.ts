@@ -6,8 +6,8 @@ import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, Student
 import userRepository from "../repositories/user.repository";
 
 interface IUserService {
-  getStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>>;
+  getStudents(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>>;
   getUserById(userId: number): Promise<Result<UserData>>;
   getUserByEmail(email: string): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
@@ -31,9 +31,13 @@ class UserService implements IUserService {
     return Result.succeed({users: admins, userCount: adminCount.getData()}, "Admins retrieve success");
   }
 
-  async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
+  async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserWithCountData>> {
     const students: UserData[] = await userRepository.getStudents(query, pageSize, page);
-    return Result.succeed(students, "Students retrieve success");
+
+
+    const studentCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.STUDENT);
+
+    return Result.succeed({users: students, userCount: studentCount.getData()}, "Students retrieve success");
   }
 
   async getUserById(userId: number): Promise<Result<UserData>> {
