@@ -9,7 +9,6 @@ import courseService from "./course.service";
 interface ISubjectService {
   getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>>;
   getSubjectById(subjectId: number): Promise<Result<SubjectData>>;
-  getSubjectBySubjectCode(subjectCode: string): Promise<Result<SubjectData>>;
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>>;
   createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>>;
