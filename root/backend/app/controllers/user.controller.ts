@@ -98,7 +98,7 @@ export default class UserController {
     const email: string = req.body.email;
     const userStatus: number = req.body.userStatus;
 
-    const response: Result<UserData | undefined> = await userService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
+    const response: Result<UserData> = await userService.updateStudentById(studentId, firstName, lastName, email, phoneNumber, userStatus);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
