@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler, runValidatorIfAdmin } from "../utils/utils";
 import ProgrammeController from "../controllers/programme.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { programmeParamValidator, programmeIntakeParamValidator, createProgrammeIntakeBodyValidator, updateProgrammeIntakeBodyValidator, createAndUpdateProgrammeBodyValidator, createStudentCourseProgrammeIntakeBodyValidator, getProgrammesAndIntakesQueryValidator, getProgrammeHistoryQueryValidator, getAdminProgrammeHistoryQueryValidator} from "../validators/programme-validator";
+import { programmeParamValidator, programmeIntakeParamValidator, createProgrammeIntakeBodyValidator, updateProgrammeIntakeBodyValidator, createProgrammeBodyValidator, updateProgrammeBodyValidator, createStudentCourseProgrammeIntakeBodyValidator, getProgrammesAndIntakesQueryValidator, getProgrammeHistoryQueryValidator, getAdminProgrammeHistoryQueryValidator} from "../validators/programme-validator";
 import { courseParamValidator } from "../validators/course-validator";
 import { studentParamValidator } from "../validators/user-validator";
 
@@ -23,11 +23,11 @@ class ProgrammeRoute {
     this.router.get("/:programmeId/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, programmeParamValidator, asyncHandler(this.controller.getProgrammeIntakesByProgrammeId));
     this.router.get("/:programmeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, programmeParamValidator, asyncHandler(this.controller.getProgrammeById));
 
-    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateProgrammeBodyValidator, asyncHandler(this.controller.createProgramme));
+    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createProgrammeBodyValidator, asyncHandler(this.controller.createProgramme));
     this.router.post("/intake", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createProgrammeIntakeBodyValidator, asyncHandler(this.controller.createProgrammeIntake));
     this.router.post("/enroll", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createStudentCourseProgrammeIntakeBodyValidator, asyncHandler(this.controller.createStudentCourseProgrammeIntake));
 
-    this.router.put("/:programmeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, programmeParamValidator, createAndUpdateProgrammeBodyValidator, asyncHandler(this.controller.updateProgrammeById));
+    this.router.put("/:programmeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, programmeParamValidator, updateProgrammeBodyValidator, asyncHandler(this.controller.updateProgrammeById));
 
     this.router.patch("/intake/:programmeIntakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, programmeIntakeParamValidator, updateProgrammeIntakeBodyValidator, asyncHandler(this.controller.updateProgrammeIntakeById));
 

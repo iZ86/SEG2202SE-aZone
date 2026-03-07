@@ -42,7 +42,7 @@ export const getAdminProgrammeHistoryQueryValidator: any = [
 ]
 
 
-export const createAndUpdateProgrammeBodyValidator: any = [
+export const createProgrammeBodyValidator: any = [
   body('programmeName')
     .trim()
     .notEmpty().withMessage('Missing programmeName')
@@ -50,6 +50,9 @@ export const createAndUpdateProgrammeBodyValidator: any = [
   validate,
 ];
 
+export const updateProgrammeBodyValidator: any = [
+  ...createProgrammeBodyValidator
+]
 
 export const createProgrammeIntakeBodyValidator: any = [
   body('programmeId')
