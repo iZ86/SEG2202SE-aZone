@@ -4,7 +4,7 @@ import { SubjectData, StudentSubjectData, StudentSubjectOverviewData } from "../
 import { TotalCount } from "../models/general-model";
 
 interface ISubjectRepository {
-  getSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]>;
+  getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
   getSubjectById(subjectId: number): Promise<SubjectData | undefined>;
   getSubjectBySubjectCode(subjectCode: string): Promise<SubjectData | undefined>;
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<SubjectData | undefined>;
@@ -18,28 +18,24 @@ interface ISubjectRepository {
 }
 
 class SubjectRepository implements ISubjectRepository {
-  getSubjects(query: string, pageSize: number | null, page: number | null): Promise<SubjectData[]> {
+  getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]> {
+    const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
-      let sql: string = `
-        SELECT *
-        FROM SUBJECT
-        WHERE subjectId LIKE ?
-        OR subjectName LIKE ?
-        OR subjectCode LIKE ? `;
-
-      const params: any[] = [
-        "%" + query + "%",
-        "%" + query + "%",
-        "%" + query + "%",
-      ];
-
-      if (page != null && pageSize != null) {
-        const offset: number = (page - 1) * pageSize;
-        sql += "LIMIT ? OFFSET ? ";
-        params.push(pageSize, offset);
-      }
-
-      databaseConn.query<SubjectData[]>(sql, params,
+     
+      databaseConn.query<SubjectData[]>(
+        "SELECT s.subjectId, s.subjectCode, s.subjectName, s.description, s.creditHours " +
+        "FROM SUBJECT s " +
+        "WHERE s.subjectId LIKE ? " +
+        "OR s.subjectName LIKE ? " +
+        "OR s.subjectCode LIKE ? " +
+        "LIMIT ? OFFSET ?;",
+        [
+          "%" + query + "%",
+          "%" + query + "%",
+          "%" + query + "%",
+          pageSize,
+          offset
+        ],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
