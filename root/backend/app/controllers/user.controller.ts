@@ -28,7 +28,7 @@ export default class UserController {
   async getStudents(req: Request, res: Response) {
     const page: number = Number(req.query.page as string) || 1;
     const pageSize: number = Number(req.query.pageSize as string) || 15;
-    const query: string = req.query.query as string;
+    const query: string = req.query.query as string || "";
 
     const response: Result<UserData[]> = await userService.getStudents(query, pageSize, page);
     const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.STUDENT);
