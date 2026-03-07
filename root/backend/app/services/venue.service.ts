@@ -1,11 +1,11 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { VenueData } from "../models/venue-model";
+import { VenueData, VenueWithCountData } from "../models/venue-model";
 import venueRepository from "../repositories/venue.repository";
 
 interface IVenueService {
-  getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueData[]>>;
+  getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueWithCountData>>;
   getVenueById(venueId: number): Promise<Result<VenueData>>;
   getVenueByVenue(venue: string): Promise<Result<VenueData>>;
   createVenue(venue: string): Promise<Result<VenueData>>;
@@ -15,10 +15,13 @@ interface IVenueService {
 }
 
 class VenueService implements IVenueService {
-  async getVenues(query: string = "", pageSize: number, page: number): Promise<Result<VenueData[]>> {
+  async getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueWithCountData>> {
     const venues: VenueData[] = await venueRepository.getVenues(query, pageSize, page);
 
-    return Result.succeed(venues, "Venues retrieve success");
+
+    const venueCount: Result<number> = await this.getVenueCount(query);
+
+    return Result.succeed({venues, venueCount: venueCount.getData()}, "Venues retrieve success");
   }
 
   async getVenueById(venueId: number): Promise<Result<VenueData>> {
