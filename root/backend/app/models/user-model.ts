@@ -72,3 +72,7 @@ export interface StudentClassData extends RowDataPacket {
   dayId: number;
   day: string;
 }
+
+export interface StudentTimeTable extends StudentSemesterStartAndEndData {
+  timetable: StudentClassData[];
+}
