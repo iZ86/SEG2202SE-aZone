@@ -35,7 +35,7 @@ export const enrollmentSubjectParamValidator: any = [
   validate,
 ]
 
-export const createAndUpdateEnrollmentBodyValidator: any = [
+export const createEnrollmentBodyValidator: any = [
   body('enrollmentStartDateTime')
     .trim()
     .notEmpty().withMessage('Missing enrollmentStartDateTime')
@@ -52,6 +52,10 @@ export const createAndUpdateEnrollmentBodyValidator: any = [
     .isNumeric().withMessage('All programmeIntakeIds must be a number'),
   validate,
 ];
+
+export const updateEnrollmentBodyValidator: any = [
+  ...createEnrollmentBodyValidator
+]
 
 export const enrollStudentSubjectsValidator: any = [
   body('enrollmentSubjectTypeIds')
