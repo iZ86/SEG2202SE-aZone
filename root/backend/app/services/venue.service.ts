@@ -13,7 +13,7 @@ interface IVenueService {
 }
 
 class VenueService implements IVenueService {
-  async getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueWithCountData>> {
+  public async getVenues(query: string, pageSize: number, page: number): Promise<Result<VenueWithCountData>> {
     const venues: VenueData[] = await venueRepository.getVenues(query, pageSize, page);
 
 
@@ -22,7 +22,7 @@ class VenueService implements IVenueService {
     return Result.succeed({venues, venueCount: venueCount.getData()}, "Venues retrieve success");
   }
 
-  async getVenueById(venueId: number): Promise<Result<VenueData>> {
+  public async getVenueById(venueId: number): Promise<Result<VenueData>> {
     const venue: VenueData | undefined = await venueRepository.getVenueById(venueId);
 
     if (!venue) {
@@ -32,7 +32,7 @@ class VenueService implements IVenueService {
     return Result.succeed(venue, "Venue retrieve success");
   }
 
-  async getVenueByVenue(venue: string): Promise<Result<VenueData>> {
+  private async getVenueByVenue(venue: string): Promise<Result<VenueData>> {
     const venueData: VenueData | undefined = await venueRepository.getVenueByVenue(venue);
 
     if (!venueData) {
@@ -42,7 +42,7 @@ class VenueService implements IVenueService {
     return Result.succeed(venueData, "Venue retrieve success");
   }
 
-  async createVenue(venue: string): Promise<Result<VenueData>> {
+  public async createVenue(venue: string): Promise<Result<VenueData>> {
     const venueResult: Result<VenueData> = await this.getVenueByVenue(venue);
 
     if (venueResult.isSuccess()) {
@@ -64,7 +64,7 @@ class VenueService implements IVenueService {
     return Result.succeed(venueResponse.getData(), "Venue create success");
   }
 
-  async updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>> {
+  public async updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>> {
     const venueResult: Result<VenueData> = await this.getVenueById(venueId);
 
     if (!venueResult.isSuccess()) {
@@ -94,7 +94,7 @@ class VenueService implements IVenueService {
     return Result.succeed(venueResponse.getData(), "Venue update success");
   }
 
-  async deleteVenueById(venueId: number): Promise<Result<null>> {
+  public async deleteVenueById(venueId: number): Promise<Result<null>> {
     const venueResult: Result<VenueData> = await this.getVenueById(venueId);
 
     if (!venueResult.isSuccess()) {
@@ -110,7 +110,7 @@ class VenueService implements IVenueService {
     return Result.succeed(null, "Venue delete success");
   }
 
-  async getVenueCount(query: string = ""): Promise<Result<number>> {
+  private async getVenueCount(query: string = ""): Promise<Result<number>> {
     const venueCount: number = await venueRepository.getVenueCount(query);
 
     return Result.succeed(venueCount, "Venue count retrieve success");
