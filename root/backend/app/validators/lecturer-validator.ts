@@ -28,7 +28,7 @@ export const getLecturersQueryValidator: any = [
   validate,
 ]
 
-export const createAndUpdateLecturerBodyValidator: any = [
+export const createLecturerBodyValidator: any = [
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')
@@ -51,3 +51,7 @@ export const createAndUpdateLecturerBodyValidator: any = [
     .matches(/^01\d{8,9}$/).withMessage("phoneNumber must start with 01 and contain 10-11 digits"),
   validate,
 ];
+
+export const updateLecturerBodyValidator: any = [
+  ...createLecturerBodyValidator
+]
