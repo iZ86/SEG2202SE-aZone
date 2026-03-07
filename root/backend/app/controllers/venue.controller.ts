@@ -23,7 +23,7 @@ export default class VenueController {
   }
 
   async getVenueById(req: Request, res: Response) {
-    const venueId: number = Number(req.params.venueId as string);
+    const venueId: number = Number(req.params.venueId);
 
     const response: Result<VenueData> = await venueService.getVenueById(venueId);
 
