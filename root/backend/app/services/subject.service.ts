@@ -3,7 +3,6 @@ import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, StudentSubjectWithCountData, SubjectWithCountData } from "../models/subject-model";
 import subjectRepository from "../repositories/subject.repository";
-import courseRepository from "../repositories/course.repository";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 import courseService from "./course.service";
 
