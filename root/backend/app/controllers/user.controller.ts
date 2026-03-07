@@ -191,7 +191,7 @@ export default class UserController {
   }
 
   async getStudentTimetableByStudentId(req: Request, res: Response) {
-    const studentId: number = Number(req.params.studentId as string);
+    const studentId: number = Number(req.params.studentId);
 
     const response: Result<StudentTimeTable> = await userService.getStudentTimetableById(studentId);
 
