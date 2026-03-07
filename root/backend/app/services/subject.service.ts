@@ -188,7 +188,7 @@ class SubjectService implements ISubjectService {
   async getSubjectCount(query: string = ""): Promise<Result<number>> {
     const subjectCount: number = await subjectRepository.getSubjectCount(query);
 
-    return Result.succeed(subjectCount ? subjectCount : 0, "Subject count retrieve success");
+    return Result.succeed(subjectCount, "Subject count retrieve success");
   }
 
   async getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectWithCountData>> {
