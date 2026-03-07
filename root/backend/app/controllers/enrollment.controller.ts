@@ -201,7 +201,7 @@ export default class EnrollmentController {
     const response: Result<EnrollmentSubjectData> = await enrollmentService.updateEnrollmentSubjectWithEnrollmentSubjectTypesById(enrollmentSubjectId, enrollmentId, subjectId, lecturerId, enrollmentSubjectTypes);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.create(response.getData(), response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
