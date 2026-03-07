@@ -4,16 +4,14 @@ import validate from "../middlewares/validate";
 export const studentParamValidator: any = [
   param('studentId')
     .exists().withMessage("Missing studentId")
-    .isInt().withMessage("studentId must be a number")
-    .toInt(),
+    .isInt().withMessage("studentId must be a number"),
   validate,
 ];
 
 export const adminParamValidator: any = [
   param('adminId')
     .exists().withMessage("Missing adminId")
-    .isInt().withMessage("adminId must be a number")
-    .toInt(),
+    .isInt().withMessage("adminId must be a number"),
   validate,
 ];
 

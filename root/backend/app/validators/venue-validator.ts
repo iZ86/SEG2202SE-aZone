@@ -4,8 +4,7 @@ import validate from "../middlewares/validate";
 export const venueParamValidator: any = [
   param('venueId')
     .exists().withMessage("Missing venueId")
-    .isInt().withMessage("venueId must be a number")
-    .toInt(),
+    .isInt().withMessage("venueId must be a number"),
   validate,
 ];
 

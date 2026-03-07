@@ -4,16 +4,14 @@ import validate from "../middlewares/validate";
 export const programmeParamValidator: any = [
   param('programmeId')
     .exists().withMessage("Missing programmeId")
-    .isInt().withMessage("programmeId must be a number")
-    .toInt(),
+    .isInt().withMessage("programmeId must be a number"),
   validate,
 ]
 
 export const programmeIntakeParamValidator: any = [
   param('programmeIntakeId')
     .exists().withMessage("Missing programmeIntakeId")
-    .isInt().withMessage("programmeIntakeId must be a number")
-    .toInt(),
+    .isInt().withMessage("programmeIntakeId must be a number"),
   validate,
 ]
 

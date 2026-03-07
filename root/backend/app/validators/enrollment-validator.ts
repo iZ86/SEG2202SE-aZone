@@ -24,16 +24,14 @@ export const getMonthlyEnrollmentCountQueryValidator: any = [
 export const enrollmentParamValidator: any = [
   param('enrollmentId')
     .exists().withMessage("Missing enrollmentId")
-    .isInt().withMessage("enrollmentId must be a number")
-    .toInt(),
+    .isInt().withMessage("enrollmentId must be a number"),
   validate,
 ]
 
 export const enrollmentSubjectParamValidator: any = [
   param('enrollmentSubjectId')
     .exists().withMessage("Missing enrollmentSubjectId")
-    .isInt().withMessage("enrollmentSubjectId must be a number")
-    .toInt(),
+    .isInt().withMessage("enrollmentSubjectId must be a number"),
   validate,
 ]
 

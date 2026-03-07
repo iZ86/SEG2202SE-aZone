@@ -4,8 +4,7 @@ import validate from "../middlewares/validate";
 export const courseParamValidator: any = [
   param('courseId')
     .exists().withMessage("Missing courseId")
-    .isInt().withMessage("courseId must be a number")
-    .toInt(),
+    .isInt().withMessage("courseId must be a number"),
   validate,
 ]
 
