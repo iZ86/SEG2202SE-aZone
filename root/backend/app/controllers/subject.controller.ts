@@ -138,7 +138,7 @@ export default class SubjectController {
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
-        subjectsCount: response.getData() || 0
+        subjectsCount: response.getData()
       }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
