@@ -27,7 +27,7 @@ class UserService implements IUserService {
 
     const adminCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.ADMIN);
 
-    return Result.succeed({users: admins, userCount: adminCount.getData()}, "Admins retrieve success");
+    return Result.succeed({ users: admins, userCount: adminCount.getData() }, "Admins retrieve success");
   }
 
   public async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserWithCountData>> {
@@ -36,7 +36,7 @@ class UserService implements IUserService {
 
     const studentCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
-    return Result.succeed({users: students, userCount: studentCount.getData()}, "Students retrieve success");
+    return Result.succeed({ users: students, userCount: studentCount.getData() }, "Students retrieve success");
   }
 
   public async getUserById(userId: number): Promise<Result<UserData>> {
@@ -236,7 +236,7 @@ class UserService implements IUserService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentSemesterStartAndEndDate.getMessage());
     }
 
-    return Result.succeed({timetable: studentTimetable, ...studentSemesterStartAndEndDate.getData()}, "Student timetable retrieve success");
+    return Result.succeed({ timetable: studentTimetable, ...studentSemesterStartAndEndDate.getData() }, "Student timetable retrieve success");
   }
 
   private async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
