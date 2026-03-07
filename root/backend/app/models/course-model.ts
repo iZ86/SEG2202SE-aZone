@@ -24,18 +24,6 @@ export interface CourseSubjectData extends RowDataPacket {
   creditHours: number;
 }
 
-export interface CourseProgrammeSubjectData extends RowDataPacket {
-  courseId: number;
-  courseName: string;
-  programmeId: number;
-  programmeName: string;
-  subjectId: number;
-  subjectCode: string;
-  subjectName: string;
-  description: string;
-  creditHours: number;
-}
-
 export interface CourseProgrammeWithCountData {
   courses: CourseProgrammeData[];
   courseCount: number;
