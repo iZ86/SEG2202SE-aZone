@@ -115,7 +115,7 @@ class VenueService implements IVenueService {
   async getVenueCount(query: string = ""): Promise<Result<number>> {
     const venueCount: number = await venueRepository.getVenueCount(query);
 
-    return Result.succeed(venueCount ? venueCount : 0, "Venue count retrieve success");
+    return Result.succeed(venueCount, "Venue count retrieve success");
   }
 }
 
