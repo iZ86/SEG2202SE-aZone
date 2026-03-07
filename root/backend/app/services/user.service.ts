@@ -2,12 +2,12 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
 interface IUserService {
-  getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
   getStudents(query: string, pageSize: number, page: number): Promise<Result<UserData[]>>;
+  getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>>;
   getUserById(userId: number): Promise<Result<UserData>>;
   getUserByEmail(email: string): Promise<Result<UserData>>;
   getAdminById(adminId: number): Promise<Result<UserData>>;
@@ -23,10 +23,12 @@ interface IUserService {
 }
 
 class UserService implements IUserService {
-  async getAdmins(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {
+  async getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>> {
     const admins: UserData[] = await userRepository.getAdmins(query, pageSize, page);
 
-    return Result.succeed(admins, "Admins retrieve success");
+    const adminCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.ADMIN);
+
+    return Result.succeed({users: admins, userCount: adminCount.getData()}, "Admins retrieve success");
   }
 
   async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserData[]>> {

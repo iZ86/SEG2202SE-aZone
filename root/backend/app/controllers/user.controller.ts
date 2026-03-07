@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData } from "../models/user-model";
+import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData } from "../models/user-model";
 import userService from "../services/user.service";
 
 export default class UserController {
@@ -10,13 +10,9 @@ export default class UserController {
     const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
-    const response: Result<UserData[]> = await userService.getAdmins(query, pageSize, page);
-    const userCount: Result<number> = await userService.getUserCount(query, ENUM_USER_ROLE.ADMIN);
+    const response: Result<UserWithCountData> = await userService.getAdmins(query, pageSize, page);
     if (response.isSuccess()) {
-      return res.sendSuccess.ok({
-        users: response.getData(),
-        userCount: userCount.isSuccess() ? userCount.getData() : 0,
-      }, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
