@@ -13,7 +13,6 @@ interface ISubjectRepository {
   deleteSubjectById(subjectId: number): Promise<ResultSetHeader>;
   getSubjectCount(query: string): Promise<number>;
   getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<StudentSubjectData[]>;
-  getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<number>;
   getActiveSubjectsOverviewByStudentId(studentId: number): Promise<StudentSubjectOverviewData[]>;
 }
 
@@ -188,41 +187,6 @@ class SubjectRepository implements ISubjectRepository {
     });
   }
 
-  getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<TotalCount[]>(
-        "SELECT COUNT(DISTINCT(s.subjectId)) AS totalCount " +
-        "FROM ENROLLMENT_SUBJECT es " +
-        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON es.enrollmentSubjectId = est.enrollmentSubjectId " +
-        "INNER JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
-        "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
-        "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
-        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
-        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-        "INNER JOIN DAY d ON est.dayId = d.dayId " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON e.enrollmentId = pi.enrollmentId " +
-        "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON pi.programmeIntakeId = scpi.programmeIntakeId " +
-        "WHERE sest.studentId = ? " +
-        "AND (s.subjectCode LIKE ? " +
-        "OR s.subjectName LIKE ?) " +
-        "AND (? = 0 OR pi.semester = ?) ",
-        [
-          studentId,
-          "%" + query + "%",
-          "%" + query + "%",
-          semester,
-          semester,
-        ],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]?.totalCount ?? 0);
-        }
-      );
-    });
-  }
 
   getActiveSubjectsOverviewByStudentId(studentId: number): Promise<StudentSubjectOverviewData[]> {
     return new Promise((resolve, reject) => {
