@@ -19,14 +19,14 @@ interface ISubjectService {
 }
 
 class SubjectService implements ISubjectService {
-  async getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>> {
+  public async getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>> {
     const subjects: SubjectData[] = await subjectRepository.getSubjects(query, pageSize, page);
 
     const subjectCount: Result<number> = await this.getSubjectCount(query);
     return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Subjects retrieve success");
   }
 
-  async getSubjectById(subjectId: number): Promise<Result<SubjectData>> {
+  public async getSubjectById(subjectId: number): Promise<Result<SubjectData>> {
     const subject: SubjectData | undefined = await subjectRepository.getSubjectById(subjectId);
 
     if (!subject) {
@@ -36,7 +36,7 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subject, "Subject retrieve success");
   }
 
-  async getSubjectBySubjectCode(subjectCode: string): Promise<Result<SubjectData>> {
+  private async getSubjectBySubjectCode(subjectCode: string): Promise<Result<SubjectData>> {
     const subject: SubjectData | undefined = await subjectRepository.getSubjectBySubjectCode(subjectCode);
 
     if (!subject) {
@@ -46,7 +46,7 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subject, "Subject retrieve success");
   }
 
-  async getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>> {
+  public async getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>> {
     const subject: SubjectData | undefined = await subjectRepository.getSubjectByIdAndSubjectCode(subjectId, subjectCode);
 
     if (!subject) {
@@ -56,7 +56,7 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subject, "Subject retrieve success");
   }
 
-  async createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>> {
+  public async createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>> {
 
 
     // Check exist or not subject code.
@@ -101,7 +101,7 @@ class SubjectService implements ISubjectService {
     return Result.succeed({ ...subject.getData(), courseSubjects: createCourseSubjectResult.getData() }, "Subject create success");
   }
 
-  async updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>> {
+  public async updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>> {
 
     // Check param exists or not
     const subjectResult: Result<SubjectData> = await this.getSubjectById(subjectId);
@@ -161,7 +161,7 @@ class SubjectService implements ISubjectService {
     return Result.succeed({ ...subject.getData(), courseSubjects: createCourseSubjectResult.getData() }, "Subject update success");
   }
 
-  async deleteSubjectById(subjectId: number): Promise<Result<null>> {
+  public async deleteSubjectById(subjectId: number): Promise<Result<null>> {
     // Check param exists or not
     const subjectResult: Result<SubjectData> = await this.getSubjectById(subjectId);
 
@@ -182,13 +182,13 @@ class SubjectService implements ISubjectService {
     return Result.succeed(null, "Subject delete success");
   }
 
-  async getSubjectCount(query: string = ""): Promise<Result<number>> {
+  public async getSubjectCount(query: string = ""): Promise<Result<number>> {
     const subjectCount: number = await subjectRepository.getSubjectCount(query);
 
     return Result.succeed(subjectCount, "Subject count retrieve success");
   }
 
-  async getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectWithCountData>> {
+  public async getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectWithCountData>> {
     const subjects: StudentSubjectData[] = await subjectRepository.getSubjectsByStudentId(studentId, semester, query, pageSize, page);
 
     const subjectCount: Result<number> = await this.getSubjectCount(query);
@@ -196,8 +196,7 @@ class SubjectService implements ISubjectService {
     return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Student subjects retrieve success");
   }
 
-
-  async getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
+  public async getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
     const studentActiveSubjects: StudentSubjectOverviewData[] = await subjectRepository.getActiveSubjectsOverviewByStudentId(studentId);
     return Result.succeed(studentActiveSubjects, "Student active subjects retrieve success");
   }
