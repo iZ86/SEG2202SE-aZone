@@ -6,8 +6,8 @@ import userService from "../services/user.service";
 
 export default class UserController {
   async getAdmins(req: Request, res: Response) {
-    const page: number = Number(req.query.page as string) || 1;
-    const pageSize: number = Number(req.query.pageSize as string) || 15;
+    const page: number = Number(req.query.page) || 1;
+    const pageSize: number = Number(req.query.pageSize) || 15;
     const query: string = req.query.query as string || "";
 
     const response: Result<UserData[]> = await userService.getAdmins(query, pageSize, page);
