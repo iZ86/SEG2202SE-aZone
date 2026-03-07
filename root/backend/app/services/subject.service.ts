@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, SubjectWithCountData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, StudentSubjectWithCountData, SubjectWithCountData } from "../models/subject-model";
 import subjectRepository from "../repositories/subject.repository";
 import courseRepository from "../repositories/course.repository";
 import { CourseData, CourseSubjectData } from "../models/course-model";
@@ -16,7 +16,7 @@ interface ISubjectService {
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>>;
   deleteSubjectById(subjectId: number): Promise<Result<null>>;
   getSubjectCount(query: string): Promise<Result<number>>;
-  getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>>;
+  getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectWithCountData>>;
   getSubjectsCountByStudentId(studentId: number, semester: number, query: string): Promise<Result<number>>;
   getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>>;
 }
@@ -191,10 +191,12 @@ class SubjectService implements ISubjectService {
     return Result.succeed(subjectCount ? subjectCount : 0, "Subject count retrieve success");
   }
 
-  async getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectData[]>> {
-    const studentEnrollmentSubject: StudentSubjectData[] = await subjectRepository.getSubjectsByStudentId(studentId, semester, query, pageSize, page);
+  async getSubjectsByStudentId(studentId: number, semester: number, query: string, pageSize: number, page: number): Promise<Result<StudentSubjectWithCountData>> {
+    const subjects: StudentSubjectData[] = await subjectRepository.getSubjectsByStudentId(studentId, semester, query, pageSize, page);
 
-    return Result.succeed(studentEnrollmentSubject, "Student subjects retrieve success");
+    const subjectCount: Result<number> = await this.getSubjectCount(query);
+
+    return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Student subjects retrieve success");
   }
 
   async getSubjectsCountByStudentId(studentId: number, semester: number, query: string = ""): Promise<Result<number>> {

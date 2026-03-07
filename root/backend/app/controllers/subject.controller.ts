@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
-import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, SubjectWithCountData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, StudentSubjectWithCountData, SubjectWithCountData } from "../models/subject-model";
 import courseService from "../services/course.service";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 
@@ -20,13 +20,11 @@ export default class SubjectController {
       const query: string = req.query.query as string || "";
       const semester: number = Number(req.query.semester) || 0;
 
-      const response: Result<StudentSubjectData[]> = await subjectService.getSubjectsByStudentId(userId, semester, query, pageSize, page);
-      const subjectCount: Result<number> = await subjectService.getSubjectsCountByStudentId(userId, semester, query);
+      const response: Result<StudentSubjectWithCountData> = await subjectService.getSubjectsByStudentId(userId, semester, query, pageSize, page);
       if (response.isSuccess()) {
-        return res.sendSuccess.ok({
-          subjects: response.getData(),
-          subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
-        }, response.getMessage());
+        return res.sendSuccess.ok(
+          response.getData(),
+          response.getMessage());
       } else {
         switch (response.getErrorCode()) {
           case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
