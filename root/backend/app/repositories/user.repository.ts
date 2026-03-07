@@ -25,7 +25,7 @@ interface IUserRepostory {
 }
 
 class UserRepository implements IUserRepostory {
-  getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]> {
+  public getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
@@ -53,7 +53,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudents(query: string, pageSize: number, page: number): Promise<UserData[]> {
+  public getStudents(query: string, pageSize: number, page: number): Promise<UserData[]> {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
@@ -81,7 +81,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getUserById(userId: number): Promise<UserData | undefined> {
+  public getUserById(userId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT userId, firstName, lastName, email, phoneNumber, profilePictureUrl, status AS userStatus " +
@@ -96,7 +96,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getUserByEmail(email: string): Promise<UserData | undefined> {
+  public getUserByEmail(email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
@@ -111,7 +111,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentById(studentId: number): Promise<UserData | undefined> {
+  public getStudentById(studentId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.profilePictureUrl, ru.status AS userStatus " +
@@ -127,7 +127,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentByEmail(email: string): Promise<UserData | undefined> {
+  public getStudentByEmail(email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
@@ -143,7 +143,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getAdminById(adminId: number): Promise<UserData | undefined> {
+  public getAdminById(adminId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
         "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
@@ -159,7 +159,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentCount(query: string): Promise<number> {
+  public getStudentCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -183,7 +183,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getAdminCount(query: string): Promise<number> {
+  public getAdminCount(query: string): Promise<number> {
     return new Promise((resolve, reject) => {
       databaseConn.query<TotalCount[]>(
         "SELECT COUNT(*) AS totalCount " +
@@ -207,7 +207,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  isAdminExist(adminId: number): Promise<boolean> {
+  public isAdminExist(adminId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       databaseConn.query(
         "SELECT EXISTS(SELECT 1 FROM REGISTERED_USER ru " +
@@ -222,7 +222,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  isStudentExist(studentId: number): Promise<boolean> {
+  public isStudentExist(studentId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       databaseConn.query(
         "SELECT EXISTS(SELECT 1 FROM REGISTERED_USER ru " +
@@ -237,7 +237,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: number): Promise<ResultSetHeader> {
+  public createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO REGISTERED_USER (firstName, lastName, email, phoneNumber, password, status) " +
@@ -251,7 +251,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  createStudent(studentId: number): Promise<ResultSetHeader> {
+  public createStudent(studentId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO STUDENT (studentId) " +
@@ -265,7 +265,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader> {
+  public updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE REGISTERED_USER SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, status = ? " +
@@ -279,7 +279,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader> {
+  public updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE REGISTERED_USER SET profilePictureUrl = ? " +
@@ -293,7 +293,7 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  getStudentInformationById(studentId: number): Promise<StudentInformation | undefined> {
+  public getStudentInformationById(studentId: number): Promise<StudentInformation | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentInformation[]>(
         "SELECT c.courseId, c.courseName, pi.programmeIntakeId, pi.intakeId as 'intake', pi.semester, " +
@@ -313,7 +313,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
+  public getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentClassData[]>(
         "SELECT est.enrollmentSubjectTypeId, es.enrollmentSubjectId, est.startTime, est.endTime, s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
@@ -339,7 +339,7 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined> {
+  public getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSemesterStartAndEndData[]>(
         "SELECT pi.semesterStartDate, pi.semesterEndDate " +
