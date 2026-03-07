@@ -29,6 +29,11 @@ export const getStudentsQueryValidator: any = [
     .isString().withMessage('query must be a string'),
   validate,
 ]
+
+export const getAdminQueryValidator: any = [
+  ...getStudentsQueryValidator
+]
+
 export const createStudentValidator: any = [
   body('firstName')
     .trim()
