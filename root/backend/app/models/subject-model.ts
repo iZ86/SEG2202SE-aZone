@@ -37,3 +37,9 @@ export interface StudentSubjectOverviewData extends RowDataPacket {
 export interface SubjectWithCourseSubjectData extends SubjectData {
   courseSubjects: CourseSubjectData[]
 }
+
+export interface SubjectWithCountData {
+  subjects: SubjectData[];
+  subjectCount: number;
+}
+}
