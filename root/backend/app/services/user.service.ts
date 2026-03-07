@@ -20,6 +20,7 @@ interface IUserService {
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
+  getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>>;
 }
 
 class UserService implements IUserService {
@@ -233,8 +234,12 @@ class UserService implements IUserService {
     return Result.succeed(studentTimetable, "Student timetable retrieve success");
   }
 
-  async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>> {
+  async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
     const studentSemesterStartAndEndData: StudentSemesterStartAndEndData | undefined = await userRepository.getStudentSemesterStartAndEndDateById(studentId);
+
+    if (!studentSemesterStartAndEndData) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student semester start and end date not found");
+    }
 
     return Result.succeed(studentSemesterStartAndEndData, "Student semester start and end date retrieve success");
   }
