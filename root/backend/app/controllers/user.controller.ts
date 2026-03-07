@@ -135,7 +135,7 @@ export default class UserController {
     const profilePictureUrl: string = req.body.profilePictureUrl;
     const userId: number = req.user.userId;
 
-    const response: Result<UserData | undefined> = await userService.updateUserProfilePictureById(userId, profilePictureUrl);
+    const response: Result<UserData> = await userService.updateUserProfilePictureById(userId, profilePictureUrl);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
