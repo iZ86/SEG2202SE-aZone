@@ -32,7 +32,7 @@ export const getAdminsQueryValidator: any = [
   ...getStudentsQueryValidator
 ]
 
-export const createStudentValidator: any = [
+export const createStudentBodyValidator: any = [
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')
@@ -60,7 +60,7 @@ export const createStudentValidator: any = [
   validate,
 ];
 
-export const updateStudentValidator: any = [
+export const updateStudentBodyValidator: any = [
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')
@@ -84,7 +84,7 @@ export const updateStudentValidator: any = [
   validate,
 ];
 
-export const updateAdminValidator: any = [
+export const updateAdminBodyValidator: any = [
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')
@@ -104,7 +104,7 @@ export const updateAdminValidator: any = [
   validate,
 ];
 
-export const updateUserProfilePictureValidator: any = [
+export const updateUserProfilePictureBodyValidator: any = [
   body('profilePictureUrl')
     .trim()
     .notEmpty().withMessage('Missing profilePictureUrl')

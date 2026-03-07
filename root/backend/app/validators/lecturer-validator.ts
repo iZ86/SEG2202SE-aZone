@@ -28,7 +28,7 @@ export const getLecturersQueryValidator: any = [
   validate,
 ]
 
-export const createAndUpdateLecturerValidator: any = [
+export const createAndUpdateLecturerBodyValidator: any = [
   body('firstName')
     .trim()
     .notEmpty().withMessage('Missing firstName')

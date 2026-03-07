@@ -21,7 +21,7 @@ export const getIntakesQueryValidator: any = [
   validate,
 ]
 
-export const createAndUpdateIntakeValidator: any = [
+export const createAndUpdateIntakeBodyValidator: any = [
   body('intakeId')
     .notEmpty().withMessage('Missing intakeId')
     .isInt({ min: 200001, max: 209912 }) // covers years 2000-2099, months 01-12

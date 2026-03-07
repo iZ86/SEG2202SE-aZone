@@ -42,7 +42,7 @@ export const getAdminProgrammeHistoryQueryValidator: any = [
 ]
 
 
-export const createAndUpdateProgrammeValidator: any = [
+export const createAndUpdateProgrammeBodyValidator: any = [
   body('programmeName')
     .trim()
     .notEmpty().withMessage('Missing programmeName')
@@ -50,7 +50,7 @@ export const createAndUpdateProgrammeValidator: any = [
   validate,
 ];
 
-export const createAndUpdateProgrammeIntakeValidator: any = [
+export const createAndUpdateProgrammeIntakeBodyValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
     .isNumeric().withMessage('programmeId must be a number')
@@ -82,7 +82,7 @@ export const createAndUpdateProgrammeIntakeValidator: any = [
   validate,
 ];
 
-export const createStudentCourseProgrammeIntakeValidator: any = [
+export const createStudentCourseProgrammeIntakeBodyValidator: any = [
   body('studentId')
     .trim()
     .notEmpty().withMessage('Missing studentId')

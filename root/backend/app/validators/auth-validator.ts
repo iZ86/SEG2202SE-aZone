@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import validate from "../middlewares/validate";
 import { ENUM_USER_ROLE } from "../enums/enums";
 
-export const loginValidator: any = [
+export const loginBodyValidator: any = [
   body('userId')
     .notEmpty().withMessage('Missing userId')
     .isNumeric().withMessage('userId must be a number'),
@@ -17,7 +17,7 @@ export const loginValidator: any = [
   validate,
 ];
 
-export const updateMeValidator: any = [
+export const updateMeBodyValidator: any = [
   body('phoneNumber')
     .trim()
     .notEmpty().withMessage('Missing phoneNumber')

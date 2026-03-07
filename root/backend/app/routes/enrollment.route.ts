@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import EnrollmentController from "../controllers/enrollment.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { enrollmentParamValidator, createEnrollmentSubjectValidator, updateEnrollmentSubjectValidator, createAndUpdateEnrollmentValidator, enrollStudentSubjectsValidator, enrollmentSubjectParamValidator, getEnrollmentsAndSubjectsQueryValidator, getMonthlyEnrollmentCountQueryValidator} from "../validators/enrollment-validator";
+import { enrollmentParamValidator, createEnrollmentSubjectBodyValidator, updateEnrollmentSubjectBodyValidator, createAndUpdateEnrollmentBodyValidator, enrollStudentSubjectsValidator, enrollmentSubjectParamValidator, getEnrollmentsAndSubjectsQueryValidator, getMonthlyEnrollmentCountQueryValidator} from "../validators/enrollment-validator";
 import { studentParamValidator } from "../validators/user-validator";
 
 class EnrollmentRoute {
@@ -26,15 +26,15 @@ class EnrollmentRoute {
     this.router.get("/:enrollmentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentParamValidator, asyncHandler(this.controller.getEnrollmentWithProgrammeIntakesById));
 
 
-    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateEnrollmentValidator, asyncHandler(this.controller.createEnrollmentWithProgrammeIntakes));
-    this.router.post("/subject", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createEnrollmentSubjectValidator, asyncHandler(this.controller.createEnrollmentSubjectWithEnrollmentSubjectTypes));
+    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateEnrollmentBodyValidator, asyncHandler(this.controller.createEnrollmentWithProgrammeIntakes));
+    this.router.post("/subject", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createEnrollmentSubjectBodyValidator, asyncHandler(this.controller.createEnrollmentSubjectWithEnrollmentSubjectTypes));
     this.router.post("/subjects", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, enrollStudentSubjectsValidator, asyncHandler(this.controller.createStudentEnrollmentSubjectTypes));
-    this.router.post("/subject/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createEnrollmentSubjectValidator, asyncHandler(this.controller.createEnrollmentSubjectWithEnrollmentSubjectTypes));
+    this.router.post("/subject/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createEnrollmentSubjectBodyValidator, asyncHandler(this.controller.createEnrollmentSubjectWithEnrollmentSubjectTypes));
     this.router.post("/subjects/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, studentParamValidator, enrollStudentSubjectsValidator, asyncHandler(this.controller.createStudentEnrollmentSubjectTypesByStudentId));
 
 
-    this.router.put("/subject/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentSubjectParamValidator, updateEnrollmentSubjectValidator, asyncHandler(this.controller.updateEnrollmentSubjectWithEnrollmentSubjectTypesById));
-    this.router.put("/:enrollmentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentParamValidator, createAndUpdateEnrollmentValidator, asyncHandler(this.controller.updateEnrollmentWithProgrammeIntakesById));
+    this.router.put("/subject/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentSubjectParamValidator, updateEnrollmentSubjectBodyValidator, asyncHandler(this.controller.updateEnrollmentSubjectWithEnrollmentSubjectTypesById));
+    this.router.put("/:enrollmentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentParamValidator, createAndUpdateEnrollmentBodyValidator, asyncHandler(this.controller.updateEnrollmentWithProgrammeIntakesById));
 
 
     this.router.delete("/subject/:enrollmentSubjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, enrollmentSubjectParamValidator, asyncHandler(this.controller.deleteEnrollmentSubjectWithEnrollmentSubjectTypesById));

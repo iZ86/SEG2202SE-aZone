@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import UserController from "../controllers/user.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { adminParamValidator, createStudentValidator, studentParamValidator, updateAdminValidator, updateStudentValidator, updateUserProfilePictureValidator, getStudentsQueryValidator, getAdminsQueryValidator } from "../validators/user-validator";
+import { adminParamValidator, createStudentBodyValidator, studentParamValidator, updateAdminBodyValidator, updateStudentBodyValidator, updateUserProfilePictureBodyValidator, getStudentsQueryValidator, getAdminsQueryValidator } from "../validators/user-validator";
 
 class UserRoute {
   router = Router();
@@ -26,12 +26,12 @@ class UserRoute {
     this.router.get("/admins/:adminId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, adminParamValidator, asyncHandler(this.controller.getAdminById));
 
 
-    this.router.post("/students", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createStudentValidator, asyncHandler(this.controller.createStudent));
+    this.router.post("/students", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createStudentBodyValidator, asyncHandler(this.controller.createStudent));
 
-    this.router.put("/students/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, studentParamValidator, updateStudentValidator, asyncHandler(this.controller.updateStudentById));
+    this.router.put("/students/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, studentParamValidator, updateStudentBodyValidator, asyncHandler(this.controller.updateStudentById));
 
-    this.router.patch("/profile-picture", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, updateUserProfilePictureValidator, asyncHandler(this.controller.updateUserProfilePictureById));
-    this.router.patch("/admins/:adminId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, adminParamValidator, updateAdminValidator, asyncHandler(this.controller.updateAdminById));
+    this.router.patch("/profile-picture", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, updateUserProfilePictureBodyValidator, asyncHandler(this.controller.updateUserProfilePictureById));
+    this.router.patch("/admins/:adminId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, adminParamValidator, updateAdminBodyValidator, asyncHandler(this.controller.updateAdminById));
   }
 }
 

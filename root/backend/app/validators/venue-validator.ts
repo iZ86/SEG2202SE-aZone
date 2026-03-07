@@ -21,7 +21,7 @@ export const getVenuesQueryValidator: any = [
   validate,
 ];
 
-export const createAndUpdateVenueValidator: any = [
+export const createAndUpdateVenueBodyValidator: any = [
   body('venue')
     .trim()
     .notEmpty().withMessage('Missing venue')

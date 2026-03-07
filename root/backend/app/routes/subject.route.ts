@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler, runValidatorIfStudent } from "../utils/utils";
 import SubjectController from "../controllers/subject.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { createAndUpdateSubjectValidator, subjectParamValidator, getSubjectsQueryValidator, getStudentSubjectsQueryValidator } from "../validators/subject-validator";
+import { createAndUpdateSubjectBodyValidator, subjectParamValidator, getSubjectsQueryValidator, getStudentSubjectsQueryValidator } from "../validators/subject-validator";
 
 class SubjectRoute {
   router = Router();
@@ -19,9 +19,9 @@ class SubjectRoute {
     this.router.get("/active", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getActiveSubjectsOverviewByStudentId));
     this.router.get("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, subjectParamValidator, asyncHandler(this.controller.getSubjectById));
 
-    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateSubjectValidator, asyncHandler(this.controller.createSubject));
+    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateSubjectBodyValidator, asyncHandler(this.controller.createSubject));
 
-    this.router.put("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, subjectParamValidator, createAndUpdateSubjectValidator, asyncHandler(this.controller.updateSubjectById));
+    this.router.put("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, subjectParamValidator, createAndUpdateSubjectBodyValidator, asyncHandler(this.controller.updateSubjectById));
 
     this.router.delete("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, subjectParamValidator, asyncHandler(this.controller.deleteSubjectById));
 

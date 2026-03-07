@@ -35,7 +35,7 @@ export const enrollmentSubjectParamValidator: any = [
   validate,
 ]
 
-export const createAndUpdateEnrollmentValidator: any = [
+export const createAndUpdateEnrollmentBodyValidator: any = [
   body('enrollmentStartDateTime')
     .trim()
     .notEmpty().withMessage('Missing enrollmentStartDateTime')
@@ -60,7 +60,7 @@ export const enrollStudentSubjectsValidator: any = [
 ];
 
 
-export const createEnrollmentSubjectValidator: any = [
+export const createEnrollmentSubjectBodyValidator: any = [
   body('enrollmentId')
     .trim()
     .notEmpty().withMessage('enrollmentId cannot be empty')
@@ -119,7 +119,7 @@ export const createEnrollmentSubjectValidator: any = [
   validate,
 ];
 
-export const updateEnrollmentSubjectValidator: any = [
+export const updateEnrollmentSubjectBodyValidator: any = [
   body('enrollmentId')
     .trim()
     .notEmpty().withMessage('enrollmentId cannot be empty')
