@@ -29,7 +29,7 @@ export const getStudentSubjectsQueryValidator: any = [
 ]
 
 
-export const createAndUpdateSubjectBodyValidator: any = [
+export const createSubjectBodyValidator: any = [
   body('subjectName')
     .trim()
     .notEmpty().withMessage('Missing subjectName')
@@ -55,3 +55,7 @@ export const createAndUpdateSubjectBodyValidator: any = [
     .toInt(),
   validate,
 ];
+
+export const updateSubjectBodyValidator: any = [
+  ...createSubjectBodyValidator
+]
