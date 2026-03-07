@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
-import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData } from "../models/user-model";
+import { StudentCourseProgrammeIntakeData, UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData, StudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
 interface IUserService {
@@ -18,8 +18,7 @@ interface IUserService {
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
-  getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>>;
-  getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData | undefined>>;
+  getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>>;
 }
 
@@ -229,9 +228,16 @@ class UserService implements IUserService {
     return Result.succeed(studentInformation, "Student information retrieve success");
   }
 
-  async getStudentTimetableById(studentId: number): Promise<Result<StudentClassData[]>> {
+  async getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>> {
     const studentTimetable: StudentClassData[] = await userRepository.getStudentTimetableById(studentId);
-    return Result.succeed(studentTimetable, "Student timetable retrieve success");
+
+    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData> = await this.getStudentSemesterStartAndEndDateById(studentId);
+
+    if (!studentSemesterStartAndEndDate.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentSemesterStartAndEndDate.getMessage());
+    }
+
+    return Result.succeed({timetable: studentTimetable, ...studentSemesterStartAndEndDate.getData()}, "Student timetable retrieve success");
   }
 
   async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {

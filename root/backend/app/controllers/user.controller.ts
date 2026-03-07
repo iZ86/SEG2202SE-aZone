@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData } from "../models/user-model";
+import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData, StudentTimeTable } from "../models/user-model";
 import userService from "../services/user.service";
 
 export default class UserController {
@@ -180,16 +180,11 @@ export default class UserController {
   async getStudentTimetableById(req: Request, res: Response) {
     const userId: number = req.user.userId;
 
-    const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(userId);
-    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(userId);
+    const response: Result<StudentTimeTable> = await userService.getStudentTimetableById(userId);
 
 
-    if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {
-      return res.sendSuccess.ok({
-        semesterStartDate: studentSemesterStartAndEndDate.getData()?.semesterStartDate,
-        semesterEndDate: studentSemesterStartAndEndDate.getData()?.semesterEndDate,
-        timetable: response.getData()
-      }, response.getMessage());
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       throw new Error("user.controller.ts, getStudentTimetableById failed");
     }
@@ -198,16 +193,11 @@ export default class UserController {
   async getStudentTimetableByStudentId(req: Request, res: Response) {
     const studentId: number = Number(req.params.studentId as string);
 
-    const response: Result<StudentClassData[]> = await userService.getStudentTimetableById(studentId);
-    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData | undefined> = await userService.getStudentSemesterStartAndEndDateById(studentId);
+    const response: Result<StudentTimeTable> = await userService.getStudentTimetableById(studentId);
 
 
-    if (response.isSuccess() && studentSemesterStartAndEndDate.isSuccess()) {
-      return res.sendSuccess.ok({
-        semesterStartDate: studentSemesterStartAndEndDate.getData()?.semesterStartDate,
-        semesterEndDate: studentSemesterStartAndEndDate.getData()?.semesterEndDate,
-        timetable: response.getData()
-      }, response.getMessage());
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       throw new Error("user.controller.ts, getStudentTimetableById failed");
     }
