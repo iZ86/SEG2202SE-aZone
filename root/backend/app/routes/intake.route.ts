@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import IntakeController from "../controllers/intake.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
-import { createAndUpdateIntakeBodyValidator, intakeParamValidator, getIntakesQueryValidator} from "../validators/intake-validator";
+import { createIntakeBodyValidator, updateIntakeBodyValidator, intakeParamValidator, getIntakesQueryValidator} from "../validators/intake-validator";
 
 class IntakeRoute {
   router = Router();
@@ -16,9 +16,10 @@ class IntakeRoute {
     this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getIntakesQueryValidator, asyncHandler(this.controller.getIntakes));
     this.router.get("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, asyncHandler(this.controller.getIntakeById));
 
-    this.router.put("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, createAndUpdateIntakeBodyValidator, asyncHandler(this.controller.updateIntakeById));
+    this.router.put("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, updateIntakeBodyValidator, asyncHandler(this.controller.updateIntakeById));
 
-    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateIntakeBodyValidator, asyncHandler(this.controller.createIntake));
+    // TODO: Move this up
+    this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createIntakeBodyValidator, asyncHandler(this.controller.createIntake));
 
     this.router.delete("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, asyncHandler(this.controller.deleteIntakeById));
   }
