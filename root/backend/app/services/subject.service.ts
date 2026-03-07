@@ -1,14 +1,14 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE } from "../enums/enums";
-import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, SubjectWithCountData } from "../models/subject-model";
 import subjectRepository from "../repositories/subject.repository";
 import courseRepository from "../repositories/course.repository";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 import courseService from "./course.service";
 
 interface ISubjectService {
-  getSubjects(query: string, pageSize: number | null, page: number | null): Promise<Result<SubjectData[]>>;
+  getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>>;
   getSubjectById(subjectId: number): Promise<Result<SubjectData>>;
   getSubjectBySubjectCode(subjectCode: string): Promise<Result<SubjectData>>;
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>>;
@@ -22,10 +22,11 @@ interface ISubjectService {
 }
 
 class SubjectService implements ISubjectService {
-  async getSubjects(query: string = "", pageSize: number | null, page: number | null): Promise<Result<SubjectData[]>> {
+  async getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>> {
     const subjects: SubjectData[] = await subjectRepository.getSubjects(query, pageSize, page);
 
-    return Result.succeed(subjects, "Subjects retrieve success");
+    const subjectCount: Result<number> = await this.getSubjectCount(query);
+    return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Subjects retrieve success");
   }
 
   async getSubjectById(subjectId: number): Promise<Result<SubjectData>> {

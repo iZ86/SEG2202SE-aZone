@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ENUM_ERROR_CODE } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import subjectService from "../services/subject.service";
-import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData } from "../models/subject-model";
+import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, SubjectWithCountData } from "../models/subject-model";
 import courseService from "../services/course.service";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 
@@ -39,22 +39,10 @@ export default class SubjectController {
       const pageSize: number = Number(req.query.pageSize) || 15;
       const query: string = req.query.query as string || "";
 
-      const response: Result<SubjectData[]> = await subjectService.getSubjects(query, pageSize, page);
-      const subjectCount: Result<number> = await subjectService.getSubjectCount(query);
-
-      let apiResponse: object = {
-        subjects: response.getData(),
-      };
-
-      if (page != null && pageSize != null) {
-        apiResponse = {
-          subjects: response.getData(),
-          subjectCount: subjectCount.isSuccess() ? subjectCount.getData() : 0,
-        };
-      }
+      const response: Result<SubjectWithCountData> = await subjectService.getSubjects(query, pageSize, page);
 
       if (response.isSuccess()) {
-        return res.sendSuccess.ok(apiResponse, response.getMessage());
+        return res.sendSuccess.ok(response.getData(), response.getMessage());
       } else {
         switch (response.getErrorCode()) {
           case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
