@@ -10,7 +10,6 @@ interface IVenueService {
   createVenue(venue: string): Promise<Result<VenueData>>;
   updateVenueById(venueId: number, venue: string): Promise<Result<VenueData>>;
   deleteVenueById(venueId: number): Promise<Result<null>>;
-  getVenueCount(query: string): Promise<Result<number>>;
 }
 
 class VenueService implements IVenueService {
