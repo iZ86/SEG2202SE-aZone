@@ -21,6 +21,15 @@ export const getSubjectsQueryValidator: any = [
     .isString().withMessage('query must be a string'),
   validate,
 ]
+
+export const getStudentSubjectsQueryValidator: any = [
+  query('semester')
+    .optional()
+    .isInt().withMessage('semester must be a number'),
+  validate,
+]
+
+
 export const createAndUpdateSubjectValidator: any = [
   body('subjectName')
     .trim()
