@@ -18,7 +18,6 @@ interface IUserService {
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
   getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>>;
-  getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>>;
 }
 
 class UserService implements IUserService {
