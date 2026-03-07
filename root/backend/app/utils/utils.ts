@@ -22,6 +22,18 @@ export const runValidatorIfAdmin = (fns: Function[]) =>
     runNext();
   };
 
+/** Used to run validators if the role is admin. */
+export const runValidatorIfStudent = (fns: Function[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user.isStudent) return next();
+    let i = 0;
+    const runNext = () => {
+      if (i >= fns.length) return next();
+      fns[i++](req, res, runNext);
+    };
+    runNext();
+  };
+
 export function isDateRangeClashing(
   startTime: Date,
   endTime: Date,
