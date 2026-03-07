@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import VenueController from "../controllers/venue.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader } from "../middlewares/auth";
-import { createAndUpdateVenueValidator, venueParamValidator } from "../validators/venue-validator";
+import { createAndUpdateVenueValidator, venueParamValidator, getVenuesQueryValidator} from "../validators/venue-validator";
 
 class VenueRoute {
   router = Router();
@@ -14,7 +14,7 @@ class VenueRoute {
 
   initializeRoutes() {
 
-    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getVenues));
+    this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getVenuesQueryValidator, asyncHandler(this.controller.getVenues));
     this.router.get("/:venueId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, venueParamValidator, asyncHandler(this.controller.getVenueById));
 
     this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createAndUpdateVenueValidator, asyncHandler(this.controller.createVenue));
