@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/utils";
 import UserController from "../controllers/user.controller";
 import { checkAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, verifyAuthTokenHeader, verifyStudentAuthToken } from "../middlewares/auth";
-import { adminParamValidator, createStudentValidator, studentParamValidator, updateAdminValidator, updateStudentValidator, updateUserProfilePictureValidator } from "../validators/user-validator";
+import { adminParamValidator, createStudentValidator, studentParamValidator, updateAdminValidator, updateStudentValidator, updateUserProfilePictureValidator, getStudentsQueryValidator } from "../validators/user-validator";
 
 class UserRoute {
   router = Router();
@@ -14,7 +14,7 @@ class UserRoute {
 
   initializeRoutes() {
 
-    this.router.get("/students", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudents));
+    this.router.get("/students", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getStudentsQueryValidator, asyncHandler(this.controller.getStudents));
     this.router.get("/admins", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getAdmins));
 
     this.router.get("/students/count", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getStudentsCount));
