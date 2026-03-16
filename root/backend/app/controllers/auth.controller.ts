@@ -20,7 +20,8 @@ export default class AuthController {
         response = await authService.loginAdmin(userId, password);
         break;
       default:
-        throw new Error("login unexpected error");
+        response = Result.fail(ENUM_ERROR_CODE.INVALID_CREDS, "Invalid user role")
+        break;
     }
 
     if (response.isSuccess()) {
