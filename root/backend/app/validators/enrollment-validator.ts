@@ -49,7 +49,7 @@ export const createEnrollmentBodyValidator: any = [
     .optional()
     .isArray({ min: 1 }).withMessage('programmeIntakeIds must be an array and at least one value'),
   body('programmeIntakeIds.*')
-    .isNumeric().withMessage('All programmeIntakeIds must be a number'),
+    .isInt().withMessage('All programmeIntakeIds must be a number'),
   validate,
 ];
 
@@ -68,29 +68,29 @@ export const createEnrollmentSubjectBodyValidator: any = [
   body('enrollmentId')
     .trim()
     .notEmpty().withMessage('enrollmentId cannot be empty')
-    .isNumeric().withMessage('enrollmentId must be a number')
+    .isInt().withMessage('enrollmentId must be a number')
     .toInt(),
   body('subjectId')
     .trim()
     .notEmpty().withMessage('subjectId cannot be empty')
-    .isNumeric().withMessage('subjectId must be a number')
+    .isInt().withMessage('subjectId must be a number')
     .toInt(),
   body('lecturerId')
     .trim()
     .notEmpty().withMessage('lecturerId cannot be empty')
-    .isNumeric().withMessage('lecturerId must be a number')
+    .isInt().withMessage('lecturerId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes')
     .isArray().withMessage('enrollmentSubjectTypes must be an array'),
   body('enrollmentSubjectTypes.*.classTypeId')
     .trim()
     .notEmpty().withMessage('classTypeId cannot be empty')
-    .isNumeric().withMessage('classTypeId must be a number')
+    .isInt().withMessage('classTypeId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.venueId')
     .trim()
     .notEmpty().withMessage('venueId cannot be empty')
-    .isNumeric().withMessage('venueId must be a number')
+    .isInt().withMessage('venueId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.startTime')
     .trim()
@@ -103,22 +103,22 @@ export const createEnrollmentSubjectBodyValidator: any = [
   body('enrollmentSubjectTypes.*.dayId')
     .trim()
     .notEmpty().withMessage('dayId cannot be empty')
-    .isNumeric().withMessage('dayId must be a number')
+    .isInt().withMessage('dayId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.numberOfSeats')
     .trim()
     .notEmpty().withMessage('numberOfSeats cannot be empty')
-    .isNumeric().withMessage('numberOfSeats must be a number')
+    .isInt().withMessage('numberOfSeats must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.grouping')
     .trim()
     .notEmpty().withMessage('grouping cannot be empty')
-    .isNumeric().withMessage('grouping must be a number')
+    .isInt().withMessage('grouping must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.lecturerId')
     .trim()
     .notEmpty().withMessage('lecturerId cannot be empty')
-    .isNumeric().withMessage('lecturerId must be a number')
+    .isInt().withMessage('lecturerId must be a number')
     .toInt(),
   validate,
 ];
@@ -127,34 +127,34 @@ export const updateEnrollmentSubjectBodyValidator: any = [
   body('enrollmentId')
     .trim()
     .notEmpty().withMessage('enrollmentId cannot be empty')
-    .isNumeric().withMessage('enrollmentId must be a number')
+    .isInt().withMessage('enrollmentId must be a number')
     .toInt(),
   body('subjectId')
     .trim()
     .notEmpty().withMessage('subjectId cannot be empty')
-    .isNumeric().withMessage('subjectId must be a number')
+    .isInt().withMessage('subjectId must be a number')
     .toInt(),
   body('lecturerId')
     .trim()
     .notEmpty().withMessage('lecturerId cannot be empty')
-    .isNumeric().withMessage('lecturerId must be a number')
+    .isInt().withMessage('lecturerId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes')
     .isArray().withMessage('enrollmentSubjectTypes must be an array'),
   body('enrollmentSubjectTypes.*.enrollmentSubjectTypeId')
     .optional()
     .trim()
-    .isNumeric().withMessage('enrollmentSubjectTypeId must be a number')
+    .isInt().withMessage('enrollmentSubjectTypeId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.classTypeId')
     .trim()
     .notEmpty().withMessage('classTypeId cannot be empty')
-    .isNumeric().withMessage('classTypeId must be a number')
+    .isInt().withMessage('classTypeId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.venueId')
     .trim()
     .notEmpty().withMessage('venueId cannot be empty')
-    .isNumeric().withMessage('venueId must be a number')
+    .isInt().withMessage('venueId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.startTime')
     .trim()
@@ -167,22 +167,22 @@ export const updateEnrollmentSubjectBodyValidator: any = [
   body('enrollmentSubjectTypes.*.dayId')
     .trim()
     .notEmpty().withMessage('dayId cannot be empty')
-    .isNumeric().withMessage('dayId must be a number')
+    .isInt().withMessage('dayId must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.numberOfSeats')
     .trim()
     .notEmpty().withMessage('numberOfSeats cannot be empty')
-    .isNumeric().withMessage('numberOfSeats must be a number')
+    .isInt().withMessage('numberOfSeats must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.grouping')
     .trim()
     .notEmpty().withMessage('grouping cannot be empty')
-    .isNumeric().withMessage('grouping must be a number')
+    .isInt().withMessage('grouping must be a number')
     .toInt(),
   body('enrollmentSubjectTypes.*.lecturerId')
     .trim()
     .notEmpty().withMessage('lecturerId cannot be empty')
-    .isNumeric().withMessage('lecturerId must be a number')
+    .isInt().withMessage('lecturerId must be a number')
     .toInt(),
   validate,
 ];

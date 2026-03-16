@@ -4,7 +4,7 @@ import validate from "../middlewares/validate";
 export const loginBodyValidator: any = [
   body('userId')
     .notEmpty().withMessage('Missing userId')
-    .isNumeric().withMessage('userId must be a number')
+    .isInt().withMessage('userId must be a number')
     .toInt(),
   body('password')
     .trim()
@@ -12,7 +12,7 @@ export const loginBodyValidator: any = [
     .isString().withMessage('Password must be a string'),
   body('role')
     .notEmpty().withMessage('Missing role')
-    .isNumeric().withMessage('Role must be a number')
+    .isInt().withMessage('Role must be a number')
     .toInt(),
   validate,
 ];

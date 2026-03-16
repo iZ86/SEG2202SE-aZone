@@ -57,19 +57,19 @@ export const updateProgrammeBodyValidator: any = [
 export const createProgrammeIntakeBodyValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
-    .isNumeric().withMessage('programmeId must be a number')
+    .isInt().withMessage('programmeId must be a number')
     .toInt(),
   body('intakeId')
     .notEmpty().withMessage('Missing intakeId')
-    .isNumeric().withMessage('intakeId must be a number')
+    .isInt().withMessage('intakeId must be a number')
     .toInt(),
   body('studyModeId')
     .notEmpty().withMessage('Missing studyModeId')
-    .isNumeric().withMessage('studyModeId must be a number')
+    .isInt().withMessage('studyModeId must be a number')
     .toInt(),
   body('semester')
     .notEmpty().withMessage('Missing semester')
-    .isNumeric().withMessage('semester must be a number')
+    .isInt().withMessage('semester must be a number')
     .toInt(),
   body('semesterStartDate')
     .notEmpty().withMessage('Missing semesterStartDate')
@@ -81,7 +81,7 @@ export const createProgrammeIntakeBodyValidator: any = [
     .toDate(),
   body('status')
     .notEmpty().withMessage('Missing status')
-    .isNumeric().withMessage('status must be a number')
+    .isInt().withMessage('status must be a number')
     .toInt(),
   validate,
 ];
@@ -94,17 +94,17 @@ export const createStudentCourseProgrammeIntakeBodyValidator: any = [
   body('studentId')
     .trim()
     .notEmpty().withMessage('Missing studentId')
-    .isNumeric().withMessage('studentId must be a number')
+    .isInt().withMessage('studentId must be a number')
     .toInt(),
   body('programmeIntakeId')
     .trim()
     .notEmpty().withMessage('Missing programmeIntakeId')
-    .isNumeric().withMessage('programmeIntakeId must be a number')
+    .isInt().withMessage('programmeIntakeId must be a number')
     .toInt(),
   body('courseId')
     .trim()
     .notEmpty().withMessage('Missing courseId')
-    .isNumeric().withMessage('courseId must be a number')
+    .isInt().withMessage('courseId must be a number')
     .toInt(),
   validate,
 ];

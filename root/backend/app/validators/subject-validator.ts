@@ -46,12 +46,12 @@ export const createSubjectBodyValidator: any = [
   body('creditHours')
     .trim()
     .notEmpty().withMessage('Missing creditHours')
-    .isNumeric().withMessage('creditHours must be a number')
+    .isInt().withMessage('creditHours must be a number')
     .toInt(),
   body('courseIds')
     .isArray({ min: 1 }).withMessage('courseIds must be an array and at least one value'),
   body('courseIds.*')
-    .isNumeric().withMessage('All items must be a number')
+    .isInt().withMessage('All items must be a number')
     .toInt(),
   validate,
 ];

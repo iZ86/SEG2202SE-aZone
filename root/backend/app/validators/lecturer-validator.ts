@@ -40,7 +40,7 @@ export const createLecturerBodyValidator: any = [
   body('lecturerTitleId')
     .trim()
     .notEmpty().withMessage('Missing lecturerTitleId')
-    .isNumeric().withMessage('lecturerTitleId must be a number'),
+    .isInt().withMessage('lecturerTitleId must be a number'),
   body('email')
     .trim()
     .notEmpty().withMessage('Missing email')
