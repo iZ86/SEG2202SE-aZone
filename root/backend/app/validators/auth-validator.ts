@@ -1,6 +1,5 @@
 import { body } from "express-validator";
 import validate from "../middlewares/validate";
-import { ENUM_USER_ROLE } from "../enums/enums";
 
 export const loginBodyValidator: any = [
   body('userId')
@@ -14,7 +13,6 @@ export const loginBodyValidator: any = [
   body('role')
     .notEmpty().withMessage('Missing role')
     .isNumeric().withMessage('Role must be a number')
-    .isIn(Object.values(ENUM_USER_ROLE)).withMessage('Invalid user role'),
     .toInt(),
   validate,
 ];
