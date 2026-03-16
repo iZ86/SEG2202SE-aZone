@@ -47,9 +47,11 @@ export const updateCourseBodyValidator: any = [
 export const createCourseSubjectBodyValidator: any = [
   body('courseId')
     .notEmpty().withMessage('Missing courseId')
-    .isInt().withMessage('courseId must be an integer'),
+    .isInt().withMessage('courseId must be an integer')
+    .toInt(),
   body('subjectId')
     .notEmpty().withMessage('Missing subjectId')
-    .isInt().withMessage('subjectId must be an integer'),
+    .isInt().withMessage('subjectId must be an integer')
+    .toInt(),
   validate,
 ];
