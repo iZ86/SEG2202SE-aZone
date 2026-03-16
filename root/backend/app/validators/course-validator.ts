@@ -27,7 +27,8 @@ export const getCoursesQueryValidator: any = [
 export const createCourseBodyValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
-    .isInt().withMessage('programmeId must be an integer'),
+    .isInt().withMessage('programmeId must be an integer')
+    .toInt(),
   body('courseCode')
     .trim()
     .notEmpty().withMessage('Missing courseCode')
