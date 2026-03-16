@@ -4,24 +4,24 @@ import validate from "../middlewares/validate";
 export const studentParamValidator: any = [
   param('studentId')
     .exists().withMessage("Missing studentId")
-    .isInt().withMessage("studentId must be a number"),
+    .isInt().withMessage("studentId must be an integer"),
   validate,
 ];
 
 export const adminParamValidator: any = [
   param('adminId')
     .exists().withMessage("Missing adminId")
-    .isInt().withMessage("adminId must be a number"),
+    .isInt().withMessage("adminId must be an integer"),
   validate,
 ];
 
 export const getStudentsQueryValidator: any = [
   query('page')
     .optional()
-    .isInt().withMessage('page must be a number'),
+    .isInt().withMessage('page must be an integer'),
   query('pageSize')
     .optional()
-    .isInt().withMessage('pageSize must be a number'),
+    .isInt().withMessage('pageSize must be an integer'),
   query('query')
     .optional()
     .isString().withMessage('query must be a string'),

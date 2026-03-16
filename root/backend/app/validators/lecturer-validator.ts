@@ -4,24 +4,24 @@ import validate from "../middlewares/validate";
 export const lecturerParamValidator: any = [
   param('lecturerId')
     .exists().withMessage("Missing lecturerId")
-    .isInt().withMessage("lecturerId must be a number"),
+    .isInt().withMessage("lecturerId must be an integer"),
   validate,
 ];
 
 export const lecturerTitleParamValidator: any = [
   param('lecturerTitleId')
     .exists().withMessage("Missing lecturerTitleId")
-    .isInt().withMessage("lecturerTitleId must be a number"),
+    .isInt().withMessage("lecturerTitleId must be an integer"),
   validate,
 ];
 
 export const getLecturersQueryValidator: any = [
   query('page')
     .optional()
-    .isInt().withMessage('page must be a number'),
+    .isInt().withMessage('page must be an integer'),
   query('pageSize')
     .optional()
-    .isInt().withMessage('pageSize must be a number'),
+    .isInt().withMessage('pageSize must be an integer'),
   query('query')
     .optional()
     .isString().withMessage('query must be a string'),
@@ -40,7 +40,7 @@ export const createLecturerBodyValidator: any = [
   body('lecturerTitleId')
     .trim()
     .notEmpty().withMessage('Missing lecturerTitleId')
-    .isInt().withMessage('lecturerTitleId must be a number'),
+    .isInt().withMessage('lecturerTitleId must be an integer'),
   body('email')
     .trim()
     .notEmpty().withMessage('Missing email')

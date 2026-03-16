@@ -4,17 +4,17 @@ import validate from "../middlewares/validate";
 export const subjectParamValidator: any = [
   param('subjectId')
     .exists().withMessage("Missing subjectId")
-    .isInt().withMessage("subjectId must be a number"),
+    .isInt().withMessage("subjectId must be an integer"),
   validate,
 ]
 
 export const getSubjectsQueryValidator: any = [
   query('page')
     .optional()
-    .isInt().withMessage('page must be a number'),
+    .isInt().withMessage('page must be an integer'),
   query('pageSize')
     .optional()
-    .isInt().withMessage('pageSize must be a number'),
+    .isInt().withMessage('pageSize must be an integer'),
   query('query')
     .optional()
     .isString().withMessage('query must be a string'),
@@ -24,7 +24,7 @@ export const getSubjectsQueryValidator: any = [
 export const getStudentSubjectsQueryValidator: any = [
   query('semester')
     .optional()
-    .isInt().withMessage('semester must be a number'),
+    .isInt().withMessage('semester must be an integer'),
   validate,
 ]
 
@@ -46,12 +46,12 @@ export const createSubjectBodyValidator: any = [
   body('creditHours')
     .trim()
     .notEmpty().withMessage('Missing creditHours')
-    .isInt().withMessage('creditHours must be a number')
+    .isInt().withMessage('creditHours must be an integer')
     .toInt(),
   body('courseIds')
     .isArray({ min: 1 }).withMessage('courseIds must be an array and at least one value'),
   body('courseIds.*')
-    .isInt().withMessage('All items must be a number')
+    .isInt().withMessage('All items must be an integer')
     .toInt(),
   validate,
 ];

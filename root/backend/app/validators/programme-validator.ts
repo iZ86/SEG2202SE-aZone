@@ -4,24 +4,24 @@ import validate from "../middlewares/validate";
 export const programmeParamValidator: any = [
   param('programmeId')
     .exists().withMessage("Missing programmeId")
-    .isInt().withMessage("programmeId must be a number"),
+    .isInt().withMessage("programmeId must be an integer"),
   validate,
 ]
 
 export const programmeIntakeParamValidator: any = [
   param('programmeIntakeId')
     .exists().withMessage("Missing programmeIntakeId")
-    .isInt().withMessage("programmeIntakeId must be a number"),
+    .isInt().withMessage("programmeIntakeId must be an integer"),
   validate,
 ]
 
 export const getProgrammesAndIntakesQueryValidator: any = [
   query('page')
     .optional()
-    .isInt().withMessage('page must be a number'),
+    .isInt().withMessage('page must be an integer'),
   query('pageSize')
     .optional()
-    .isInt().withMessage('pageSize must be a number'),
+    .isInt().withMessage('pageSize must be an integer'),
   query('query')
     .optional()
     .isString().withMessage('query must be a string'),
@@ -31,13 +31,13 @@ export const getProgrammesAndIntakesQueryValidator: any = [
 export const getProgrammeHistoryQueryValidator: any = [
   query('status')
     .optional()
-    .isInt().withMessage('status must be a number'),
+    .isInt().withMessage('status must be an integer'),
   validate,
 ]
 
 export const getAdminProgrammeHistoryQueryValidator: any = [
   query('studentId')
-    .isInt().withMessage('studentId must be a number'),
+    .isInt().withMessage('studentId must be an integer'),
   validate,
 ]
 
@@ -57,19 +57,19 @@ export const updateProgrammeBodyValidator: any = [
 export const createProgrammeIntakeBodyValidator: any = [
   body('programmeId')
     .notEmpty().withMessage('Missing programmeId')
-    .isInt().withMessage('programmeId must be a number')
+    .isInt().withMessage('programmeId must be an integer')
     .toInt(),
   body('intakeId')
     .notEmpty().withMessage('Missing intakeId')
-    .isInt().withMessage('intakeId must be a number')
+    .isInt().withMessage('intakeId must be an integer')
     .toInt(),
   body('studyModeId')
     .notEmpty().withMessage('Missing studyModeId')
-    .isInt().withMessage('studyModeId must be a number')
+    .isInt().withMessage('studyModeId must be an integer')
     .toInt(),
   body('semester')
     .notEmpty().withMessage('Missing semester')
-    .isInt().withMessage('semester must be a number')
+    .isInt().withMessage('semester must be an integer')
     .toInt(),
   body('semesterStartDate')
     .notEmpty().withMessage('Missing semesterStartDate')
@@ -81,7 +81,7 @@ export const createProgrammeIntakeBodyValidator: any = [
     .toDate(),
   body('status')
     .notEmpty().withMessage('Missing status')
-    .isInt().withMessage('status must be a number')
+    .isInt().withMessage('status must be an integer')
     .toInt(),
   validate,
 ];
@@ -94,17 +94,17 @@ export const createStudentCourseProgrammeIntakeBodyValidator: any = [
   body('studentId')
     .trim()
     .notEmpty().withMessage('Missing studentId')
-    .isInt().withMessage('studentId must be a number')
+    .isInt().withMessage('studentId must be an integer')
     .toInt(),
   body('programmeIntakeId')
     .trim()
     .notEmpty().withMessage('Missing programmeIntakeId')
-    .isInt().withMessage('programmeIntakeId must be a number')
+    .isInt().withMessage('programmeIntakeId must be an integer')
     .toInt(),
   body('courseId')
     .trim()
     .notEmpty().withMessage('Missing courseId')
-    .isInt().withMessage('courseId must be a number')
+    .isInt().withMessage('courseId must be an integer')
     .toInt(),
   validate,
 ];

@@ -4,17 +4,17 @@ import validate from "../middlewares/validate";
 export const intakeParamValidator: any = [
   param('intakeId')
     .exists().withMessage("Missing intakeId")
-    .isInt().withMessage("intakeId must be a number"),
+    .isInt().withMessage("intakeId must be an integer"),
   validate,
 ];
 
 export const getIntakesQueryValidator: any = [
   query('page')
     .optional()
-    .isInt().withMessage('page must be a number'),
+    .isInt().withMessage('page must be an integer'),
   query('pageSize')
     .optional()
-    .isInt().withMessage('pageSize must be a number'),
+    .isInt().withMessage('pageSize must be an integer'),
   query('query')
     .optional()
     .isString().withMessage('query must be a string'),
