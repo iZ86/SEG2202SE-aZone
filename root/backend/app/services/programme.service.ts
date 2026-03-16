@@ -14,7 +14,7 @@ import intakeService from "./intake.service";
 import { IntakeData } from "../models/intake-model";
 
 interface IProgrammeService {
-  getProgrammes(query: string, pageSize: number | null, page: number | null): Promise<Result<ProgrammeWithCountData>>;
+  getProgrammes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeWithCountData>>;
   getProgrammeById(programmeId: number): Promise<Result<ProgrammeData>>;
   createProgramme(programmeName: string): Promise<Result<ProgrammeData>>;
   updateProgrammeById(programmeId: number, programmeName: string): Promise<Result<ProgrammeData>>;
