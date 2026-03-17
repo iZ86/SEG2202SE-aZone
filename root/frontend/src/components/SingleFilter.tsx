@@ -46,18 +46,18 @@ export default function SingleFilter({
               value.value === -1 && !isFocused
                 ? isInvalid
                   ? "text-red-tomato border-red-tomato"
-                  : "border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority"
+                  : "border-slate-300 focus:border-blue-air-superiority focus:text-blue-air-superiority"
                 : isInvalid
                 ? "text-red-tomato border-red-tomato"
                 : "border-blue-air-superiority text-blue-air-superiority"
             }
-            px-4 h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} border-2 rounded-2xl outline-hidden`,
+            px-4 h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} border rounded-xl outline-hidden`,
             menu: () =>
-              `text-blue-air-superiority bg-white border-blue-air-superiority focus:text-blue-air-superiority border-2 mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-2xl p-2`,
+              `text-blue-air-superiority bg-white border-blue-air-superiority focus:text-blue-air-superiority border mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-xl p-2`,
             option: (state) =>
               `${
                 state.isFocused ? "bg-neutral-200" : "bg-white"
-              } py-2 px-4 rounded-xl border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority`,
+              } py-2 px-4 rounded-xl border-slate-300 focus:border-blue-air-superiority focus:text-blue-air-superiority`,
             valueContainer: () => "flex gap-x-2 gap-y-2",
           }}
           unstyled

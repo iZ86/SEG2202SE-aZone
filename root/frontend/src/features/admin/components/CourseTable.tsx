@@ -103,7 +103,7 @@ export default function CourseTable() {
 
       <section className="mt-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="h-75 overflow-y-auto">
+          <div className="h-72 overflow-y-auto">
             <table className="min-w-full text-left">
               <thead className="bg-slate-50 text-slate-500">
                 <tr className="text-sm">

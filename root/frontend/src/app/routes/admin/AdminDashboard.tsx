@@ -10,7 +10,7 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="px-6 py-6 flex-1">
         <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-[#4A739C] mt-4">
+        <p className="text-[#4A739C] mt-2">
           Monitor and track important information easily
         </p>
 

@@ -76,15 +76,15 @@ export default function NormalTextField({
           disabled={isDisabled}
           {...attributes}
           value={text}
-          className={`min-h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} rounded-2xl border-2 px-4 outline-hidden peer
+          className={`min-h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} rounded-xl border px-4 outline-hidden peer
                     ${
                       text.length === 0
                         ? isInvalid
                           ? "border-red-tomato"
-                          : "border-gray-battleship focus:border-blue-air-superiority focus:text-blue-air-superiority"
+                          : "border-slate-300 focus:border-blue-air-superiority focus:text-blue-air-superiority"
                         : isInvalid
-                        ? "border-red-tomato text-red-tomato"
-                        : "border-blue-air-superiority text-blue-air-superiority"
+                          ? "border-red-tomato text-red-tomato"
+                          : "border-blue-air-superiority text-blue-air-superiority"
                     }`}
           onChange={(e) => onChange(e.target.value)}
         />
