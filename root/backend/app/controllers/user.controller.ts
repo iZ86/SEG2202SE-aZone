@@ -152,7 +152,7 @@ export default class UserController {
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
-        studentsCount: response.getData() || 0
+        studentsCount: response.getData()
       }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
