@@ -55,8 +55,7 @@ export const createStudentBodyValidator: any = [
     .isString().withMessage('password must be a string'),
   body('userStatus')
     .trim()
-    .notEmpty().withMessage('Missing userStatus')
-    .isIn([1, 0]).withMessage('userStatus must be either 1 or 0'),
+    .notEmpty().withMessage('Missing userStatus'),
   validate,
 ];
 
