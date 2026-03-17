@@ -57,14 +57,10 @@ export default class SubjectController {
   async getSubjectById(req: Request, res: Response) {
     const subjectId: number = Number(req.params.subjectId);
 
-    const response: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
-    const courseSubjectResponse: Result<CourseSubjectData[]> = await courseService.getCourseSubjectsBySubjectId(subjectId);
+    const response: Result<SubjectWithCourseSubjectData> = await subjectService.getSubjectWithCourseSubjectsById(subjectId);
 
     if (response.isSuccess()) {
-      return res.sendSuccess.ok({
-        subjects: response.getData(),
-        courses: courseSubjectResponse.getData(),
-      }, response.getMessage());
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
       switch (response.getErrorCode()) {
         case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
