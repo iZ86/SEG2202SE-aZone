@@ -144,7 +144,7 @@ export const updateEnrollmentSubjectBodyValidator: any = [
   body('enrollmentSubjectTypes')
     .isArray().withMessage('enrollmentSubjectTypes must be an array'),
   body('enrollmentSubjectTypes.*.enrollmentSubjectTypeId')
-    .optional()
+    .optional() // If got enrollmentSubjectTypeId, update existing. Otherwise, create new one.
     .trim()
     .isInt().withMessage('enrollmentSubjectTypeId must be an integer')
     .toInt(),
