@@ -136,7 +136,7 @@ export default class CourseController {
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok({
-        coursesCount: response.getData() || 0
+        coursesCount: response.getData()
       }, response.getMessage());
     } else {
       switch (response.getErrorCode()) {
