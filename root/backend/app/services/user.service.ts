@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_ROLE, ENUM_USER_STATUS } from "../enums/enums";
 import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData, StudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
@@ -107,12 +107,18 @@ class UserService implements IUserService {
   }
 
   public async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>> {
-    const isEmailExistResult: Result<UserData> = await this.getStudentByEmail(email);
 
+    // Check params.
+    if (!(userStatus in ENUM_USER_STATUS)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "userStatus not found");
+    }
+
+    const isEmailExistResult: Result<UserData> = await this.getStudentByEmail(email);
     if (isEmailExistResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Email already exist");
     }
 
+    
     const hashedPassword: string = await argon2.hash(password, {
       type: argon2.argon2id,
       memoryCost: 2 ** 16,
