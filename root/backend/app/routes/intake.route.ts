@@ -16,10 +16,9 @@ class IntakeRoute {
     this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getIntakesQueryValidator, asyncHandler(this.controller.getIntakes));
     this.router.get("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, asyncHandler(this.controller.getIntakeById));
 
-    this.router.put("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, updateIntakeBodyValidator, asyncHandler(this.controller.updateIntakeById));
-
-    // TODO: Move this up
     this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createIntakeBodyValidator, asyncHandler(this.controller.createIntake));
+
+    this.router.put("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, updateIntakeBodyValidator, asyncHandler(this.controller.updateIntakeById));
 
     this.router.delete("/:intakeId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, intakeParamValidator, asyncHandler(this.controller.deleteIntakeById));
   }
