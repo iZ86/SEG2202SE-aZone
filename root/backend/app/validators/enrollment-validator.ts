@@ -17,7 +17,8 @@ export const getEnrollmentsAndSubjectsQueryValidator: any = [
 export const getMonthlyEnrollmentCountQueryValidator: any = [
   query('duration')
     .optional()
-    .isInt().withMessage('duration must be an integer'),
+    .isInt().withMessage('duration must be an integer')
+    .toInt(),
   validate,
 ]
 
