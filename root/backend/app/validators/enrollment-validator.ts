@@ -40,7 +40,6 @@ export const createEnrollmentBodyValidator: any = [
     .trim()
     .notEmpty().withMessage('Missing enrollmentStartDateTime')
     .isISO8601().withMessage("enrollmentStartDateTime must be a date time"),
-  validate,
   body('enrollmentEndDateTime')
     .trim()
     .notEmpty().withMessage('Missing enrollmentEndDateTime')
