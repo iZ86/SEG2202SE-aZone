@@ -9,6 +9,7 @@ import courseService from "./course.service";
 interface ISubjectService {
   getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>>;
   getSubjectById(subjectId: number): Promise<Result<SubjectData>>;
+  getSubjectWithCourseSubjectsById(subjectId: number): Promise<Result<SubjectWithCourseSubjectData>>;
   getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>>;
   createSubject(subjectName: string, subjectCode: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>>;
   updateSubjectById(subjectId: number, subjectCode: string, subjectName: string, description: string, creditHours: number, courseIds: number[]): Promise<Result<SubjectWithCourseSubjectData>>;
@@ -34,6 +35,20 @@ class SubjectService implements ISubjectService {
     }
 
     return Result.succeed(subject, "Subject retrieve success");
+  }
+
+  public async getSubjectWithCourseSubjectsById(subjectId: number): Promise<Result<SubjectWithCourseSubjectData>> {
+    const subjectResult: Result<SubjectData> = await this.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+    const courseSubjectsResult: Result<CourseSubjectData[]> = await courseService.getCourseSubjectsBySubjectId(subjectId);
+    if (!courseSubjectsResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseSubjectsResult.getMessage())
+    }
+    
+    return Result.succeed({ ...subjectResult.getData(), courseSubjects: courseSubjectsResult.getData()}, "Subject retrieve success");
   }
 
   private async getSubjectBySubjectCode(subjectCode: string): Promise<Result<SubjectData>> {
