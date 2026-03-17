@@ -103,7 +103,7 @@ class UserService implements IUserService {
         return Result.succeed(0, "Failed to get user count");
     }
 
-    return Result.succeed(userCount ? userCount : 0, "User count retrieve success");
+    return Result.succeed(userCount, "User count retrieve success");
   }
 
   public async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>> {
