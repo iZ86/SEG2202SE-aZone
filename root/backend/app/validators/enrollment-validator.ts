@@ -39,16 +39,19 @@ export const createEnrollmentBodyValidator: any = [
   body('enrollmentStartDateTime')
     .trim()
     .notEmpty().withMessage('Missing enrollmentStartDateTime')
-    .isISO8601().withMessage("enrollmentStartDateTime must be a date time"),
+    .isISO8601().withMessage("enrollmentStartDateTime must be a date time")
+    .toDate(),
   body('enrollmentEndDateTime')
     .trim()
     .notEmpty().withMessage('Missing enrollmentEndDateTime')
-    .isISO8601().withMessage("enrollmentEndDateTime must be a date time"),
+    .isISO8601().withMessage("enrollmentEndDateTime must be a date time")
+    .toDate(),
   body('programmeIntakeIds')
     .optional()
     .isArray({ min: 1 }).withMessage('programmeIntakeIds must be an array and at least one value'),
   body('programmeIntakeIds.*')
-    .isInt().withMessage('All programmeIntakeIds must be an integer'),
+    .isInt().withMessage('All programmeIntakeIds must be an integer')
+    .toInt(),
   validate,
 ];
 
