@@ -78,8 +78,7 @@ export const updateStudentBodyValidator: any = [
     .matches(/^01\d{8,9}$/).withMessage("phoneNumber must start with 01 and contain 10-11 digits"),
   body('userStatus')
     .trim()
-    .notEmpty().withMessage('Missing userStatus')
-    .isIn([0, 1]).withMessage('userStatus must be either 1 or 0'),
+    .notEmpty().withMessage('Missing userStatus'),
   validate,
 ];
 
