@@ -190,7 +190,7 @@ class UserService implements IUserService {
     const adminResult: Result<UserData> = await this.getAdminById(adminId);
 
     if (!adminResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid adminId");
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, adminResult.getMessage());
     }
 
     const updateAdminResult: ResultSetHeader = await userRepository.updateUserById(adminId, firstName, lastName, phoneNumber, email, 1);
