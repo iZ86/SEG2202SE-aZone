@@ -268,6 +268,14 @@ class UserService implements IUserService {
   }
 
   private async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
+
+    // Check params exist.
+    const studentResult: Result<UserData> = await this.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+    
+    
     const studentSemesterStartAndEndData: StudentSemesterStartAndEndData | undefined = await userRepository.getStudentSemesterStartAndEndDateById(studentId);
 
     if (!studentSemesterStartAndEndData) {
