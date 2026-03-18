@@ -483,11 +483,10 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
     }
 
-    const curseResult: Result<CourseData> = await courseService.getCourseById(courseId);
-    if (!curseResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, curseResult.getMessage());
+    const courseResult: Result<CourseProgrammeData> = await courseService.getCourseById(courseId);
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
     }
-
 
     const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
     if (!programmeIntakeResult.isSuccess()) {
