@@ -16,7 +16,7 @@ class SubjectRoute {
 
     this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, getSubjectsQueryValidator, runValidatorIfStudent(getStudentSubjectsQueryValidator), asyncHandler(this.controller.getSubjects));
     this.router.get("/count", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, asyncHandler(this.controller.getSubjectsCount));
-    this.router.get("/active", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getActiveSubjectsOverviewByStudentId));
+    this.router.get("/active", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getActiveSubjectsOverview));
     this.router.get("/:subjectId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, subjectParamValidator, asyncHandler(this.controller.getSubjectById));
 
     this.router.post("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, createSubjectBodyValidator, asyncHandler(this.controller.createSubject));

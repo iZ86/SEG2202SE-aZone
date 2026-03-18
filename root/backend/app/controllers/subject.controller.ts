@@ -144,7 +144,7 @@ export default class SubjectController {
     }
   }
 
-  async getActiveSubjectsOverviewByStudentId(req: Request, res: Response) {
+  async getActiveSubjectsOverview(req: Request, res: Response) {
     const userId: number = req.user.userId;
 
     const response: Result<StudentSubjectOverviewData[]> = await subjectService.getActiveSubjectsOverviewByStudentId(userId);
