@@ -73,11 +73,18 @@ class LecturerService implements ILecturerService {
   }
 
   public async updateLecturerById(lecturerId: number, firstName: string, lastName: string, lecturerTitleId: number, email: string, phoneNumber: string): Promise<Result<LecturerData>> {
-    const lecturerResult: Result<LecturerData> = await this.getLecturerById(lecturerId);
 
+    // Check param exist.
+    const lecturerTitleResult: Result<LecturerTitleData> = await this.getLecturerTitleById(lecturerTitleId);
+    if (!lecturerTitleResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, lecturerTitleResult.getMessage());
+    }
+
+    const lecturerResult: Result<LecturerData> = await this.getLecturerById(lecturerId);
     if (!lecturerResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, lecturerResult.getMessage());
     }
+    
 
     if (lecturerResult.getData().email !== email) {
       const isLecturerEmailExistResult: Result<LecturerData> = await this.getLecturerByEmail(email);
