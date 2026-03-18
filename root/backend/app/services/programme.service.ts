@@ -438,6 +438,24 @@ class ProgrammeService implements IProgrammeService {
   }
 
   private async getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+
+    // Check if params exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
+    const courseResult: Result<CourseProgrammeData> = await courseService.getCourseById(courseId);
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
+    }
+
+    const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+    if (!programmeIntakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResult.getMessage());
+    }
+
+
     const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
 
     if (!studentCourseProgrammeIntake) {
