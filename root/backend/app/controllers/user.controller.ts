@@ -162,7 +162,7 @@ export default class UserController {
     }
   }
 
-  async getStudentInformationById(req: Request, res: Response) {
+  async getStudentInformation(req: Request, res: Response) {
     const userId: number = req.user.userId;
 
     const response: Result<StudentInformation> = await userService.getStudentInformationById(userId);
