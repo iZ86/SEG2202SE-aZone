@@ -62,6 +62,19 @@ class SubjectService implements ISubjectService {
   }
 
   public async getSubjectByIdAndSubjectCode(subjectId: number, subjectCode: string): Promise<Result<SubjectData>> {
+
+    // Check param exist.
+    const subjectResult: Result<SubjectData> = await this.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+    const subjectCodeResult: Result<SubjectData> = await this.getSubjectBySubjectCode(subjectCode);
+    if (!subjectCodeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectCodeResult.getMessage());
+    }
+
+
     const subject: SubjectData | undefined = await subjectRepository.getSubjectByIdAndSubjectCode(subjectId, subjectCode);
 
     if (!subject) {
