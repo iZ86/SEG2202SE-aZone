@@ -415,6 +415,12 @@ class ProgrammeService implements IProgrammeService {
 
   public async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
 
+    // Check if params exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
 
     // Check status valid or not.
     if (!(status in ENUM_PROGRAMME_STATUS)) {
