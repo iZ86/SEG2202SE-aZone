@@ -4,7 +4,7 @@ import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS, E
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
-import { CourseData } from "../models/course-model";
+import { CourseData, CourseProgrammeData } from "../models/course-model";
 import userService from "./user.service";
 import { UserData } from "../models/user-model";
 import enrollmentService from "./enrollment.service";
@@ -438,7 +438,7 @@ class ProgrammeService implements IProgrammeService {
     }
 
 
-    const courseResult: Result<CourseData> = await courseService.getCourseById(courseId);
+    const courseResult: Result<CourseProgrammeData> = await courseService.getCourseById(courseId);
     if (!courseResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
     }
