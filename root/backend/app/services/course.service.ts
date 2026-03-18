@@ -200,6 +200,19 @@ class CourseService implements ICourseService {
   }
 
   public async getCourseSubjectById(courseId: number, subjectId: number): Promise<Result<CourseSubjectData>> {
+
+    // Check params exist.
+    const courseResult: Result<CourseProgrammeData> = await this.getCourseById(courseId);
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
+    }
+
+    const subjectResult: Result<SubjectData> = await subjectService.getSubjectById(subjectId);
+    if (!subjectResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, subjectResult.getMessage());
+    }
+
+
     const courseSubject: CourseSubjectData | undefined = await courseRepository.getCourseSubjectById(courseId, subjectId);
 
     if (!courseSubject) {
