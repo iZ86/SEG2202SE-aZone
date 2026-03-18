@@ -17,7 +17,7 @@ class EnrollmentRoute {
 
 
     this.router.get("/", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getEnrollmentsAndSubjectsQueryValidator, asyncHandler(this.controller.getEnrollments));
-    this.router.get("/schedule", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getEnrollmentScheduleByStudentId));
+    this.router.get("/schedule", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getEnrollmentSchedule));
     this.router.get("/subjects", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAdminAuthToken, verifyAuthToken, runValidatorIfAdmin(getEnrollmentsAndSubjectsQueryValidator), asyncHandler(this.controller.getEnrollmentSubjects));
     this.router.get("/monthly-count", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, getMonthlyEnrollmentCountQueryValidator, asyncHandler(this.controller.getMonthlyEnrollmentCount));
     this.router.get("/subjects/enrolled", checkAuthTokenHeader, verifyAuthTokenHeader, verifyStudentAuthToken, verifyAuthToken, asyncHandler(this.controller.getEnrolledSubjectsByStudentId));

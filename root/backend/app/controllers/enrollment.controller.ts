@@ -225,7 +225,7 @@ export default class EnrollmentController {
     }
   }
 
-  async getEnrollmentScheduleByStudentId(req: Request, res: Response) {
+  async getEnrollmentSchedule(req: Request, res: Response) {
     const studentId: number = req.user.userId as number;
 
     const response: Result<StudentEnrollmentSchedule> = await enrollmentService.getEnrollmentScheduleByStudentId(studentId);
