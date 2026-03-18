@@ -231,6 +231,13 @@ class UserService implements IUserService {
   }
 
   public async getStudentInformationById(studentId: number): Promise<Result<StudentInformation>> {
+
+    // Check params exist.
+    const studentResult: Result<UserData> = await this.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
     const studentInformation: StudentInformation | undefined = await userRepository.getStudentInformationById(studentId);
 
     if (!studentInformation) {
