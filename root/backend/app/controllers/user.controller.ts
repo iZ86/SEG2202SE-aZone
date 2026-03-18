@@ -131,7 +131,7 @@ export default class UserController {
     }
   }
 
-  async updateUserProfilePictureById(req: Request, res: Response) {
+  async updateUserProfilePicture(req: Request, res: Response) {
     const profilePictureUrl: string = req.body.profilePictureUrl;
     const userId: number = req.user.userId;
 

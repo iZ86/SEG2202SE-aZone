@@ -30,7 +30,7 @@ class UserRoute {
 
     this.router.put("/students/:studentId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, studentParamValidator, updateStudentBodyValidator, asyncHandler(this.controller.updateStudentById));
 
-    this.router.patch("/profile-picture", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, updateUserProfilePictureBodyValidator, asyncHandler(this.controller.updateUserProfilePictureById));
+    this.router.patch("/profile-picture", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyStudentAuthToken, verifyAuthToken, updateUserProfilePictureBodyValidator, asyncHandler(this.controller.updateUserProfilePicture));
     this.router.patch("/admins/:adminId", checkAuthTokenHeader, verifyAuthTokenHeader, verifyAdminAuthToken, verifyAuthToken, adminParamValidator, updateAdminBodyValidator, asyncHandler(this.controller.updateAdminById));
   }
 }
