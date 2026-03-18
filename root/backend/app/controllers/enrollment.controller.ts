@@ -281,7 +281,7 @@ export default class EnrollmentController {
 
 
 
-  async getEnrolledSubjectsByStudentId(req: Request, res: Response) {
+  async getEnrolledSubjects(req: Request, res: Response) {
     const userId: number = req.user.userId as number;
     const isStudent: boolean = req.user.isStudent as boolean;
 
