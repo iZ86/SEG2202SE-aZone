@@ -155,6 +155,14 @@ class ProgrammeService implements IProgrammeService {
   }
 
   public async getProgrammeIntakesByProgrammeId(programmeId: number): Promise<Result<ProgrammeIntakeData[]>> {
+
+    // Check param exist.
+    const programmeResult: Result<ProgrammeData> = await this.getProgrammeById(programmeId);
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage());
+    }
+
+
     const programmeIntakesData: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByProgrammeId(programmeId);
 
     return Result.succeed(programmeIntakesData, "Programme retrieve success");
