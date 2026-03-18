@@ -211,8 +211,8 @@ class UserService implements IUserService {
   public async updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>> {
     const userResult: Result<UserData> = await this.getUserById(userId);
 
-    if (!userResult) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
+    if (!userResult.isSuccess()) {
     }
 
     const updateUserProfilePictureResult: ResultSetHeader = await userRepository.updateUserProfilePictureById(userId, profilePictureUrl);
