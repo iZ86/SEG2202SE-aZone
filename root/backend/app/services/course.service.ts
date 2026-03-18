@@ -66,6 +66,13 @@ class CourseService implements ICourseService {
   }
 
   public async getCoursesByProgrammeId(programmeId: number): Promise<Result<CourseProgrammeData[]>> {
+
+    // Check param exist
+    const programmeResult: Result<ProgrammeData> = await programmeService.getProgrammeById(programmeId);
+    if (!programmeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeResult.getMessage())
+    }
+
     const courses: CourseProgrammeData[] | undefined = await courseRepository.getCoursesByProgrammeId(programmeId);
 
     if (!courses) {
