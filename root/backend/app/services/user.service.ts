@@ -118,7 +118,7 @@ class UserService implements IUserService {
       return Result.fail(ENUM_ERROR_CODE.CONFLICT, "Email already exist");
     }
 
-    
+
     const hashedPassword: string = await argon2.hash(password, {
       type: argon2.argon2id,
       memoryCost: 2 ** 16,
