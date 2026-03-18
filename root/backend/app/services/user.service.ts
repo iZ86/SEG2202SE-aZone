@@ -153,8 +153,8 @@ class UserService implements IUserService {
 
     const studentResult: Result<UserData> = await this.getStudentById(studentId);
 
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId");
     if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
     }
 
     const currentUserData: UserData = studentResult.getData();
