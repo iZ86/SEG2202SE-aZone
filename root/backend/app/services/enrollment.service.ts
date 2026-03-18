@@ -1000,6 +1000,14 @@ class EnrollmentService implements IEnrollmentService {
 
 
   public async getEnrollmentScheduleByStudentId(studentId: number): Promise<Result<StudentEnrollmentSchedule>> {
+
+    // Check if params exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
+    
     const studentEnrollmentSchedule: StudentEnrollmentSchedule | undefined = await enrollmentRepository.getEnrollmentScheduleByStudentId(studentId);
 
     if (!studentEnrollmentSchedule) {
