@@ -5,6 +5,8 @@ import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWit
 import subjectRepository from "../repositories/subject.repository";
 import { CourseData, CourseSubjectData } from "../models/course-model";
 import courseService from "./course.service";
+import { UserData } from "../models/user-model";
+import userService from "./user.service";
 
 interface ISubjectService {
   getSubjects(query: string, pageSize: number, page: number): Promise<Result<SubjectWithCountData>>;
@@ -233,6 +235,13 @@ class SubjectService implements ISubjectService {
   }
 
   public async getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
+
+    // Check if params exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
     const studentActiveSubjects: StudentSubjectOverviewData[] = await subjectRepository.getActiveSubjectsOverviewByStudentId(studentId);
     return Result.succeed(studentActiveSubjects, "Student active subjects retrieve success");
   }
