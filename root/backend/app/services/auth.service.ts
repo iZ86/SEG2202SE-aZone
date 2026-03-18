@@ -100,8 +100,8 @@ class AuthService implements IAuthService {
   public async updateMe(userId: number, phoneNumber: string, email: string): Promise<Result<UserData>> {
     const userResult: Result<UserData> = await userService.getUserById(userId);
 
-    if (!userResult) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid userId");
+    if (!userResult.isSuccess()) {
     }
 
     const currentUserData: UserData = userResult.getData();
