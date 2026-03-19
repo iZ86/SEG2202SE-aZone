@@ -47,7 +47,6 @@ function LoginForm({ userRole, setError500 }: { userRole: 1 | 2, setError500: Di
 
       if (response.status === 200) {
         const token = data.data.token;
-        console.log(token + "hello");
         if (rememberMe) {
           sessionStorage.setItem(userRole === 1 ? "aZoneStudentAuthToken" : "aZoneAdminAuthToken", token);
         } else {
