@@ -29,7 +29,7 @@ interface IProgrammeService {
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
   updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
-  getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>>;
+  getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<ProgrammeHistoryData[]>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
@@ -421,7 +421,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntakeCount, "Programme intake count retrieve success");
   }
 
-  public async getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<Result<ProgrammeHistoryData[]>> {
+  public async getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<ProgrammeHistoryData[]>> {
 
     // Check if params exist.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -431,11 +431,11 @@ class ProgrammeService implements IProgrammeService {
 
 
     // Check status valid or not.
-    if (!(status in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID)) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid status");
+    if (!(studentCourseProgrammeIntakeStatusId in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentCourseProgrammeIntakeStatusId");
     }
 
-    const programmeHistoryList: ProgrammeHistoryData[] = await programmeRepository.getProgrammeHistoryByStudentId(studentId, status);
+    const programmeHistoryList: ProgrammeHistoryData[] = await programmeRepository.getProgrammeHistoryByStudentId(studentId, studentCourseProgrammeIntakeStatusId);
     if (programmeHistoryList.length > 0) {
       programmeHistoryList.map((programmeHistory) => {
         const statusText = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[programmeHistory.studentCourseProgrammeIntakeStatusId];
