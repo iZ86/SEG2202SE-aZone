@@ -268,7 +268,7 @@ class UserRepository implements IUserRepostory {
   public updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "UPDATE REGISTERED_USER SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, status = ? " +
+        "UPDATE REGISTERED_USER SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, userStatusId = ? " +
         "WHERE userId = ?;",
         [firstName, lastName, phoneNumber, email, userStatus, userId],
         (err, res) => {
