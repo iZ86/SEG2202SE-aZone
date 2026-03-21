@@ -146,7 +146,7 @@ class UserRepository implements IUserRepostory {
   public getAdminById(adminId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.userStatusId, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN ADMIN a ON ru.userId = a.adminId " +
         "WHERE a.adminId = ?;",
