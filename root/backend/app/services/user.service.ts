@@ -13,8 +13,8 @@ interface IUserService {
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getUserCount(query: string, role: ENUM_USER_ROLE): Promise<Result<number>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
-  updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>>;
   createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatusId: number): Promise<Result<UserData>>;
+  updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatusId: number): Promise<Result<UserData>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
@@ -143,11 +143,11 @@ class UserService implements IUserService {
     return Result.succeed(student.getData(), "Student create success");
   }
 
-  public async updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>> {
+  public async updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatusId: number): Promise<Result<UserData>> {
 
     // Check params.
-    if (!(userStatus in ENUM_USER_STATUS_ID)) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "userStatus not found");
+    if (!(userStatusId in ENUM_USER_STATUS_ID)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "userStatusId not found");
     }
 
 
@@ -171,7 +171,7 @@ class UserService implements IUserService {
       }
     }
 
-    const updateStudentResult: ResultSetHeader = await userRepository.updateUserById(studentId, firstName, lastName, phoneNumber, email, userStatus);
+    const updateStudentResult: ResultSetHeader = await userRepository.updateUserById(studentId, firstName, lastName, phoneNumber, email, userStatusId);
 
     if (updateStudentResult.affectedRows === 0) {
       throw new Error("updateStudentById failed to update");
