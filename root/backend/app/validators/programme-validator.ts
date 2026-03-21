@@ -29,9 +29,9 @@ export const getProgrammesAndIntakesQueryValidator: any = [
 ]
 
 export const getProgrammeHistoryQueryValidator: any = [
-  query('status')
+  query('studentCourseProgrammeIntakeStatusId')
     .optional()
-    .isInt().withMessage('status must be an integer'),
+    .isInt().withMessage('studentCourseProgrammeIntakeStatusId must be an integer'),
   validate,
 ]
 
