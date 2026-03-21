@@ -416,9 +416,9 @@ class ProgrammeRepository implements IProgrammeRepository {
   public updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET status = ? " +
+        "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET studentCourseProgrammeIntakeStatusId = ? " +
         "WHERE studentId = ? " +
-        "AND status = ?;",
+        "AND studentCourseProgrammeIntakeStatusId = ?;",
         [status, studentId, 1],
         (err, res) => {
           if (err) reject(err);
