@@ -48,7 +48,7 @@ export enum ENUM_STUDY_MODE {
   PART_TIME = 2
 }
 
-export enum ENUM_USER_STATUS {
+export enum ENUM_USER_STATUS_ID {
   INACTIVE = 0,
   ACTIVE = 1
 }
