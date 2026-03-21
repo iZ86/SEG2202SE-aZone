@@ -2,7 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution } from "../models/programme-model";
 import databaseConn from "../database/db-connection";
 import { IsExist, TotalCount } from "../models/general-model";
-import { ENUM_PROGRAMME_STATUS } from "../enums/enums";
+import { ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID } from "../enums/enums";
 
 
 interface IProgrammeRepository {
@@ -27,7 +27,7 @@ interface IProgrammeRepository {
   getProgrammeIntakeCount(query: string): Promise<number>;
   getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]>;
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
-  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
@@ -376,7 +376,7 @@ class ProgrammeRepository implements IProgrammeRepository {
 
       const params: any[] = [studentId];
 
-      if (status != ENUM_PROGRAMME_STATUS.ALL) {
+      if (status != ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL) {
         sql += "AND scpi.status = ?;";
         params.push(status);
       }
@@ -413,7 +413,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   };
 
-  public updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_PROGRAMME_STATUS): Promise<ResultSetHeader> {
+  public updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET status = ? " +

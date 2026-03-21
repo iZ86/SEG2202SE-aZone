@@ -13,7 +13,7 @@ export enum ENUM_USER_ROLE {
   ADMIN = 2,
 }
 
-export enum ENUM_PROGRAMME_STATUS {
+export enum ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID {
   ALL = 0, // Means all status
   ACTIVE = 1,
   COMPLETED = 2,

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_STATUS } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID } from "../enums/enums";
 import { Result } from "../../libs/Result";
 import programmeService from "../services/programme.service";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
@@ -206,7 +206,7 @@ export default class ProgrammeController {
     const userId: number = req.user.userId as number;
     const isStudent: boolean = req.user.isStudent as boolean;
     const isAdmin: boolean = req.user.isAdmin as boolean;
-    const status: number = Number(req.query.status) || ENUM_PROGRAMME_STATUS.ALL;
+    const studentCourseProgrammeIntakeStatusId: number = Number(req.query.studentCourseProgrammeIntakeStatusId) || ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL;
 
     if (isStudent) {
 

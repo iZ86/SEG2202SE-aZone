@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_PROGRAMME_STATUS, ENUM_STUDY_MODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDY_MODE } from "../enums/enums";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
@@ -431,14 +431,14 @@ class ProgrammeService implements IProgrammeService {
 
 
     // Check status valid or not.
-    if (!(status in ENUM_PROGRAMME_STATUS)) {
+    if (!(status in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid status");
     }
 
     const programmeHistoryList: ProgrammeHistoryData[] = await programmeRepository.getProgrammeHistoryByStudentId(studentId, status);
     if (programmeHistoryList.length > 0) {
       programmeHistoryList.map((programmeHistory) => {
-        const statusText = ENUM_PROGRAMME_STATUS[programmeHistory.status];
+        const statusText = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[programmeHistory.status];
         programmeHistory.statusLabel = statusText.charAt(0) + statusText.slice(1).toLowerCase();
       })
     }
@@ -502,7 +502,7 @@ class ProgrammeService implements IProgrammeService {
 
 
     // Update old student course programme intake.
-    await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_PROGRAMME_STATUS.COMPLETED);
+    await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.COMPLETED);
 
     // Create new student course programme intake.
     const createStudentCourseProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
