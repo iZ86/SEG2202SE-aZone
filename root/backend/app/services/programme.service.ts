@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDY_MODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDY_MODE } from "../enums/enums";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
@@ -266,7 +266,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
     }
 
-    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
+    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "status not found");
     }
 
@@ -313,7 +313,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
     }
 
-    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
+    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "status not found");
     }
 
@@ -565,7 +565,7 @@ class ProgrammeService implements IProgrammeService {
 
   public async getProgrammeIntakesByStatus(status: number): Promise<Result<ProgrammeIntakeData[]>> {
 
-    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS)) {
+    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid programme intake status");
     }
     // Get Programme Intakes.

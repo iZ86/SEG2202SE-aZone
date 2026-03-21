@@ -38,7 +38,7 @@ export enum ENUM_CLASS_TYPE {
   WORKSHOP = 4,
 }
 
-export enum ENUM_PROGRAMME_INTAKE_STATUS {
+export enum ENUM_PROGRAMME_INTAKE_STATUS_ID {
   INACTIVE = 0,
   ACTIVE = 1,
 }
