@@ -439,7 +439,7 @@ class ProgrammeService implements IProgrammeService {
     if (programmeHistoryList.length > 0) {
       programmeHistoryList.map((programmeHistory) => {
         const statusText = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[programmeHistory.studentCourseProgrammeIntakeStatusId];
-        programmeHistory.statusLabel = statusText.charAt(0) + statusText.slice(1).toLowerCase();
+        programmeHistory.studentCourseProgrammeIntakeStatus = statusText.charAt(0) + statusText.slice(1).toLowerCase();
       })
     }
     return Result.succeed(programmeHistoryList, "Students course programme intakes retrieve success");
