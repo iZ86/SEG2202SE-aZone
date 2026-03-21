@@ -438,7 +438,7 @@ class ProgrammeService implements IProgrammeService {
     const programmeHistoryList: ProgrammeHistoryData[] = await programmeRepository.getProgrammeHistoryByStudentId(studentId, status);
     if (programmeHistoryList.length > 0) {
       programmeHistoryList.map((programmeHistory) => {
-        const statusText = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[programmeHistory.status];
+        const statusText = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[programmeHistory.studentCourseProgrammeIntakeStatusId];
         programmeHistory.statusLabel = statusText.charAt(0) + statusText.slice(1).toLowerCase();
       })
     }
