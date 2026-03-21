@@ -346,7 +346,7 @@ class UserRepository implements IUserRepostory {
         "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
         "WHERE scpi.studentId = ? " +
-        "AND scpi.status = 1;",
+        "AND scpi.studentCourseProgrammeIntakeStatusId = 1;",
         [studentId],
         (err, res) => {
           if (err) reject(err);
