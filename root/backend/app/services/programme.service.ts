@@ -24,8 +24,8 @@ interface IProgrammeService {
   getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   getProgrammeIntakeById(programmeIntakeId: number): Promise<Result<ProgrammeIntakeData>>;
   getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<Result<ProgrammeIntakeData[]>>;
-  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>>;
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData>>;
+  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData>>;
   deleteProgrammeIntakeById(programmeIntakeId: number): Promise<Result<null>>;
   updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
@@ -291,7 +291,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(programmeIntake.getData(), "Programme intake create success");
   }
 
-  public async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<Result<ProgrammeIntakeData>> {
+  public async updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData>> {
 
     // Check param exist.
     const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
@@ -313,8 +313,8 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
     }
 
-    if (!(status in ENUM_PROGRAMME_INTAKE_STATUS_ID)) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "status not found");
+    if (!(programmeIntakeStatusId in ENUM_PROGRAMME_INTAKE_STATUS_ID)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "programmeIntakeStatusId not found");
     }
 
     // Check if there is an existing programmeIntake with the same programmeId, intakeId, and semester.
@@ -327,7 +327,7 @@ class ProgrammeService implements IProgrammeService {
       }
     }
 
-    const updateProgrammeIntakeResult: ResultSetHeader = await programmeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
+    const updateProgrammeIntakeResult: ResultSetHeader = await programmeRepository.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, programmeIntakeStatusId);
     if (updateProgrammeIntakeResult.affectedRows === 0) {
       throw new Error("updateProgrammeIntakeById failed to update");
     }
