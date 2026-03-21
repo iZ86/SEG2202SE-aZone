@@ -240,7 +240,7 @@ class UserRepository implements IUserRepostory {
   public createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "INSERT INTO REGISTERED_USER (firstName, lastName, email, phoneNumber, password, status) " +
+        "INSERT INTO REGISTERED_USER (firstName, lastName, email, phoneNumber, password, userStatusId) " +
         "VALUES (?, ?, ?, ?, ?, ?);",
         [firstName, lastName, email, phoneNumber, password, status],
         (err, res) => {
