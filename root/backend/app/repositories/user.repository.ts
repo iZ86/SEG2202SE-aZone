@@ -57,7 +57,7 @@ class UserRepository implements IUserRepostory {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.userStatusId, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.userId LIKE ? " +
