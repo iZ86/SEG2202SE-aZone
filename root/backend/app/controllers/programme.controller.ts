@@ -170,10 +170,10 @@ export default class ProgrammeController {
     const semester: number = req.body.semester;
     const semesterStartDate: Date = req.body.semesterStartDate;
     const semesterEndDate: Date = req.body.semesterEndDate;
-    const status: number = req.body.status;
+    const programmeIntakeStatusId: number = req.body.programmeIntakeStatusId;
 
 
-    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status);
+    const response = await programmeService.updateProgrammeIntakeById(programmeIntakeId, programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, programmeIntakeStatusId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
