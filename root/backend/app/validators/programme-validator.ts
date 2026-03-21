@@ -79,9 +79,9 @@ export const createProgrammeIntakeBodyValidator: any = [
     .notEmpty().withMessage('Missing semesterEndDate')
     .isDate().withMessage('semesterEndDate must be a (YYYY-MM-DD) format')
     .toDate(),
-  body('status')
-    .notEmpty().withMessage('Missing status')
-    .isInt().withMessage('status must be an integer')
+  body('programmeIntakeStatusId')
+    .notEmpty().withMessage('Missing programmeIntakeStatusId')
+    .isInt().withMessage('programmeIntakeStatusId must be an integer')
     .toInt(),
   validate,
 ];
