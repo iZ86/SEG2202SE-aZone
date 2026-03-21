@@ -135,7 +135,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, " +
-        "sm.studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "sm.studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -160,7 +160,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -180,7 +180,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -200,7 +200,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -218,7 +218,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakesByIds(programmeIntakeIds: number[]): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -236,7 +236,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakeByProgrammeIdAndIntakeIdAndSemester(programmeId: number, intakeId: number, semester: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
@@ -256,7 +256,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "INSERT INTO PROGRAMME_INTAKE (programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status) " +
+        "INSERT INTO PROGRAMME_INTAKE (programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, programmeIntakeStatusId) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?);",
         [programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status],
         (err, res) => {
@@ -270,7 +270,7 @@ class ProgrammeRepository implements IProgrammeRepository {
   public updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
-        "UPDATE PROGRAMME_INTAKE SET programmeId = ?, intakeId = ?, studyModeId = ?, semester = ?, semesterStartDate = ?, semesterEndDate = ?, status = ? " +
+        "UPDATE PROGRAMME_INTAKE SET programmeId = ?, intakeId = ?, studyModeId = ?, semester = ?, semesterStartDate = ?, semesterEndDate = ?, programmeIntakeStatusId = ? " +
         "WHERE programmeIntakeId = ?;",
         [programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status, programmeIntakeId],
         (err, res) => {
@@ -479,12 +479,12 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.status " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
         "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
-        "WHERE pi.status = ?;",
+        "WHERE pi.programmeIntakeStatusId = ?;",
         [
           status
         ],

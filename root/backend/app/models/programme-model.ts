@@ -21,7 +21,7 @@ export interface ProgrammeIntakeData extends RowDataPacket {
   semesterStartDate: Date;
   semesterEndDate: Date;
   enrollmentId: number | null;
-  status: number;
+  programmeIntakeStatusId: number;
 }
 
 export interface ProgrammeIntakeWithCountData {
