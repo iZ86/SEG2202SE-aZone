@@ -370,7 +370,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "LEFT JOIN STUDENT_ENROLLMENT_SUBJECT_TYPE sest ON est.enrollmentSubjectTypeId = sest.enrollmentSubjectTypeId " +
         "WHERE scpi.studentId = ? " +
-        "AND scpi.status = 1 " +
+        "AND scpi.studentCourseProgrammeIntakeStatusId = 1 " +
         "GROUP BY est.enrollmentSubjectTypeId " +
         "ORDER BY est.grouping ASC;",
         [studentId],
