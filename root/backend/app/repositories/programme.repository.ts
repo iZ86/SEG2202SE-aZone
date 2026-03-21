@@ -466,7 +466,7 @@ class ProgrammeRepository implements IProgrammeRepository {
         "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
         "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
         "INNER JOIN PROGRAMME p ON c.programmeId = p.programmeId " +
-        "WHERE scpi.status = 1 " +
+        "WHERE scpi.studentCourseProgrammeIntakeStatusId = 1 " +
         "GROUP BY p.programmeName;",
         (err, res) => {
           if (err) reject(err);
