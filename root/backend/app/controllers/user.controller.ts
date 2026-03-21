@@ -74,9 +74,9 @@ export default class UserController {
     const phoneNumber: string = req.body.phoneNumber;
     const email: string = req.body.email;
     const password: string = req.body.password;
-    const userStatus: number = req.body.userStatus;
+    const userStatusId: number = req.body.userStatusId;
 
-    const response: Result<UserData> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatus);
+    const response: Result<UserData> = await userService.createStudent(firstName, lastName, email, phoneNumber, password, userStatusId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());
