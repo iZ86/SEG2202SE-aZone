@@ -25,7 +25,7 @@ interface IProgrammeRepository {
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
   getProgrammeCount(query: string): Promise<number>;
   getProgrammeIntakeCount(query: string): Promise<number>;
-  getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]>;
+  getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ProgrammeHistoryData[]>;
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
@@ -363,7 +363,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  public getProgrammeHistoryByStudentId(studentId: number, status: number): Promise<ProgrammeHistoryData[]> {
+  public getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ProgrammeHistoryData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
           SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.studentCourseProgrammeIntakeStatusId
@@ -376,9 +376,9 @@ class ProgrammeRepository implements IProgrammeRepository {
 
       const params: any[] = [studentId];
 
-      if (status != ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL) {
+      if (studentCourseProgrammeIntakeStatusId != ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL) {
         sql += "AND scpi.studentCourseProgrammeIntakeStatusId = ?;";
-        params.push(status);
+        params.push(studentCourseProgrammeIntakeStatusId);
       }
 
       databaseConn.query<ProgrammeHistoryData[]>(sql, params,
