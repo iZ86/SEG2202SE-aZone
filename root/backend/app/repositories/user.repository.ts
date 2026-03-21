@@ -130,7 +130,7 @@ class UserRepository implements IUserRepostory {
   public getStudentByEmail(email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.status AS userStatus, ru.profilePictureUrl " +
+        "SELECT ru.userId, ru.firstName, ru.lastName, ru.email, ru.phoneNumber, ru.userStatusId, ru.profilePictureUrl " +
         "FROM REGISTERED_USER ru " +
         "INNER JOIN STUDENT s ON ru.userId = s.studentId " +
         "WHERE ru.email COLLATE utf8mb4_general_ci = ?;",
