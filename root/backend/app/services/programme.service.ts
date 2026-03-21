@@ -502,7 +502,7 @@ class ProgrammeService implements IProgrammeService {
 
 
     // Update old student course programme intake.
-    await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.COMPLETED);
+    await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.COMPLETED);
 
     // Create new student course programme intake.
     const createStudentCourseProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);

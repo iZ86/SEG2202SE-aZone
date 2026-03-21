@@ -27,7 +27,7 @@ interface IProgrammeRepository {
   getProgrammeIntakeCount(query: string): Promise<number>;
   getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ProgrammeHistoryData[]>;
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
-  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, oldStudentCourseProgrammeIntakeStatusId: number, newStudentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
@@ -413,13 +413,13 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   };
 
-  public updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader> {
+  public updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, oldStudentCourseProgrammeIntakeStatusId: number, newStudentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET studentCourseProgrammeIntakeStatusId = ? " +
         "WHERE studentId = ? " +
         "AND studentCourseProgrammeIntakeStatusId = ?;",
-        [status, studentId, 1],
+        [newStudentCourseProgrammeIntakeStatusId, studentId, oldStudentCourseProgrammeIntakeStatusId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
