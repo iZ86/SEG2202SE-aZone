@@ -99,7 +99,7 @@ class UserRepository implements IUserRepostory {
   public getUserByEmail(email: string): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT userId, firstName, lastName, email, phoneNumber, status AS userStatus, profilePictureUrl " +
+        "SELECT userId, firstName, lastName, email, phoneNumber, userStatusId, profilePictureUrl " +
         "FROM REGISTERED_USER " +
         "WHERE email = ?;",
         [email],
