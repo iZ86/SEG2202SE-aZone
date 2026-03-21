@@ -12,7 +12,7 @@ CREATE TABLE REGISTERED_USER (
     phoneNumber VARCHAR(20),
     password VARCHAR(255) NOT NULL,
     profilePictureUrl VARCHAR(255),
-    status INT DEFAULT 1 NOT NULL
+    userStatusId INT DEFAULT 1 NOT NULL
 );
 
 CREATE TABLE PROGRAMME (
@@ -242,7 +242,7 @@ INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, 
 (3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1, 1);
 
 
-INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `status`) VALUES
+INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `userStatusId`) VALUES
 (10000001, 'admin', 'admin', 'admin@imail.sunway.edu.my', '-', '$argon2id$v=19$m=65536,t=3,p=1$Is6WCr0RuL4kQlaFSWee7w$ejJPE9Vs0BRYoA4eh5oYGuONU+gq8cnNLcXSeQzwVE0', 1),
 (23049679, 'Isaac Ming', 'Yeow', 'izack86@gmail.com', '0111235123', '$argon2id$v=19$m=65536,t=3,p=1$Is6WCr0RuL4kQlaFSWee7w$ejJPE9Vs0BRYoA4eh5oYGuONU+gq8cnNLcXSeQzwVE0', 1),
 (23055155, 'Jia Seng', 'Foo', 'skyfoojs@gmail.com', '0172681225', '$argon2id$v=19$m=65536,t=3,p=1$Is6WCr0RuL4kQlaFSWee7w$ejJPE9Vs0BRYoA4eh5oYGuONU+gq8cnNLcXSeQzwVE0', 1),
