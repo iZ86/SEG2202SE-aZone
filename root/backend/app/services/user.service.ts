@@ -13,8 +13,8 @@ interface IUserService {
   getAdminById(adminId: number): Promise<Result<UserData>>;
   getUserCount(query: string, role: ENUM_USER_ROLE): Promise<Result<number>>;
   getStudentById(studentId: number): Promise<Result<UserData>>;
-  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>>;
   updateStudentById(studentId: number, firstName: string, lastName: string, email: string, phoneNumber: string, userStatus: number): Promise<Result<UserData>>;
+  createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatusId: number): Promise<Result<UserData>>;
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
@@ -106,11 +106,11 @@ class UserService implements IUserService {
     return Result.succeed(userCount, "User count retrieve success");
   }
 
-  public async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatus: number): Promise<Result<UserData>> {
+  public async createStudent(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatusId: number): Promise<Result<UserData>> {
 
     // Check params.
-    if (!(userStatus in ENUM_USER_STATUS_ID)) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "userStatus not found");
+    if (!(userStatusId in ENUM_USER_STATUS_ID)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "userStatusId not found");
     }
 
     const isEmailExistResult: Result<UserData> = await this.getStudentByEmail(email);
@@ -126,7 +126,7 @@ class UserService implements IUserService {
       parallelism: 1
     });
 
-    const createUserResult: ResultSetHeader = await userRepository.createUser(firstName, lastName, email, phoneNumber, hashedPassword, userStatus);
+    const createUserResult: ResultSetHeader = await userRepository.createUser(firstName, lastName, email, phoneNumber, hashedPassword, userStatusId);
 
     const createStudentResult: ResultSetHeader = await userRepository.createStudent(createUserResult.insertId);
 
