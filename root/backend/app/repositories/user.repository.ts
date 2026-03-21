@@ -17,7 +17,7 @@ interface IUserRepostory {
   isStudentExist(studentId: number): Promise<boolean>;
   createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatusId: number): Promise<ResultSetHeader>;
   createStudent(studentId: number): Promise<ResultSetHeader>;
-  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
+  updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatusId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
   getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
@@ -265,12 +265,12 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  public updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader> {
+  public updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatusId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE REGISTERED_USER SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, userStatusId = ? " +
         "WHERE userId = ?;",
-        [firstName, lastName, phoneNumber, email, userStatus, userId],
+        [firstName, lastName, phoneNumber, email, userStatusId, userId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
