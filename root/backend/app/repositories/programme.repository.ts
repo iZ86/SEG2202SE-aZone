@@ -18,8 +18,8 @@ interface IProgrammeRepository {
   getProgrammeIntakes(query: string, pageSize: number | null, page: number | null): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByProgrammeId(programmeId: number): Promise<ProgrammeIntakeData[]>;
   getProgrammeIntakesByEnrollmentId(enrollmentId: number): Promise<ProgrammeIntakeData[]>;
-  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader>;
   createProgrammeIntake(programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, programmeIntakeStatusId: number): Promise<ResultSetHeader>;
+  updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, programmeIntakeStatusId: number): Promise<ResultSetHeader>;
   deleteProgrammeIntakeById(programmIntakeId: number): Promise<ResultSetHeader>;
   updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<ResultSetHeader>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<ResultSetHeader>;
@@ -267,12 +267,12 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  public updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, status: number): Promise<ResultSetHeader> {
+  public updateProgrammeIntakeById(programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: Date, semesterEndDate: Date, programmeIntakeStatusId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "UPDATE PROGRAMME_INTAKE SET programmeId = ?, intakeId = ?, studyModeId = ?, semester = ?, semesterStartDate = ?, semesterEndDate = ?, programmeIntakeStatusId = ? " +
         "WHERE programmeIntakeId = ?;",
-        [programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, status, programmeIntakeId],
+        [programmeId, intakeId, studyModeId, semester, semesterStartDate, semesterEndDate, programmeIntakeStatusId, programmeIntakeId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
