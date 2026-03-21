@@ -31,7 +31,7 @@ interface IProgrammeRepository {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
-  getProgrammeIntakesByStatus(programmeIntakeStatusId: number): Promise<ProgrammeIntakeData[]>;
+  getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<ProgrammeIntakeData[]>;
   isExistProgrammeIntakesByProgrammeId(programmeId: number): Promise<IsExist | undefined>;
 }
 
@@ -476,7 +476,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     });
   }
 
-  public getProgrammeIntakesByStatus(programmeIntakeStatusId: number): Promise<ProgrammeIntakeData[]> {
+  public getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<ProgrammeIntakeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +

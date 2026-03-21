@@ -569,7 +569,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid programme intake status");
     }
     // Get Programme Intakes.
-    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByStatus(status)
+    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId)
 
     return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
