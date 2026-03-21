@@ -459,7 +459,7 @@ class EnrollmentService implements IEnrollmentService {
       // Otherwise, there is no clashing occur.
 
       // Get programmeIntakes by enrollmentId and active status.
-      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByStatus(ENUM_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
+      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByProgrammeIntakeStatusId(ENUM_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
       if (!programmeIntakesResult.isSuccess()) {
         return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
       }
@@ -814,7 +814,7 @@ class EnrollmentService implements IEnrollmentService {
       // Otherwise, there is no clashing occur.
 
       // Get programmeIntakes by enrollmentId and active status.
-      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByStatus(ENUM_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
+      const programmeIntakesResult: Result<ProgrammeIntakeData[]> = await programmeService.getProgrammeIntakesByProgrammeIntakeStatusId(ENUM_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
       if (!programmeIntakesResult.isSuccess()) {
         return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakesResult.getMessage());
       }

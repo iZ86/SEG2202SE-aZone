@@ -33,7 +33,7 @@ interface IProgrammeService {
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
-  getProgrammeIntakesByStatus(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>>;
+  getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -563,7 +563,7 @@ class ProgrammeService implements IProgrammeService {
     return Result.succeed(ProgrammeDistribution, "Programme retrieve success");
   }
 
-  public async getProgrammeIntakesByStatus(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>> {
+  public async getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>> {
 
     if (!(programmeIntakeStatusId in ENUM_PROGRAMME_INTAKE_STATUS_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid programmeIntakeStatusId");
