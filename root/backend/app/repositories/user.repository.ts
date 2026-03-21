@@ -84,7 +84,7 @@ class UserRepository implements IUserRepostory {
   public getUserById(userId: number): Promise<UserData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<UserData[]>(
-        "SELECT userId, firstName, lastName, email, phoneNumber, profilePictureUrl, status AS userStatus " +
+        "SELECT userId, firstName, lastName, email, phoneNumber, profilePictureUrl, userStatusId " +
         "FROM REGISTERED_USER " +
         "WHERE userId = ?;",
         [userId],
