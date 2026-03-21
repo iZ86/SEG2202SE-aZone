@@ -25,7 +25,7 @@ export interface StudentInformation extends RowDataPacket {
   semesterEndDate: Date;
   studyModeId: number;
   studyMode: string;
-  status: number;
+  studentCourseProgrammeIntakeStatusId: number;
 }
 
 export interface StudentSemesterStartAndEndData extends RowDataPacket {
