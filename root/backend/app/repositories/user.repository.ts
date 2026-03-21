@@ -15,7 +15,7 @@ interface IUserRepostory {
   getStudentCount(query: string): Promise<number>;
   isAdminExist(adminId: number): Promise<boolean>;
   isStudentExist(studentId: number): Promise<boolean>;
-  createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: number): Promise<ResultSetHeader>;
+  createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatusId: number): Promise<ResultSetHeader>;
   createStudent(studentId: number): Promise<ResultSetHeader>;
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatus: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
@@ -237,12 +237,12 @@ class UserRepository implements IUserRepostory {
     });
   };
 
-  public createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, status: number): Promise<ResultSetHeader> {
+  public createUser(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, userStatusId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO REGISTERED_USER (firstName, lastName, email, phoneNumber, password, userStatusId) " +
         "VALUES (?, ?, ?, ?, ?, ?);",
-        [firstName, lastName, email, phoneNumber, password, status],
+        [firstName, lastName, email, phoneNumber, password, userStatusId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
