@@ -28,7 +28,7 @@ interface IProgrammeRepository {
   getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ProgrammeHistoryData[]>;
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, status: ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID): Promise<ResultSetHeader>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
   getProgrammeIntakesByStatus(status: number): Promise<ProgrammeIntakeData[]>;
@@ -429,12 +429,12 @@ class ProgrammeRepository implements IProgrammeRepository {
   };
 
 
-  public createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader> {
+  public createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO STUDENT_COURSE_PROGRAMME_INTAKE (studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId) " +
-        "VALUES (?, ?, ?, ?);",
-        [studentId, courseId, programmeIntakeId, 1],
+        "VALUES (?, ?, ?, ?, ?);",
+        [studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
