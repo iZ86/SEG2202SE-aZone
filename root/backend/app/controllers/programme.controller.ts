@@ -210,7 +210,7 @@ export default class ProgrammeController {
 
     if (isStudent) {
 
-      const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(userId, status);
+      const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(userId, studentCourseProgrammeIntakeStatusId);
 
       if (response.isSuccess()) {
         return res.sendSuccess.ok(
@@ -230,7 +230,7 @@ export default class ProgrammeController {
       // Not optional
       const studentId: number = Number(req.query.studentId);
 
-      const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(studentId, status);
+      const response: Result<ProgrammeHistoryData[]> = await programmeService.getProgrammeHistoryByStudentId(studentId, studentCourseProgrammeIntakeStatusId);
 
       if (response.isSuccess()) {
         return res.sendSuccess.ok(
