@@ -312,7 +312,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
         "INNER JOIN ENROLLMENT e ON pi.enrollmentId = e.enrollmentId " +
         "WHERE scpi.studentId = ? " +
-        "AND scpi.status = 1;",
+        "AND scpi.studentCourseProgrammeIntakeStatusId = 1;",
         [studentId],
         (err, res) => {
           if (err) reject(err);
