@@ -186,7 +186,7 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
     studentId INT NOT NULL,
     courseId INT NOT NULL,
     programmeIntakeId INT NOT NULL,
-    status INT DEFAULT 1 NOT NULL,
+    studentCourseProgrammeIntakeStatusId INT DEFAULT 1 NOT NULL,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
@@ -255,7 +255,7 @@ INSERT INTO `STUDENT` (`studentId`) VALUES
 (23055155),
 (23056138);
 
-INSERT INTO `STUDENT_COURSE_PROGRAMME_INTAKE` (`studentId`, `courseId`, `programmeIntakeId`, `status`) VALUES
+INSERT INTO `STUDENT_COURSE_PROGRAMME_INTAKE` (`studentId`, `courseId`, `programmeIntakeId`, `studentCourseProgrammeIntakeStatusId`) VALUES
 (23049679, 3, 3, 1),
 (23055155, 4, 1, 1),
 (23056138, 2, 1, 1);
