@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
 import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData, StudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 
@@ -267,6 +267,9 @@ class UserService implements IUserService {
     if (!studentInformation) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student information not found");
     }
+
+    const studentCourseProgrammeIntakeStatus = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[studentInformation.studentCourseProgrammeIntakeStatusId]
+    studentInformation.studentCourseProgrammeIntakeStatus = studentCourseProgrammeIntakeStatus.charAt(0) + studentCourseProgrammeIntakeStatus.slice(1).toLowerCase();
 
     return Result.succeed(studentInformation, "Student information retrieve success");
   }
