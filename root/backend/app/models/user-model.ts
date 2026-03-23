@@ -7,6 +7,7 @@ export interface UserData extends RowDataPacket {
   email: string;
   phoneNumber: string;
   profilePictureUrl: string;
+  userStatusId: number;
 }
 
 export interface UserWithCountData {
