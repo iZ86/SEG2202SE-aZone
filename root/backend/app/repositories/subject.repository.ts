@@ -2,6 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { SubjectData, StudentSubjectData, StudentSubjectOverviewData } from "../models/subject-model";
 import { TotalCount } from "../models/general-model";
+import { ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
 
 interface ISubjectRepository {
   getSubjects(query: string, pageSize: number, page: number): Promise<SubjectData[]>;
@@ -194,10 +195,10 @@ class SubjectRepository implements ISubjectRepository {
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "WHERE sest.subjectStatusId = 1 " +
+        "WHERE sest.subjectStatusId = ? " +
         "AND sest.studentId = ? " +
         "ORDER BY s.subjectId;",
-        [studentId],
+        [ENUM_SUBJECT_STATUS_ID.ACTIVE, studentId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
