@@ -188,7 +188,7 @@ class ProgrammeService implements IProgrammeService {
     }
 
     // Get Programme Intakes.
-    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByEnrollmentId(enrollmentId)
+    const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByEnrollmentId(enrollmentId);
 
     return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
