@@ -240,6 +240,11 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `programmeIntakeIds not found: [${missingIds.join(", ")}]`);
     }
 
+    for (const programmeIntake of programmeIntakes) {
+      const programmeIntakeStatus = ENUM_PROGRAMME_INTAKE_STATUS_ID[programmeIntake.programmeIntakeStatusId]
+      programmeIntake.programmeIntakeStatus = programmeIntakeStatus.charAt(0) + programmeIntakeStatus.slice(1).toLowerCase();
+    }
+
     return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
 
