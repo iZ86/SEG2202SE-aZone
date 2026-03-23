@@ -4,7 +4,7 @@ import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDENT_COURSE_P
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
-import { CourseData, CourseProgrammeData } from "../models/course-model";
+import { CourseProgrammeData } from "../models/course-model";
 import userService from "./user.service";
 import { UserData } from "../models/user-model";
 import enrollmentService from "./enrollment.service";
