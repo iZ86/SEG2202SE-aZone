@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
 import { SubjectData, StudentSubjectData, StudentSubjectOverviewData, SubjectWithCourseSubjectData, StudentSubjectWithCountData, SubjectWithCountData } from "../models/subject-model";
 import subjectRepository from "../repositories/subject.repository";
 import { CourseData, CourseSubjectData } from "../models/course-model";
@@ -228,6 +228,11 @@ class SubjectService implements ISubjectService {
 
 
     const subjects: StudentSubjectData[] = await subjectRepository.getSubjectsByStudentId(studentId, semester, query, pageSize, page);
+
+    for (const subject of subjects) {
+      const subjectStatus = ENUM_SUBJECT_STATUS_ID[subject.subjectStatusId]
+      subject.subjectStatus = subjectStatus.charAt(0) + subjectStatus.slice(1).toLowerCase();
+    }
 
     const subjectCount: Result<number> = await this.getSubjectCount(query);
 
