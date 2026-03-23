@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { Result } from "../../libs/Result";
 import { BasicAdminLoginData, BasicStudentLoginData } from "../models/auth-model";
-import { ENUM_ERROR_CODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_USER_STATUS_ID } from "../enums/enums";
 import jwt from "jsonwebtoken";
 import authRepository from "../repositories/auth.repository";
 import userRepository from "../repositories/user.repository";
@@ -82,6 +82,9 @@ class AuthService implements IAuthService {
     if (!studentData) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentId");
     }
+
+    const userStatus = ENUM_USER_STATUS_ID[studentData.userStatusId]
+    studentData.userStatus = userStatus.charAt(0) + userStatus.slice(1).toLowerCase();
 
     return Result.succeed(studentData, "Get me success");
   }
