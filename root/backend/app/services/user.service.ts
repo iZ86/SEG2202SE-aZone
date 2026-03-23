@@ -301,8 +301,8 @@ class UserService implements IUserService {
     if (!studentResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
     }
-    
-    
+
+
     const studentSemesterStartAndEndData: StudentSemesterStartAndEndData | undefined = await userRepository.getStudentSemesterStartAndEndDateById(studentId);
 
     if (!studentSemesterStartAndEndData) {
