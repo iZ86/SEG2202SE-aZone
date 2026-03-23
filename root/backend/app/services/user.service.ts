@@ -55,6 +55,9 @@ class UserService implements IUserService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "User not found");
     }
 
+    const userStatus = ENUM_USER_STATUS_ID[student.userStatusId]
+    student.userStatus = userStatus.charAt(0) + userStatus.slice(1).toLowerCase();
+
     return Result.succeed(student, "User retrieve success");
   }
 
