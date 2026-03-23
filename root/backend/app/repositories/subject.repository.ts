@@ -157,9 +157,8 @@ class SubjectRepository implements ISubjectRepository {
     const offset: number = (page - 1) * pageSize;
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentSubjectData[]>(
-        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId, ss.subjectStatus " +
+        "SELECT DISTINCT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, sest.subjectStatusId " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
-        "INNER JOIN SUBJECT_STATUS ss ON sest.subjectStatusId = ss.subjectStatusId " +
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
