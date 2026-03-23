@@ -150,6 +150,11 @@ class ProgrammeService implements IProgrammeService {
   public async getProgrammeIntakes(query: string, pageSize: number, page: number): Promise<Result<ProgrammeIntakeWithCountData>> {
     const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakes(query, pageSize, page);
 
+    for (const programmeIntake of programmeIntakes) {
+      const programmeIntakeStatus = ENUM_PROGRAMME_INTAKE_STATUS_ID[programmeIntake.programmeIntakeStatusId]
+      programmeIntake.programmeIntakeStatus = programmeIntakeStatus.charAt(0) + programmeIntakeStatus.slice(1).toLowerCase();
+    }
+
     const programmeIntakeCount: Result<number> = await this.getProgrammeIntakeCount(query);
     return Result.succeed({ programmeIntakes, programmeIntakeCount: programmeIntakeCount.getData() }, "Programme retrieve success");
   }
