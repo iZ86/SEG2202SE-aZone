@@ -26,7 +26,7 @@ class SubjectService implements ISubjectService {
     const subjects: SubjectData[] = await subjectRepository.getSubjects(query, pageSize, page);
 
     const subjectCount: Result<number> = await this.getSubjectCount(query);
-    return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Subjects retrieve success");
+    return Result.succeed({ subjects, subjectCount: subjectCount.getData() }, "Subjects retrieve success");
   }
 
   public async getSubjectById(subjectId: number): Promise<Result<SubjectData>> {
@@ -49,8 +49,8 @@ class SubjectService implements ISubjectService {
     if (!courseSubjectsResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseSubjectsResult.getMessage())
     }
-    
-    return Result.succeed({ ...subjectResult.getData(), courseSubjects: courseSubjectsResult.getData()}, "Subject retrieve success");
+
+    return Result.succeed({ ...subjectResult.getData(), courseSubjects: courseSubjectsResult.getData() }, "Subject retrieve success");
   }
 
   private async getSubjectBySubjectCode(subjectCode: string): Promise<Result<SubjectData>> {
@@ -236,7 +236,7 @@ class SubjectService implements ISubjectService {
 
     const subjectCount: Result<number> = await this.getSubjectCount(query);
 
-    return Result.succeed({subjects, subjectCount: subjectCount.getData()}, "Student subjects retrieve success");
+    return Result.succeed({ subjects, subjectCount: subjectCount.getData() }, "Student subjects retrieve success");
   }
 
   public async getActiveSubjectsOverviewByStudentId(studentId: number): Promise<Result<StudentSubjectOverviewData[]>> {
