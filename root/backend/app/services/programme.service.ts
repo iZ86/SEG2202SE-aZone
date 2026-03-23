@@ -603,6 +603,11 @@ class ProgrammeService implements IProgrammeService {
     // Get Programme Intakes.
     const programmeIntakes: ProgrammeIntakeData[] = await programmeRepository.getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId);
 
+    for (const programmeIntake of programmeIntakes) {
+      const programmeIntakeStatus = ENUM_PROGRAMME_INTAKE_STATUS_ID[programmeIntake.programmeIntakeStatusId]
+      programmeIntake.programmeIntakeStatus = programmeIntakeStatus.charAt(0) + programmeIntakeStatus.slice(1).toLowerCase();
+    }
+
     return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
 }
