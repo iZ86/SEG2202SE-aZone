@@ -52,3 +52,9 @@ export enum ENUM_USER_STATUS_ID {
   INACTIVE = 0,
   ACTIVE = 1
 }
+
+export enum ENUM_SUBJECT_STATUS_ID {
+  ACTIVE = 1,
+  EXEMPTED = 2,
+  COMPLETED = 3
+}
