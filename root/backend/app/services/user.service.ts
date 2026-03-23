@@ -62,13 +62,13 @@ class UserService implements IUserService {
   }
 
   public async getUserByEmail(email: string): Promise<Result<UserData>> {
-    const student: UserData | undefined = await userRepository.getUserByEmail(email);
+    const user: UserData | undefined = await userRepository.getUserByEmail(email);
 
-    if (!student) {
+    if (!user) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "User not found");
     }
 
-    return Result.succeed(student, "User retrieve success");
+    return Result.succeed(user, "User retrieve success");
   }
 
   public async getStudentById(studentId: number): Promise<Result<UserData>> {
