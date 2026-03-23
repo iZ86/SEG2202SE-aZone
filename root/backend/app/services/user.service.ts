@@ -25,6 +25,11 @@ class UserService implements IUserService {
   public async getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>> {
     const admins: UserData[] = await userRepository.getAdmins(query, pageSize, page);
 
+    for (const admin of admins) {
+      const userStatus = ENUM_USER_STATUS_ID[admin.userStatusId]
+      admin.userStatus = userStatus.charAt(0) + userStatus.slice(1).toLowerCase();
+    }
+
     const adminCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.ADMIN);
 
     return Result.succeed({ users: admins, userCount: adminCount.getData() }, "Admins retrieve success");
