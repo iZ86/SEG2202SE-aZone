@@ -164,11 +164,6 @@ CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
     UNIQUE (enrollmentSubjectId, startTime, endTime, dayId, lecturerId)
 );
 
-CREATE TABLE SUBJECT_STATUS (
-    subjectStatusId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    subjectStatus VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE STUDENT_ENROLLMENT_SUBJECT_TYPE (
     studentId INT NOT NULL,
     enrollmentSubjectTypeId INT NOT NULL,
@@ -176,8 +171,6 @@ CREATE TABLE STUDENT_ENROLLMENT_SUBJECT_TYPE (
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (enrollmentSubjectTypeId) REFERENCES ENROLLMENT_SUBJECT_TYPE(enrollmentSubjectTypeId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (subjectStatusId) REFERENCES SUBJECT_STATUS(subjectStatusId)
         ON DELETE CASCADE,
     PRIMARY KEY (studentId, enrollmentSubjectTypeId)
 );
@@ -276,11 +269,6 @@ INSERT INTO `COURSE_SUBJECT` (`courseId`, `subjectId`) VALUES
 (3, 4),
 (4, 1),
 (4, 2);
-
-INSERT INTO `SUBJECT_STATUS` (`subjectStatusId`, `subjectStatus`) VALUES
-(1, 'Active'),
-(2, 'Exempted'),
-(3, 'Completed');
 
 INSERT INTO `VENUE` (`venueId`, `venue`) VALUES
 (1, 'UW-8-6'),
