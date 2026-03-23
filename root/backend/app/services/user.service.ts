@@ -38,6 +38,10 @@ class UserService implements IUserService {
   public async getStudents(query: string = "", pageSize: number, page: number): Promise<Result<UserWithCountData>> {
     const students: UserData[] = await userRepository.getStudents(query, pageSize, page);
 
+    for (const student of students) {
+      const userStatus = ENUM_USER_STATUS_ID[student.userStatusId]
+      student.userStatus = userStatus.charAt(0) + userStatus.slice(1).toLowerCase();
+    }
 
     const studentCount: Result<number> = await this.getUserCount(query, ENUM_USER_ROLE.STUDENT);
 
