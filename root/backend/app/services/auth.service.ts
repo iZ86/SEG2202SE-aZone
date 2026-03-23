@@ -96,6 +96,9 @@ class AuthService implements IAuthService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid adminId");
     }
 
+    const userStatus = ENUM_USER_STATUS_ID[adminData.userStatusId]
+    adminData.userStatus = userStatus.charAt(0) + userStatus.slice(1).toLowerCase();
+
     return Result.succeed(adminData, "Get me success");
   }
 
