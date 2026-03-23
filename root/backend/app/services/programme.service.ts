@@ -269,6 +269,10 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Programme intake not found");
     }
 
+    const programmeIntakeStatus = ENUM_PROGRAMME_INTAKE_STATUS_ID[programmeIntake.programmeIntakeStatusId]
+    programmeIntake.programmeIntakeStatus = programmeIntakeStatus.charAt(0) + programmeIntakeStatus.slice(1).toLowerCase();
+
+
     return Result.succeed(programmeIntake, "Programme intake retrieve success");
   }
 
