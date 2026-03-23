@@ -2,6 +2,7 @@ import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
 import { StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
+import { ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
 
 interface IUserRepostory {
   getAdmins(query: string, pageSize: number, page: number): Promise<UserData[]>;
@@ -328,9 +329,9 @@ class UserRepository implements IUserRepostory {
         "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON est.venueId = v.venueId " +
         "INNER JOIN DAY d ON est.dayId = d.dayId " +
-        "WHERE sest.subjectStatusId = 1 " +
+        "WHERE sest.subjectStatusId = ? " +
         "AND studentId = ?;",
-        [studentId],
+        [ENUM_SUBJECT_STATUS_ID.ACTIVE, studentId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
