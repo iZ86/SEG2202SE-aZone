@@ -470,6 +470,10 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
     }
 
+
+    const studentCourseProgrammeIntakeStatus = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatusId]
+    studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatus = studentCourseProgrammeIntakeStatus.charAt(0) + studentCourseProgrammeIntakeStatus.slice(1).toLowerCase();
+
     return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
   }
 
