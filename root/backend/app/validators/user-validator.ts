@@ -60,7 +60,26 @@ export const createStudentBodyValidator: any = [
 ];
 
 export const updateStudentBodyValidator: any = [
-  ...createStudentBodyValidator
+  body('firstName')
+    .trim()
+    .notEmpty().withMessage('Missing firstName')
+    .isString().withMessage('firstName must be a string'),
+  body('lastName')
+    .trim()
+    .notEmpty().withMessage('Missing lastName')
+    .isString().withMessage('lastName must be a string'),
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Missing email')
+    .isEmail().withMessage('Invalid email format'),
+  body('phoneNumber')
+    .trim()
+    .notEmpty().withMessage('Missing phoneNumber')
+    .matches(/^01\d{8,9}$/).withMessage("phoneNumber must start with 01 and contain 10-11 digits"),
+  body('userStatusId')
+    .trim()
+    .notEmpty().withMessage('Missing userStatusId'),
+  validate,
 ];
 
 export const updateAdminBodyValidator: any = [
