@@ -433,7 +433,7 @@ class ProgrammeRepository implements IProgrammeRepository {
     return new Promise((resolve, reject) => {
       databaseConn.query<ResultSetHeader>(
         "INSERT INTO STUDENT_COURSE_PROGRAMME_INTAKE (studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId) " +
-        "VALUES (?, ?, ?, ?, ?);",
+        "VALUES (?, ?, ?, ?);",
         [studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId],
         (err, res) => {
           if (err) reject(err);
