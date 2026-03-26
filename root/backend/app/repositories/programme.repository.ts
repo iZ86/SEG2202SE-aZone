@@ -33,6 +33,7 @@ interface IProgrammeRepository {
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
   getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<ProgrammeIntakeData[]>;
   isExistProgrammeIntakesByProgrammeId(programmeId: number): Promise<IsExist | undefined>;
+  getStudentCourseProgrammeIntakeByIdAndStatusId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
 }
 
 class ProgrammeRepository implements IProgrammeRepository {
@@ -513,6 +514,28 @@ class ProgrammeRepository implements IProgrammeRepository {
       );
     });
   }
+
+  public getStudentCourseProgrammeIntakeByIdAndStatusId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<StudentCourseProgrammeIntakeData | undefined> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<StudentCourseProgrammeIntakeData[]>(
+        "SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.studentCourseProgrammeIntakeStatusId " +
+        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
+        "INNER JOIN COURSE c ON scpi.courseId = c.courseId " +
+        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
+        "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
+        "INNER JOIN INTAKE i ON i.intakeId = pi.intakeId " +
+        "WHERE scpi.studentId = ? " +
+        "AND scpi.studentCourseProgrammeIntakeStatusId = ?;",
+        [
+          studentId, studentCourseProgrammeIntakeStatusId
+        ],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res[0]);
+        }
+      );
+    });
+  };
 }
 
 export default new ProgrammeRepository();
