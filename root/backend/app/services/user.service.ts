@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
-import { UserData, StudentInformation, StudentSemesterStartAndEndDateData, StudentClassData, UserWithCountData, StudentTimeTable, NoProgrammeIntakeStudentTimeTable } from "../models/user-model";
+import { UserData, StudentInformation, StudentClassData, UserWithCountData, StudentTimeTable, NoProgrammeIntakeStudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 import { StudentCourseProgrammeIntakeData } from "../models/programme-model";
 import programmeService from "./programme.service";
@@ -313,24 +313,6 @@ class UserService implements IUserService {
       studentCourseProgrammeIntakeStatus: studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatus,
       timetable: studentTimetable
     } as StudentTimeTable, "Student timetable retrieve success");
-  }
-
-  private async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
-
-    // Check params exist.
-    const studentResult: Result<UserData> = await this.getStudentById(studentId);
-    if (!studentResult.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
-    }
-
-
-    const studentSemesterStartAndEndData: StudentSemesterStartAndEndData | undefined = await userRepository.getStudentSemesterStartAndEndDateById(studentId);
-
-    if (!studentSemesterStartAndEndData) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student semester start and end date not found");
-    }
-
-    return Result.succeed(studentSemesterStartAndEndData, "Student semester start and end date retrieve success");
   }
 }
 
