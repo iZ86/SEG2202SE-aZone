@@ -202,7 +202,10 @@ export default class UserController {
     if (response.isSuccess()) {
       return res.sendSuccess.ok(response.getData(), response.getMessage());
     } else {
-      throw new Error("user.controller.ts, getStudentTimetableById failed");
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+      }
     }
   }
 }
