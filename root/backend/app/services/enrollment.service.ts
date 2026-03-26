@@ -1308,7 +1308,6 @@ class EnrollmentService implements IEnrollmentService {
     return Result.succeed(enrolledSubjects.getData(), "Student enrolled successfully.");
   }
 
-  // Make this return StudentEnrollmentSubjectData
   public async getEnrolledSubjectsByStudentId(studentId: number): Promise<Result<StudentEnrollmentScheduleWithSubjectData>> {
 
     // Check param exists.
