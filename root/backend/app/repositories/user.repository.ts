@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import databaseConn from "../database/db-connection";
-import { StudentInformation, StudentSemesterStartAndEndData, UserData, StudentClassData } from "../models/user-model";
+import { StudentInformation, UserData, StudentClassData } from "../models/user-model";
 import { TotalCount } from "../models/general-model";
 import { ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
 
@@ -21,7 +21,6 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatusId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
-  getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
   getStudentTimetableByIdAndProgrammeIntakeId(studentId: number, programmeIntakeId: number): Promise<StudentClassData[]>;
 }
 
@@ -338,23 +337,6 @@ class UserRepository implements IUserRepostory {
         (err, res) => {
           if (err) reject(err);
           resolve(res);
-        }
-      );
-    });
-  }
-
-  public getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined> {
-    return new Promise((resolve, reject) => {
-      databaseConn.query<StudentSemesterStartAndEndData[]>(
-        "SELECT pi.semesterStartDate, pi.semesterEndDate " +
-        "FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi " +
-        "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
-        "WHERE scpi.studentId = ? " +
-        "AND scpi.studentCourseProgrammeIntakeStatusId = 1;",
-        [studentId],
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res[0]);
         }
       );
     });
