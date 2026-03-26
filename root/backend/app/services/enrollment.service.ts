@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_CLASS_TYPE, ENUM_DAY, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
+import { ENUM_CLASS_TYPE, ENUM_DAY_ID, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
 import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData, EnrollmentSubjectWithCountData} from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
@@ -364,7 +364,7 @@ class EnrollmentService implements IEnrollmentService {
       for (const createEnrollmentSubjectType of createEnrollmentSubjectTypes) {
         // Check if their foreign keys are valid.
 
-        if (!(createEnrollmentSubjectType.dayId in ENUM_DAY)) {
+        if (!(createEnrollmentSubjectType.dayId in ENUM_DAY_ID)) {
           return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid dayId at at index: ${index}`)
         }
 
@@ -713,7 +713,7 @@ class EnrollmentService implements IEnrollmentService {
       for (const updateEnrollmentSubjectType of updateEnrollmentSubjectTypes) {
         // Check if their foreign keys are valid.
 
-        if (!(updateEnrollmentSubjectType.dayId in ENUM_DAY)) {
+        if (!(updateEnrollmentSubjectType.dayId in ENUM_DAY_ID)) {
           return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, `Invalid dayId at at index: ${index}`)
         }
 

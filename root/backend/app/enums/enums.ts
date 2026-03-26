@@ -21,7 +21,7 @@ export enum ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID {
   DROPPED = 4,
 }
 
-export enum ENUM_DAY {
+export enum ENUM_DAY_ID {
   MONDAY = 1,
   TUESDAY = 2,
   WEDNESDAY = 3,
