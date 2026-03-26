@@ -1,6 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDY_MODE } from "../enums/enums";
+import { ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDY_MODE_ID } from "../enums/enums";
 import { ProgrammeData, ProgrammeIntakeData, ProgrammeHistoryData, StudentCourseProgrammeIntakeData, ProgrammeDistribution, ProgrammeWithCountData, ProgrammeIntakeWithCountData } from "../models/programme-model";
 import programmeRepository from "../repositories/programme.repository";
 import courseService from "./course.service";
@@ -291,7 +291,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, intakeResult.getMessage());
     }
 
-    if (!(studyModeId in ENUM_STUDY_MODE)) {
+    if (!(studyModeId in ENUM_STUDY_MODE_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
     }
 
@@ -338,7 +338,7 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, intakeResult.getMessage());
     }
 
-    if (!(studyModeId in ENUM_STUDY_MODE)) {
+    if (!(studyModeId in ENUM_STUDY_MODE_ID)) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studyModeId not found");
     }
 

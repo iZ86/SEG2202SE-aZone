@@ -43,7 +43,7 @@ export enum ENUM_PROGRAMME_INTAKE_STATUS_ID {
   ACTIVE = 1,
 }
 
-export enum ENUM_STUDY_MODE {
+export enum ENUM_STUDY_MODE_ID {
   FULL_TIME = 1,
   PART_TIME = 2
 }
