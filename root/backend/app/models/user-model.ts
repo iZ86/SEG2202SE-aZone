@@ -31,11 +31,6 @@ export interface StudentInformation extends RowDataPacket {
   studentCourseProgrammeIntakeStatus: string;
 }
 
-export interface StudentSemesterStartAndEndData extends RowDataPacket {
-  semesterStartDate: Date;
-  semesterEndDate: Date;
-}
-
 export interface StudentClassData extends RowDataPacket {
   enrollmentSubjectId: number;
   startTime: string;
