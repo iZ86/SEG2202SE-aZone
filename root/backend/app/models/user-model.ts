@@ -58,6 +58,22 @@ export interface StudentClassData extends RowDataPacket {
   day: string;
 }
 
-export interface StudentTimeTable extends StudentSemesterStartAndEndData {
+export interface StudentTimeTable {
+  programmeId: number;
+  programmeName: string;
+  courseId: number;
+  courseName: string;
+  programmeIntakeId: number;
+  intakeId: number;
+  semester: number;
+  semesterStartDate: Date;
+  semesterEndDate: Date;
+  studentCourseProgrammeIntakeStatusId: number;
+  studentCourseProgrammeIntakeStatus: string;
   timetable: StudentClassData[];
+}
+
+/** If there is no programme intake, the data in StudentTimeTable wont exist. Therefore, the timetable will also be an empty array */
+export interface NoProgrammeIntakeStudentTimeTable {
+  timetable: StudentClassData[]
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ENUM_ERROR_CODE, ENUM_USER_ROLE } from "../enums/enums";
 import { Result } from "../../libs/Result";
-import { UserData, StudentInformation, UserWithCountData, StudentTimeTable } from "../models/user-model";
+import { UserData, StudentInformation, UserWithCountData, StudentTimeTable, NoProgrammeIntakeStudentTimeTable } from "../models/user-model";
 import userService from "../services/user.service";
 
 export default class UserController {
@@ -180,7 +180,7 @@ export default class UserController {
   async getStudentTimetable(req: Request, res: Response) {
     const userId: number = req.user.userId;
 
-    const response: Result<StudentTimeTable> = await userService.getStudentTimetableById(userId);
+    const response: Result<StudentTimeTable | NoProgrammeIntakeStudentTimeTable> = await userService.getStudentTimetableById(userId);
 
 
     if (response.isSuccess()) {
@@ -193,7 +193,7 @@ export default class UserController {
   async getStudentTimetableByStudentId(req: Request, res: Response) {
     const studentId: number = Number(req.params.studentId);
 
-    const response: Result<StudentTimeTable> = await userService.getStudentTimetableById(studentId);
+    const response: Result<StudentTimeTable | NoProgrammeIntakeStudentTimeTable> = await userService.getStudentTimetableById(studentId);
 
 
     if (response.isSuccess()) {

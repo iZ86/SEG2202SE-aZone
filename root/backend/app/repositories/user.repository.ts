@@ -21,8 +21,8 @@ interface IUserRepostory {
   updateUserById(userId: number, firstName: string, lastName: string, phoneNumber: string, email: string, userStatusId: number): Promise<ResultSetHeader>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<ResultSetHeader>;
   getStudentInformationById(studentId: number): Promise<StudentInformation | undefined>;
-  getStudentTimetableById(studentId: number): Promise<StudentClassData[]>;
   getStudentSemesterStartAndEndDateById(studentId: number): Promise<StudentSemesterStartAndEndData | undefined>;
+  getStudentTimetableByIdAndProgrammeIntakeId(studentId: number, programmeIntakeId: number): Promise<StudentClassData[]>;
 }
 
 class UserRepository implements IUserRepostory {
@@ -314,24 +314,27 @@ class UserRepository implements IUserRepostory {
     });
   }
 
-  public getStudentTimetableById(studentId: number): Promise<StudentClassData[]> {
+  public getStudentTimetableByIdAndProgrammeIntakeId(studentId: number, programmeIntakeId: number): Promise<StudentClassData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentClassData[]>(
         "SELECT est.enrollmentSubjectTypeId, es.enrollmentSubjectId, est.startTime, est.endTime, s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
-        "lt.lecturerTitleId, lt.lecturerTitle, " +
-        "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, est.grouping, d.dayId, d.day " +
-        "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
-        "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
-        "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
-        "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
-        "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
-        "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
-        "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
-        "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-        "INNER JOIN DAY d ON est.dayId = d.dayId " +
-        "WHERE sest.subjectStatusId = ? " +
-        "AND studentId = ?;",
-        [ENUM_SUBJECT_STATUS_ID.ACTIVE, studentId],
+          "lt.lecturerTitleId, lt.lecturerTitle, " +
+          "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, est.grouping, d.dayId, d.day " +
+          "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
+          "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
+          "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
+          "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
+          "INNER JOIN PROGRAMME_INTAKE pi ON es.enrollmentId = pi.enrollmentId " +
+          "INNER JOIN SUBJECT s ON es.subjectId = s.subjectId " +
+          "INNER JOIN LECTURER l ON es.lecturerId = l.lecturerId " +
+          "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
+          "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
+          "INNER JOIN VENUE v ON est.venueId = v.venueId " +
+          "INNER JOIN DAY d ON est.dayId = d.dayId " +
+          "WHERE sest.subjectStatusId = ? " +
+          "AND studentId = ? " +
+          "AND pi.programmeIntakeId = ?;",
+        [ENUM_SUBJECT_STATUS_ID.ACTIVE, studentId, programmeIntakeId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);

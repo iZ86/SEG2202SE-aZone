@@ -2,8 +2,10 @@ import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
-import { UserData, StudentInformation, StudentSemesterStartAndEndData, StudentClassData, UserWithCountData, StudentTimeTable } from "../models/user-model";
+import { UserData, StudentInformation, StudentSemesterStartAndEndDateData, StudentClassData, UserWithCountData, StudentTimeTable, NoProgrammeIntakeStudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
+import { StudentCourseProgrammeIntakeData } from "../models/programme-model";
+import programmeService from "./programme.service";
 
 interface IUserService {
   getAdmins(query: string, pageSize: number, page: number): Promise<Result<UserWithCountData>>;
@@ -18,7 +20,7 @@ interface IUserService {
   updateAdminById(adminId: number, firstName: string, lastName: string, email: string, phoneNumber: string): Promise<Result<UserData>>;
   updateUserProfilePictureById(userId: number, profilePictureUrl: string): Promise<Result<UserData>>;
   getStudentInformationById(studentId: number): Promise<Result<StudentInformation>>;
-  getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>>;
+  getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable | NoProgrammeIntakeStudentTimeTable>>;
 }
 
 class UserService implements IUserService {
@@ -274,7 +276,7 @@ class UserService implements IUserService {
     return Result.succeed(studentInformation, "Student information retrieve success");
   }
 
-  public async getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable>> {
+  public async getStudentTimetableById(studentId: number): Promise<Result<StudentTimeTable | NoProgrammeIntakeStudentTimeTable>> {
 
     // Check params exist.
     const studentResult: Result<UserData> = await this.getStudentById(studentId);
@@ -283,15 +285,34 @@ class UserService implements IUserService {
     }
 
 
-    const studentTimetable: StudentClassData[] = await userRepository.getStudentTimetableById(studentId);
-
-    const studentSemesterStartAndEndDate: Result<StudentSemesterStartAndEndData> = await this.getStudentSemesterStartAndEndDateById(studentId);
-
-    if (!studentSemesterStartAndEndDate.isSuccess()) {
-      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentSemesterStartAndEndDate.getMessage());
+    const studentCourseProgrammeIntakeResult: Result<StudentCourseProgrammeIntakeData> = await programmeService.getStudentCourseProgrammeIntakeByStudentIdAndStatusId(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
+    if (!studentCourseProgrammeIntakeResult.isSuccess()) {
+      const errorMsg = studentCourseProgrammeIntakeResult.getMessage();
+      if (errorMsg === "Student course programme intake not found") {
+        return Result.succeed({ timetable: [] }, "Student timetable retrieve success");
+      }
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentCourseProgrammeIntakeResult.getMessage());
     }
 
-    return Result.succeed({ timetable: studentTimetable, ...studentSemesterStartAndEndDate.getData() }, "Student timetable retrieve success");
+    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData = studentCourseProgrammeIntakeResult.getData()
+
+    const studentTimetable: StudentClassData[] = await userRepository.getStudentTimetableByIdAndProgrammeIntakeId(studentId, studentCourseProgrammeIntake.programmeIntakeId);
+
+
+    return Result.succeed({
+      programmeId: studentCourseProgrammeIntake.programmeId,
+      programmeName: studentCourseProgrammeIntake.programmeName,
+      courseId: studentCourseProgrammeIntake.courseId,
+      courseName: studentCourseProgrammeIntake.courseName,
+      programmeIntakeId: studentCourseProgrammeIntake.programmeIntakeId,
+      intakeId: studentCourseProgrammeIntake.intakeId,
+      semester: studentCourseProgrammeIntake.semester,
+      semesterStartDate: studentCourseProgrammeIntake.semesterStartDate,
+      semesterEndDate: studentCourseProgrammeIntake.semesterEndDate,
+      studentCourseProgrammeIntakeStatusId: studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatusId,
+      studentCourseProgrammeIntakeStatus: studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatus,
+      timetable: studentTimetable
+    } as StudentTimeTable, "Student timetable retrieve success");
   }
 
   private async getStudentSemesterStartAndEndDateById(studentId: number): Promise<Result<StudentSemesterStartAndEndData>> {
