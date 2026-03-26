@@ -34,6 +34,7 @@ interface IProgrammeService {
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
   getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>>;
+  getStudentCourseProgrammeIntakeByStudentIdAndStatusId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
 }
 
 class ProgrammeService implements IProgrammeService {
@@ -610,6 +611,33 @@ class ProgrammeService implements IProgrammeService {
 
     return Result.succeed(programmeIntakes, "Programme intakes retrieve success");
   }
+
+  public async getStudentCourseProgrammeIntakeByStudentIdAndStatusId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+
+    // Check if params exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
+    if (!(studentCourseProgrammeIntakeStatusId in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID)) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "studentCourseProgrammeIntakeStatusId not found");
+    }
+
+
+    const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData | undefined = await programmeRepository.getStudentCourseProgrammeIntakeByIdAndStatusId(studentId, studentCourseProgrammeIntakeStatusId);
+
+    if (!studentCourseProgrammeIntake) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student course programme intake not found");
+    }
+
+
+    const studentCourseProgrammeIntakeStatus = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatusId]
+    studentCourseProgrammeIntake.studentCourseProgrammeIntakeStatus = studentCourseProgrammeIntakeStatus.charAt(0) + studentCourseProgrammeIntakeStatus.slice(1).toLowerCase();
+
+    return Result.succeed(studentCourseProgrammeIntake, "Students course programme intakes retrieve success");
+  }
+
 }
 
 export default new ProgrammeService();
