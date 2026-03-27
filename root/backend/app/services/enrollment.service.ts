@@ -995,6 +995,11 @@ class EnrollmentService implements IEnrollmentService {
 
     const studentEnrollmentSubjects: StudentEnrollmentSubjectData[] = await enrollmentRepository.getEnrollmentSubjectsByStudentId(studentId);
 
+    for (const studentEnrollmentSubject of studentEnrollmentSubjects) {
+      const day = ENUM_DAY_ID[studentEnrollmentSubject.dayId]
+      studentEnrollmentSubject.day = day.charAt(0) + day.slice(1).toLowerCase();
+    }
+
     return Result.succeed({ ...studentEnrollmentScheduleResult.getData(), enrollmentSubjectTypes: studentEnrollmentSubjects }, "Student enrollment subject retrieve success");
   }
 
