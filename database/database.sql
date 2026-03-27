@@ -104,11 +104,6 @@ CREATE TABLE VENUE (
     venue VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE DAY(
-    dayId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    day VARCHAR(9) NOT NULL
-);
-
 CREATE TABLE LECTURER_TITLE (
     lecturerTitleId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     lecturerTitle VARCHAR(50) NOT NULL UNIQUE
@@ -154,8 +149,6 @@ CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
     FOREIGN KEY (classTypeId) REFERENCES CLASS_TYPE(classTypeId)
         ON DELETE CASCADE,
     FOREIGN KEY (venueId) REFERENCES VENUE(venueId)
-        ON DELETE CASCADE,
-    FOREIGN KEY (dayId) REFERENCES DAY(dayId)
         ON DELETE CASCADE,
     FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId)
         ON DELETE CASCADE,
@@ -285,15 +278,6 @@ INSERT INTO `VENUE` (`venueId`, `venue`) VALUES
 (12, 'NE-2-16'),
 (13, 'NW-2-12'),
 (14, 'NE-5-7');
-
-INSERT INTO `DAY` (`dayId`, `day`) VALUES
-(1, 'Monday'),
-(2, 'Tuesday'),
-(3, 'Wednesday'),
-(4, 'Thursday'),
-(5, 'Friday'),
-(6, 'Saturday'),
-(7, 'Sunday');
 
 INSERT INTO `LECTURER_TITLE` (`lecturerTitleId`, `lecturerTitle`) VALUES
 (1, "None"),
