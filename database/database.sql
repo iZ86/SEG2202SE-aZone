@@ -60,11 +60,6 @@ CREATE TABLE COURSE (
         ON DELETE CASCADE
 );
 
-CREATE TABLE STUDY_MODE (
-    studyModeId INT AUTO_INCREMENT PRIMARY KEY,
-    studyMode VARCHAR(255) NOT NULL UNIQUE
-);
-
 CREATE TABLE PROGRAMME_INTAKE (
     programmeIntakeId INT AUTO_INCREMENT PRIMARY KEY,
     programmeId INT NOT NULL,
@@ -79,7 +74,6 @@ CREATE TABLE PROGRAMME_INTAKE (
         ON DELETE CASCADE,
     FOREIGN KEY (intakeId) REFERENCES INTAKE(intakeId)
         ON DELETE CASCADE,
-    FOREIGN KEY (studyModeId) REFERENCES STUDY_MODE(studyModeId),
     FOREIGN KEY (enrollmentId) REFERENCES ENROLLMENT(enrollmentId),
     UNIQUE (programmeId, intakeId, semester)
 );
@@ -217,10 +211,6 @@ INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`, `courseCode`) VAL
 (7, 3, 'Foundation in Science and Technology', 'FIST'),
 (8, 2, 'Diploma in Finance', 'DIF'),
 (9, 2, 'Diploma in Business Administration', 'DIBA');
-
-INSERT INTO `STUDY_MODE` (`studyMode`) VALUES
-("Full Time"),
-("Part Time");
 
 INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`, `programmeIntakeStatusId`) VALUES
 (1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1, 1),
