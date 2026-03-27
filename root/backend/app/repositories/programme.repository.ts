@@ -198,11 +198,10 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeIntakeById(programmeIntakeId: number): Promise<ProgrammeIntakeData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
-        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, sm.studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
+        "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.studyModeId, '' AS studyMode, pi.semester, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE pi.programmeIntakeId = ?;",
         [programmeIntakeId],
         (err, res) => {
