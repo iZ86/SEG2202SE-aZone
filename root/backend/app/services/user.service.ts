@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_DAY_ID, ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
+import { ENUM_DAY_ID, ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_STUDY_MODE_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
 import { UserData, StudentInformation, StudentClassData, UserWithCountData, StudentTimeTable, NoProgrammeIntakeStudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 import { StudentCourseProgrammeIntakeData } from "../models/programme-model";
@@ -269,6 +269,12 @@ class UserService implements IUserService {
     if (!studentInformation) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Student information not found");
     }
+
+    const studyMode = ENUM_STUDY_MODE_ID[studentInformation.studyModeId];
+    studentInformation.studyMode = studyMode
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
 
     const studentCourseProgrammeIntakeStatus = ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID[studentInformation.studentCourseProgrammeIntakeStatusId]
     studentInformation.studentCourseProgrammeIntakeStatus = studentCourseProgrammeIntakeStatus.charAt(0) + studentCourseProgrammeIntakeStatus.slice(1).toLowerCase();
