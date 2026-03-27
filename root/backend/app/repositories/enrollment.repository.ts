@@ -560,12 +560,11 @@ class EnrollmentRepository implements IEnrollmentRepository {
   public getEnrollmentSubjectTypesByEnrollmentIdAndNotEnrollmentSubjectId(enrollmentId: number, enrollmentSubjectId: number): Promise<EnrollmentSubjectTypeData[]> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectTypeData[]>(
-        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, d.day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
+        "SELECT est.enrollmentSubjectTypeId, est.enrollmentSubjectId, est.classTypeId, ct.classType, est.venueId, v.venue, est.dayId, '' AS day, est.startTime, est.endTime, est.numberOfSeats, est.grouping, est.lecturerId " +
         "FROM ENROLLMENT_SUBJECT_TYPE est " +
         "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
         "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-        "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "WHERE es.enrollmentId = ? " +
         "AND est.enrollmentSubjectId != ?;",
         [enrollmentId, enrollmentSubjectId],
