@@ -297,12 +297,11 @@ class UserRepository implements IUserRepostory {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentInformation[]>(
         "SELECT c.courseId, c.courseName, pi.programmeIntakeId, pi.intakeId as 'intake', pi.semester, " +
-        "pi.semesterStartDate, pi.semesterEndDate, sm.studyModeId, sm.studyMode, scpi.studentCourseProgrammeIntakeStatusId " +
+        "pi.semesterStartDate, pi.semesterEndDate, pi.studyModeId, '' AS studyMode, scpi.studentCourseProgrammeIntakeStatusId " +
         "FROM STUDENT s " +
         "INNER JOIN STUDENT_COURSE_PROGRAMME_INTAKE scpi ON s.studentId = scpi.studentId " +
         "INNER JOIN COURSE c on scpi.courseId = c.courseId " +
         "INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE s.studentId = ?;",
         [studentId],
         (err, res) => {
