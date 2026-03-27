@@ -136,11 +136,10 @@ class ProgrammeRepository implements IProgrammeRepository {
     return new Promise((resolve, reject) => {
       databaseConn.query<ProgrammeIntakeData[]>(
         "SELECT pi.programmeIntakeId, pi.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.studyModeId, " +
-        "sm.studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
+        "'' AS studyMode, pi.semesterStartDate, pi.semesterEndDate, pi.enrollmentId, pi.programmeIntakeStatusId " +
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE p.programmeName LIKE ? " +
         "OR i.intakeId LIKE ? " +
         "LIMIT ? OFFSET ?;",
