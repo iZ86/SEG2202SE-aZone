@@ -326,7 +326,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
     return new Promise((resolve, reject) => {
       databaseConn.query<StudentEnrollmentSubjectData[]>(
         "SELECT s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, " +
-        "lt.lecturerTitle, est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.grouping, d.dayId, d.day, est.startTime, " +
+        "lt.lecturerTitle, est.enrollmentSubjectTypeId, est.classTypeId, ct.classType, est.grouping, est.dayId, '' AS day, est.startTime, " +
         "est.endTime, COUNT(sest.enrollmentSubjectTypeId) as numberOfStudentsEnrolled, est.numberOfSeats " +
         "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
         "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
@@ -336,7 +336,6 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
         "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
         "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-        "INNER JOIN DAY d ON est.dayId = d.dayId " +
         "WHERE es.enrollmentId = ? " +
         "AND sest.studentId = ? " +
         "GROUP BY est.enrollmentSubjectTypeId " +
