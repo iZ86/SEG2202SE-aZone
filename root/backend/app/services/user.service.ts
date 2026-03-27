@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
-import { ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
+import { ENUM_DAY_ID, ENUM_ERROR_CODE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID, ENUM_USER_ROLE, ENUM_USER_STATUS_ID } from "../enums/enums";
 import { UserData, StudentInformation, StudentClassData, UserWithCountData, StudentTimeTable, NoProgrammeIntakeStudentTimeTable } from "../models/user-model";
 import userRepository from "../repositories/user.repository";
 import { StudentCourseProgrammeIntakeData } from "../models/programme-model";
@@ -297,6 +297,11 @@ class UserService implements IUserService {
     const studentCourseProgrammeIntake: StudentCourseProgrammeIntakeData = studentCourseProgrammeIntakeResult.getData()
 
     const studentTimetable: StudentClassData[] = await userRepository.getStudentTimetableByIdAndProgrammeIntakeId(studentId, studentCourseProgrammeIntake.programmeIntakeId);
+
+    for (const studentClass of studentTimetable) {
+      const day = ENUM_DAY_ID[studentClass.dayId]
+      studentClass.day = day.charAt(0) + day.slice(1).toLowerCase();
+    }
 
 
     return Result.succeed({
