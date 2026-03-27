@@ -1,7 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { Result } from "../../libs/Result";
 import { ENUM_CLASS_TYPE, ENUM_DAY_ID, ENUM_ERROR_CODE, ENUM_PROGRAMME_INTAKE_STATUS_ID, ENUM_SUBJECT_STATUS_ID } from "../enums/enums";
-import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData, EnrollmentSubjectWithCountData} from "../models/enrollment-model";
+import { EnrollmentData, EnrollmentSubjectData, StudentEnrollmentSubjectData, StudentEnrollmentSchedule, EnrollmentSubjectTypeData, MonthlyEnrollmentData, EnrollmentSubjectWithTypesData, CreateEnrollmentSubjectTypeData, EnrollmentWithProgrammeIntakesData, UpdateEnrollmentSubjectTypeData, StudentEnrollmentScheduleWithSubjectData, EnrollmentWithCountData, EnrollmentSubjectWithCountData } from "../models/enrollment-model";
 import { ProgrammeIntakeData, SemesterSchedule } from "../models/programme-model";
 import enrollmentRepository from "../repositories/enrollment.repository";
 import { isTimeClashing } from "../utils/utils";
@@ -41,7 +41,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrollmentCount: Result<number> = await this.getEnrollmentCount(query);
 
-    return Result.succeed({enrollments: enrollments, enrollmentCount: enrollmentCount.getData()}, "Enrollments retrieve success");
+    return Result.succeed({ enrollments: enrollments, enrollmentCount: enrollmentCount.getData() }, "Enrollments retrieve success");
   }
 
   public async getEnrollmentById(enrollmentId: number): Promise<Result<EnrollmentData>> {
@@ -272,7 +272,7 @@ class EnrollmentService implements IEnrollmentService {
 
     const enrollmentSubjectCount: Result<number> = await this.getEnrollmentSubjectCount(query);
 
-    return Result.succeed({enrollmentSubjects, enrollmentSubjectCount: enrollmentSubjectCount.getData()}, "Enrollment subjects retrieve success");
+    return Result.succeed({ enrollmentSubjects, enrollmentSubjectCount: enrollmentSubjectCount.getData() }, "Enrollment subjects retrieve success");
   }
 
   public async getEnrollmentSubjectById(enrollmentSubjectId: number): Promise<Result<EnrollmentSubjectData>> {
