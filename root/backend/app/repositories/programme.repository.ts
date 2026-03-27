@@ -343,7 +343,6 @@ class ProgrammeRepository implements IProgrammeRepository {
         "FROM PROGRAMME_INTAKE pi " +
         "INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId " +
         "INNER JOIN INTAKE i ON pi.intakeId = i.intakeId " +
-        "INNER JOIN STUDY_MODE sm ON pi.studyModeId = sm.studyModeId " +
         "WHERE p.programmeName LIKE ? " +
         "OR i.intakeId LIKE ?; ",
         [
