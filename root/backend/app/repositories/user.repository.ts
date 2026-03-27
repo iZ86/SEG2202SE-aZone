@@ -318,7 +318,7 @@ class UserRepository implements IUserRepostory {
       databaseConn.query<StudentClassData[]>(
         "SELECT est.enrollmentSubjectTypeId, es.enrollmentSubjectId, est.startTime, est.endTime, s.subjectId, s.subjectCode, s.subjectName, s.creditHours, l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, " +
           "lt.lecturerTitleId, lt.lecturerTitle, " +
-          "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, est.grouping, d.dayId, d.day " +
+          "l.email, ct.classTypeId, ct.classType, v.venueId, v.venue, est.grouping, est.dayId, '' AS day " +
           "FROM STUDENT_ENROLLMENT_SUBJECT_TYPE sest " +
           "INNER JOIN ENROLLMENT_SUBJECT_TYPE est ON sest.enrollmentSubjectTypeId = est.enrollmentSubjectTypeId " +
           "INNER JOIN ENROLLMENT_SUBJECT es ON est.enrollmentSubjectId = es.enrollmentSubjectId " +
@@ -329,7 +329,6 @@ class UserRepository implements IUserRepostory {
           "INNER JOIN LECTURER_TITLE lt ON l.lecturerTitleId = lt.lecturerTitleId " +
           "INNER JOIN CLASS_TYPE ct ON est.classTypeId = ct.classTypeId " +
           "INNER JOIN VENUE v ON est.venueId = v.venueId " +
-          "INNER JOIN DAY d ON est.dayId = d.dayId " +
           "WHERE sest.subjectStatusId = ? " +
           "AND studentId = ? " +
           "AND pi.programmeIntakeId = ?;",
