@@ -360,8 +360,9 @@ class ProgrammeRepository implements IProgrammeRepository {
   public getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ProgrammeHistoryData[]> {
     return new Promise((resolve, reject) => {
       let sql: string = `
-          SELECT scpi.studentId, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.studentCourseProgrammeIntakeStatusId
+          SELECT scpi.studentId, ru.firstName as studentFirstName, ru.lastName as studentLastName, scpi.courseId, c.courseName, scpi.programmeIntakeId, p.programmeId, p.programmeName, pi.intakeId, pi.semester, pi.semesterStartDate, pi.semesterEndDate, scpi.studentCourseProgrammeIntakeStatusId
           FROM STUDENT_COURSE_PROGRAMME_INTAKE scpi
+          INNER JOIN REGISTERED_USER ru ON scpi.studentId = ru.userId
           INNER JOIN COURSE c ON scpi.courseId = c.courseId
           INNER JOIN PROGRAMME_INTAKE pi ON scpi.programmeIntakeId = pi.programmeIntakeId
           INNER JOIN PROGRAMME p ON pi.programmeId = p.programmeId
@@ -371,9 +372,11 @@ class ProgrammeRepository implements IProgrammeRepository {
       const params: any[] = [studentId];
 
       if (studentCourseProgrammeIntakeStatusId != ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL) {
-        sql += "AND scpi.studentCourseProgrammeIntakeStatusId = ?;";
+        sql += "AND scpi.studentCourseProgrammeIntakeStatusId = ? ";
         params.push(studentCourseProgrammeIntakeStatusId);
+        
       }
+      sql += "ORDER BY scpi.studentCourseProgrammeIntakeStatusId ASC, pi.semesterEndDate ASC;";
 
       databaseConn.query<ProgrammeHistoryData[]>(sql, params,
         (err, res) => {
