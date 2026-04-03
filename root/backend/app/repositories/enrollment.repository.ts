@@ -186,8 +186,8 @@ class EnrollmentRepository implements IEnrollmentRepository {
         "%" + query + "%",
         "%" + query + "%",
         "%" + query + "%",
-        pageSize,
-        offset
+          pageSize,
+          offset
         ],
         (err, res) => {
           if (err) reject(err);
