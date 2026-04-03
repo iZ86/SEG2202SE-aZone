@@ -586,13 +586,13 @@ class ProgrammeService implements IProgrammeService {
       throw new Error("createStudentCourseProgrammeIntake failed to insert");
     }
 
-    const studentCrouseProgrammeIntake: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
 
-    if (!studentCrouseProgrammeIntake.isSuccess()) {
+    if (!studentCourseProgrammeIntake.isSuccess()) {
       throw new Error("createStudentCourseProgrammeIntake student course programme intake created not found");
     }
 
-    return Result.succeed(studentCrouseProgrammeIntake.getData(), "Student course programme intake create success");
+    return Result.succeed(studentCourseProgrammeIntake.getData(), "Student course programme intake create success");
   }
 
   // Delete enrolled/history of programme intake.
