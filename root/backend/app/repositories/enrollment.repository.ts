@@ -221,7 +221,9 @@ class EnrollmentRepository implements IEnrollmentRepository {
   public getEnrollmentSubjectByEnrollmentIdAndSubjectId(enrollmentId: number, subjectId: number): Promise<EnrollmentSubjectData | undefined> {
     return new Promise((resolve, reject) => {
       databaseConn.query<EnrollmentSubjectData[]>(
-        "SELECT * " +
+        "SELECT es.enrollmentSubjectId, es.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime, " +
+        "s.subjectId, s.subjectCode, s.subjectName, s.description, s.creditHours, l.lecturerId, l.firstName as lecturerFirstName, " +
+        "l.lastName as lecturerLastName, l.email, l.phoneNumber, lt.lecturerTitleId, lt.lecturerTitle " +
         "FROM ENROLLMENT_SUBJECT es " +
         "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
         "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
