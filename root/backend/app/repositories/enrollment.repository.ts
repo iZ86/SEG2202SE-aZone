@@ -171,7 +171,7 @@ class EnrollmentRepository implements IEnrollmentRepository {
       databaseConn.query<EnrollmentSubjectData[]>(
         "SELECT es.enrollmentSubjectId, e.enrollmentId, e.enrollmentStartDateTime, e.enrollmentEndDateTime, " +
         "s.subjectId, s.subjectCode, s.subjectName, s.description, s.creditHours, " +
-        "l.lecturerId, l.firstName, l.lastName, lt.lecturerTitleId, lt.lecturerTitle, l.email, l.phoneNumber " +
+        "l.lecturerId, l.firstName as lecturerFirstName, l.lastName as lecturerLastName, lt.lecturerTitleId, lt.lecturerTitle, l.email, l.phoneNumber " +
         "FROM ENROLLMENT_SUBJECT es " +
         "INNER JOIN ENROLLMENT e ON es.enrollmentId = e.enrollmentId " +
         "INNER JOIN SUBJECT s ON es.subjectid = s.subjectId " +
