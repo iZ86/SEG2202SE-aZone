@@ -23,8 +23,8 @@ export interface EnrollmentSubjectData extends RowDataPacket {
   description: string;
   creditHours: number;
   lecturerId: number;
-  firstName: string;
-  lastName: string;
+  lecturerFirstName: string;
+  lecturerLastName: string;
   lecturerTitleId: number;
   lecturerTitle: string;
   email: string;
