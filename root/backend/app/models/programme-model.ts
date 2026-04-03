@@ -51,8 +51,8 @@ export interface ProgrammeHistoryData extends RowDataPacket {
 
 export interface StudentCourseProgrammeIntakeData extends RowDataPacket {
   studentId: number;
-  firstName: string;
-  lastName: string;
+  studentFirstName: string;
+  studentLastName: string;
   email: string;
   phoneNumber: string;
   courseId: number;
