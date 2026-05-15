@@ -186,7 +186,8 @@ INSERT INTO `CLASS_TYPE` (`classTypeId`, `classType`) VALUES
 (4, 'Workshop');
 
 INSERT INTO `ENROLLMENT` (`enrollmentId`, `enrollmentStartDateTime`, `enrollmentEndDateTime`) VALUES
-(1, '2025-10-01 08:30:00', '2026-10-03 23:59:59');
+(1, '2025-10-01 08:30:00', '2026-10-03 23:59:59'),
+(2, '2025-10-01 08:30:00', '2026-10-03 23:59:59');
 
 
 INSERT INTO `INTAKE` (`intakeId`) VALUES
@@ -215,8 +216,8 @@ INSERT INTO `COURSE` (`courseId`, `programmeId`, `courseName`, `courseCode`) VAL
 INSERT INTO `PROGRAMME_INTAKE` (`programmeIntakeId`, `programmeId`, `intakeId`, `studyModeId`, `semester`, `semesterStartDate`, `semesterEndDate`, `enrollmentId`, `programmeIntakeStatusId`) VALUES
 (1, 1, 202509, 1, 4, '2025-09-22', '2026-01-16', 1, 1),
 (2, 2, 202508, 1, 1, '2025-08-16', '2026-12-12', 1, 1),
-(3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1, 1);
-
+(3, 1, 202504, 1, 5, '2025-04-09', '2026-08-06', 1, 1),
+(4, 1, 202508, 1, 5, '2025-04-09', '2026-08-06', 2, 1);
 
 INSERT INTO `REGISTERED_USER` (`userId`, `firstName`, `lastName`, `email`, `phoneNumber`, `password`, `userStatusId`) VALUES
 (10000001, 'admin', 'admin', 'admin@imail.sunway.edu.my', '-', '$argon2id$v=19$m=65536,t=3,p=1$Is6WCr0RuL4kQlaFSWee7w$ejJPE9Vs0BRYoA4eh5oYGuONU+gq8cnNLcXSeQzwVE0', 1),
@@ -233,6 +234,7 @@ INSERT INTO `STUDENT` (`studentId`) VALUES
 
 INSERT INTO `STUDENT_COURSE_PROGRAMME_INTAKE` (`studentId`, `courseId`, `programmeIntakeId`, `studentCourseProgrammeIntakeStatusId`) VALUES
 (23049679, 3, 3, 1),
+(23049679, 4, 3, 2),
 (23055155, 4, 1, 1),
 (23056138, 2, 1, 1);
 
@@ -288,7 +290,7 @@ INSERT INTO `ENROLLMENT_SUBJECT` (`enrollmentSubjectId`, `enrollmentId`, `subjec
 (18, 1, 2, 4),
 (20, 1, 7, 6),
 (21, 1, 4, 7),
-(22, 1, 3, 3);
+(22, 2, 3, 3);
 
 INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectTypeId`, `enrollmentSubjectId`, `classTypeId`, `venueId`, `startTime`, `endTime`, `dayId`, `numberOfSeats`, `grouping`, `lecturerId`) VALUES
 (44, 18, 1, 9, '10:00:00', '12:00:00', 2, 100, 1, 3),
@@ -303,11 +305,12 @@ INSERT INTO `ENROLLMENT_SUBJECT_TYPE` (`enrollmentSubjectTypeId`, `enrollmentSub
 (76, 17, 1, 3, '12:00:00', '14:00:00', 1, 30, 1, 3),
 (77, 17, 2, 8, '08:00:00', '10:00:00', 1, 100, 1, 4),
 (78, 17, 4, 5, '15:00:00', '16:00:00', 2, 25, 2, 3),
-(79, 17, 2, 3, '14:00:00', '16:00:00', 2, 20, 3, 4);
+(79, 22, 2, 3, '14:00:00', '16:00:00', 2, 20, 3, 4);
 
 INSERT INTO `STUDENT_ENROLLMENT_SUBJECT_TYPE` (`studentId`, `enrollmentSubjectTypeId`, `subjectStatusId`) VALUES
 (23049679, 44, 1),
 (23049679, 49, 1),
+(23049679, 79, 1),
 (23055155, 44, 1),
 (23055155, 51, 1),
 (23056138, 44, 1);
