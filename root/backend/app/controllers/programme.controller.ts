@@ -271,6 +271,27 @@ export default class ProgrammeController {
     }
   }
 
+   async updateStudentCourseProgrammeIntake(req: Request, res: Response) {
+    const studentId: number = Number(req.params.studentId);
+    const courseId: number = Number(req.params.courseId);
+    const programmeIntakeId: number = Number(req.params.programmeIntakeId);
+    const studentCourseProgrammeIntakeStatusId: number = req.body.studentCourseProgrammeIntakeStatusId;
+
+
+    const response: Result<StudentCourseProgrammeIntakeData> = await programmeService.updateStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId);
+
+    if (response.isSuccess()) {
+      return res.sendSuccess.ok(response.getData(), response.getMessage());
+    } else {
+      switch (response.getErrorCode()) {
+        case ENUM_ERROR_CODE.ENTITY_NOT_FOUND:
+          return res.sendError.notFound(response.getMessage());
+        case ENUM_ERROR_CODE.CONFLICT:
+          return res.sendError.conflict(response.getMessage());
+      }
+    }
+  }
+
   async deleteStudentCourseProgrammeIntake(req: Request, res: Response) {
     const studentId: number = Number(req.params.studentId);
     const courseId: number = Number(req.params.courseId);
