@@ -11,7 +11,7 @@ export const checkAuthTokenHeader = (req: Request, res: Response, next: NextFunc
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    res.setHeader('WWW-Authentiate', 'Bearer realm="okujobseeker"');
+    res.setHeader('WWW-Authentiate', 'Bearer realm="azone"');
     return res.sendError.unauthorized("Invalid credentials");
   }
   return next();
@@ -35,7 +35,7 @@ export const verifyAuthTokenHeader = (req: Request, res: Response, next: NextFun
   } catch (err) {
 
     if (err instanceof JsonWebTokenError) {
-      res.setHeader('WWW-Authentiate', 'Bearer realm="okujobseeker", error="invalid_token", error_description="Invalid access token"');
+      res.setHeader('WWW-Authentiate', 'Bearer realm="azone", error="invalid_token", error_description="Invalid access token"');
       return res.sendError.unauthorized("Invalid credentials");
 
     } else {
