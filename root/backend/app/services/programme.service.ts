@@ -31,6 +31,7 @@ interface IProgrammeService {
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<ProgrammeHistoryData[]>>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  updateStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
   getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>>;
@@ -599,6 +600,74 @@ class ProgrammeService implements IProgrammeService {
     }
 
     return Result.succeed(studentCourseProgrammeIntake.getData(), "Student course programme intake create success");
+  }
+
+  public async updateStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+
+    // Check if parameters exist.
+    const studentResult: Result<UserData> = await userService.getStudentById(studentId);
+    if (!studentResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
+    }
+
+    const courseResult: Result<CourseProgrammeData> = await courseService.getCourseById(courseId);
+    if (!courseResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
+    }
+
+    const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
+    if (!programmeIntakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResult.getMessage());
+    }
+
+    // All status is only used for filtering when getting it, should not be in db.
+    if (!(studentCourseProgrammeIntakeStatusId in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID) || ((studentCourseProgrammeIntakeStatusId in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID) && (studentCourseProgrammeIntakeStatusId === ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL))) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentCourseProgrammeIntakeStatusId");
+    }
+
+    // Check if student course programme intake exists.
+    const studentCourseProgrammeIntakeResult: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
+    if (!studentCourseProgrammeIntakeResult.isSuccess()) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentCourseProgrammeIntakeResult.getMessage());
+    }
+
+
+    // If there exists a programme that status is active, give conflict.
+    if (studentCourseProgrammeIntakeStatusId === ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE) {
+      const studentCourseProgrammeIntakeActiveStatusResult: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeByStudentIdAndStatusId(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
+
+
+
+      if (studentCourseProgrammeIntakeActiveStatusResult.isSuccess()) {
+
+        const studentCourseProgrammeIntakeActive: StudentCourseProgrammeIntakeData = studentCourseProgrammeIntakeActiveStatusResult.getData();
+
+        if ((studentId !== studentCourseProgrammeIntakeActive.studentId) ||
+          (courseId !== studentCourseProgrammeIntakeActive.courseId) ||
+          (programmeIntakeId !== studentCourseProgrammeIntakeActive.programmeIntakeId)) {
+          return Result.fail(ENUM_ERROR_CODE.CONFLICT, "There is already an active student course programme intake");
+        }
+
+      } else {
+        if (studentCourseProgrammeIntakeActiveStatusResult.getMessage() !== "Student course programme intake not found") {
+          return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentCourseProgrammeIntakeActiveStatusResult.getMessage());
+        }
+      }
+    }
+
+    const updateStudentCourseProgrammeIntakeResult: ResultSetHeader = await programmeRepository.updateStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId);
+    if (updateStudentCourseProgrammeIntakeResult.affectedRows === 0) {
+      throw new Error("updateStudentCourseProgrammeIntake failed to update")
+    }
+
+
+    const studentCourseProgrammeIntake: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
+
+    if (!studentCourseProgrammeIntake.isSuccess()) {
+      throw new Error("updateStudentCourseProgrammeIntake student course programme intake updated not found");
+    }
+
+    return Result.succeed(studentCourseProgrammeIntake.getData(), "Student course programme intake update success");
   }
 
   // Delete enrolled/history of programme intake.
