@@ -254,9 +254,10 @@ export default class ProgrammeController {
     const studentId: number = req.body.studentId;
     const courseId: number = req.body.courseId;
     const programmeIntakeId: number = req.body.programmeIntakeId;
+    const studentCourseProgrammeIntakeStatusId: number = req.body.studentCourseProgrammeIntakeStatusId
 
 
-    const response: Result<StudentCourseProgrammeIntakeData> = await programmeService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId);
+    const response: Result<StudentCourseProgrammeIntakeData> = await programmeService.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId);
 
     if (response.isSuccess()) {
       return res.sendSuccess.create(response.getData(), response.getMessage());

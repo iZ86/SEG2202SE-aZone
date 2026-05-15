@@ -30,7 +30,7 @@ interface IProgrammeService {
   updateProgrammeIntakeEnrollmentIdByIds(programmeIntakeIds: number[], enrollmentId: number): Promise<Result<ProgrammeIntakeData[]>>;
   deleteProgrammeIntakeEnrollmentIdByEnrollmentId(enrollmentId: number): Promise<Result<null>>;
   getProgrammeHistoryByStudentId(studentId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<ProgrammeHistoryData[]>>;
-  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
+  createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<null>>;
   getProgrammeDistribution(): Promise<Result<ProgrammeDistribution[]>>;
   getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<Result<ProgrammeIntakeData[]>>;
@@ -550,7 +550,7 @@ class ProgrammeService implements IProgrammeService {
   }
 
   // Enroll the student into a course, and specify a programme intake.
-  public async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
+  public async createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Result<StudentCourseProgrammeIntakeData>> {
 
     // Check if parameters exist.
     const studentResult: Result<UserData> = await userService.getStudentById(studentId);
@@ -558,17 +558,21 @@ class ProgrammeService implements IProgrammeService {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, studentResult.getMessage());
     }
 
-
     const courseResult: Result<CourseProgrammeData> = await courseService.getCourseById(courseId);
     if (!courseResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, courseResult.getMessage());
     }
 
-
     const programmeIntakeResult: Result<ProgrammeIntakeData> = await this.getProgrammeIntakeById(programmeIntakeId);
     if (!programmeIntakeResult.isSuccess()) {
       return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, programmeIntakeResult.getMessage());
     }
+
+    // All status is only used for filtering when getting it, should not be in db.
+    if (!(studentCourseProgrammeIntakeStatusId in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID) || ((studentCourseProgrammeIntakeStatusId in ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID) && (studentCourseProgrammeIntakeStatusId === ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL))) {
+      return Result.fail(ENUM_ERROR_CODE.ENTITY_NOT_FOUND, "Invalid studentCourseProgrammeIntakeStatusId");
+    }
+
 
     // Check if student course programme intake exists.
     const studentCourseProgrammeIntakeResult: Result<StudentCourseProgrammeIntakeData> = await this.getStudentCourseProgrammeIntakeById(studentId, courseId, programmeIntakeId);
@@ -577,11 +581,13 @@ class ProgrammeService implements IProgrammeService {
     }
 
 
-    // Update old student course programme intake.
-    await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.COMPLETED);
+    // If adding new programme that is active, the old active automatically turn to completed.
+    if (studentCourseProgrammeIntakeStatusId === ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE) {
+      await programmeRepository.updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.COMPLETED);
+    }
 
     // Create new student course programme intake.
-    const createStudentCourseProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ACTIVE);
+    const createStudentCourseProgrammeIntakeResult: ResultSetHeader = await programmeRepository.createStudentCourseProgrammeIntake(studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId);
     if (createStudentCourseProgrammeIntakeResult.affectedRows === 0) {
       throw new Error("createStudentCourseProgrammeIntake failed to insert");
     }
