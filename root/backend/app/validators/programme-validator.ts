@@ -113,3 +113,12 @@ export const createStudentCourseProgrammeIntakeBodyValidator: any = [
     .toInt(),
   validate,
 ];
+
+export const updateStudentCourseProgrammeIntakeBodyValidator: any = [
+  body('studentCourseProgrammeIntakeStatusId')
+    .trim()
+    .notEmpty().withMessage('Missing studentCourseProgrammeIntakeStatusId')
+    .isInt().withMessage('studentCourseProgrammeIntakeStatusId must be an integer')
+    .toInt(),
+  validate,
+];
