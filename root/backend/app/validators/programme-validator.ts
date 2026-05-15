@@ -106,5 +106,10 @@ export const createStudentCourseProgrammeIntakeBodyValidator: any = [
     .notEmpty().withMessage('Missing courseId')
     .isInt().withMessage('courseId must be an integer')
     .toInt(),
+  body('studentCourseProgrammeIntakeStatusId')
+    .trim()
+    .notEmpty().withMessage('Missing studentCourseProgrammeIntakeStatusId')
+    .isInt().withMessage('studentCourseProgrammeIntakeStatusId must be an integer')
+    .toInt(),
   validate,
 ];
