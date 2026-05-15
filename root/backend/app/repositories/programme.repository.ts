@@ -374,9 +374,9 @@ class ProgrammeRepository implements IProgrammeRepository {
       if (studentCourseProgrammeIntakeStatusId != ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID.ALL) {
         sql += "AND scpi.studentCourseProgrammeIntakeStatusId = ? ";
         params.push(studentCourseProgrammeIntakeStatusId);
-        
+
       }
-      sql += "ORDER BY scpi.studentCourseProgrammeIntakeStatusId ASC, pi.semesterEndDate ASC;";
+      sql += "ORDER BY pi.semesterEndDate ASC;";
 
       databaseConn.query<ProgrammeHistoryData[]>(sql, params,
         (err, res) => {
