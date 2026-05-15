@@ -166,7 +166,7 @@ CREATE TABLE STUDENT_COURSE_PROGRAMME_INTAKE (
     studentId INT NOT NULL,
     courseId INT NOT NULL,
     programmeIntakeId INT NOT NULL,
-    studentCourseProgrammeIntakeStatusId INT DEFAULT 1 NOT NULL,
+    studentCourseProgrammeIntakeStatusId INT NOT NULL,
     FOREIGN KEY (studentId) REFERENCES STUDENT(studentId)
         ON DELETE CASCADE,
     FOREIGN KEY (courseId) REFERENCES COURSE(courseId)
