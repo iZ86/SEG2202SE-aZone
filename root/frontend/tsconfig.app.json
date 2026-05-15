@@ -23,13 +23,12 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": "src",
     "paths": {
-      "@routes/*": ["app/routes/*"],
-      "@images/*" : ["assets/images/*"],
-      "@components/*": ["components/*"],
-      "@features/*": ["features/*"],
-      "@datatypes/*": ["datatypes/*"],
+      "@routes/*": ["./src/app/routes/*"],
+      "@images/*" : ["./src/assets/images/*"],
+      "@components/*": ["./src/components/*"],
+      "@features/*": ["./src/features/*"],
+      "@datatypes/*": ["./src/datatypes/*"],
     }
   },
   "include": ["src"]
