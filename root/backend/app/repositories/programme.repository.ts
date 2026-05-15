@@ -29,6 +29,7 @@ interface IProgrammeRepository {
   getStudentCourseProgrammeIntakeById(studentId: number, courseId: number, programmeIntakeId: number): Promise<StudentCourseProgrammeIntakeData | undefined>;
   updateStudentCourseProgrammeIntakeStatusByStudentIdAndStatus(studentId: number, oldStudentCourseProgrammeIntakeStatusId: number, newStudentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
   createStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
+  updateStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader>;
   deleteStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number): Promise<ResultSetHeader>;
   getProgrammeDistribution(): Promise<ProgrammeDistribution[]>;
   getProgrammeIntakesByProgrammeIntakeStatusId(programmeIntakeStatusId: number): Promise<ProgrammeIntakeData[]>;
@@ -433,6 +434,22 @@ class ProgrammeRepository implements IProgrammeRepository {
         "INSERT INTO STUDENT_COURSE_PROGRAMME_INTAKE (studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId) " +
         "VALUES (?, ?, ?, ?);",
         [studentId, courseId, programmeIntakeId, studentCourseProgrammeIntakeStatusId],
+        (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        }
+      );
+    });
+  };
+
+  public updateStudentCourseProgrammeIntake(studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<ResultSetHeader> {
+    return new Promise((resolve, reject) => {
+      databaseConn.query<ResultSetHeader>(
+        "UPDATE STUDENT_COURSE_PROGRAMME_INTAKE SET studentCourseProgrammeIntakeStatusId = ? " +
+        "WHERE studentId = ? " +
+        "AND courseId = ? " + 
+        "AND programmeIntakeId = ?;",
+        [studentCourseProgrammeIntakeStatusId, studentId, courseId, programmeIntakeId],
         (err, res) => {
           if (err) reject(err);
           resolve(res);
