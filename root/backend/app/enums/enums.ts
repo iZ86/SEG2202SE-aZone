@@ -14,11 +14,11 @@ export enum ENUM_USER_ROLE {
 }
 
 export enum ENUM_STUDENT_COURSE_PROGRAMME_INTAKE_STATUS_ID {
-  ALL = 0, // Means all status
+  ALL = 0, // Means all status, only used during filter, must not be in db
   ACTIVE = 1,
   COMPLETED = 2,
-  FINISHED = 3,
-  DROPPED = 4,
+  DROPPED = 3,
+  UPCOMING = 4
 }
 
 export enum ENUM_DAY_ID {
