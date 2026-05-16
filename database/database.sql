@@ -136,7 +136,7 @@ CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
     endTime TIME NOT NULL,
     dayId INT NOT NULL,
     numberOfSeats INT NOT NULL,
-    grouping INT NOT NULL,
+    `grouping` INT NOT NULL,
     lecturerId INT NOT NULL,
     FOREIGN KEY (enrollmentSubjectId) REFERENCES ENROLLMENT_SUBJECT(enrollmentSubjectId)
         ON DELETE CASCADE,
@@ -146,7 +146,7 @@ CREATE TABLE ENROLLMENT_SUBJECT_TYPE (
         ON DELETE CASCADE,
     FOREIGN KEY (lecturerId) REFERENCES LECTURER(lecturerId)
         ON DELETE CASCADE,
-    UNIQUE (enrollmentSubjectId, classTypeId, grouping),
+    UNIQUE (enrollmentSubjectId, classTypeId, `grouping`),
     UNIQUE (enrollmentSubjectId, venueId, startTime, endTime, dayId),
     UNIQUE (enrollmentSubjectId, startTime, endTime, dayId, lecturerId)
 );
