@@ -7,7 +7,7 @@ import MediumButton from "@components/MediumButton";
 import Timetable from "@features/timetable/components/Timetable";
 import { useStudent } from "@features/student/hooks/useStudent";
 import { fetchEnrollmentSubjectsAPI } from "@features/enrollment/api/enrollment-subjects";
-import type { StudentEnrolledSubject, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData } from "@datatypes/enrollmentType";
+import type { StudentEnrollmentSubject, StudentEnrollmentSchedule, StudentEnrollmentSubjectOrganizedData } from "@datatypes/enrollmentType";
 import { enrollSubjectsAPI, fetchEnrolledSubjectsAPI } from "@features/enrollment/api/enrolled-subjects";
 import { StudentError404Panel, StudentError500Panel } from "@components/student/StudentErrorComponent";
 import { toast } from "react-toastify";
@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 // TODO: Why do in such a roundabout way when can just map everything and store the keys?
 interface SelectedEnrollmentSubjectIdxs { [studentEnrollmentSubjectIndex: number]: { [classTypeIndex: number]: { [enrollmentSubjectTypeIndex: number]: boolean } } };
 interface SelectedEnrollmentSubjectIndexModal { [studentEnrollmentSubjectIndex: number]: { [classTypeIndex: number]: { [enrollmentSubjectTypeIndex: number]: boolean } } };
-interface StudentEnrolledSubjectMap { [enrollmentSubjectTypeId: number]: StudentEnrolledSubject };
+interface StudentEnrolledSubjectMap { [enrollmentSubjectTypeId: number]: StudentEnrollmentSubject };
 // The value is subjectId of the respective enrollmentSubjectTypeId
 interface StudentEnrollmentSubjectsMap {
   [enrollmentSubjectTypeId: number]: {
@@ -272,10 +272,10 @@ export default function StudentEnrollment() {
   const { authToken } = useStudent();
   const [viewEnrollmentSubjectIndex, setViewEnrollmentSubjectIndex] = useState(1);
   const [studentEnrollmentSchedule, setStudentEnrollmentSchedule] = useState<StudentEnrollmentSchedule | undefined>(undefined);
-  const [studentEnrollmentSubjects, setStudentEnrollmentSubjects] = useState<StudentEnrollmentSubjectOrganizedData[]>([]);
+  const [studentEnrollmentSubjects, setStudentEnrollmentSubjects] = useState<StudentEnrollmentSubject[]>([]);
   const [selectedEnrollmentSubjectsIndex, setSelectedEnrollmentSubjectsIndex] = useState<SelectedEnrollmentSubjectIdxs>({});
   const [selectedEnrollmentSubjectIndexModal, setSelectedEnrollmentSubjectIndexModal] = useState<SelectedEnrollmentSubjectIndexModal>({});
-  const [enrolledSubjects, setEnrolledSubjects] = useState<StudentEnrolledSubject[]>([]);
+  const [enrolledSubjects, setEnrolledSubjects] = useState<StudentEnrollmentSubject[]>([]);
   const [enrolledSubjectsMap, setEnrolledSubjectsMap] = useState<StudentEnrolledSubjectMap>({});
   const [error500, setError500] = useState(false);
   const [error404, setError404] = useState(false);
@@ -313,7 +313,7 @@ export default function StudentEnrollment() {
     const responseData = await response.json();
 
 
-    setEnrolledSubjects(responseData.data.studentEnrolledSubjects);
+    setEnrolledSubjects(responseData.data.enrollmentSubjectTypes);
   }
 
   async function fetchEnrollmentSubjects() {
@@ -332,11 +332,16 @@ export default function StudentEnrollment() {
     const responseData = await response.json();
 
 
-    setStudentEnrollmentSchedule(responseData.data.studentEnrollmentSchedule);
-    setStudentEnrollmentSubjects(responseData.data.studentEnrollmentSubjects);
+    setStudentEnrollmentSchedule({
+      programmeIntakeId: responseData.data.programmeIntakeId,
+      enrollmentId: responseData.data.enrollmentId,
+      enrollmentStartDateTime: responseData.data.enrollmentStartDateTime,
+      enrollmentEndDateTime: responseData.data.enrollmentEndDateTime
+    });
+    setStudentEnrollmentSubjects(responseData.data.enrollmentSubjectTypes);
   }
 
-  function initializeStudentEnrollSubjects(studentEnrolledSubjects: StudentEnrolledSubject[], studentEnrollmentSubjects: StudentEnrollmentSubjectOrganizedData[]) {
+  function initializeStudentEnrollSubjects(studentEnrolledSubjects: StudentEnrollmentSubject[], studentEnrollmentSubjects: StudentEnrollmentSubject[]) {
 
 
 
@@ -348,25 +353,25 @@ export default function StudentEnrollment() {
     const selectedEnrollmentSubjectIndex: SelectedEnrollmentSubjectIdxs = {};
 
     studentEnrollmentSubjects.map((subject, subjectIdx) => {
-      subject.classTypes.map((classType, classTypeIdx) => {
-        classType.classTypeDetails.map((classTypeDetail, classTypeDetailIdx) => {
-          if (enrolledSubjectsMap[classTypeDetail.enrollmentSubjectTypeId]) {
-            if (classTypeDetail.enrollmentSubjectTypeId === enrolledSubjectsMap[classTypeDetail.enrollmentSubjectTypeId].enrollmentSubjectTypeId) {
+      // subject.classTypes.map((classType, classTypeIdx) => {
+      //   classType.classTypeDetails.map((classTypeDetail, classTypeDetailIdx) => {
+      //     if (enrolledSubjectsMap[classTypeDetail.enrollmentSubjectTypeId]) {
+      //       if (classTypeDetail.enrollmentSubjectTypeId === enrolledSubjectsMap[classTypeDetail.enrollmentSubjectTypeId].enrollmentSubjectTypeId) {
 
-              if (!selectedEnrollmentSubjectIndex[subjectIdx]) {
-                selectedEnrollmentSubjectIndex[subjectIdx] = {};
-              }
-              if (!selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx]) {
-                selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx] = {};
-              }
-              if (!selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx][classTypeDetailIdx]) {
-                selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx][classTypeDetailIdx] = true;
-              }
-            }
-          }
+      //         if (!selectedEnrollmentSubjectIndex[subjectIdx]) {
+      //           selectedEnrollmentSubjectIndex[subjectIdx] = {};
+      //         }
+      //         if (!selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx]) {
+      //           selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx] = {};
+      //         }
+      //         if (!selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx][classTypeDetailIdx]) {
+      //           selectedEnrollmentSubjectIndex[subjectIdx][classTypeIdx][classTypeDetailIdx] = true;
+      //         }
+      //       }
+      //     }
 
-        })
-      })
+      //   })
+      // })
     })
 
     setEnrolledSubjectsMap(enrolledSubjectsMap);
@@ -591,7 +596,7 @@ export default function StudentEnrollment() {
                   </div>
                 </div>
 
-                <ChooseSubjectButton onClick={() => { chooseSubjectType(index, subj.classTypes) }} />
+                {/* <ChooseSubjectButton onClick={() => { chooseSubjectType(index, subj.classTypes) }} /> */}
               </div>
             ))}
             <ModalOverlay isDismissable
@@ -615,7 +620,7 @@ export default function StudentEnrollment() {
                       <div className="flex flex-col px-12 py-8 gap-y-8 overflow-auto max-h-256 text-gray-charcoal text-left font-semibold">
                         <h1 className="text-black">Select Groups for {studentEnrollmentSubjects[viewEnrollmentSubjectIndex].subjectCode} - {studentEnrollmentSubjects[viewEnrollmentSubjectIndex].subjectName}</h1>
 
-                        {
+                        {/* {
                           studentEnrollmentSubjects[viewEnrollmentSubjectIndex].classTypes.map((classType, classTypeIndex) => {
                             return (
                               <div className="flex flex-col gap-y-6">
@@ -629,7 +634,7 @@ export default function StudentEnrollment() {
                               </div>
                             )
                           })
-                        }
+                        } */}
                       </div>
                     )
                     }
@@ -685,9 +690,9 @@ export default function StudentEnrollment() {
                         <Button slot="close" className="font-nunito-sans px-6 py-3 bg-red-tomato text-white font-bold text-xl flex gap-x-2 justify-center items-center rounded-md hover:bg-red-500 cursor-pointer">
                           Cancel
                         </Button>
-                        <Button slot="close" className="font-nunito-sans px-6 py-3 bg-blue-air-superiority text-white font-bold text-xl flex gap-x-2 justify-center items-center rounded-md hover:bg-blue-yinmn cursor-pointer" onClick={() => { enrollSubjects(studentEnrollmentSchedule, selectedEnrollmentSubjectsIndex, studentEnrollmentSubjects) }}>
+                        {/* <Button slot="close" className="font-nunito-sans px-6 py-3 bg-blue-air-superiority text-white font-bold text-xl flex gap-x-2 justify-center items-center rounded-md hover:bg-blue-yinmn cursor-pointer" onClick={() => { enrollSubjects(studentEnrollmentSchedule, selectedEnrollmentSubjectsIndex, studentEnrollmentSubjects) }}>
                           Confirm
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                   </Dialog>
@@ -726,7 +731,7 @@ export default function StudentEnrollment() {
                     <div className="flex flex-col gap-y-16">
                       <div className="flex flex-col gap-y-8">
                         <h1>Preview Timetable</h1>
-                        <Timetable token={authToken} studentEnrollmentSubjects={studentEnrollmentSubjects} selectedEnrollmentSubjectIndex={selectedEnrollmentSubjectsIndex} />
+                        {/* <Timetable token={authToken} studentEnrollmentSubjects={studentEnrollmentSubjects} selectedEnrollmentSubjectIndex={selectedEnrollmentSubjectsIndex} /> */}
                       </div>
                       <div className="flex flex-col gap-y-8">
                         <h1>Selected Subjects</h1>
@@ -767,12 +772,12 @@ export default function StudentEnrollment() {
                                             const enrollmentSubjectTypeIndex: number = +key;
                                             return (
                                               <p>
-                                                {studentEnrollmentSubjects[subjectIdx].classTypes[classTypeIndex].classType
+                                                {/* {studentEnrollmentSubjects[subjectIdx].classTypes[classTypeIndex].classType
                                                   + " Group " + studentEnrollmentSubjects[subjectIdx].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].grouping
                                                   + ", " + studentEnrollmentSubjects[subjectIdx].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].day
                                                   + " " + convert24UTCTimeTo12LocalTime(studentEnrollmentSubjects[subjectIdx].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].startTime)
                                                   + " - " + convert24UTCTimeTo12LocalTime(studentEnrollmentSubjects[subjectIdx].classTypes[classTypeIndex].classTypeDetails[enrollmentSubjectTypeIndex].endTime)
-                                                }
+                                                } */}
                                               </p>
                                             );
                                           })}

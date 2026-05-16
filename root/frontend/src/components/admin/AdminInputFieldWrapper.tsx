@@ -6,17 +6,21 @@ export default function AdminInputFieldWrapper({
 }: {
   isEmpty: boolean;
   isInvalid?: boolean;
-  invalidMessage?: string;
+  invalidMessage?: string | string[];
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="w-full max-w-full">
       {children}
       {isEmpty && (
         <p className="text-red-tomato pl-2">This field is required.</p>
       )}
       {isInvalid && invalidMessage && (
-        <p className="text-red-tomato pl-2">{invalidMessage}</p>
+        Array.isArray(invalidMessage)
+          ? invalidMessage.map((msg, index) => (
+              <p className="text-red-tomato pl-2">{msg}</p>
+            ))
+          : <p className="text-red-tomato pl-2">{invalidMessage}</p>
       )}
     </div>
   );

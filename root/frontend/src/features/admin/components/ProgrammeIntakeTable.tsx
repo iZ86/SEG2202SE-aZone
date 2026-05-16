@@ -11,15 +11,16 @@ import type { ProgrammeIntake } from "@datatypes/programmeType";
 import { useAdmin } from "../hooks/useAdmin";
 import LoadingOverlay from "@components/LoadingOverlay";
 import { toast } from "react-toastify";
+import { INITIAL_PAGE, DEFAULT_PAGE_SIZE } from "../utils/constants";
 
 export default function ProgrammeIntakeTable() {
   const [programmeIntakes, setProgrammeIntakes] = useState<ProgrammeIntake[]>(
     [],
   );
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(INITIAL_PAGE);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(15);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
 
@@ -123,6 +124,9 @@ export default function ProgrammeIntakeTable() {
                   <th className="px-6 py-4 font-medium">
                     Semester Start & End Date
                   </th>
+                   <th className="px-6 py-4 font-medium">
+                    status
+                  </th>
                   <th className="px-6 py-4 font-medium">Edit</th>
                   <th className="px-6 py-4 font-medium">Delete</th>
                 </tr>
@@ -158,6 +162,7 @@ export default function ProgrammeIntakeTable() {
                           programmeIntake.semesterEndDate,
                         ).toLocaleDateString()}
                     </td>
+                    <td className="px-6 py-5">{programmeIntake.programmeIntakeStatus}</td>
                     <td className="px-6 py-5 text-slate-500">
                       <Link
                         to={`/admin/programme-intakes/${programmeIntake.programmeIntakeId}/edit`}
@@ -188,6 +193,8 @@ export default function ProgrammeIntakeTable() {
               totalPages={totalPages}
               currentPage={currentPage}
               onPageChange={handlePageChange}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
             />
           </div>
         )}

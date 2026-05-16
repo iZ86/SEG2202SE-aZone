@@ -3,8 +3,16 @@ import {
 } from "@internationalized/date";
 
 export const getAllProgrammesAPI = async (token: string, pageSize?: number, page?: number, query?: string): Promise<Response | undefined> => {
+
+  const params = new URLSearchParams();
+  if (query) params.append('query', query);
+  if (pageSize) params.append('pageSize', pageSize.toString());
+  if (page) params.append('page', page.toString());
+  const queryString = params.toString();
+  const url = `http://localhost:8080/api/v1/programmes${queryString ? `?${queryString}` : ''}`;
+
   try {
-    return await fetch("http://localhost:8080/api/v1/programmes?" + (query ? `query=${query}&` : '') + `pageSize=${pageSize}&page=${page}`,
+    return await fetch(url,
       {
         method: 'GET',
         headers: {
@@ -89,8 +97,16 @@ export const deleteProgrammeByIdAPI = async (token: string, programmeId: number)
 };
 
 export const getAllProgrammeIntakesAPI = async (token: string, pageSize?: number, page?: number, query?: string): Promise<Response | undefined> => {
+
+  const params = new URLSearchParams();
+  if (query) params.append('query', query);
+  if (pageSize) params.append('pageSize', pageSize.toString());
+  if (page) params.append('page', page.toString());
+  const queryString = params.toString();
+  const url = `http://localhost:8080/api/v1/programmes/intake${queryString ? `?${queryString}` : ''}`;
+
   try {
-    return await fetch("http://localhost:8080/api/v1/programmes/intake?" + (query ? `query=${query}&` : '') + `pageSize=${pageSize}&page=${page}`,
+    return await fetch(url,
       {
         method: 'GET',
         headers: {
@@ -136,7 +152,7 @@ export const getProgrammeIntakesByProgrammeIdAPI = async (token: string, program
   }
 };
 
-export const createProgrammeIntakeAPI = async (token: string, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: CalendarDateTime, semesterEndDate: CalendarDateTime): Promise<Response | undefined> => {
+export const createProgrammeIntakeAPI = async (token: string, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: CalendarDateTime, semesterEndDate: CalendarDateTime, status: number): Promise<Response | undefined> => {
   try {
     return await fetch("http://localhost:8080/api/v1/programmes/intake",
       {
@@ -152,6 +168,7 @@ export const createProgrammeIntakeAPI = async (token: string, programmeId: numbe
           semester,
           semesterStartDate: semesterStartDate.toString().slice(0, 19).replace('T', ' '),
           semesterEndDate: semesterEndDate.toString().slice(0, 19).replace('T', ' '),
+          status: status
         }),
         mode: "cors"
       });
@@ -160,7 +177,7 @@ export const createProgrammeIntakeAPI = async (token: string, programmeId: numbe
   }
 };
 
-export const updateProgrammeIntakeByIdAPI = async (token: string, programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: CalendarDateTime, semesterEndDate: CalendarDateTime): Promise<Response | undefined> => {
+export const updateProgrammeIntakeByIdAPI = async (token: string, programmeIntakeId: number, programmeId: number, intakeId: number, studyModeId: number, semester: number, semesterStartDate: CalendarDateTime, semesterEndDate: CalendarDateTime, status: number): Promise<Response | undefined> => {
   try {
     return await fetch(`http://localhost:8080/api/v1/programmes/intake/${programmeIntakeId}`,
       {
@@ -176,6 +193,7 @@ export const updateProgrammeIntakeByIdAPI = async (token: string, programmeIntak
           semester,
           semesterStartDate: semesterStartDate.toString().slice(0, 19).replace('T', ' '),
           semesterEndDate: semesterEndDate.toString().slice(0, 19).replace('T', ' '),
+          status: status
         }),
         mode: "cors"
       });

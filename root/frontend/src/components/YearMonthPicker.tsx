@@ -18,9 +18,9 @@ export default function YearMonthPicker({
   onChange,
   isInvalid,
   placeholder,
-  width = "full",
-  minWidth = "48",
-  maxWidth = "74",
+  width = "w-full",
+  minWidth = "min-w-48",
+  maxWidth = "max-w-74",
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -50,7 +50,7 @@ export default function YearMonthPicker({
   return (
     <DialogTrigger isOpen={isFocused} onOpenChange={setIsFocused}>
       <div
-        className={`relative w-${width} max-w-${maxWidth} min-w-${minWidth} text-base text-gray-battleship`}
+        className={`relative ${width} ${maxWidth} ${minWidth} text-base text-gray-battleship`}
       >
         <Button
           className={`${
@@ -61,7 +61,7 @@ export default function YearMonthPicker({
               : isInvalid
               ? "text-red-tomato border-red-tomato"
               : "border-blue-air-superiority text-blue-air-superiority"
-          } px-4 h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} border-2 rounded-2xl outline-hidden`}
+          } px-4 h-12 ${width} ${maxWidth} ${minWidth} border-2 rounded-2xl outline-hidden`}
         >
           {value && <div className="flex gap-x-2 gap-y-2">{value}</div>}
         </Button>

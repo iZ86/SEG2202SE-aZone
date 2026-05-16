@@ -33,9 +33,9 @@ export default function DateTimePicker({
   onChange,
   isInvalid,
   placeholder,
-  width = "full",
-  minWidth = "48",
-  maxWidth = "74",
+  width = "w-full",
+  minWidth = "min-w-48",
+  maxWidth = "max-w-74",
   isMinuteGranularity = true,
 }: {
   value: CalendarDate | CalendarDateTime | ZonedDateTime | null;
@@ -56,7 +56,7 @@ export default function DateTimePicker({
       value={value}
       onChange={onChange}
       granularity={isMinuteGranularity ? "minute" : "day"}
-      className={`relative max-w-${maxWidth} min-w-${minWidth} w-${width}`}
+      className={`relative ${maxWidth} ${minWidth} ${width}`}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
     >

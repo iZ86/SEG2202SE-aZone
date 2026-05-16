@@ -8,13 +8,14 @@ import { deleteProgrammeByIdAPI, getAllProgrammesAPI } from "../api/programmes";
 import { useAdmin } from "../hooks/useAdmin";
 import LoadingOverlay from "@components/LoadingOverlay";
 import { toast } from "react-toastify";
+import { INITIAL_PAGE, DEFAULT_PAGE_SIZE } from "../utils/constants";
 
 export default function ProgrammeTable() {
   const [programmes, setProgrammes] = useState<Programme[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(INITIAL_PAGE);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(15);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const navigate = useNavigate();
   const { authToken, admin, loading } = useAdmin();
 
@@ -59,23 +60,30 @@ export default function ProgrammeTable() {
     setPageSize(pageSize);
   };
 
-  const handleDelete = async (programmeId: number) => {
+  const handleDelete = async (programmeId: number, programmeName: string) => {
     if (!authToken) return;
     const confirmDelete = window.confirm(
-      `Are you sure you want to delete Programme ID ${programmeId}?`,
+      `Are you sure you want to delete Programme ${programmeName}?`,
     );
     if (!confirmDelete) return;
 
-    const response = await deleteProgrammeByIdAPI(authToken, programmeId);
-    if (response && response.ok) {
-      navigate("/admin/programmes");
-      fetchProgrammes(authToken, currentPage);
-      toast.success(`Programme ${programmeId} deleted`);
-      return;
-    } else {
-      toast.error(`Failed to delete programme ${programmeId}`);
-      return;
+    const response: Response | undefined = await deleteProgrammeByIdAPI(authToken, programmeId);
+
+    // TODO: 500?
+    if (response) {
+      if (response.ok) {
+        navigate("/admin/programmes");
+        fetchProgrammes(authToken, currentPage);
+        toast.success(`Programme ${programmeName} deleted`);
+        return;
+      } else if (response.status === 409) {
+        const data = await response.json();
+        toast.error(data.message);
+        return;
+      }
     }
+    toast.error(`Failed to delete programme ${programmeName}`);
+    return;
   };
 
   return (
@@ -135,7 +143,7 @@ export default function ProgrammeTable() {
                     </td>
                     <td className="px-6 py-5 text-slate-500">
                       <button
-                        onClick={() => handleDelete(programme.programmeId)}
+                        onClick={() => handleDelete(programme.programmeId, programme.programmeName)}
                         className="text-red-600 hover:text-red-500 hover:underline cursor-pointer"
                       >
                         <Trash2 size={16} className="inline-block ml-1" />
@@ -153,6 +161,8 @@ export default function ProgrammeTable() {
               totalPages={totalPages}
               currentPage={currentPage}
               onPageChange={handlePageChange}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
             />
           </div>
         )}

@@ -5,13 +5,16 @@ export default function Pagination({
   totalPages,
   currentPage,
   onPageChange,
+  pageSize,
+  setPageSize
 }: {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number, pageSize: number) => void;
+  pageSize: number,
+  setPageSize: (page: number) => void;
 }) {
   const [inputValue, setInputValue] = useState(currentPage.toString());
-  const [pageSize, setPageSize] = useState<number>(15);
 
   useEffect(() => {
     setInputValue(currentPage.toString());

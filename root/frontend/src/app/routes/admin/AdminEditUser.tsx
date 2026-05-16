@@ -15,12 +15,12 @@ export default function AdminEditUser() {
     idNumber = 0;
   }
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-100">
       {/* Navbar + Sidebar button */}
       <AdminNavbar page="users" />
 
       {/* Main Content */}
-      <main className="px-6 py-6 flex-1">
+      <main className="p-6">
         <UserForm type="Edit" id={idNumber} />
       </main>
     </div>
