@@ -45,7 +45,7 @@ export const createStudentAPI = async (token: string, firstName: string, lastNam
           email,
           phoneNumber,
           password,
-          userStatus: status,
+          userStatusId: status,
         }),
         mode: "cors"
       });
@@ -69,7 +69,7 @@ export const updateStudentByIdAPI = async (token: string, studentId: number, fir
           email,
           phoneNumber,
           password,
-          userStatus: status,
+          userStatusId: status,
         }),
         mode: "cors"
       });
@@ -94,9 +94,9 @@ export const getStudentProgrammeHistoryAPI = async (token: string, studentId: nu
   }
 };
 
-export const createStudentCourseProgrammeIntakeAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number): Promise<Response | undefined> => {
+export const createStudentCourseProgrammeIntakeAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/programme/enroll`,
+    return await fetch(`http://localhost:8080/api/v1/programmes/enroll`,
       {
         method: 'POST',
         headers: {
@@ -107,6 +107,26 @@ export const createStudentCourseProgrammeIntakeAPI = async (token: string, stude
           studentId,
           courseId,
           programmeIntakeId,
+          studentCourseProgrammeIntakeStatusId
+        }),
+        mode: "cors"
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const updateStudentCourseProgrammeIntakeAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number, studentCourseProgrammeIntakeStatusId: number): Promise<Response | undefined> => {
+  try {
+    return await fetch(`http://localhost:8080/api/v1/programmes/student/${studentId}/course/${courseId}/programme/intake/${programmeIntakeId}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          studentCourseProgrammeIntakeStatusId
         }),
         mode: "cors"
       });
@@ -117,7 +137,7 @@ export const createStudentCourseProgrammeIntakeAPI = async (token: string, stude
 
 export const deleteStudentCourseProgrammeIntakeAPI = async (token: string, studentId: number, courseId: number, programmeIntakeId: number): Promise<Response | undefined> => {
   try {
-    return await fetch(`http://localhost:8080/api/v1/programme/history/student/${studentId}/course/${courseId}/programme/intake/${programmeIntakeId}`,
+    return await fetch(`http://localhost:8080/api/v1/programmes/history/student/${studentId}/course/${courseId}/programme/intake/${programmeIntakeId}`,
       {
         method: 'DELETE',
         headers: {

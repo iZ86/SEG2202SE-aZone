@@ -11,9 +11,9 @@ export default function NormalTextField({
   isInvalid,
   placeholder,
   Icon = undefined,
-  width = "full",
-  minWidth = "48",
-  maxWidth = "74",
+  width = "w-full",
+  minWidth = "min-w-48",
+  maxWidth = "max-w-74",
   isDisabled = false,
 }: {
   text: string;
@@ -70,13 +70,13 @@ export default function NormalTextField({
   return (
     <div>
       <div
-        className={`relative w-${width} max-w-${maxWidth} min-w-${minWidth} text-base text-gray-battleship`}
+        className={`relative ${width} ${maxWidth} ${minWidth} text-base text-gray-battleship`}
       >
         <input
           disabled={isDisabled}
           {...attributes}
           value={text}
-          className={`min-h-12 w-${width} max-w-${maxWidth} min-w-${minWidth} rounded-xl border px-4 outline-hidden peer
+          className={`min-h-12 ${width} ${maxWidth} ${minWidth} rounded-xl border px-4 outline-hidden peer
                     ${
                       text.length === 0
                         ? isInvalid

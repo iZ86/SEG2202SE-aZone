@@ -5,7 +5,8 @@ export type User = {
   email: string;
   phoneNumber: string;
   profilePictureUrl: string;
-  userStatus: number;
+  userStatusId: number;
+  userStatus: string;
   role?: "Student" | "Admin";
 };
 
@@ -21,7 +22,8 @@ export type StudentCourseProgrammeIntake = {
   semesterStartDate: string;
   semesterEndDate: string;
   courseStatus: number;
-  status: string;
+  studentCourseProgrammeIntakeStatusId: number;
+  studentCourseProgrammeIntakeStatus: string;
 };
 
 export type StudentInformation = {

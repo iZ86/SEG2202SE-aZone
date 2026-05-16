@@ -8,13 +8,16 @@ import type { User } from "@datatypes/userType";
 import { getAllAdminsAPI } from "../api/admins";
 import { useAdmin } from "../hooks/useAdmin";
 import LoadingOverlay from "@components/LoadingOverlay";
+import { INITIAL_PAGE, DEFAULT_PAGE_SIZE } from "../utils/constants";
+
+
 
 export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(INITIAL_PAGE);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(15);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const { authToken, admin, loading } = useAdmin();
 
   const fetchUsers = useCallback(
@@ -30,17 +33,13 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
           break;
       }
 
+      // TODO: 500, it wont ever be !response.ok
       if (!response || !response.ok) {
         setUsers([]);
         return;
       }
 
       const { data } = await response.json();
-
-      if (!data.users || data.users.length === 0) {
-        setUsers([]);
-        return;
-      }
 
       setUsers(data.users);
       setTotalPages(Math.ceil(data.userCount / pageSize));
@@ -52,6 +51,11 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
     if (!authToken) return;
     fetchUsers(authToken, currentPage);
   }, [authToken, currentPage, fetchUsers]);
+
+  useEffect(() => {
+    setCurrentPage(INITIAL_PAGE);
+  }, [activeTab]);
+
 
   if (loading || !admin) {
     return <LoadingOverlay />;
@@ -67,11 +71,10 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
       <div className="items-center space-x-4 mt-4 sm:flex">
         <input
           type="text"
-          placeholder={`${
-            activeTab === "Student"
-              ? "Search with Student ID, name, or email..."
-              : "Search with Admin ID, name, or email..."
-          }`}
+          placeholder={`${activeTab === "Student"
+            ? "Search with Student ID, name, or email..."
+            : "Search with Admin ID, name, or email..."
+            }`}
           className="w-full sm:w-0 sm:grow px-4 py-2 rounded-md border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-400 text-black"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -129,20 +132,18 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
                     <td className="px-6 py-5">{user.phoneNumber}</td>
                     <td className="px-6 py-5">
                       <span
-                        className={`font-bold px-4 py-2 ${
-                          user.userStatus
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
-                        } rounded-xl`}
+                        className={`font-bold px-4 py-2 ${user.userStatusId == 1
+                          ? "bg-green-100 text-green-600"
+                          : user.userStatusId == 0 ? "bg-red-100 text-red-600": ""
+                          } rounded-xl`}
                       >
-                        {user.userStatus ? "Active" : "Inactive"}
+                        {user.userStatus}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-slate-500">
                       <Link
-                        to={`/admin/users/${user.userId}/edit${
-                          activeTab === "Student" ? "" : "?admin=true"
-                        }`}
+                        to={`/admin/users/${user.userId}/edit${activeTab === "Student" ? "" : "?admin=true"
+                          }`}
                         className="text-indigo-600 hover:text-indigo-500 hover:underline"
                       >
                         <Pencil size={16} className="inline-block ml-1" />
@@ -160,6 +161,8 @@ export default function UserTable({ activeTab }: { activeTab: User["role"] }) {
               totalPages={totalPages}
               currentPage={currentPage}
               onPageChange={handlePageChange}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
             />
           </div>
         )}

@@ -1,5 +1,5 @@
 import Select, { type MultiValue } from "react-select";
-import type { reactSelectOptionType } from "datatypes/reactSelectOptionType";
+import type { reactSelectOptionType } from "@datatypes/reactSelectOptionType";
 import { type ReactElement, useState } from "react";
 
 export function MultiFilter({
@@ -9,9 +9,9 @@ export function MultiFilter({
   value,
   isInvalid,
   onChange,
-  width = "full",
-  minWidth = "48",
-  maxWidth = "74",
+  width = "w-full",
+  minWidth = "min-w-48",
+  maxWidth = "max-w-74",
 }: {
   placeholder: string;
   icon?: ReactElement;
@@ -39,7 +39,7 @@ export function MultiFilter({
   return (
     <div>
       <div
-        className={`relative w-${width} max-w-${maxWidth} min-w-${minWidth} text-base text-gray-battleship`}
+        className={`relative ${width} ${maxWidth} ${minWidth} text-base text-gray-battleship`}
       >
         <Select
           styles={customStyles}
@@ -53,11 +53,11 @@ export function MultiFilter({
                 ? "text-red-tomato border-red-tomato"
                 : "border-blue-air-superiority text-blue-air-superiority"
             }
-            px-4 w-${width} max-w-${maxWidth} min-w-${minWidth} border rounded-xl outline-hidden ${
+            px-4 ${width} ${maxWidth} ${minWidth} border rounded-xl outline-hidden ${
               value.length > 0 ? "py-1.5" : undefined
             }`,
             menu: () =>
-              `text-blue-air-superiority bg-white border-blue-air-superiority focus:text-blue-air-superiority border border-blue-marian mt-1 w-${width} min-w-${minWidth} max-w-${maxWidth} rounded-xl p-2`,
+              `text-blue-air-superiority bg-white border-blue-air-superiority focus:text-blue-air-superiority border border-blue-marian mt-1 ${width} ${minWidth} ${maxWidth} rounded-xl p-2`,
             option: (state) =>
               `${
                 state.isFocused ? "bg-neutral-200" : "bg-white"

@@ -52,26 +52,30 @@ export interface StudentEnrollmentSchedule {
   enrollmentEndDateTime: Date;
 }
 
-export interface StudentEnrolledSubject {
+export interface StudentEnrollmentSubject {
   subjectId: number;
   subjectCode: string;
   subjectName: string;
   creditHours: number;
   lecturerId: number;
-  firstName: string;
-  lastName: string;
+  lecturerFirstName: string;
+  lecturerLastName: string;
   lecturerTitleId: number;
   lecturerTitle: string;
   enrollmentSubjectTypeId: number;
+  venueId: number;
+  venue: string;
   classTypeId: number;
   classType: string;
   grouping: number;
   dayId: number;
   day: string;
-  startTime: Time;
-  endTime: Time;
+  startTime: string;
+  endTime: string;
+  numberOfStudentsEnrolled: number;
   numberOfSeats: number;
 };
+
 
 export type CreateEnrollmentSubjectType = {
   classTypeId: number;

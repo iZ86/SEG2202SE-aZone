@@ -18,6 +18,7 @@
   --color-yellow-sunbeam: #ffe92a;
   --color-green-laser: #2aff2a;
   --color-blue-digital: #2a6bff;
+  --color-blue-alice: #dbe9ee;
 
   --font-poppins: "Poppins", sans-serif;
   --font-nunito-sans: "Nunito Sans", sans-serif;
@@ -87,7 +88,7 @@ h6 {
 }
 
 p,
-label {
+label, td, th {
   font-size: 16px;
   line-height: 24px;
 }

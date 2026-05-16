@@ -55,6 +55,10 @@ export default function ProgrammeIntakeForm({
   const [semesterEndDate, setSemesterEndDate] = useState<
     CalendarDate | CalendarDateTime | ZonedDateTime | null
   >(null);
+  const [status, setStatus] = useState<reactSelectOptionType>({
+    value: -1,
+    label: "",
+  });
 
   const [emptyProgramme, setEmptyProgramme] = useState(false);
   const [emptyIntake, setEmptyIntake] = useState(false);
@@ -62,6 +66,7 @@ export default function ProgrammeIntakeForm({
   const [emptySemester, setEmptySemester] = useState(false);
   const [emptySemesterStartDate, setEmptySemesterStartDate] = useState(false);
   const [emptySemesterEndDate, setEmptySemesterEndDate] = useState(false);
+  const [emptyStatus, setEmptyStatus] = useState(false);
 
   const [invalidProgrammeIntake, setInvalidProgrammeIntake] = useState(false);
 
@@ -75,6 +80,12 @@ export default function ProgrammeIntakeForm({
     { value: 1, label: "Full-time" },
     { value: 2, label: "Part-time" },
   ];
+
+  const statusOptions: reactSelectOptionType[] = [
+    { value: 0, label: "Inactive" },
+    { value: 1, label: "Active" },
+  ];
+
   const semesterOptions: reactSelectOptionType[] = [
     { value: 1, label: "1" },
     { value: 2, label: "2" },
@@ -139,6 +150,9 @@ export default function ProgrammeIntakeForm({
           ? toCalendarDate(parseAbsoluteToLocal(data.semesterEndDate))
           : null
       );
+      setStatus({
+        label: data.status
+      })
     };
 
     if (!authToken) {
@@ -191,7 +205,8 @@ export default function ProgrammeIntakeForm({
         studyMode.value,
         semester.value,
         semesterStartDate as CalendarDateTime,
-        semesterEndDate as CalendarDateTime
+        semesterEndDate as CalendarDateTime,
+        status.value
       );
     } else if (type === "Edit") {
       response = await updateProgrammeIntakeByIdAPI(
@@ -202,25 +217,31 @@ export default function ProgrammeIntakeForm({
         studyMode.value,
         semester.value,
         semesterStartDate as CalendarDateTime,
-        semesterEndDate as CalendarDateTime
+        semesterEndDate as CalendarDateTime,
+        status.value
       );
     }
 
-    if (response && response.status === 409) {
-      setInvalidProgrammeIntake(true);
-      setIsLoading(false);
-      toast.error("ProgrammeIntake name existed");
-      return;
+    if (response) {
+      if (response.status === 409) {
+        setInvalidProgrammeIntake(true);
+        setIsLoading(false);
+        toast.error("ProgrammeIntake name existed");
+        return;
+      } else if (response.ok) {
+        setIsLoading(false);
+        navigate("/admin/programme-intakes");
+        toast.success(
+          `${type === "Add" ? "Created new" : "Updated"} programme intake`
+        );
+        return;
+      }
     }
-
-    if (response && response.ok) {
-      setIsLoading(false);
-      navigate("/admin/programme-intakes");
-      toast.success(
-        `${type === "Add" ? "Created new" : "Updated"} programme intake`
-      );
-      return;
-    }
+    navigate("/admin/programme-intakes");
+    toast.error(
+      `Failed to ${type === "Add" ? "Create new" : "Update"} programme intake`,
+    );
+    return;
   }
 
   function setEmptyInputs(): boolean {
@@ -285,6 +306,17 @@ export default function ProgrammeIntakeForm({
     setStudyMode(onChangeStudyMode);
     setEmptyStudyMode(false);
   }
+
+  function onChangeStatus(
+    onChangeStatus: SingleValue<reactSelectOptionType>
+  ) {
+    if (!onChangeStatus) {
+      return;
+    }
+    setStatus(onChangeStatus);
+    setEmptyStatus(false);
+  }
+
 
   function onChangeSemester(
     onChangeSemester: SingleValue<reactSelectOptionType>
@@ -466,6 +498,19 @@ export default function ProgrammeIntakeForm({
                 </AdminInputFieldWrapper>
               </div>
             </div>
+
+            <div>
+              <AdminInputFieldWrapper isEmpty={emptyStatus}>
+                <SingleFilter
+                  placeholder="Select Programme Status"
+                  options={statusOptions}
+                  value={status}
+                  isInvalid={emptyStatus}
+                  onChange={onChangeStatus}
+                />
+              </AdminInputFieldWrapper>
+            </div>
+
 
             <div className="justify-center flex gap-x-10 flex-col gap-y-4 sm:flex-row sm:gap-y-0">
               <MediumButton

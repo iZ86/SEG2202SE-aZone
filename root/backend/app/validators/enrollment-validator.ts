@@ -83,6 +83,7 @@ export const createEnrollmentSubjectBodyValidator: any = [
     .notEmpty().withMessage('lecturerId cannot be empty')
     .isInt().withMessage('lecturerId must be an integer')
     .toInt(),
+  // Allow for optional?
   body('enrollmentSubjectTypes')
     .isArray().withMessage('enrollmentSubjectTypes must be an array'),
   body('enrollmentSubjectTypes.*.classTypeId')
