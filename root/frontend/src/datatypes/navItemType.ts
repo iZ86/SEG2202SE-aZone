@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 
 export type NavbarItem = {
   dashboard: { label: string, to: string },
@@ -6,3 +8,9 @@ export type NavbarItem = {
   signOut: { label: string, to: string },
 }
 
+export type NavItem = {
+  key: string;
+  label: string;
+  icon?: LucideIcon;
+  to: string
+};
