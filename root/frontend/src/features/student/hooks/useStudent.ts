@@ -4,7 +4,7 @@ import { createContext } from "react";
 
 type StudentContextType = {
   authToken: string;
-  student: User | null;
+  student: User;
   loading: boolean;
 };
 
