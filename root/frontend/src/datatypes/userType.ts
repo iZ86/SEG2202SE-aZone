@@ -1,3 +1,5 @@
+import type { ENUM_USER_ROLE } from "@enums/enums";
+
 export type User = {
   userId: number;
   firstName: string;
@@ -7,7 +9,7 @@ export type User = {
   profilePictureUrl: string;
   userStatusId: number;
   userStatus: string;
-  role?: "Student" | "Admin";
+  role: ENUM_USER_ROLE;
 };
 
 export type StudentCourseProgrammeIntake = {
