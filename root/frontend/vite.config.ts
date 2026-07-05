@@ -16,7 +16,8 @@ export default defineConfig({
       "@images": path.resolve(__dirname, "src/assets/images"),
       "@components": path.resolve(__dirname, "src/components"),
       "@features": path.resolve(__dirname, "src/features"),
-      "@datatypes": path.resolve(__dirname, "src/datatypes")
+      "@datatypes": path.resolve(__dirname, "src/datatypes"),
+      "@enums": path.resolve(__dirname, "src/enums")
     }
   }
 })

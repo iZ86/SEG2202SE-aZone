@@ -29,6 +29,7 @@
       "@components/*": ["./src/components/*"],
       "@features/*": ["./src/features/*"],
       "@datatypes/*": ["./src/datatypes/*"],
+      "@enums/*": ["./src/enums/*"],
     }
   },
   "include": ["src"]
